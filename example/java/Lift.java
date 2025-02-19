@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.example.java;
 import com.rowanmcalpin.nextftc.core.Subsystem;
 import com.rowanmcalpin.nextftc.core.command.Command;
 import com.rowanmcalpin.nextftc.core.control.coefficients.PIDCoefficients;
-import com.rowanmcalpin.nextftc.core.control.controllers.PIDController;
+import com.rowanmcalpin.nextftc.core.control.controllers.PIDFController;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.MotorEx;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.RunToPosition;
 
@@ -18,7 +18,7 @@ public class Lift extends Subsystem {
     // USER CODE
     public MotorEx motor;
 
-    public PIDController controller = new PIDController(new PIDCoefficients(0.005, 0.0, 0.0));
+    public PIDFController controller = new PIDFController(new PIDCoefficients(0.005, 0.0, 0.0));
 
     public String name = "lift_motor";
 
