@@ -2,13 +2,11 @@ package org.firstinspires.ftc.teamcode.example.java;
 
 import com.rowanmcalpin.nextftc.core.Subsystem;
 import com.rowanmcalpin.nextftc.core.command.Command;
-import com.rowanmcalpin.nextftc.core.control.coefficients.PIDCoefficients;
+import com.rowanmcalpin.nextftc.core.command.utility.InstantCommand;
 import com.rowanmcalpin.nextftc.core.control.controllers.PIDFController;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.MotorEx;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.RunToPosition;
 
-import java.util.Collections;
-import java.util.HashSet;
 
 public class Lift extends Subsystem {
     // BOILERPLATE
@@ -18,7 +16,11 @@ public class Lift extends Subsystem {
     // USER CODE
     public MotorEx motor;
 
-    public PIDFController controller = new PIDFController(new PIDCoefficients(0.005, 0.0, 0.0));
+    public PIDFController controller = new PIDFController(0.005, 0.0, 0.0);
+
+    public Command resetZero() {
+        return new InstantCommand(() -> { motor.resetEncoder(); });
+    }
 
     public String name = "lift_motor";
 
