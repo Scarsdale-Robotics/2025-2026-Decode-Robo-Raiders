@@ -1,35 +1,21 @@
 package org.firstinspires.ftc.teamcode.example.java;
 
 import com.qualcomm.robotcore.hardware.Servo;
-import com.rowanmcalpin.nextftc.core.Subsystem;
-import com.rowanmcalpin.nextftc.core.command.Command;
-import com.rowanmcalpin.nextftc.ftc.OpModeData;
-import com.rowanmcalpin.nextftc.ftc.hardware.ServoToPosition;
 
-public class Claw extends Subsystem {
-    // BOILERPLATE
+import dev.nextftc.control.ControlSystem;
+import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.hardware.controllable.RunToPosition;
+import dev.nextftc.hardware.impl.MotorEx;
+import dev.nextftc.hardware.impl.ServoEx;
+import dev.nextftc.hardware.positionable.SetPosition;
+
+public class Claw implements Subsystem {
     public static final Claw INSTANCE = new Claw();
     private Claw() { }
 
-    // USER CODE
-    public Servo servo;
-    
-    public String name = "claw_servo";
+    private ServoEx servo = new ServoEx("claw_servo");
 
-    public Command open() {
-        return new ServoToPosition(servo, // SERVO TO MOVE
-                0.9, // POSITION TO MOVE TO
-                this); // IMPLEMENTED SUBSYSTEM
-    }
-
-    public Command close() {
-        return new ServoToPosition(servo, // SERVO TO MOVE
-                0.2, // POSITION TO MOVE TO
-                this); // IMPLEMENTED SUBSYSTEM
-    }
-
-    @Override
-    public void initialize() {
-        servo = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, name);
-    }
+    public Command open = new SetPosition(servo, 0.1).requires(this);
+    public Command close = new SetPosition(servo, 0.2).requires(this);
 }

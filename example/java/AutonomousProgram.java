@@ -1,42 +1,41 @@
 package org.firstinspires.ftc.teamcode.example.java;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.rowanmcalpin.nextftc.core.command.Command;
-import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
-import com.rowanmcalpin.nextftc.core.command.groups.SequentialGroup;
-import com.rowanmcalpin.nextftc.core.command.utility.delays.Delay;
-import com.rowanmcalpin.nextftc.ftc.NextFTCOpMode;
-import com.rowanmcalpin.nextftc.ftc.OpModeData;
-import com.rowanmcalpin.nextftc.ftc.gamepad.GamepadManager;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
+import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.ParallelGroup;
+import dev.nextftc.core.commands.groups.SequentialGroup;
+import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.ftc.NextFTCOpMode;
+import dev.nextftc.ftc.components.BulkReadComponent;
 
 @Autonomous(name = "NextFTC Autonomous Program Java")
 public class AutonomousProgram extends NextFTCOpMode {
     public AutonomousProgram() {
-        super(Claw.INSTANCE, Lift.INSTANCE);
+        addComponents(
+                new SubsystemComponent(Lift.INSTANCE, Claw.INSTANCE),
+                BulkReadComponent.INSTANCE
+        );
     }
 
-    public Command firstRoutine() {
+    private Command autonomousRoutine() {
         return new SequentialGroup(
-                Lift.INSTANCE.toHigh(),
+                Lift.INSTANCE.toHigh,
                 new ParallelGroup(
-                        Lift.INSTANCE.toMiddle(),
-                        Claw.INSTANCE.close()
+                        Lift.INSTANCE.toMiddle,
+                        Claw.INSTANCE.close
                 ),
                 new Delay(0.5),
                 new ParallelGroup(
-                        Claw.INSTANCE.open(),
-                        Lift.INSTANCE.toLow()
+                        Claw.INSTANCE.open,
+                        Lift.INSTANCE.toLow
                 )
         );
     }
 
     @Override
     public void onStartButtonPressed() {
-        firstRoutine().invoke();
+        autonomousRoutine().schedule();
     }
 }

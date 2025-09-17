@@ -1,52 +1,28 @@
 package org.firstinspires.ftc.teamcode.example.java;
 
-import com.rowanmcalpin.nextftc.core.Subsystem;
-import com.rowanmcalpin.nextftc.core.command.Command;
-import com.rowanmcalpin.nextftc.core.command.utility.InstantCommand;
-import com.rowanmcalpin.nextftc.core.control.controllers.PIDFController;
-import com.rowanmcalpin.nextftc.ftc.hardware.controllables.MotorEx;
-import com.rowanmcalpin.nextftc.ftc.hardware.controllables.RunToPosition;
+import dev.nextftc.control.ControlSystem;
+import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.hardware.controllable.RunToPosition;
+import dev.nextftc.hardware.impl.MotorEx;
 
-
-public class Lift extends Subsystem {
-    // BOILERPLATE
+public class Lift implements Subsystem {
     public static final Lift INSTANCE = new Lift();
     private Lift() { }
 
-    // USER CODE
-    public MotorEx motor;
+    private MotorEx motor = new MotorEx("lift_motor");
 
-    public PIDFController controller = new PIDFController(0.005, 0.0, 0.0);
+    private ControlSystem controlSystem = ControlSystem.builder()
+            .posPid(0.005, 0, 0)
+            .elevatorFF(0)
+            .build();
 
-    public Command resetZero() {
-        return new InstantCommand(() -> { motor.resetEncoder(); });
-    }
+    public Command toLow = new RunToPosition(controlSystem, 0).requires(this);
+    public Command toMiddle = new RunToPosition(controlSystem, 500).requires(this);
+    public Command toHigh = new RunToPosition(controlSystem, 1200).requires(this);
 
-    public String name = "lift_motor";
-
-    public Command toLow() {
-        return new RunToPosition(motor, // MOTOR TO MOVE
-                0.0, // TARGET POSITION, IN TICKS
-                controller, // CONTROLLER TO IMPLEMENT
-                this); // IMPLEMENTED SUBSYSTEM
-    }
-
-    public Command toMiddle() {
-        return new RunToPosition(motor, // MOTOR TO MOVE
-                500.0, // TARGET POSITION, IN TICKS
-                controller, // CONTROLLER TO IMPLEMENT
-                this); // IMPLEMENTED SUBSYSTEM
-    }
-
-    public Command toHigh() {
-        return new RunToPosition(motor, // MOTOR TO MOVE
-                1200.0, // TARGET POSITION, IN TICKS
-                controller, // CONTROLLER TO IMPLEMENT
-                this); // IMPLEMENTED SUBSYSTEM
-    }
-    
     @Override
-    public void initialize() {
-        motor = new MotorEx(name);
+    public void periodic() {
+        motor.setPower(controlSystem.calculate(motor.getState()));
     }
 }
