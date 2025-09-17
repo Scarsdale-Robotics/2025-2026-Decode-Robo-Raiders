@@ -54,9 +54,11 @@ public class TemplateTeleOp extends NextFTCOpMode {
     // Intake //
     ////////////
     Gamepads.gamepad1().leftBumper()
-      .whenBecomesTrue(IntakeSubsystem.INSTANCE.on);
+      .whenBecomesTrue(IntakeSubsystem.INSTANCE.in)
+      .whenBecomesFalse(IntakeSubsystem.INSTANCE.stop);
     Gamepads.gamepad1().rightBumper()
-      .whenBecomesTrue(IntakeSubsystem.INSTANCE.off);
+      .whenBecomesTrue(IntakeSubsystem.INSTANCE.out)
+      .whenBecomesFalse(IntakeSubsystem.INSTANCE.stop);
 
 
     /////////////////////
