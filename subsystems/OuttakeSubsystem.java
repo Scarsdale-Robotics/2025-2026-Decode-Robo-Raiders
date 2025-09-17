@@ -23,4 +23,18 @@ public class OuttakeSubsystem extends SubsystemGroup {
         manualOverrideEnabled = !manualOverrideEnabled;
       })
       .setIsDone(() -> true);
+
+
+    public Command openShooter = new LambdaCommand()
+      .setStart(()->{
+        ShooterSubsystem.INSTANCE.setgoal(true);
+      })
+      .setUpdate(ShooterSubsystem.INSTANCE::runUpdate)
+      .setIsDone(ShooterSubsystem.INSTANCE::isopen);
+    public Command closeShooter = new LambdaCommand()
+      .setStart(()->{
+        ShooterSubsystem.INSTANCE.setgoal(false);
+      })
+      .setUpdate(ShooterSubsystem.INSTANCE::runUpdate)
+      .setIsDone(() -> !ShooterSubsystem.INSTANCE.isopen());
 }
