@@ -69,5 +69,11 @@ public class TemplateTeleOp extends NextFTCOpMode {
       .whenBecomesTrue(OuttakeSubsystem.INSTANCE.toggleManualOverride);
 
   }
+  @Override public void onUpdate(){
+    if(OuttakeSubsystem.INSTANCE.manualOverrideEnabled){
+      // put manual turn code here
+    }
+
+  }
 
 }
