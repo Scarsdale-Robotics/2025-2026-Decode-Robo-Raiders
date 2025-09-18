@@ -49,8 +49,8 @@ public class TemplateTeleOp extends NextFTCOpMode {
 
 
     Gamepads.gamepad1().circle()
-      .whenBecomesTrue(Outtake_Subsystem.openShooter)
-      .whenBecomesFalse(Outtake_Subsystem.closeShooter);
+      .whenBecomesTrue(Outtake_Subsystem.ShooterOff)
+      .whenBecomesFalse(Outtake_Subsystem.ShooterOn);
 
 
     ////////////

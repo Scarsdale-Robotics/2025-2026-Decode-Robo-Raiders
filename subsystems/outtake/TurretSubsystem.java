@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems.outtake;
 
 import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.hardware.impl.MotorEx;
+import dev.nextftc.hardware.impl.ServoEx;
 
 public class TurretSubsystem implements Subsystem {
+
+    private final MotorEx horizontal = new MotorEx("Turret Horizontal");
+    private final ServoEx vertical = new ServoEx("Turret Vertical");
     public static final TurretSubsystem INSTANCE = new TurretSubsystem();
 
     public double target_x;
