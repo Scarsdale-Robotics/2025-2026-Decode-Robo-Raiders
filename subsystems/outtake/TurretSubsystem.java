@@ -71,6 +71,11 @@ public class TurretSubsystem implements Subsystem {
 
     }
 
+    // to Nathan: Implement later maybe? this is for auto targeting
+    public void autoAim(){
+
+    }
+
     public void turretSetPower(double x, double y){
         // direct set motors
     }
