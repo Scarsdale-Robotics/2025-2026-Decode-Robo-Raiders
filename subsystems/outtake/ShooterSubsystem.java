@@ -23,7 +23,7 @@ public class ShooterSubsystem implements Subsystem {
     }
 
     public void runUpdate(){
-
+      //open or close based on goal
     }
 
 }

@@ -5,7 +5,6 @@ import org.firstinspires.ftc.teamcode.subsystems.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -16,6 +15,10 @@ import dev.nextftc.hardware.impl.MotorEx;
 
 @TeleOp(name = "NextFTC TeleOp Program Java")
 public class TemplateTeleOp extends NextFTCOpMode {
+
+  // aliases because that name is really long
+  OuttakeSubsystem Outtake_Subsystem = OuttakeSubsystem.INSTANCE;
+  IntakeSubsystem Intake_Subsystem = IntakeSubsystem.INSTANCE;
 
   private final MotorEx frontLeftMotor = new MotorEx("front_left").reversed();
   private final MotorEx frontRightMotor = new MotorEx("front_right");
@@ -46,19 +49,19 @@ public class TemplateTeleOp extends NextFTCOpMode {
 
 
     Gamepads.gamepad1().circle()
-      .whenBecomesTrue(OuttakeSubsystem.INSTANCE.openShooter)
-      .whenBecomesFalse(OuttakeSubsystem.INSTANCE.closeShooter);
+      .whenBecomesTrue(Outtake_Subsystem.openShooter)
+      .whenBecomesFalse(Outtake_Subsystem.closeShooter);
 
 
     ////////////
     // Intake //
     ////////////
     Gamepads.gamepad1().leftBumper()
-      .whenBecomesTrue(IntakeSubsystem.INSTANCE.in)
-      .whenBecomesFalse(IntakeSubsystem.INSTANCE.stop);
+      .whenBecomesTrue(Intake_Subsystem.in)
+      .whenBecomesFalse(Intake_Subsystem.stop);
     Gamepads.gamepad1().rightBumper()
-      .whenBecomesTrue(IntakeSubsystem.INSTANCE.out)
-      .whenBecomesFalse(IntakeSubsystem.INSTANCE.stop);
+      .whenBecomesTrue(Intake_Subsystem.out)
+      .whenBecomesFalse(Intake_Subsystem.stop);
 
 
     /////////////////////
@@ -66,11 +69,11 @@ public class TemplateTeleOp extends NextFTCOpMode {
     /////////////////////
 
     Gamepads.gamepad2().leftStickButton()
-      .whenBecomesTrue(OuttakeSubsystem.INSTANCE.toggleManualOverride);
+      .whenBecomesTrue(Outtake_Subsystem.toggleManualOverride);
 
   }
   @Override public void onUpdate(){
-    if(OuttakeSubsystem.INSTANCE.manualOverrideEnabled){
+    if(Outtake_Subsystem.manualOverrideEnabled){
       // put manual turn code here
     }
 
