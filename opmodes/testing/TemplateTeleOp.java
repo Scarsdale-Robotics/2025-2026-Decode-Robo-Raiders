@@ -45,7 +45,7 @@ public class TemplateTeleOp extends NextFTCOpMode {
     driverControlled.schedule();
 
 
-    Gamepads.gamepad1().a()
+    Gamepads.gamepad1().circle()
       .whenBecomesTrue(OuttakeSubsystem.INSTANCE.openShooter)
       .whenBecomesFalse(OuttakeSubsystem.INSTANCE.closeShooter);
 
