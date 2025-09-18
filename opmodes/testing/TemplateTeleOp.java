@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -27,7 +28,9 @@ public class TemplateTeleOp extends NextFTCOpMode {
   private final MotorEx backRightMotor = new MotorEx("back_right");
 
 
-  private boolean manualOverride = false;
+
+  public boolean manualOverrideEnabled;
+
   public TemplateTeleOp(){
     addComponents(
       new SubsystemComponent(CVSubsystem.INSTANCE, IntakeSubsystem.INSTANCE, LocalizationSubsystem.INSTANCE, OuttakeSubsystem.INSTANCE)
@@ -64,22 +67,44 @@ public class TemplateTeleOp extends NextFTCOpMode {
       .whenBecomesTrue(Intake_Subsystem.out)
       .whenBecomesFalse(Intake_Subsystem.stop);
 
+    manualOverrideEnabled = false;
+
 
     /////////////////////
     // Manual Override //
     /////////////////////
 
     Gamepads.gamepad2().leftStickButton()
-      .whenBecomesTrue(Outtake_Subsystem.toggleManualOverride);
+      .whenBecomesTrue(this.toggleManualOverride);
 
   }
   @Override public void onUpdate(){
     OuttakeSubsystem.INSTANCE.onUpdate();
     LocalizationSubsystem.INSTANCE.onUpdate();
-    if(Outtake_Subsystem.manualOverrideEnabled){
+    if(this.manualOverrideEnabled){
       // put manual turn code here
+    }
+    else{
+      autoAim();
     }
 
   }
+
+
+
+  // to Nathan: Implement later maybe? this is for auto targeting
+  public void autoAim(){
+
+  }
+
+  ///////////////////////
+  /// turret commands ///
+  ///////////////////////
+
+
+  public Command toggleManualOverride = new LambdaCommand()
+    .setStart(() -> manualOverrideEnabled = !manualOverrideEnabled)
+    .setIsDone(() -> true)
+    .setRequirements(TurretSubsystem.INSTANCE);
 
 }

@@ -14,7 +14,6 @@ public class OuttakeSubsystem extends SubsystemGroup {
       ShooterSubsystem.INSTANCE,
       TurretSubsystem.INSTANCE
     );
-    manualOverrideEnabled = false;
   }
 
 
@@ -23,36 +22,6 @@ public class OuttakeSubsystem extends SubsystemGroup {
     TurretSubsystem.INSTANCE.onUpdate();
 
   }
-  public boolean manualOverrideEnabled;
-
-
-
-
-
-
-
-
-  ///////////////////////
-  /// turret commands ///
-  ///////////////////////
-  public Command runAutoTarget = new LambdaCommand()
-    .setUpdate(TurretSubsystem.INSTANCE::autoAim)
-    .setInterruptible(true)
-    .setRequirements(TurretSubsystem.INSTANCE);
-
-
-  public Command toggleManualOverride = new LambdaCommand()
-    .setStart(() -> {
-      manualOverrideEnabled = !manualOverrideEnabled;
-      if (!manualOverrideEnabled)
-        runAutoTarget.schedule();
-    })
-    .setIsDone(() -> manualOverrideEnabled)
-    .setRequirements(TurretSubsystem.INSTANCE);
-
-
-
-
 
 
   ////////////////////////
