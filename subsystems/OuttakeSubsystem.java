@@ -51,10 +51,10 @@ public class OuttakeSubsystem extends SubsystemGroup {
   ////////////////////////
   /// shooter commands ///
   ////////////////////////
-  public Command ShooterOn = new LambdaCommand()
+  public Command shooterOn = new LambdaCommand()
     .setStart(()->ShooterSubsystem.INSTANCE.setOn(true))
     .setIsDone(()->true);
-  public Command ShooterOff = new LambdaCommand()
+  public Command shooterOff = new LambdaCommand()
     .setStart(()->ShooterSubsystem.INSTANCE.setOn(false))
     .setIsDone(()->true);
 

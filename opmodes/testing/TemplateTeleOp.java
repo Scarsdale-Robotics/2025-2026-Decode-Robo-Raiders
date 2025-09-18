@@ -5,7 +5,6 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -50,8 +49,8 @@ public class TemplateTeleOp extends NextFTCOpMode {
 
 
     Gamepads.gamepad1().circle()
-      .whenBecomesTrue(Outtake_Subsystem.ShooterOff)
-      .whenBecomesFalse(Outtake_Subsystem.ShooterOn);
+      .whenBecomesTrue(Outtake_Subsystem.shooterOff)
+      .whenBecomesFalse(Outtake_Subsystem.shooterOn);
 
 
     ////////////
