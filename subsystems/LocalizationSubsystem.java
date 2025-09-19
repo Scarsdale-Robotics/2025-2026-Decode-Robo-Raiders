@@ -31,9 +31,7 @@ public class LocalizationSubsystem extends SubsystemGroup {
     // returns motif pattern
     return 0;
   }
-  public Pose getPos(){
-    return new Pose(x,y,h);
-  }
+
 
 
   public double getX(){
