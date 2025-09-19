@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 
+import com.pedropathing.geometry.Pose;
+
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
@@ -8,6 +10,13 @@ import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
 import dev.nextftc.core.subsystems.SubsystemGroup;
 
 public class LocalizationSubsystem extends SubsystemGroup {
+
+  private double x;
+  private double y;
+  private double h;
+
+
+
   public static final LocalizationSubsystem INSTANCE = new LocalizationSubsystem();
   private LocalizationSubsystem() {
     super(
@@ -22,22 +31,26 @@ public class LocalizationSubsystem extends SubsystemGroup {
     // returns motif pattern
     return 0;
   }
+  public Pose getPos(){
+    return new Pose(x,y,h);
+  }
 
-//  public Pose2D getPos(){
-//    //gets pos
-//    return new Pose2D(getX(), getY(), getH());
-//
-//  }
+
   public double getX(){
-    return 0; // make this work eventually
+    return x; // make this work eventually
   }
   public double getY(){
-    return 0; // make this work eventually
+    return y; // make this work eventually
   }
   public double getH(){
-    return 0; // make this work eventually
+    return h; // make this work eventually
   }
   public void resetH(double H){
 
+  }
+
+  @Override
+  public void periodic(){
+    // update headings based on locale modules
   }
 }
