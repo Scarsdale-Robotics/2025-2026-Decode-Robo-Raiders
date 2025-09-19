@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.Command;
@@ -33,7 +32,7 @@ public class TemplateTeleOp extends NextFTCOpMode {
 
   public TemplateTeleOp(){
     addComponents(
-      new SubsystemComponent(CVSubsystem.INSTANCE, IntakeSubsystem.INSTANCE, LocalizationSubsystem.INSTANCE, OuttakeSubsystem.INSTANCE)
+      new SubsystemComponent(IntakeSubsystem.INSTANCE, LocalizationSubsystem.INSTANCE, OuttakeSubsystem.INSTANCE)
     );
 
   }
@@ -53,8 +52,8 @@ public class TemplateTeleOp extends NextFTCOpMode {
 
 
     Gamepads.gamepad1().circle()
-      .whenBecomesTrue(Outtake_Subsystem.shooterOff)
-      .whenBecomesFalse(Outtake_Subsystem.shooterOn);
+      .whenBecomesTrue(Outtake_Subsystem.stopShoot)
+      .whenBecomesFalse(Outtake_Subsystem.shoot);
 
 
     ////////////
