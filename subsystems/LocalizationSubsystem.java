@@ -23,9 +23,11 @@ public class LocalizationSubsystem extends SubsystemGroup {
     return 0;
   }
 
-  //public Pose2D getPos(){
-    //gets pos
-  //}
+//  public Pose2D getPos(){
+//    //gets pos
+//    return new Pose2D(getX(), getY(), getH());
+//
+//  }
   public double getX(){
     return 0; // make this work eventually
   }
