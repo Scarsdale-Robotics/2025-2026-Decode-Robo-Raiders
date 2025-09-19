@@ -17,11 +17,6 @@ public class LocalizationSubsystem extends SubsystemGroup {
   }
 
 
-  public void onUpdate(){
-    CVSubsystem.INSTANCE.onUpdate();
-    OdometrySubsystem.INSTANCE.onUpdate();
-  }
-
 
   public int getPattern(){
     // returns motif pattern
