@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem;
+
+import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.Command;
@@ -18,9 +16,6 @@ import dev.nextftc.hardware.impl.MotorEx;
 @TeleOp(name = "NextFTC TeleOp Program Java")
 public class TemplateTeleOp extends NextFTCOpMode {
 
-  // aliases because that name is really long
-  OuttakeSubsystem Outtake_Subsystem = OuttakeSubsystem.INSTANCE;
-  IntakeSubsystem Intake_Subsystem = IntakeSubsystem.INSTANCE;
 
   private final MotorEx frontLeftMotor = new MotorEx("front_left").reversed();
   private final MotorEx frontRightMotor = new MotorEx("front_right");
@@ -33,7 +28,7 @@ public class TemplateTeleOp extends NextFTCOpMode {
 
   public TemplateTeleOp(){
     addComponents(
-      new SubsystemComponent(CVSubsystem.INSTANCE, IntakeSubsystem.INSTANCE, LocalizationSubsystem.INSTANCE, OuttakeSubsystem.INSTANCE)
+      new SubsystemComponent(Robot.intakeSubsystem, Robot.outtakeSubsystem, Robot.localizationSubsystem)
     );
 
   }
@@ -53,49 +48,43 @@ public class TemplateTeleOp extends NextFTCOpMode {
 
 
     Gamepads.gamepad1().circle()
-      .whenBecomesTrue(Outtake_Subsystem.shooterOff)
-      .whenBecomesFalse(Outtake_Subsystem.shooterOn);
+      .whenBecomesTrue(Robot.outtakeSubsystem.shooterSubsystem.shoot)
+      .whenBecomesFalse(Robot.outtakeSubsystem.shooterSubsystem.stopShoot);
 
 
     ////////////
     // Intake //
     ////////////
     Gamepads.gamepad1().leftBumper()
-      .whenBecomesTrue(Intake_Subsystem.in)
-      .whenBecomesFalse(Intake_Subsystem.stop);
+      .whenBecomesTrue(Robot.intakeSubsystem.in)
+      .whenBecomesFalse(Robot.intakeSubsystem.stop);
     Gamepads.gamepad1().rightBumper()
-      .whenBecomesTrue(Intake_Subsystem.out)
-      .whenBecomesFalse(Intake_Subsystem.stop);
+      .whenBecomesTrue(Robot.intakeSubsystem.out)
+      .whenBecomesFalse(Robot.intakeSubsystem.stop);
 
-    manualOverrideEnabled = false;
 
 
     /////////////////////
     // Manual Override //
     /////////////////////
+    manualOverrideEnabled = false;
 
     Gamepads.gamepad2().leftStickButton()
       .whenBecomesTrue(this.toggleManualOverride);
 
   }
   @Override public void onUpdate(){
-    OuttakeSubsystem.INSTANCE.onUpdate();
-    LocalizationSubsystem.INSTANCE.onUpdate();
     if(this.manualOverrideEnabled){
       // put manual turn code here
+      Robot.outtakeSubsystem.turretSubsystem.setAim(2,4);
     }
     else{
-      autoAim();
+      Robot.autoAim();
     }
 
   }
 
 
-
-  // to Nathan: Implement later maybe? this is for auto targeting
-  public void autoAim(){
-
-  }
 
   ///////////////////////
   /// turret commands ///

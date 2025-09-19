@@ -6,9 +6,10 @@ import dev.nextftc.core.subsystems.Subsystem;
 public class CVSubsystem implements Subsystem {
   public static final CVSubsystem INSTANCE = new CVSubsystem() ;
 
+  @Override
+  public void periodic(){
 
-  // runs each loop
-  public void onUpdate(){}
+  }
 
 
 }

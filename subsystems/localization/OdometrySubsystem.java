@@ -6,5 +6,5 @@ public class OdometrySubsystem implements Subsystem {
   public static final OdometrySubsystem INSTANCE = new OdometrySubsystem();
 
   // runs each loop
-  public void onUpdate() {}
+  public void onUpdate(){}
 }

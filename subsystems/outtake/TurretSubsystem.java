@@ -38,7 +38,7 @@ public class TurretSubsystem implements Subsystem {
         servo_theta.setPosition(0.0);
     }
 
-    public void setGoal(double theta, double phi) {
+    public void setAim(double theta, double phi) {
         setTheta(theta); setPhi(phi);
     }
 
@@ -57,8 +57,8 @@ public class TurretSubsystem implements Subsystem {
                 )
         );
     }
-
-    public void onUpdate() {
+  @Override
+  public void periodic(){
 
         // move towards targets
         motor_phi.setPower(
