@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-
-import com.pedropathing.geometry.Pose;
-
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;

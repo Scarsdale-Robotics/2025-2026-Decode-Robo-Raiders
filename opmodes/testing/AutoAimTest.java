@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.utils.QuarticMaxNonnegRoot.maxNonNe
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
@@ -72,18 +73,22 @@ public class AutoAimTest extends NextFTCOpMode {
                 .whenBecomesTrue(ShooterSubsystem.INSTANCE.startShoot)
                 .whenBecomesFalse(ShooterSubsystem.INSTANCE.stopShoot);
 
-        // intended 0, 0, 0 is goals, facing away from audience
-        // intended FIELD_SIZE, FIELD_SIZE is other corner
-        // intended reset point, for now: 1,5 (audience-side, blue, margin 1, robot center)
+        // pedro coords
+        // intended reset point, for now: 24,24 (audience-side, blue, margin 1, robot center)
         Gamepads.gamepad1().leftBumper().and(Gamepads.gamepad1().rightBumper())
                 .whenTrue(
                         new ParallelGroup(
                                 LocalizationSubsystem.INSTANCE.resetH(0),
                                 LocalizationSubsystem.INSTANCE.resetX(1 * TILE_SIZE),
-                                LocalizationSubsystem.INSTANCE.resetY(5 * TILE_SIZE)
+                                LocalizationSubsystem.INSTANCE.resetY(1 * TILE_SIZE)
                         )
                 );
     }
+
+
+    private Telemetry.Item autoAimTime = telemetry.addData("[ATA] t", "...");
+    private Telemetry.Item autoAimThetaGoal = telemetry.addData("[ATA] θ", "...");
+    private Telemetry.Item autoAimPhiGoal = telemetry.addData("[ATA] φ", "...");
 
     private Command autoAim = new InstantCommand(() -> {
         // TARGET INFO (T = Target)
@@ -103,6 +108,10 @@ public class AutoAimTest extends NextFTCOpMode {
         double vyU = LocalizationSubsystem.INSTANCE.getVY();
         double vUmag = Math.hypot(vxU, vyU);
 
+        if (Math.abs(vxU) > 5 || Math.abs(vyU) > 5) {
+            telemetry.addLine("(!) [ATA] Velocity spike (" + vxU + " m/s, " + vyU + " m/s)");
+        }
+
         // Deltas
         double dz = zT - zU;
         double dy = yT - yU;
@@ -118,9 +127,19 @@ public class AutoAimTest extends NextFTCOpMode {
         };
         double t = maxNonNegativeRoot(coeffs);
 
+        if (t == Double.NaN) {
+            telemetry.addLine("(!) [ATA] No positive time found");
+        }
+
         // note notation opposite Stephen's doc, equal to subsystems, phi l/r, theta up/down
         double theta_res = Math.asin((dz + 0.5 * g * t * t) / (v0 * t));
         double phi_res = Math.atan2(dy - vyU * t, dx - vxU * t);
+
+        telemetry.addData("[ATA] t", "%.3f s", t);
+        telemetry.addData("[ATA] θ", "%.2f deg", Math.toDegrees(theta_res));
+        telemetry.addData("[ATA] φ", "%.2f deg", Math.toDegrees(phi_res));
+
+        telemetry.update();
 
         TurretSubsystem.INSTANCE.setAim(theta_res, phi_res);
     });
