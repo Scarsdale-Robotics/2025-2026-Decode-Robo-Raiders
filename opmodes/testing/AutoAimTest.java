@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing;
 
+import static org.firstinspires.ftc.teamcode.utils.Angles.normalizeAngle;
 import static org.firstinspires.ftc.teamcode.utils.QuarticMaxNonnegRoot.maxNonNegativeRoot;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -88,7 +89,7 @@ public class AutoAimTest extends NextFTCOpMode {
         // TARGET INFO (T = Target)
         double xT = isRed ? (FIELD_SIZE - TILE_SIZE / 2.0) : (TILE_SIZE / 2.0);
         double yT = TILE_SIZE / 2.0;
-        double zT = 40.0;  // 38.75 is min, 53.75 is max
+        double zT = 42.0;  // 38.75 is min, 53.75 is max
 
         // TURRET INFO (U = Turret)
         double xU = LocalizationSubsystem.INSTANCE.getX() + 0;  // TODO: add turret offsets
@@ -102,23 +103,25 @@ public class AutoAimTest extends NextFTCOpMode {
         double vyU = LocalizationSubsystem.INSTANCE.getVY();
         double vUmag = Math.hypot(vxU, vyU);
 
-        double drTUmag = Math.hypot(xT - xU, yT - yU);
+        // Deltas
+        double dz = zT - zU;
+        double dy = yT - yU;
+        double dx = xT - xU;
+        double drMag = Math.hypot(dx, dy);
 
         double[] coeffs = {
                 0.25 * g * g,
                 0,
-                vUmag * vUmag + g * (zT - zU) - v0 * v0,
-                -2 * drTUmag * vUmag * Math.cos(Math.atan2(yT - yU, xT - xU) - Math.atan2(vyU, vxU)),
-                Math.pow(drTUmag, 2)
+                vUmag * vUmag + g * dz - v0 * v0,
+                -2 * drMag * vUmag * Math.cos(normalizeAngle(Math.atan2(dy, dx) - Math.atan2(vyU, vxU))),
+                Math.pow(drMag, 2)
         };
         double t = maxNonNegativeRoot(coeffs);
 
         // note notation opposite Stephen's doc, equal to subsystems, phi l/r, theta up/down
-        double theta_res = Math.asin((zT - zU + 0.5 * g * t * t) / (v0 * t));
-        double phi_res = Math.atan2(yT - yU - vyU * t, xT - xU - vxU * t);
+        double theta_res = Math.asin((dz + 0.5 * g * t * t) / (v0 * t));
+        double phi_res = Math.atan2(dy - vyU * t, dx - vxU * t);
 
         TurretSubsystem.INSTANCE.setAim(theta_res, phi_res);
     });
-
-    private double[] quarticSolver()
 }
