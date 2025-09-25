@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.CommandManager;
 import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -85,11 +86,6 @@ public class AutoAimTest extends NextFTCOpMode {
                 );
     }
 
-
-    private Telemetry.Item autoAimTime = telemetry.addData("[ATA] t", "...");
-    private Telemetry.Item autoAimThetaGoal = telemetry.addData("[ATA] θ", "...");
-    private Telemetry.Item autoAimPhiGoal = telemetry.addData("[ATA] φ", "...");
-
     private Command autoAim = new InstantCommand(() -> {
         // TARGET INFO (T = Target)
         double xT = isRed ? (FIELD_SIZE - TILE_SIZE / 2.0) : (TILE_SIZE / 2.0);
@@ -141,6 +137,8 @@ public class AutoAimTest extends NextFTCOpMode {
 
         telemetry.update();
 
-        TurretSubsystem.INSTANCE.setAim(theta_res, phi_res);
+        CommandManager.INSTANCE.scheduleCommand(
+                TurretSubsystem.INSTANCE.setAim(theta_res, phi_res)
+        );  // could also make a method that just returns setAim(theta_res, phi_res), but this probably has a more conventional style because I feel like it
     });
 }
