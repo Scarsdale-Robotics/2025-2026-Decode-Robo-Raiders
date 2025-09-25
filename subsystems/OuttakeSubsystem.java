@@ -21,7 +21,7 @@ public class OuttakeSubsystem extends SubsystemGroup {
           .setUpdate(() -> {
               if (TurretSubsystem.INSTANCE.atTarget()) {
                   CommandManager.INSTANCE.scheduleCommand(
-                          ShooterSubsystem.INSTANCE.shoot
+                          ShooterSubsystem.INSTANCE.startShoot
                   );
               }
           })

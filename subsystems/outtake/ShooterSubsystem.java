@@ -14,7 +14,7 @@ public class ShooterSubsystem implements Subsystem {
 
   }
 
-  public Command shoot = new LambdaCommand()
+  public Command startShoot = new LambdaCommand()
     .setStart(() -> shootMotor.setPower(1))
     .setInterruptible(true)
     .setRequirements(ShooterSubsystem.INSTANCE);
