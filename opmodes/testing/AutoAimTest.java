@@ -86,6 +86,7 @@ public class AutoAimTest extends NextFTCOpMode {
                 );
     }
 
+    // ! WHEN TRANSPORTING to other files: CONFIRM CONSTANT/FIELD UNITS
     private Command autoAim = new InstantCommand(() -> {
         // TARGET INFO (T = Target)
         double xT = isRed ? (FIELD_SIZE - TILE_SIZE / 2.0) : (TILE_SIZE / 2.0);
@@ -102,7 +103,7 @@ public class AutoAimTest extends NextFTCOpMode {
 
         double vxU = LocalizationSubsystem.INSTANCE.getVX();  // more representative of vxR, but close enough
         double vyU = LocalizationSubsystem.INSTANCE.getVY();
-        double vUmag = Math.hypot(vxU, vyU);
+//        double vUmag = Math.hypot(vxU, vyU);
 
         if (Math.abs(vxU) > 5 || Math.abs(vyU) > 5) {
             telemetry.addLine("(!) [ATA] Velocity spike (" + vxU + " in/s, " + vyU + " in/s)");
@@ -112,14 +113,14 @@ public class AutoAimTest extends NextFTCOpMode {
         double dz = zT - zU;
         double dy = yT - yU;
         double dx = xT - xU;
-        double drMag = Math.sqrt(dx * dx + dy * dy + dz * dz);
+//        double drMag = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
         double[] coeffs = {
                 0.25 * g * g,
                 0,
-                vUmag * vUmag + g * dz - v0 * v0,
+                vxU * vxU + vyU * vyU + g * dz - v0 * v0,
                 -2 * (dx * vxU + dy * vyU),
-                drMag * drMag
+                dx * dx + dy * dy + dz * dz
         };
         double t = maxNonNegativeRoot(coeffs);
 
