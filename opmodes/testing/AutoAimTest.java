@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.CommandManager;
 import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -34,8 +35,8 @@ public class AutoAimTest extends NextFTCOpMode {
 
     public static boolean isRed = false;
 
-    private final double g = 9.80665;
-    private final double v0 = 5;  // TODO: TEST, tune, check if angle changes significantly, etc.
+    private final double g = 386.08858267717;  // inches/sec^2
+    private final double v0 = 5;  // inches/sec  // TODO: TEST, tune, check if angle changes significantly, etc.
 
     public AutoAimTest() {
         addComponents(
@@ -85,11 +86,7 @@ public class AutoAimTest extends NextFTCOpMode {
                 );
     }
 
-
-    private Telemetry.Item autoAimTime = telemetry.addData("[ATA] t", "...");
-    private Telemetry.Item autoAimThetaGoal = telemetry.addData("[ATA] θ", "...");
-    private Telemetry.Item autoAimPhiGoal = telemetry.addData("[ATA] φ", "...");
-
+    // ! WHEN TRANSPORTING to other files: CONFIRM CONSTANT/FIELD UNITS
     private Command autoAim = new InstantCommand(() -> {
         // TARGET INFO (T = Target)
         double xT = isRed ? (FIELD_SIZE - TILE_SIZE / 2.0) : (TILE_SIZE / 2.0);
@@ -109,25 +106,25 @@ public class AutoAimTest extends NextFTCOpMode {
         double vUmag = Math.hypot(vxU, vyU);
 
         if (Math.abs(vxU) > 5 || Math.abs(vyU) > 5) {
-            telemetry.addLine("(!) [ATA] Velocity spike (" + vxU + " m/s, " + vyU + " m/s)");
+            telemetry.addLine("(!) [ATA] Velocity spike (" + vxU + " in/s, " + vyU + " in/s)");
         }
 
         // Deltas
         double dz = zT - zU;
         double dy = yT - yU;
         double dx = xT - xU;
-        double drMag = Math.hypot(dx, dy);
+//        double drMag = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
         double[] coeffs = {
                 0.25 * g * g,
                 0,
-                vUmag * vUmag + g * dz - v0 * v0,
-                -2 * drMag * vUmag * Math.cos(normalizeAngle(Math.atan2(dy, dx) - Math.atan2(vyU, vxU))),
-                Math.pow(drMag, 2)
+                vxU * vxU + vyU * vyU + g * dz - v0 * v0,
+                -2 * (dx * vxU + dy * vyU),
+                dx * dx + dy * dy + dz * dz
         };
         double t = maxNonNegativeRoot(coeffs);
 
-        if (t == Double.NaN) {
+        if (Double.isNaN(t)) {
             telemetry.addLine("(!) [ATA] No positive time found");
         }
 
@@ -141,6 +138,8 @@ public class AutoAimTest extends NextFTCOpMode {
 
         telemetry.update();
 
-        TurretSubsystem.INSTANCE.setAim(theta_res, phi_res);
+        CommandManager.INSTANCE.scheduleCommand(
+                TurretSubsystem.INSTANCE.setAim(theta_res, phi_res)
+        );  // could also make a method that just returns setAim(theta_res, phi_res), but this probably has a more conventional style because I feel like it
     });
 }
