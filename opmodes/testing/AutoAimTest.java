@@ -97,15 +97,15 @@ public class AutoAimTest extends NextFTCOpMode {
         double zT = 42.0;  // 38.75 is min, 53.75 is max
 
         // TURRET INFO (U = Turret)
-        double xU = LocalizationSubsystem.INSTANCE.getX() + 0;  // TODO: add turret offsets
-        double yU = LocalizationSubsystem.INSTANCE.getY() + 0;
+        double xU = LocalizationSubsystem.INSTANCE.getXR() + 0;  // TODO: add turret offsets
+        double yU = LocalizationSubsystem.INSTANCE.getYR() + 0;
         double zU = 5.0;
 
         // ROBOT INFO (R = Robot)
-        double hR = LocalizationSubsystem.INSTANCE.getH();
+        double hR = LocalizationSubsystem.INSTANCE.getHR();
 
-        double vxU = LocalizationSubsystem.INSTANCE.getVX();  // more representative of vxR, but close enough
-        double vyU = LocalizationSubsystem.INSTANCE.getVY();
+        double vxU = LocalizationSubsystem.INSTANCE.getVXR();  // more representative of vxR, but close enough
+        double vyU = LocalizationSubsystem.INSTANCE.getVYR();
         double vUmag = Math.hypot(vxU, vyU);
 
         if (Math.abs(vxU) > 5 || Math.abs(vyU) > 5) {
