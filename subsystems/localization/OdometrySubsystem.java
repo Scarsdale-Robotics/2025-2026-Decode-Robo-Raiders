@@ -32,7 +32,7 @@ public class OdometrySubsystem {
     pinpoint.update();
   }
 
-  public void update(){
+  public void updateOdom(){
     pinpoint.update();
     ROx1 = pinpoint.getPosition().getX(INCH);
     ROy1 = pinpoint.getPosition().getY(INCH);
