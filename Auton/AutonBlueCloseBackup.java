@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auton;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
@@ -8,21 +8,18 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
-
 import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
-
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.extensions.pedro.*;
 import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 import dev.nextftc.extensions.pedro.PedroComponent;
-
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.components.SubsystemComponent;
+
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
 //First slot = Name Type: Auton
