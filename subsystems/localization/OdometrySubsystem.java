@@ -8,20 +8,21 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 
-import dev.nextftc.core.subsystems.Subsystem;
-
 public class OdometrySubsystem {
 
 
-  public double ROx1;
-  public double ROy1;
+  public double ROx1; // Inch
+  public double ROy1; // Inch
   public double ROh; //normalized to [pi, -pi)
   public double distance;
   public GoBildaPinpointDriver pinpoint;
 
   public OdometrySubsystem(double x1, double y1, double h, HardwareMap hm){
     pinpoint = hm.get(GoBildaPinpointDriver.class,"pinpoint");
+    pinpoint.resetPosAndIMU();
+    pinpoint.recalibrateIMU();
     Pose2D Init = new Pose2D(INCH, x1,y1,AngleUnit.RADIANS,h);
+    pinpoint.update();
     pinpoint.setOffsets(1,3,INCH); //Set properly ltr
     pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED); //Set properly ltr
     pinpoint.setPosition(Init);
@@ -40,8 +41,18 @@ public class OdometrySubsystem {
     distance = Math.hypot(ROx1, ROy1);
   }
 
-  ///Gets///
+  public void setPinpoint(double x1, double y1, double h){
+    pinpoint.setPosition(new Pose2D(INCH, x1, y1, AngleUnit.RADIANS, h));
+  }
 
+  public void resetPinpoint() {
+    pinpoint.resetPosAndIMU();
+    pinpoint.recalibrateIMU();
+  }
+
+
+
+  ///Gets///
   public double getROh() {
     return ROh;
   }
