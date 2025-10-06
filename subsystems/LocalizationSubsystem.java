@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-
-import com.pedropathing.geometry.Pose;
-
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
 
+import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.subsystems.SubsystemGroup;
 
+// CAUTION !! RESETTING LOCALIZATION SHOULD HANDLE (or at least keep note of) POTENTIAL VELOCITY SPIKE !!
 public class LocalizationSubsystem extends SubsystemGroup {
 
   private double x;
@@ -34,17 +33,39 @@ public class LocalizationSubsystem extends SubsystemGroup {
 
 
 
-  public double getX(){
+  public double getXR(){
     return x; // make this work eventually
   }
-  public double getY(){
+  public double getYR(){
     return y; // make this work eventually
   }
-  public double getH(){
+  public double getHR(){
     return h; // make this work eventually
   }
-  public void resetH(double H){
+  public double getVXR(){
+    return x; // make this work eventually
+  }
+  public double getVYR(){
+    return y; // make this work eventually
+  }
+  public double getVHR(){
+    return h; // make this work eventually
+  }
 
+  public Command resetX(double xR){
+    return new InstantCommand(() -> {
+
+    });
+  }
+  public Command resetY(double yR){
+    return new InstantCommand(() -> {
+
+    });
+  }
+  public Command resetH(double hR){
+    return new InstantCommand(() -> {
+
+    });
   }
 
   @Override

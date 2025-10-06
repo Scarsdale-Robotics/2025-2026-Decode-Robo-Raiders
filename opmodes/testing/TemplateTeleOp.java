@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes.testing;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Robot;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.Command;
@@ -28,7 +30,11 @@ public class TemplateTeleOp extends NextFTCOpMode {
 
   public TemplateTeleOp(){
     addComponents(
-      new SubsystemComponent(Robot.intakeSubsystem, Robot.outtakeSubsystem, Robot.localizationSubsystem)
+      new SubsystemComponent(
+              Robot.intakeSubsystem,
+              Robot.outtakeSubsystem,
+              Robot.localizationSubsystem
+      )
     );
 
   }
@@ -48,19 +54,19 @@ public class TemplateTeleOp extends NextFTCOpMode {
 
 
     Gamepads.gamepad1().circle()
-      .whenBecomesTrue(Robot.outtakeSubsystem.shooterSubsystem.shoot)
-      .whenBecomesFalse(Robot.outtakeSubsystem.shooterSubsystem.stopShoot);
+      .whenBecomesTrue(ShooterSubsystem.INSTANCE.startShoot)
+      .whenBecomesFalse(ShooterSubsystem.INSTANCE.stopShoot);
 
 
     ////////////
     // Intake //
     ////////////
     Gamepads.gamepad1().leftBumper()
-      .whenBecomesTrue(Robot.intakeSubsystem.in)
-      .whenBecomesFalse(Robot.intakeSubsystem.stop);
+      .whenBecomesTrue(IntakeSubsystem.INSTANCE.in)
+      .whenBecomesFalse(IntakeSubsystem.INSTANCE.stop);
     Gamepads.gamepad1().rightBumper()
-      .whenBecomesTrue(Robot.intakeSubsystem.out)
-      .whenBecomesFalse(Robot.intakeSubsystem.stop);
+      .whenBecomesTrue(IntakeSubsystem.INSTANCE.out)
+      .whenBecomesFalse(IntakeSubsystem.INSTANCE.stop);
 
 
 
@@ -76,10 +82,9 @@ public class TemplateTeleOp extends NextFTCOpMode {
   @Override public void onUpdate(){
     if(this.manualOverrideEnabled){
       // put manual turn code here
-      Robot.outtakeSubsystem.turretSubsystem.setAim(2,4);
     }
     else{
-      Robot.autoAim();
+      autoAim();
     }
 
   }
@@ -96,4 +101,10 @@ public class TemplateTeleOp extends NextFTCOpMode {
     .setIsDone(() -> true)
     .setRequirements(TurretSubsystem.INSTANCE);
 
+  public void autoAim(){
+    TurretSubsystem.INSTANCE.setAim(
+            Math.toRadians(2),
+            Math.toRadians(4)
+    );
+  }
 }

@@ -6,8 +6,5 @@ public class OdometrySubsystem implements Subsystem {
   public static final OdometrySubsystem INSTANCE = new OdometrySubsystem();
 
   // runs each loop
-  @Override
-  public void periodic(){
-
-  }
+  public void onUpdate(){}
 }
