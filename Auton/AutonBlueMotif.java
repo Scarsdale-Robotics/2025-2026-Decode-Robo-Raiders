@@ -30,6 +30,7 @@ import dev.nextftc.core.components.SubsystemComponent;
 
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 
@@ -76,16 +77,6 @@ public class AutonBlueMotif extends NextFTCOpMode {
     private void intakeOff() {
         //does absolutely nothing for now
     }
-    private void shooterOn() {
-        //does absolutely nothing for now
-    }
-    private void shooterOff() {
-        //does absolutely nothing for now
-    }
-    private Command autoAim() {
-        return null;
-    }
-
 
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
@@ -98,10 +89,11 @@ public class AutonBlueMotif extends NextFTCOpMode {
     private final Pose startPose = new Pose(33, 136, Math.toRadians(0)); // Start Pose of our robot.
     private final Pose startPathControlP = new Pose (58, 108);
     private final Pose endBeforeMotifStartPose = new Pose(25, 100, Math.toRadians(270)); // End Pose of our robot.
-    // MotifPPGIntake1 positions
-    private final Pose motifPPGIntake1ControlP1 = new Pose(5, 60);
-    private final Pose motifPPGIntake1ControlP2 = new Pose(47, 88);
-    private final Pose motifPPGIntake1EndPos = new Pose(55, 94, Math.toRadians(30));
+    // MotifPPGIntake1 prep
+    private final Pose motifPPGIntake1StartPos = new Pose (18.2, 92.6, Math.toRadians(-65));
+    private final Pose motifPPGIntake1MidPos = new Pose (18.2, 89.5);
+    // MotifPPGIntake 1 position
+    private final Pose motifPPGIntake1EndPos = new Pose(59, 94, Math.toRadians(0));
     // MotifPPGIntake2 intake preparation
     private final Pose motifPPGIntake2ControlP1 = new Pose(94, 93);
     private final Pose motifPPGIntake2MidPos = new Pose(37, 68, Math.toRadians(180));
@@ -129,9 +121,12 @@ public class AutonBlueMotif extends NextFTCOpMode {
     //Motif GPG Paths
     private PathChain motifPGP;
     //Motif PPG Paths
-    private PathChain motifPPG;
+    private PathChain motifPPGIntake1Prep;
+    private Path motifPPGIntake1;
+    private PathChain motifPPGIntake2;
+    private Path motifPPGLastShot;
 
-    private Path motifPark;
+    private Path motifPark; //wants to put end pos in the folder: org.firstinspires.ftc.teamcode
 
     ////////////////////
     ////Path Builder////
@@ -152,14 +147,23 @@ public class AutonBlueMotif extends NextFTCOpMode {
 
 
         // 3rd Pattern motif, Purple-Purple-Green for now all paths are combined, but in future this will probably be separated.
-        motifPPG = follower().pathBuilder()
-                .addPath(new BezierCurve(
+        motifPPGIntake1Prep = follower().pathBuilder()
+                .addPath(new BezierLine(
                         endBeforeMotifStartPose,
-                        motifPPGIntake1ControlP1,
-                        motifPPGIntake1ControlP2,
-                        motifPPGIntake1EndPos))
-                .setLinearHeadingInterpolation(endBeforeMotifStartPose.getHeading(), motifPPGIntake1EndPos.getHeading())
+                        motifPPGIntake1StartPos))
+                .setLinearHeadingInterpolation(endBeforeMotifStartPose.getHeading(), motifPPGIntake1StartPos.getHeading())
 
+                .addPath(new BezierLine(
+                        motifPPGIntake1StartPos,
+                        motifPPGIntake1MidPos))
+                .build();
+
+        motifPPGIntake1 = new Path(new BezierLine(
+                motifPPGIntake1MidPos,
+                motifPPGIntake1EndPos));
+        robotStartPath.setLinearHeadingInterpolation(motifPPGIntake1StartPos.getHeading(), motifPPGIntake1EndPos.getHeading());
+
+        motifPPGIntake2 = follower().pathBuilder()
                 .addPath(new BezierCurve(
                         motifPPGIntake1EndPos,
                         motifPPGIntake2ControlP1,
@@ -175,19 +179,13 @@ public class AutonBlueMotif extends NextFTCOpMode {
                         motifPPGIntake2EndControlP1,
                         motifPPGIntake2End))
                 .setLinearHeadingInterpolation(motifPPGIntake2MidPos.getHeading(), motifPPGIntake2End.getHeading())
+                .build();
 
-                .addPath(new BezierLine(
+        motifPPGLastShot = new Path(new BezierLine(
                         motifPPGIntake2End,
-                        motifsShooterEnd))
-                .setLinearHeadingInterpolation(motifPPGIntake2End.getHeading(), motifsShooterEnd.getHeading())
-                .build();
+                        motifsShooterEnd));
+        motifPPGLastShot.setLinearHeadingInterpolation(motifPPGIntake2End.getHeading(), motifsShooterEnd.getHeading());
 
-        // 2nd Pattern motif, Purple-Green-Purple for now all paths are combined, but in future this will probably be separated.
-        motifPGP = follower().pathBuilder()
-                .build();
-        // 3rd Pattern motif, Purple-Purple-Green for now all paths are combined, but in future this will probably be separated.
-        motifPPG = follower().pathBuilder()
-                .build();
 
         //last path to follow, the park path
         motifPark = new Path(new BezierCurve(
@@ -206,11 +204,53 @@ public class AutonBlueMotif extends NextFTCOpMode {
         switch (pathState) { //Although there may be no unique states useful for future Autons
             case 0:
                 new FollowPath(robotStartPath);
-                setPathState(1); //Last Path
+                setPathState(3); //for now 3
                 break;
-            case 1:
+            case 1: //Motif GPP starts
                 // shouldn't do stuff
                 break;
+            case 2: //Motif PGP starts
+                break;
+            case 3: //Motif PPG starts (INTAKE1 PREP)
+                if (!follower().isBusy()) {
+                    CommandManager.INSTANCE.scheduleCommand(OuttakeSubsystem.INSTANCE.shootWhenReady);
+                    CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(1)); //(TURNS ON INTAKE) temporary value
+                    new FollowPath(motifPPGIntake1Prep);
+                    setPathState(4);
+                }
+                break;
+            case 4: //Motif PPG sequence 1 (INTAKE1 LOAD)
+                if (!follower().isBusy()) {
+                    new FollowPath(motifPPGIntake1);
+                    if (follower().atPose(motifPPGIntake1EndPos, 1, 1)) {
+                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(0)); //(TURNS OFF INTAKE) temporary value
+                    }
+                    setPathState(5);
+                }
+                break;
+            case 5: //Motif PPG sequence 2 ( (INTAKE2 LOAD)
+                if (!follower().isBusy()) {
+                    CommandManager.INSTANCE.scheduleCommand(OuttakeSubsystem.INSTANCE.shootWhenReady);
+                    if (follower().atPose(motifPPGIntake2MidPos, 1, 1)) {
+                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(1)); //(TURNS ON INTAKE) temporary value
+                    }
+                    new FollowPath(motifPPGIntake2);
+                    if (follower().atPose(motifPPGIntake2End, 1, 1)) {
+                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(0)); //(TURNS OFF INTAKE) temporary value
+                    }
+                    setPathState(6);
+                }
+                break;
+            case 6: //Motif park for all, current case # is temporary
+                if (!follower().isBusy()) {
+                    CommandManager.INSTANCE.scheduleCommand(OuttakeSubsystem.INSTANCE.shootWhenReady);
+                    if (pathTimer.getElapsedTimeSeconds() > 2.5) {
+                        new FollowPath(motifPark);
+                    }
+                    setPathState(-1); //last path
+                }
+                break;
+
         }
     }
 
@@ -220,8 +260,8 @@ public class AutonBlueMotif extends NextFTCOpMode {
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower.update();
         autonomousPathUpdate();
-        if (pathTimer.getElapsedTimeSeconds() > 3) {
-            autoAim();
+        if (pathTimer.getElapsedTimeSeconds() > 1) {
+            CommandManager.INSTANCE.scheduleCommand(TurretSubsystem.INSTANCE.autoAim(telemetry));
         }
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState);
@@ -238,7 +278,7 @@ public class AutonBlueMotif extends NextFTCOpMode {
         opmodeTimer.resetTimer();
 //        follower = Constants.createFollower(hardwareMap);
         buildPaths();
-//        follower.setStartingPose(startPose);
+        follower().setStartingPose(startPose);
     }
 
     /** This method is called continuously after Init while waiting for "play". **/

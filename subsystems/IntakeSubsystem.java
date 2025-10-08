@@ -19,6 +19,11 @@ public class IntakeSubsystem implements Subsystem {
                 intakeMotor.setPower(rightTrigger.get() - leftTrigger.get()));
     }
 
+    public Command setPower(double power) {
+        return new InstantCommand(() ->
+                intakeMotor.setPower(power));
+    }
+
     public Command in = new SetPower(intakeMotor, 1);// power val is placeholder
 
     public Command out = new SetPower(intakeMotor, -1);// power val is placeholder
