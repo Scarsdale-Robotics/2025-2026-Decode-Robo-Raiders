@@ -88,7 +88,6 @@ public class T67 extends NextFTCOpMode {
         );
         CommandManager.INSTANCE.scheduleCommand(intakePower);
 
-        
     }
 
     // ! WHEN TRANSPORTING to other files: CONFIRM CONSTANT/FIELD UNITS
