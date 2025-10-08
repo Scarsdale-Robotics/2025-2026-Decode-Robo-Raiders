@@ -6,6 +6,8 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+
 import dev.nextftc.core.subsystems.Subsystem;
 
 public class CVSubsystem{
@@ -15,7 +17,9 @@ public class CVSubsystem{
 
   public double RCx1;
   public double RCy1;
-  public double RCh1;
+  public double RCh;
+
+
 
   public CVSubsystem(double x1, double y1, double h, HardwareMap hm){
     cam = hm.get(Limelight3A.class, "Limelight");
@@ -25,6 +29,9 @@ public class CVSubsystem{
     imu = hm.get(IMU.class, "imu");
     RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.FORWARD); // Tune
     imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
+    RCx1 = x1;
+    RCy1 = y1;
+    RCh = h;
   }
 
   public void init(){
@@ -35,6 +42,11 @@ public class CVSubsystem{
   public void closeCam(){
     cam.close();
     imu.resetYaw();
+  }
+
+  public void getMotif(){
+    cam.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
+    llresult
   }
 
 
