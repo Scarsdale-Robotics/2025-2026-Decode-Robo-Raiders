@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Auton;
 
+import static org.firstinspires.ftc.teamcode.utils.QuarticMaxNonnegRoot.maxNonNegativeRoot;
+
 import com.pedropathing.geometry.BezierCurve;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.pedropathing.follower.Follower;
@@ -10,6 +12,11 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
+
+import dev.nextftc.core.commands.CommandManager;
+import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.extensions.pedro.*;
@@ -20,6 +27,12 @@ import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.components.SubsystemComponent;
+
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
+
+
 
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
@@ -69,6 +82,9 @@ public class AutonBlueMotif extends NextFTCOpMode {
     private void shooterOff() {
         //does absolutely nothing for now
     }
+    private Command autoAim() {
+        return null;
+    }
 
 
     private Timer pathTimer, actionTimer, opmodeTimer;
@@ -79,20 +95,20 @@ public class AutonBlueMotif extends NextFTCOpMode {
     /////////////////
     // Positions the robot will be in during Auton
     // robotStartPath positions
-    private final Pose startPose = new Pose(3, 136, Math.toRadians(0)); // Start Pose of our robot.
+    private final Pose startPose = new Pose(33, 136, Math.toRadians(0)); // Start Pose of our robot.
     private final Pose startPathControlP = new Pose (58, 108);
     private final Pose endBeforeMotifStartPose = new Pose(25, 100, Math.toRadians(270)); // End Pose of our robot.
-    // MotifGPPIntake1 positions
-    private final Pose motifGPPIntake1ControlP1 = new Pose(5, 60);
-    private final Pose motifGPPIntake1ControlP2 = new Pose(47, 88);
-    private final Pose motifGPPIntake1EndPos = new Pose(55, 94, Math.toRadians(30));
-    // MotifGPPIntake2 intake preparation
-    private final Pose motifGPPIntake2ControlP1 = new Pose(94, 93);
-    private final Pose motifGPPIntake2MidPos = new Pose(37, 68, Math.toRadians(180));
-    // MotifGPPIntake2 positions
-    private final Pose motifGPPIntake2PushOutPurple = new Pose(37, 57.5);
-    private final Pose motifGPPIntake2EndControlP1 = new Pose(45, 88);
-    private final Pose motifGPPIntake2End = new Pose(37, 42, Math.toRadians(270));
+    // MotifPPGIntake1 positions
+    private final Pose motifPPGIntake1ControlP1 = new Pose(5, 60);
+    private final Pose motifPPGIntake1ControlP2 = new Pose(47, 88);
+    private final Pose motifPPGIntake1EndPos = new Pose(55, 94, Math.toRadians(30));
+    // MotifPPGIntake2 intake preparation
+    private final Pose motifPPGIntake2ControlP1 = new Pose(94, 93);
+    private final Pose motifPPGIntake2MidPos = new Pose(37, 68, Math.toRadians(180));
+    // MotifPPGIntake2 positions
+    private final Pose motifPPGIntake2PushOutPurple = new Pose(37, 57.5);
+    private final Pose motifPPGIntake2EndControlP1 = new Pose(45, 88);
+    private final Pose motifPPGIntake2End = new Pose(37, 42, Math.toRadians(270));
 
     // MotifPark
     private final Pose motifsShooterEnd = new Pose(75, 90, Math.toRadians(180));
@@ -129,35 +145,41 @@ public class AutonBlueMotif extends NextFTCOpMode {
                 endBeforeMotifStartPose));
         robotStartPath.setLinearHeadingInterpolation(startPose.getHeading(), endBeforeMotifStartPose.getHeading());
 
-        // 1st Pattern motif, Green-Purple-Purple for now all paths are combined, but in future this will probably be separated.
-        motifGPP = follower().pathBuilder()
+        // 1st Pattern motif, Green-Purple-Purple
+
+
+        // 2nd Pattern motif, Purple-Green-Purple
+
+
+        // 3rd Pattern motif, Purple-Purple-Green for now all paths are combined, but in future this will probably be separated.
+        motifPPG = follower().pathBuilder()
                 .addPath(new BezierCurve(
                         endBeforeMotifStartPose,
-                        motifGPPIntake1ControlP1,
-                        motifGPPIntake1ControlP2,
-                        motifGPPIntake1EndPos))
-                .setLinearHeadingInterpolation(endBeforeMotifStartPose.getHeading(), motifGPPIntake1EndPos.getHeading())
+                        motifPPGIntake1ControlP1,
+                        motifPPGIntake1ControlP2,
+                        motifPPGIntake1EndPos))
+                .setLinearHeadingInterpolation(endBeforeMotifStartPose.getHeading(), motifPPGIntake1EndPos.getHeading())
 
                 .addPath(new BezierCurve(
-                        motifGPPIntake1EndPos,
-                        motifGPPIntake2ControlP1,
-                        motifGPPIntake2MidPos))
-                .setLinearHeadingInterpolation(motifGPPIntake1EndPos.getHeading(), motifGPPIntake2MidPos.getHeading())
+                        motifPPGIntake1EndPos,
+                        motifPPGIntake2ControlP1,
+                        motifPPGIntake2MidPos))
+                .setLinearHeadingInterpolation(motifPPGIntake1EndPos.getHeading(), motifPPGIntake2MidPos.getHeading())
 
                 .addPath(new BezierLine(
-                        motifGPPIntake2MidPos,
-                        motifGPPIntake2PushOutPurple))
+                        motifPPGIntake2MidPos,
+                        motifPPGIntake2PushOutPurple))
 
                 .addPath(new BezierCurve(
-                        motifGPPIntake2PushOutPurple,
-                        motifGPPIntake2EndControlP1,
-                        motifGPPIntake2End))
-                .setLinearHeadingInterpolation(motifGPPIntake2MidPos.getHeading(), motifGPPIntake2End.getHeading())
+                        motifPPGIntake2PushOutPurple,
+                        motifPPGIntake2EndControlP1,
+                        motifPPGIntake2End))
+                .setLinearHeadingInterpolation(motifPPGIntake2MidPos.getHeading(), motifPPGIntake2End.getHeading())
 
                 .addPath(new BezierLine(
-                        motifGPPIntake2End,
+                        motifPPGIntake2End,
                         motifsShooterEnd))
-                .setLinearHeadingInterpolation(motifGPPIntake2End.getHeading(), motifsShooterEnd.getHeading())
+                .setLinearHeadingInterpolation(motifPPGIntake2End.getHeading(), motifsShooterEnd.getHeading())
                 .build();
 
         // 2nd Pattern motif, Purple-Green-Purple for now all paths are combined, but in future this will probably be separated.
@@ -184,7 +206,7 @@ public class AutonBlueMotif extends NextFTCOpMode {
         switch (pathState) { //Although there may be no unique states useful for future Autons
             case 0:
                 new FollowPath(robotStartPath);
-                setPathState(-1); //Last Path
+                setPathState(1); //Last Path
                 break;
             case 1:
                 // shouldn't do stuff
@@ -198,6 +220,9 @@ public class AutonBlueMotif extends NextFTCOpMode {
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower.update();
         autonomousPathUpdate();
+        if (pathTimer.getElapsedTimeSeconds() > 3) {
+            autoAim();
+        }
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower().getPose().getX());
