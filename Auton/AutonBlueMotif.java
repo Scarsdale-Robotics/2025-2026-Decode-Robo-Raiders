@@ -34,6 +34,12 @@ import dev.nextftc.core.components.SubsystemComponent;
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__WaitFarShooter & Auton__Motif
 
+/*
+current Motif IDs
+Motif GPP: 21
+Motif PGP: 22
+Motif PPG: 23
+ */
 @Autonomous(name = "Auton Blue Motif", group = "Auton")
 public class AutonBlueMotif extends NextFTCOpMode {
     public AutonBlueMotif() {
@@ -48,6 +54,22 @@ public class AutonBlueMotif extends NextFTCOpMode {
         pathState = pState;
         pathTimer.resetTimer();
     }
+    //////////////////////////
+    ////METHODS(TEMPORARY)////
+    //////////////////////////
+    private void intakeOn() {
+        //does absolutely nothing for now
+    }
+    private void intakeOff() {
+        //does absolutely nothing for now
+    }
+    private void shooterOn() {
+        //does absolutely nothing for now
+    }
+    private void shooterOff() {
+        //does absolutely nothing for now
+    }
+
 
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
@@ -72,9 +94,9 @@ public class AutonBlueMotif extends NextFTCOpMode {
     private final Pose motifGPPIntake2EndControlP1 = new Pose(45, 88);
     private final Pose motifGPPIntake2End = new Pose(37, 42, Math.toRadians(270));
 
-    private final Pose motifGPPShooterEnd = new Pose(75, 90, Math.toRadians(180));
-
     // MotifPark
+    private final Pose motifsShooterEnd = new Pose(75, 90, Math.toRadians(180));
+
     private final Pose motifBlueParkControlP = new Pose(54, 14);
     private final Pose motifBluePark = new Pose(16, 5);
 
@@ -88,18 +110,12 @@ public class AutonBlueMotif extends NextFTCOpMode {
     private Path robotStartPath;
     //Motif GPP Paths
     private PathChain motifGPP;
-    private Path motifGPPIntake2;
-    private Path motifGPPPark;
     //Motif GPG Paths
-    private PathChain motifGPG;
-    private Path motifGPGIntake1;
-    private Path motifGPGIntake2;
-    private Path motifGPGPark;
+    private PathChain motifPGP;
     //Motif PPG Paths
     private PathChain motifPPG;
-    private Path motifPPGIntake1;
-    private Path motifPPGIntake2;
-    private Path motifPPGPark;
+
+    private Path motifPark;
 
     ////////////////////
     ////Path Builder////
@@ -113,7 +129,7 @@ public class AutonBlueMotif extends NextFTCOpMode {
                 endBeforeMotifStartPose));
         robotStartPath.setLinearHeadingInterpolation(startPose.getHeading(), endBeforeMotifStartPose.getHeading());
 
-        // first Pattern motif, Green-Purple-Purple for now all paths are combined, but in future this will probably be separated.
+        // 1st Pattern motif, Green-Purple-Purple for now all paths are combined, but in future this will probably be separated.
         motifGPP = follower().pathBuilder()
                 .addPath(new BezierCurve(
                         endBeforeMotifStartPose,
@@ -140,14 +156,22 @@ public class AutonBlueMotif extends NextFTCOpMode {
 
                 .addPath(new BezierLine(
                         motifGPPIntake2End,
-                        motifGPPShooterEnd))
-                .setLinearHeadingInterpolation(motifGPPIntake2End.getHeading(), motifGPPShooterEnd.getHeading())
-
-                .addPath(new BezierCurve(
-                        motifGPPShooterEnd,
-                        motifBlueParkControlP,
-                        motifBluePark))
+                        motifsShooterEnd))
+                .setLinearHeadingInterpolation(motifGPPIntake2End.getHeading(), motifsShooterEnd.getHeading())
                 .build();
+
+        // 2nd Pattern motif, Purple-Green-Purple for now all paths are combined, but in future this will probably be separated.
+        motifPGP = follower().pathBuilder()
+                .build();
+        // 3rd Pattern motif, Purple-Purple-Green for now all paths are combined, but in future this will probably be separated.
+        motifPPG = follower().pathBuilder()
+                .build();
+
+        //last path to follow, the park path
+        motifPark = new Path(new BezierCurve(
+                motifsShooterEnd,
+                motifBlueParkControlP,
+                motifBluePark));
     }
 
 
