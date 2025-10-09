@@ -86,7 +86,6 @@ public class CVSubsystem{
     if(bin.isValid() && bin != null){
       if(bin.getFiducialResults().get(1).getFiducialId() == 20 && side){ //blue
 
-
       }else if (bin.getFiducialResults().get(1).getFiducialId() == 24 && !side){ //red
 
       }else{
