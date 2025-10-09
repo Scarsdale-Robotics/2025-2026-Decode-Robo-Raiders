@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.localization;
 
 
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -19,9 +20,15 @@ public class CVSubsystem{
   public double RCy1;
   public double RCh;
 
+  public motif motif;
+  public LLResult bin;
+
+  public boolean side; //True = blue, False = red
 
 
-  public CVSubsystem(double x1, double y1, double h, HardwareMap hm){
+
+
+  public CVSubsystem(double x1, double y1, double h, boolean side, HardwareMap hm){
     cam = hm.get(Limelight3A.class, "Limelight");
     cam.pipelineSwitch(0); //work on pipline
     //need limelight for tuning
@@ -32,6 +39,8 @@ public class CVSubsystem{
     RCx1 = x1;
     RCy1 = y1;
     RCh = h;
+    side = side;
+    this.init();
   }
 
   public void init(){
@@ -44,10 +53,50 @@ public class CVSubsystem{
     imu.resetYaw();
   }
 
-  public void getMotif(){
+  public motif getMotif() {
     cam.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
-    llresult
+    LLResult llResult = cam.getLatestResult();
+    if (llResult != null && llResult.isValid()) {
+      int num = llResult.getFiducialResults().get(1).getFiducialId(); //check if its acc 1
+      motif result = motif.FD(num);
+      return result;
+    }
+    return motif.Na;
   }
+
+  public enum motif {
+    GPP(1, 21),
+    PGP(2, 22),
+    PPG(3, 23),
+    Na(0, -1);
+    private final int motifValue;
+    private final int num;
+    motif(int motifValue, int num) {this.motifValue = motifValue;this.num = num;}
+    public int getMotifValue() {return motifValue;}
+    public int getInputID() {return num;}
+    public static motif FD(int num) {
+      for (motif m : values()) {if (m.num == num) {return m;}}
+      return Na;
+    }
+  }
+
+  public void updateCV(){
+    cam.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
+    bin = cam.getLatestResult();
+    if(bin.isValid() && bin != null){
+      if(bin.getFiducialResults().get(1).getFiducialId() == 20 && side){ //blue
+
+
+      }else if (bin.getFiducialResults().get(1).getFiducialId() == 24 && !side){ //red
+
+      }else{
+        return;
+      }
+    }
+  }
+
+
+  public boolean getSide(){return side;}
 
 
 }
