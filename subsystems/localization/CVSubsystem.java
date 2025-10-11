@@ -103,6 +103,12 @@ public class CVSubsystem{
     }
   }
 
+  public void setCv(double x1, double y1, double h){
+    RCx1 = x1;
+    RCy1 = y1;
+    RCh = h;
+  }
+
 
 
   ///gets///

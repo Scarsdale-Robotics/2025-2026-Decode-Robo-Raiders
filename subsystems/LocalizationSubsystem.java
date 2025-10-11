@@ -47,7 +47,9 @@ public class LocalizationSubsystem {
 
 
 
-  ///gets///
+
+
+  ///gets/setters///
   public double getX() { return Rx; }
   public double getY() { return Ry; }
   public double getH() { return Rh; }
@@ -57,6 +59,7 @@ public class LocalizationSubsystem {
   public double getAX() { return 0.0; }
   public double getAY() { return 0.0; }
   public double getAH() { return 0.0; }
-  public CVSubsystem.motif getMotif() { return cv.getMotifc();}
+  public void setPos(double x1, double y1, double h){cv.setCv(x1, y1, h); odom.setPinpoint(x1, y1, h);}
+  public CVSubsystem.motif getMotif() {return cv.getMotifc();}
 
 }
