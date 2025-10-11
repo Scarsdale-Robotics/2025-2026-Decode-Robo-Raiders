@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.outtake.turret;
 
-import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
-
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.subsystems.Subsystem;
@@ -23,6 +21,10 @@ public class TurretThetaSubsystem implements Subsystem {
                 (theta / (2 * Math.PI) + 0.5) % 1 *
                         (MAX_SERVO_THETA - MIN_SERVO_THETA) + MIN_SERVO_THETA
         ));
+    }
+
+    public double getCurrentTargetTheta() {
+        return servo.getPosition();
     }
 
     public boolean atTarget() { return true; }

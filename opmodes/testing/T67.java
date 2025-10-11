@@ -1,19 +1,17 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing;
 
-import static org.firstinspires.ftc.teamcode.utils.QuarticMaxNonnegRoot.maxNonNegativeRoot;
-
-import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.CommandManager;
 import dev.nextftc.core.commands.groups.ParallelGroup;
 import dev.nextftc.core.commands.utility.InstantCommand;
-import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -31,6 +29,9 @@ public class T67 extends NextFTCOpMode {
     private double backupClosePhi = 0;
     private double backupFarTheta = 0;
     private double backupCloseTheta = 0;
+
+    private boolean manualLastFar = true;
+    private boolean autoAimEngaged = true;
 
     public T67() {
         addComponents(
@@ -56,18 +57,20 @@ public class T67 extends NextFTCOpMode {
         );
         driverControlled.schedule();
 
-        CommandManager.INSTANCE.scheduleCommand(
-                TurretSubsystem.INSTANCE.autoAim(telemetry)
-        );
+        if (autoAimEngaged) {
+            CommandManager.INSTANCE.scheduleCommand(
+                    TurretSubsystem.INSTANCE.autoAim(telemetry)
+            );
+        }
 
         // circle is shoot
         Gamepads.gamepad1().triangle().and(Gamepads.gamepad1().leftBumper().not())
                 .whenBecomesTrue(OuttakeSubsystem.INSTANCE.shootWhenReady)
-                .whenBecomesFalse(ShooterSubsystem.INSTANCE.stopShoot);
+                .whenBecomesFalse(ShooterSubsystem.INSTANCE.stopShoot);  // todo: mag subsystem
         // circle and left bumper is force shoot
         Gamepads.gamepad1().triangle().and(Gamepads.gamepad1().leftBumper())
                 .whenBecomesTrue(ShooterSubsystem.INSTANCE.startShoot)
-                .whenBecomesFalse(ShooterSubsystem.INSTANCE.stopShoot);
+                .whenBecomesFalse(ShooterSubsystem.INSTANCE.setVelocity);
 
         // pedro coords
         // intended reset point, for now: 24,24 (audience-side, blue, margin 1, robot center)
@@ -94,11 +97,59 @@ public class T67 extends NextFTCOpMode {
 
         Gamepads.gamepad2().dpadDown()
                 .whenTrue(
-                        TurretSubsystem.INSTANCE.setAim(
-                                backupFarTheta,
-                                backupFarPhi
-                        )
-                )
+                        () -> {
+                            manualLastFar = true;
+                            CommandManager.INSTANCE.scheduleCommand(
+                                    TurretSubsystem.INSTANCE.setAim(
+                                        backupFarTheta,
+                                        backupFarPhi
+                                )
+                            );
+                        }
+                );
+
+        Gamepads.gamepad2().dpadUp()
+                .whenTrue(
+                        () -> {
+                            manualLastFar = true;
+                            CommandManager.INSTANCE.scheduleCommand(
+                                    TurretSubsystem.INSTANCE.setAim(
+                                        backupCloseTheta,
+                                        backupClosePhi
+                                    )
+                            );
+                        }
+                );
+
+
+        Gamepads.gamepad2().circle()
+                .whenTrue(
+                        () -> {
+                            if (manualLastFar) {
+                                backupFarPhi = TurretPhiSubsystem.INSTANCE.getCurrentTargetPhi();
+                                backupClosePhi = TurretThetaSubsystem.INSTANCE.getCurrentTargetTheta();
+                            }
+                        }
+                );
+
+        Gamepads.gamepad2().leftBumper().and(Gamepads.gamepad2().rightBumper())
+                .whenBecomesTrue(
+                        () -> autoAimEngaged = !autoAimEngaged
+                );
+
+        backupClosePhi += Math.toRadians(Gamepads.gamepad2().rightStickX().get());
+        backupFarPhi += Math.toRadians(Gamepads.gamepad2().rightStickY().get());
+
+        if (!autoAimEngaged) {
+            TurretSubsystem.INSTANCE.autoAim().schedule();
+        }
+
+        // COLORS
+        if (!autoAimEngaged) {
+            gamepad2.setLedColor(255, 0, 0, -1);
+        } else {
+            gamepad2.setLedColor(255, 255, 255, -1);
+        }
     }
 
 }

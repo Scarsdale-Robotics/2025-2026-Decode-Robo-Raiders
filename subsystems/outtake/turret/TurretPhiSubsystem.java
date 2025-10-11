@@ -3,9 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.outtake.turret;
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
-import dev.nextftc.core.commands.CommandManager;
 import dev.nextftc.core.commands.utility.InstantCommand;
-import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.MotorEx;
 
@@ -34,6 +32,10 @@ public class TurretPhiSubsystem implements Subsystem {
                                 (MAX_ENCODER_PHI - MIN_ENCODER_PHI) + MIN_ENCODER_PHI
                 )
         ));
+    }
+
+    public double getCurrentTargetPhi() {
+        return controller_phi.getGoal().getPosition();
     }
 
     // IMPORTANT: being at target phi does not mean no motor power,
