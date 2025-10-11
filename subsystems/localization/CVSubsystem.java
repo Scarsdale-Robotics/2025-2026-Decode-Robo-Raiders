@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 
 public class CVSubsystem{
-
+  //CAUTION MIGHT HAVE TO CHECK IF getFiducialResults ISNT A EMPTY ARRAY
   public Limelight3A cam;
   public IMU imu;
 
@@ -42,7 +42,7 @@ public class CVSubsystem{
     RCx1 = x1;
     RCy1 = y1;
     RCh = h;
-    side = side;
+    this.side = side;
     this.init();
   }
 
@@ -56,7 +56,7 @@ public class CVSubsystem{
     imu.resetYaw();
   }
 
-  public motif getMotif() {
+  public motif getMotifc() {
     cam.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
     LLResult llResult = cam.getLatestResult();
     if (llResult != null && llResult.isValid()) {
