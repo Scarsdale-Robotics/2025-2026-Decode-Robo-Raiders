@@ -5,6 +5,8 @@ import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.localization.Kalman;
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
 
+import java.util.LinkedList;
+
 public class LocalizationSubsystem {
 
   double Rx;
@@ -25,6 +27,12 @@ public class LocalizationSubsystem {
   double clock;
   double timeSinceLastUpdate;
   double lastUpdateTime;
+
+  //5 point stencil stuff
+  private final LinkedList<Double> xHistory = new LinkedList<>();
+  private final LinkedList<Double> yHistory = new LinkedList<>();
+  private final LinkedList<Double> hHistory = new LinkedList<>();
+  private final LinkedList<Double> tHistory = new LinkedList<>();
 
   public LocalizationSubsystem(double x1, double y1, double h, boolean side, HardwareMap hm) {
     cv = new CVSubsystem(x1, y1, h, side, hm);
@@ -50,6 +58,38 @@ public class LocalizationSubsystem {
     Rx = kalmanX.getEstimate();
     Ry = kalmanY.getEstimate();
     Rh = odom.getROh();
+    updateHistory();
+    Vx = computeFirstDerivative(xHistory, tHistory);
+    Vy = computeFirstDerivative(yHistory, tHistory);
+    Vh = computeFirstDerivative(hHistory, tHistory);
+    Ax = computeSecondDerivative(xHistory, tHistory);
+    Ay = computeSecondDerivative(yHistory, tHistory);
+    Ah = computeSecondDerivative(hHistory, tHistory);
+  }
+
+  private void updateHistory() {
+    if (xHistory.size() >= 5) {
+      xHistory.removeFirst();
+      yHistory.removeFirst();
+      hHistory.removeFirst();
+      tHistory.removeFirst();
+    }
+    xHistory.add(Rx);
+    yHistory.add(Ry);
+    hHistory.add(Rh);
+    tHistory.add(clock); // might have to convert ms to seconds
+  }
+
+  private double computeFirstDerivative(LinkedList<Double> values, LinkedList<Double> times) {
+    if (values.size() < 5) return 0.0;
+    double h = (times.get(4) - times.get(0)) / 4.0;
+    return (-values.get(4) + 8*values.get(3) - 8*values.get(1) + values.get(0)) / (12*h);
+  }
+
+  private double computeSecondDerivative(LinkedList<Double> values, LinkedList<Double> times) {
+    if (values.size() < 5) return 0.0;
+    double h = (times.get(4) - times.get(0)) / 4.0;
+    return (-values.get(4) + 16*values.get(3) - 30*values.get(2) + 16*values.get(1) - values.get(0)) / (12*h*h);
   }
 
   public double getX() { return Rx; }
