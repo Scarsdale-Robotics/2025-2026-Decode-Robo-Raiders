@@ -7,5 +7,4 @@ import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 public class Robot {
   public static IntakeSubsystem intakeSubsystem = IntakeSubsystem.INSTANCE;
   public static OuttakeSubsystem outtakeSubsystem = OuttakeSubsystem.INSTANCE;
-  public static LocalizationSubsystem localizationSubsystem = LocalizationSubsystem.INSTANCE;
 }

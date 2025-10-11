@@ -1,73 +1,62 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem;
-
-import dev.nextftc.core.commands.Command;
-import dev.nextftc.core.commands.utility.InstantCommand;
-import dev.nextftc.core.subsystems.SubsystemGroup;
-
-// CAUTION !! RESETTING LOCALIZATION SHOULD HANDLE (or at least keep note of) POTENTIAL VELOCITY SPIKE !!
-public class LocalizationSubsystem extends SubsystemGroup {
-
-  private double x;
-  private double y;
-  private double h;
+import org.firstinspires.ftc.teamcode.subsystems.localization.Kalman;
+import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
 
 
+public class LocalizationSubsystem {
 
-  public static final LocalizationSubsystem INSTANCE = new LocalizationSubsystem();
-  private LocalizationSubsystem() {
-    super(
+  double Rx;
+  double Ry;
+  double Rh;
+  double Vx;
+  double Vy;
+  double Vh;
+  double Ax;
+  double Ay;
+  double Ah;
+  CVSubsystem cv; //note rember to have a method to return mosique
+  OdometrySubsystem odom;
+  Kalman kalmanX;
+  Kalman kalmanY;
 
-    );
+  public LocalizationSubsystem(double x1, double y1, double h, boolean side, HardwareMap hm){
+    cv = new CVSubsystem(x1, y1, h, side, hm);
+    odom = new OdometrySubsystem(x1, y1, h, hm);
+    kalmanX = new Kalman(x1, 0.05, 0.3, 0.7); //tune - (0.3q = 70% trust odom)
+    kalmanY = new Kalman(y1,0.05, 0.3, 0.7 ); //tune - (0.3q = 70% trust odom)
+    Rx = kalmanX.getEstimate();
+    Ry = kalmanY.getEstimate();
+    Rh = odom.getROh();
+  }
+
+  public void update(){
+    cv.updateCV();
+    odom.updateOdom();
+    kalmanX.updateKF(odom.getROx1(), cv.getRCx1());
+    kalmanY.updateKF(odom.getROy1(), cv.getRCy1());
+    Rx = kalmanX.getEstimate();
+    Ry = kalmanY.getEstimate();
+    Rh = odom.getROh();
   }
 
 
 
-  public int getPattern(){
-    // returns motif pattern
-    return 0;
-  }
 
+  ///gets///
+  public double getX() { return Rx; }
+  public double getY() { return Ry; }
+  public double getH() { return Rh; }
+  public double getVX() { return 0.0; }
+  public double getVY() { return 0.0; }
+  public double getVH() { return 0.0; }
+  public double getAX() { return 0.0; }
+  public double getAY() { return 0.0; }
+  public double getAH() { return 0.0; }
+  public CVSubsystem.motif getMotif() { return cv.getMotifc();}
 
-
-  public double getX(){
-    return x; // make this work eventually
-  }
-  public double getY(){
-    return y; // make this work eventually
-  }
-  public double getH(){
-    return h; // make this work eventually
-  }
-  public double getVX(){
-    return x; // make this work eventually
-  }
-  public double getVY(){
-    return y; // make this work eventually
-  }
-  public double getVH(){
-    return h; // make this work eventually
-  }
-  public Command resetX(double X){
-    return new InstantCommand(() -> {
-
-    });
-  }
-  public Command resetY(double Y){
-    return new InstantCommand(() -> {
-
-    });
-  }
-  public Command resetH(double H){
-    return new InstantCommand(() -> {
-
-    });
-  }
-
-  @Override
-  public void periodic(){
-    // update headings based on locale modules
-  }
 }
