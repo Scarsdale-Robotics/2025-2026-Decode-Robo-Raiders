@@ -47,7 +47,7 @@ public class LocalizationSubsystem {
     timeSinceLastUpdate = 0;
   }
 
-  public void update() {
+  public void updateLocalization() {
     clock = System.currentTimeMillis();
     timeSinceLastUpdate = clock - lastUpdateTime;
     lastUpdateTime = clock;
@@ -81,17 +81,44 @@ public class LocalizationSubsystem {
   }
 
   private double computeFirstDerivative(LinkedList<Double> values, LinkedList<Double> times) {
-    if (values.size() < 5) return 0.0;
-    double h = (times.get(4) - times.get(0)) / 4.0;
-    return (-values.get(4) + 8*values.get(3) - 8*values.get(1) + values.get(0)) / (12*h);
+    int n = values.size();
+    if (n < 2) return 0.0;
+
+    if (n >= 5) {
+      double h = (times.get(4) - times.get(0)) / 4.0;
+      return (-values.get(4) + 8*values.get(3) - 8*values.get(1) + values.get(0)) / (12*h);
+    }
+
+    double h = (times.get(n - 1) - times.get(0)) / (n - 1);
+    return (values.get(n - 1) - values.get(0)) / (times.get(n - 1) - times.get(0));
   }
 
   private double computeSecondDerivative(LinkedList<Double> values, LinkedList<Double> times) {
-    if (values.size() < 5) return 0.0;
-    double h = (times.get(4) - times.get(0)) / 4.0;
-    return (-values.get(4) + 16*values.get(3) - 30*values.get(2) + 16*values.get(1) - values.get(0)) / (12*h*h);
+    int n = values.size();
+    if (n < 3) return 0.0;
+
+    if (n >= 5) {
+      double h = (times.get(4) - times.get(0)) / 4.0;
+      return (-values.get(4) + 16*values.get(3) - 30*values.get(2) + 16*values.get(1) - values.get(0)) / (12*h*h);
+    }
+
+    double h1 = times.get(1) - times.get(0);
+    double h2 = times.get(n - 1) - times.get(n - 2);
+    if (n == 3) {
+      double h = (times.get(2) - times.get(0)) / 2.0;
+      return (values.get(2) - 2 * values.get(1) + values.get(0)) / (h * h);
+    }
+    double h = (times.get(n - 1) - times.get(0)) / (n - 1);
+    return (values.get(n - 1) - 2 * values.get(n / 2) + values.get(0)) / (h * h);
   }
 
+  public void setPos(double x1, double y1, double h) {
+    cv.setCv(x1, y1, h);
+    odom.setPinpoint(x1, y1, h);
+  }
+
+
+  ///gets///
   public double getX() { return Rx; }
   public double getY() { return Ry; }
   public double getH() { return Rh; }
@@ -103,7 +130,8 @@ public class LocalizationSubsystem {
   public double getAH() { return Ah; }
   public double getTimeSinceLastUpdate() { return timeSinceLastUpdate; }
   public double getClock() { return clock; }
-  private double getTimeS() { return System.nanoTime() / 1_000_000.0; }
-  public void setPos(double x1, double y1, double h) { cv.setCv(x1, y1, h); odom.setPinpoint(x1, y1, h); }
+  public double getTimeS() { return clock/1000; }
+  public double getLastUpdateTime(){return lastUpdateTime;}
+
   public CVSubsystem.motif getMotif() { return cv.getMotifc(); }
 }
