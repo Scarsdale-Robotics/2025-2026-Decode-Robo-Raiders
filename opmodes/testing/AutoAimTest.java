@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing;
 
-import static org.firstinspires.ftc.teamcode.utils.Angles.normalizeAngle;
 import static org.firstinspires.ftc.teamcode.utils.QuarticMaxNonnegRoot.maxNonNegativeRoot;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeControlledCommand;
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.Command;
@@ -41,7 +37,7 @@ public class AutoAimTest extends NextFTCOpMode {
     public AutoAimTest() {
         addComponents(
                 new SubsystemComponent(
-                        IntakeSubsystem.INSTANCE,
+                        IntakeControlledCommand.INSTANCE,
                         LocalizationSubsystem.INSTANCE,
                         OuttakeSubsystem.INSTANCE
                 )

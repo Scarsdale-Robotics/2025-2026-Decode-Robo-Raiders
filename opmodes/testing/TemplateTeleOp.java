@@ -3,8 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.testing;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Robot;
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeControlledCommand;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.Command;
@@ -62,11 +61,11 @@ public class TemplateTeleOp extends NextFTCOpMode {
     // Intake //
     ////////////
     Gamepads.gamepad1().leftBumper()
-      .whenBecomesTrue(IntakeSubsystem.INSTANCE.in)
-      .whenBecomesFalse(IntakeSubsystem.INSTANCE.stop);
+      .whenBecomesTrue(IntakeControlledCommand.INSTANCE.in)
+      .whenBecomesFalse(IntakeControlledCommand.INSTANCE.stop);
     Gamepads.gamepad1().rightBumper()
-      .whenBecomesTrue(IntakeSubsystem.INSTANCE.out)
-      .whenBecomesFalse(IntakeSubsystem.INSTANCE.stop);
+      .whenBecomesTrue(IntakeControlledCommand.INSTANCE.out)
+      .whenBecomesFalse(IntakeControlledCommand.INSTANCE.stop);
 
 
 

@@ -1,17 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing;
 
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeControlledCommand;
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.MagazineSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.CommandManager;
 import dev.nextftc.core.commands.groups.ParallelGroup;
-import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -36,9 +32,10 @@ public class T67 extends NextFTCOpMode {
     public T67() {
         addComponents(
                 new SubsystemComponent(
-                        IntakeSubsystem.INSTANCE,
+                        IntakeControlledCommand.INSTANCE,
                         LocalizationSubsystem.INSTANCE,
-                        OuttakeSubsystem.INSTANCE
+                        OuttakeSubsystem.INSTANCE,
+                        MagazineSubsystem.INSTANCE
                 )
         );
     }
@@ -85,7 +82,7 @@ public class T67 extends NextFTCOpMode {
                 );
 
         // INTAKE
-        Command intakePower = IntakeSubsystem.INSTANCE.setPower(
+        Command intakePower = IntakeControlledCommand.INSTANCE.setPower(
                 Gamepads.gamepad1().leftTrigger(),
                 Gamepads.gamepad1().rightTrigger()
         );

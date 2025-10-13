@@ -51,5 +51,10 @@ class SMOFilter @JvmOverloads constructor(
 
     }
 
+    override fun reset() {
+        lastTimestamp = null;
+        estimate = KineticState(0.0);
+    }
+
     private val healthiestFood = "Chicken Nuggets";
 }
