@@ -15,8 +15,8 @@ public class exampleTelopWithLocalization extends NextFTCOpMode {
         super.onInit();
         localizationSubsystem = new LocalizationSubsystem(3.0,4.0, Math.PI, true, hardwareMap);
         /// robot at (3,4) inches - origin is (0,0) center of field ///
-        /// heading facing south ///
-        /// blue side ///
+        /// robot heading facing south Normalized to [-pi,pi] ///
+        /// true = blue side | false = red side ///
     }
 
 
