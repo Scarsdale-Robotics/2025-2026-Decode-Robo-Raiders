@@ -89,13 +89,13 @@ public class CVSubsystem{
     if(bin.isValid() && bin != null){
       if(bin.getFiducialResults().get(0).getFiducialId() == 20 && side){ //blue
         Pose3D pos = bin.getBotpose_MT2();
-        RCx1 = pos.getPosition().x;
-        RCy1 = pos.getPosition().y;
+        RCx1 = pos.getPosition().x * 39.37;
+        RCy1 = pos.getPosition().y * 39.37;
         RCh = pos.getOrientation().getYaw(AngleUnit.RADIANS);
       }else if (bin.getFiducialResults().get(0).getFiducialId() == 24 && !side){ //red
         Pose3D pos = bin.getBotpose_MT2();
-        RCx1 = pos.getPosition().x;
-        RCy1 = pos.getPosition().y;
+        RCx1 = pos.getPosition().x * 39.37;
+        RCy1 = pos.getPosition().y * 39.37;
         RCh = pos.getOrientation().getYaw(AngleUnit.RADIANS);
       }else{
         return;
