@@ -25,7 +25,7 @@ class SMOFilter @JvmOverloads constructor(
             lastTimestamp = timestamp;
         }
 
-        val dt = (timestamp - lastTimestamp!!).toDouble(DurationUnit.NANOSECONDS);
+        val dt = (timestamp - lastTimestamp!!).toDouble(DurationUnit.SECONDS);
 
         estimate.plus(
             KineticState(

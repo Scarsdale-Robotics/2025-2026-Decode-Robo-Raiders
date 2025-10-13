@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystems.magazine
+package org.firstinspires.ftc.teamcode.subsystems.lower.magazine
 
 import com.acmerobotics.dashboard.config.Config
 import dev.nextftc.core.commands.utility.InstantCommand
