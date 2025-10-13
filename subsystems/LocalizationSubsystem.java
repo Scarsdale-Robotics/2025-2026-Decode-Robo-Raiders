@@ -133,5 +133,8 @@ public class LocalizationSubsystem {
   public double getTimeS() { return clock/1000; }
   public double getLastUpdateTime(){return lastUpdateTime;}
 
+  public double getKalmangainX(){return kalmanX.getKalmanGain();}
+  public double getKalmangainY(){return  kalmanY.getKalmanGain();}
+
   public CVSubsystem.motif getMotif() { return cv.getMotifc(); }
 }
