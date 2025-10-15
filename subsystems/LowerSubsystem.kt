@@ -17,7 +17,7 @@ object LowerSubsystem : SubsystemGroup(
 ) {
     @JvmField var FIX_JAM_DELAY_MS = 1000;
 
-    val fixJam = SequentialGroup(
+    @JvmField var fixJam = SequentialGroup(
         ParallelGroup(
             DriverCommandDefaultOn { 1.0 },  // 1.0 --> full reverse
             MagazineMotorSubsystem.reverse,

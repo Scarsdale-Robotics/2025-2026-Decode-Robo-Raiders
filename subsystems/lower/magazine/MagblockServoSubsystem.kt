@@ -14,5 +14,5 @@ object MagblockServoSubsystem : Subsystem {
     private val servo = ServoEx("magblock");
 
     @JvmField val open = InstantCommand { SetPosition(servo, OPEN); }
-    val close = InstantCommand { SetPosition(servo, CLOSED); }
+    @JvmField val close = InstantCommand { SetPosition(servo, CLOSED); }
 }
