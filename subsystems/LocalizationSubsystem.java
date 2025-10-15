@@ -77,7 +77,7 @@ public class LocalizationSubsystem {
     xHistory.add(Rx);
     yHistory.add(Ry);
     hHistory.add(Rh);
-    tHistory.add(clock); // might have to convert ms to seconds
+    tHistory.add(clock/1000); // might have to convert ms to seconds
   }
 
   private double computeFirstDerivative(LinkedList<Double> values, LinkedList<Double> times) {
