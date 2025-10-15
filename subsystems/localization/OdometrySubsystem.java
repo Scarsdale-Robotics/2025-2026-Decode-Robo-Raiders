@@ -56,15 +56,12 @@ public class OdometrySubsystem {
   public double getROh() {
     return ROh;
   }
-
   public double getROx1() {
     return ROx1;
   }
-
   public double getDistance() {
     return distance;
   }
-
   public double getROy1() {
     return ROy1;
   }
