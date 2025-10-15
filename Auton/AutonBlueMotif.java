@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auton;
 
-import static org.firstinspires.ftc.teamcode.utils.QuarticMaxNonnegRoot.maxNonNegativeRoot;
-
 import com.pedropathing.geometry.BezierCurve;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
@@ -12,27 +8,16 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.CommandManager;
-import dev.nextftc.core.commands.utility.InstantCommand;
-import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.extensions.pedro.*;
 import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 import dev.nextftc.extensions.pedro.PedroComponent;
-import dev.nextftc.core.commands.Command;
-import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
-import dev.nextftc.core.commands.groups.SequentialGroup;
-import dev.nextftc.core.components.SubsystemComponent;
 
-import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
-
 
 
 //Auton Naming Convention
@@ -312,7 +297,7 @@ public class AutonBlueMotif extends NextFTCOpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                CommandManager.INSTANCE.scheduleCommand(OuttakeSubsystem.INSTANCE.shootWhenReady);
+                CommandManager.INSTANCE.scheduleCommand(MagblockServoSubsystem.INSTANCE.);
                 new FollowPath(robotStartPath);
                 setPathState(3); //for now 3
                 break;

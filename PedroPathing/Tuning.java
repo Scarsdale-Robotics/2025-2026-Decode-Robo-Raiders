@@ -7,6 +7,8 @@ import static org.firstinspires.ftc.teamcode.PedroPathing.Tuning.follower;
 import static org.firstinspires.ftc.teamcode.PedroPathing.Tuning.stopRobot;
 import static org.firstinspires.ftc.teamcode.PedroPathing.Tuning.telemetryM;
 
+import android.graphics.Path;
+
 import com.bylazar.configurables.PanelsConfigurables;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.configurables.annotations.IgnoreConfigurable;
