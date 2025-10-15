@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.Gamepad
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
+import dev.nextftc.core.units.rad
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.hardware.driving.MecanumDriverControlled
@@ -36,7 +37,9 @@ class TeleOpMain : NextFTCOpMode() {
             )  // todo: consider add localization subsystem
         )
 
-        autoAimCommand = TurretSubsystem.AutoAim();  // todo: connect with localization
+        autoAimCommand = TurretSubsystem.AutoAim(
+            { 0.0 }, { 0.0 }, {0.0.rad}
+        );  // todo: connect with localization
         manualAimCommand = TurretSubsystem.DriverCommand(
             Gamepads.gamepad2.triangle,
             Gamepads.gamepad2.cross,
@@ -52,7 +55,7 @@ class TeleOpMain : NextFTCOpMode() {
         );
     }
 
-    override fun onStartButtonPressed() {
+    override fun onStartButtonPressed(): Unit {
         IntakeSubsystem.DriverCommandDefaultOn(
             Gamepads.gamepad1.leftTrigger,
         ).schedule();
