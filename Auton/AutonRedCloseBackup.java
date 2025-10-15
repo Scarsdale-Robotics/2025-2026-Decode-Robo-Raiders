@@ -23,12 +23,12 @@ import dev.nextftc.core.components.SubsystemComponent;
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
 //First slot = Name Type: Auton
-//2nd slot = Classifier type (There can be multiple types on the same auto):
+//2nd slot = Side type: Blue, Red
+//3rd slot = Classifier type (There can be multiple types on the same auto):
 //1. Leaving it blank
 //2. Wait (only for shooter type autons)
 //3. Far (only for shooter and backup type autons)
 //4. Close (only for shooter and backup type autons)
-//3rd slot = Side type: Blue, Red
 //4th slot = Auton type: Motif, Backup, Shooter
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__WaitFarShooter & Auton__Motif
