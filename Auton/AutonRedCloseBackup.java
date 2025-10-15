@@ -33,9 +33,9 @@ import dev.nextftc.core.components.SubsystemComponent;
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__WaitFarShooter & Auton__Motif
 
-@Autonomous(name = "Auton Blue Close Backup", group = "Auton")
-public class AutonBlueCloseBackup extends NextFTCOpMode {
-    public AutonBlueCloseBackup() {
+@Autonomous(name = "Auton Red Close Backup", group = "Auton")
+public class AutonRedCloseBackup extends NextFTCOpMode {
+    public AutonRedCloseBackup() {
         addComponents(
                 new PedroComponent(Constants::createFollower)
         );
@@ -55,8 +55,8 @@ public class AutonBlueCloseBackup extends NextFTCOpMode {
     ////Positions////
     /////////////////
     // Positions the robot will be in during Auton
-    private final Pose startPose = new Pose(56, 8, Math.toRadians(90)); // Start Pose of our robot.
-    private final Pose endPose = new Pose(56, 36, Math.toRadians(180)); // End Pose of our robot.
+    private final Pose startPose = new Pose(88, 8, Math.toRadians(90)); // Start Pose of our robot.
+    private final Pose endPose = new Pose(88, 36, Math.toRadians(360)); // End Pose of our robot.
 
     /////////////
     ////Paths////

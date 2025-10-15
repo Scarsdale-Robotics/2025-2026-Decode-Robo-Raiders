@@ -1,28 +1,45 @@
-package org.firstinspires.ftc.teamcode.subsystems.outtake;
+package org.firstinspires.ftc.teamcode.subsystems.outtake
 
-import dev.nextftc.core.commands.Command;
-import dev.nextftc.core.commands.utility.LambdaCommand;
-import dev.nextftc.core.subsystems.Subsystem;
-import dev.nextftc.hardware.impl.MotorEx;
+import android.service.controls.Control
+import com.acmerobotics.dashboard.config.Config
+import dev.nextftc.control.ControlSystem
+import dev.nextftc.control.KineticState
+import dev.nextftc.control.builder.controlSystem
+import dev.nextftc.control.feedback.FeedbackType
+import dev.nextftc.core.commands.utility.InstantCommand
+import dev.nextftc.core.subsystems.Subsystem
+import dev.nextftc.hardware.impl.MotorEx
+import org.firstinspires.ftc.teamcode.utils.SMO.SMOFilter
+import java.time.Instant
 
-public class ShooterSubsystem implements Subsystem {
-  public static final ShooterSubsystem INSTANCE = new ShooterSubsystem();
+@Config
+object ShooterSubsystem : Subsystem {
+    private val motor = MotorEx("shooter");
 
-  private final MotorEx shootMotor = new MotorEx("Shooter");
+    @JvmField var Ls = 0.0;
+    @JvmField var Lv = 0.0;
+    @JvmField var La = 0.0;
 
-  private ShooterSubsystem() {
+    @JvmField var MAX_VELOCITY = 1.0;
+    @JvmField var NO_VELOCITY = 0.0;
 
-  }
+    private var targetShooterVelocity = NO_VELOCITY;
+    private val controlSystem: ControlSystem;
 
-  public Command startShoot = new LambdaCommand()
-    .setStart(() -> shootMotor.setPower(1))
-    .setInterruptible(true)
-    .setRequirements(ShooterSubsystem.INSTANCE);
+    init {
+        val velSMO = SMOFilter(FeedbackType.VELOCITY, Ls, Lv, La)
+        controlSystem = controlSystem {
+            velFilter { filter -> filter.custom(velSMO).build() }
+            velSquID(Ls, Lv, La)
+        }
+    }
 
-  public Command stopShoot = new LambdaCommand()
-    .setStart(() -> shootMotor.setPower(0))
-    .setRequirements(ShooterSubsystem.INSTANCE);
+    val run = InstantCommand { targetShooterVelocity = MAX_VELOCITY; }
+    val stop = InstantCommand { targetShooterVelocity = NO_VELOCITY; }
 
-
-
+    override fun periodic() {
+        motor.power = controlSystem.calculate(
+            KineticState(0.0, targetShooterVelocity)  // todo: if issue (no move after bit), consider nonzero position here
+        )
+    }
 }
