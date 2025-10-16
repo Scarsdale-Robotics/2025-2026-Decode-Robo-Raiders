@@ -15,8 +15,8 @@ object MagazineMotorSubsystem : Subsystem {
 
     private var power = 0.0;
 
-    val forward = InstantCommand { power = POWER_FORWARD };
-    val reverse = InstantCommand { power = POWER_REVERSE };
+    class Forward : InstantCommand({ power = POWER_FORWARD });
+    class Reverse : InstantCommand({ power = POWER_REVERSE });
 
     override fun periodic() {
         SetPower(motor, power);

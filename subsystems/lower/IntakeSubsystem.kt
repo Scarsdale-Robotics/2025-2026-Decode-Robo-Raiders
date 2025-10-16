@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.lower
 
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
@@ -20,6 +21,11 @@ object IntakeSubsystem : Subsystem {
     override fun periodic() {
         SetPower(motor, power);
     }
+
+    class SetPower(power: Double) : InstantCommand({ IntakeSubsystem.power = power });
+
+    class Forward : InstantCommand({ IntakeSubsystem.power = FORWARD });
+    class Reverse : InstantCommand({ IntakeSubsystem.power = REVERSE });
 
     class DriverCommandDefaultOn(  // could be bad for power draw?
         private val reversePower: Supplier<Double>,

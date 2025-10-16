@@ -8,6 +8,7 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
@@ -16,8 +17,6 @@ import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.extensions.pedro.*;
 import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 import dev.nextftc.extensions.pedro.PedroComponent;
-
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 
 
 //Auton Naming Convention
@@ -40,8 +39,8 @@ Motif PGP: 22
 Motif PPG: 23
  */
 @Autonomous(name = "Auton Blue Motif", group = "Auton")
-public class AutonBlueMotif extends NextFTCOpMode {
-    public AutonBlueMotif() {
+public class AutonBlueMotifJava extends NextFTCOpMode {
+    public AutonBlueMotifJava() {
         addComponents(
                 new PedroComponent(Constants::createFollower)
         );
@@ -297,13 +296,13 @@ public class AutonBlueMotif extends NextFTCOpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                CommandManager.INSTANCE.scheduleCommand(MagblockServoSubsystem.INSTANCE.);
+                CommandManager.INSTANCE.scheduleCommand(new MagblockServoSubsystem.Open());
                 new FollowPath(robotStartPath);
                 setPathState(3); //for now 3
                 break;
             case 1: //Motif GPP starts
                 if (!follower().isBusy()) {
-                    CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(1)); //(TURNS ON INTAKE) temporary value
+                    CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Forward()); //(TURNS ON INTAKE) temporary value
                     new FollowPath(motifGPPIntake1);
                     if (follower().atPose(endBeforeMotifStartPose, 1, 1)) {
                         setPathState(7);
@@ -312,7 +311,7 @@ public class AutonBlueMotif extends NextFTCOpMode {
                 break;
             case 2: //Motif PGP starts
                 if (!follower().isBusy()) {
-                    CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(1)); //(TURNS ON INTAKE) temporary value
+                    CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Forward()); //(TURNS ON INTAKE) temporary value
                     new FollowPath(motifPGPIntake1);
                     if (follower().atPose(endBeforeMotifStartPose, 1, 1)) {
                         setPathState(9);
@@ -321,7 +320,7 @@ public class AutonBlueMotif extends NextFTCOpMode {
                 break;
             case 3: //Motif PPG starts (INTAKE1 PREP)
                 if (!follower().isBusy()) {
-                    CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(1)); //(TURNS ON INTAKE) temporary value
+                    CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Forward()); //(TURNS ON INTAKE) temporary value
                     new FollowPath(motifPPGIntake1Prep);
                     if (follower().atPose(endBeforeMotifStartPose, 1, 1)) {
                         setPathState(4);
@@ -332,7 +331,7 @@ public class AutonBlueMotif extends NextFTCOpMode {
                 if (!follower().isBusy()) {
                     new FollowPath(motifPPGIntake1);
                     if (follower().atPose(motifPPGIntake1EndPos, 1, 1)) {
-                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(0)); //(TURNS OFF INTAKE) temporary value
+                        CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Reverse()); //(TURNS OFF INTAKE) temporary value
                     }
                     if (follower().atPose(motifPPGIntake1EndPos, 1, 1)) {
                         setPathState(5);
@@ -341,13 +340,13 @@ public class AutonBlueMotif extends NextFTCOpMode {
                 break;
             case 5: //Motif PPG sequence 2 ( (INTAKE2 LOAD)
                 if (!follower().isBusy()) {
-                    CommandManager.INSTANCE.scheduleCommand(OuttakeSubsystem.INSTANCE.shootWhenReady);
+                    CommandManager.INSTANCE.scheduleCommand(new MagblockServoSubsystem.Open());
                     if (follower().atPose(motifPPGIntake2MidPos, 1, 1)) {
-                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(1)); //(TURNS ON INTAKE) temporary value
+                        CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Forward()); //(TURNS ON INTAKE) temporary value
                     }
                     new FollowPath(motifPPGIntake2);
                     if (follower().atPose(motifPPGIntake2End, 1, 1)) {
-                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(0)); //(TURNS OFF INTAKE) temporary value
+                        CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Reverse()); //(TURNS OFF INTAKE) temporary value
                     }
                     if (follower().atPose(motifPPGIntake2End, 1, 1)) {
                         setPathState(6);
@@ -364,11 +363,11 @@ public class AutonBlueMotif extends NextFTCOpMode {
                 if (!follower().isBusy()) {
                     new FollowPath(motifGPPIntake2);
                     if (follower().atPose(motifGPPIntake1ToShoot, 1, 1)) {
-                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(0)); //(TURNS OFF INTAKE) temporary value
-                        CommandManager.INSTANCE.scheduleCommand(OuttakeSubsystem.INSTANCE.shootWhenReady);
+                        CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Reverse()); //(TURNS OFF INTAKE) temporary value
+                        CommandManager.INSTANCE.scheduleCommand(new MagblockServoSubsystem.Open());
                     }
                     if (follower().atPose(motifGPPIntake2Purp1Intaked, 5, 5)) {
-                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(1)); //(TURNS ON INTAKE) temporary value
+                        CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Forward()); //(TURNS ON INTAKE) temporary value
                     }
                     if (follower().atPose(motifGPPIntake2Intaked2, 1, 1)) {
                         setPathState(8);
@@ -385,7 +384,7 @@ public class AutonBlueMotif extends NextFTCOpMode {
                 if (!follower().isBusy()) {
                     new FollowPath(motifPGPIntake1);
                     if (follower().atPose(motifPGPIntake1FinalPos, 1, 1)) {
-                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(0)); //(TURNS OFF INTAKE) temporary value
+                        CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Reverse()); //(TURNS OFF INTAKE) temporary value
                     }
                     if (follower().atPose(motifPPGIntake1EndPos, 1, 1)) {
                         setPathState(10);
@@ -395,12 +394,12 @@ public class AutonBlueMotif extends NextFTCOpMode {
             case 10: //Motif PGP sequence 2 (INTAKE2 LOAD)
                 if (!follower().isBusy()) {
                     new FollowPath(motifPGPIntake2);
-                    CommandManager.INSTANCE.scheduleCommand(OuttakeSubsystem.INSTANCE.shootWhenReady);
+                    CommandManager.INSTANCE.scheduleCommand(new MagblockServoSubsystem.Open());
                     if (follower().atPose(motifPGPIntake2Prep, 5, 5)) {
-                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(1)); //(TURNS ON INTAKE) temporary value
+                        CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Forward()); //(TURNS ON INTAKE) temporary value
                     }
                     if (follower().atPose(motifsShooterEnd, 1, 1)) {
-                        CommandManager.INSTANCE.scheduleCommand(IntakeSubsystem.INSTANCE.setPower(0)); //(TURNS OFF INTAKE) temporary value
+                        CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Reverse()); //(TURNS OFF INTAKE) temporary value
                     }
                     if (follower().atPose(motifsShooterEnd, 1, 1)) {
                         setPathState(999);
@@ -409,7 +408,7 @@ public class AutonBlueMotif extends NextFTCOpMode {
                 break;
             case 999: //Motif park for all, current case # is temporary
                 if (!follower().isBusy()) {
-                    CommandManager.INSTANCE.scheduleCommand(OuttakeSubsystem.INSTANCE.shootWhenReady);
+                    CommandManager.INSTANCE.scheduleCommand(new MagblockServoSubsystem.Open());
                     if (pathTimer.getElapsedTimeSeconds() > 2.5) {
                         new FollowPath(motifPark);
                     }
@@ -429,7 +428,7 @@ public class AutonBlueMotif extends NextFTCOpMode {
 //        if (pathTimer.getElapsedTimeSeconds() > 1) {
 //            CommandManager.INSTANCE.scheduleCommand(TurretSubsystem.INSTANCE.autoAim(telemetry));
 //        }
-        CommandManager.INSTANCE.scheduleCommand(TurretSubsystem.INSTANCE.autoAim(telemetry));
+        CommandManager.INSTANCE.scheduleCommand(new TurretSubsystem.AutoAim(0.0, 0.0, ));  // todo: wait for localization
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower().getPose().getX());

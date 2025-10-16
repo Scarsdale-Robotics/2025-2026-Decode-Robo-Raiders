@@ -34,8 +34,8 @@ object ShooterSubsystem : Subsystem {
         }
     }
 
-    val run = InstantCommand { targetShooterVelocity = MAX_VELOCITY; }
-    val stop = InstantCommand { targetShooterVelocity = NO_VELOCITY; }
+    class Run : InstantCommand({ targetShooterVelocity = MAX_VELOCITY; });
+    class Stop : InstantCommand({ targetShooterVelocity = NO_VELOCITY; });
 
     override fun periodic() {
         motor.power = controlSystem.calculate(

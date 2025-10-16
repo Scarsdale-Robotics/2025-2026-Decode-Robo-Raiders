@@ -30,28 +30,8 @@ object TurretSubsystem : SubsystemGroup(
         TurretPhiSubsystem.AutoAim(dx, dy),
         TurretThetaSubsystem.AutoAim({ hypot(dx.get(), dy.get()) }, angleByDistance),
     )
-  // Java doesn't support default parameters
-  class DriverCommandNoDefaults(
-    private val farModeButton: Button,
-    private val nearModeButton: Button,
-    private val shiftUpButton: Button,
-    private val shiftDownButton: Button,
-    private val shiftLeftButton: Button,
-    private val shiftRightButton: Button,
-    private val setButton: Button,
-    initialFarModeTheta: Double,
-    initialNearModeTheta: Double,
-    initialFarModePhi: Double,
-    initialNearModePhi: Double
-    ): DriverCommand(
-      farModeButton,
-      nearModeButton,
-      shiftUpButton,
-      shiftDownButton,shiftLeftButton, shiftRightButton,setButton,initialFarModeTheta.deg,initialNearModeTheta.deg,initialFarModePhi.deg,initialNearModePhi.deg,
-    TimeSource.Monotonic
-  )
 
-    open class DriverCommand(
+    open class DriverCommand @JvmOverloads constructor(
         private val farModeButton: Button,
         private val nearModeButton: Button,
         private val shiftUpButton: Button,
