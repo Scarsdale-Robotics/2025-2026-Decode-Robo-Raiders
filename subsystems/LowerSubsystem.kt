@@ -20,11 +20,11 @@ object LowerSubsystem : SubsystemGroup(
     @JvmField var fixJam = SequentialGroup(
         ParallelGroup(
             DriverCommandDefaultOn { 1.0 },  // 1.0 --> full reverse
-            MagazineMotorSubsystem.Reverse(),
+            MagazineMotorSubsystem.reverse(),
         ),
-        MagblockServoSubsystem.Open(),
+        MagblockServoSubsystem.open(),
         Delay(FIX_JAM_DELAY_MS.milliseconds),
-        MagblockServoSubsystem.Close(),
-        MagazineMotorSubsystem.Forward(),  // doesn't reset intake b/c we don't know what intake was set at
+        MagblockServoSubsystem.close(),
+        MagazineMotorSubsystem.forward(),  // doesn't reset intake b/c we don't know what intake was set at
     ).setInterruptible(false);
 }

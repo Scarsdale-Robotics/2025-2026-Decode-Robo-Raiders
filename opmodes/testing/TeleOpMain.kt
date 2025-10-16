@@ -10,7 +10,6 @@ import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.MagazineSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
@@ -74,8 +73,8 @@ class TeleOpMain : NextFTCOpMode() {
         autoAimCommand.schedule();
 
         // circle --> shoot
-        Gamepads.gamepad1.circle whenBecomesTrue MagblockServoSubsystem.open;
-        Gamepads.gamepad1.circle whenBecomesFalse MagblockServoSubsystem.close;
+        Gamepads.gamepad1.circle whenBecomesTrue MagblockServoSubsystem.open();
+        Gamepads.gamepad1.circle whenBecomesFalse MagblockServoSubsystem.close();
 
         // g2 both bumpers --> toggle autoAim
         Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.rightBumper whenBecomesTrue {

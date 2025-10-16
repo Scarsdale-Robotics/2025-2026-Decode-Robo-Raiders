@@ -6,7 +6,6 @@ import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
-import dev.nextftc.core.commands.CommandManager.scheduleCommand
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
@@ -16,7 +15,7 @@ import org.firstinspires.ftc.teamcode.PedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.Open
+import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.open
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem
 
 class AutonBlueMotif : NextFTCOpMode() {
@@ -381,7 +380,7 @@ class AutonBlueMotif : NextFTCOpMode() {
     fun autonomousPathUpdate() {
         when (pathState) {
             0 -> {
-                Open().schedule()
+                open().schedule()
                 FollowPath(robotStartPath!!)
                 setPathState(3) //for now 3
             }
@@ -421,7 +420,7 @@ class AutonBlueMotif : NextFTCOpMode() {
             }
 
             5 -> if (!PedroComponent.follower.isBusy) {
-                Open().schedule()
+                open().schedule()
                 if (PedroComponent.follower.atPose(motifPPGIntake2MidPos, 1.0, 1.0)) {
                     IntakeSubsystem.Forward().schedule() //(TURNS ON INTAKE) temporary value
                 }
@@ -443,7 +442,7 @@ class AutonBlueMotif : NextFTCOpMode() {
                 FollowPath(motifGPPIntake2!!)
                 if (PedroComponent.follower.atPose(motifGPPIntake1ToShoot, 1.0, 1.0)) {
                     IntakeSubsystem.Reverse().schedule() //(TURNS OFF INTAKE) temporary value
-                    Open().schedule()
+                    open().schedule()
                 }
                 if (PedroComponent.follower.atPose(motifGPPIntake2Purp1Intaked, 5.0, 5.0)) {
                     IntakeSubsystem.Forward().schedule() //(TURNS ON INTAKE) temporary value
@@ -470,7 +469,7 @@ class AutonBlueMotif : NextFTCOpMode() {
 
             10 -> if (!PedroComponent.follower.isBusy) {
                 FollowPath(motifPGPIntake2!!)
-                Open().schedule()
+                open().schedule()
                 if (PedroComponent.follower.atPose(motifPGPIntake2Prep, 5.0, 5.0)) {
                     IntakeSubsystem.Forward().schedule() //(TURNS ON INTAKE) temporary value
                 }
@@ -483,7 +482,7 @@ class AutonBlueMotif : NextFTCOpMode() {
             }
 
             999 -> if (!PedroComponent.follower.isBusy) {
-                Open().schedule()
+                open().schedule()
                 if (pathTimer!!.elapsedTimeSeconds > 2.5) {
                     FollowPath(motifPark!!)
                 }

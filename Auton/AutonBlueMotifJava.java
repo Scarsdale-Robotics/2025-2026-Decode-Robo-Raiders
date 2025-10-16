@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSub
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
 
 import dev.nextftc.core.commands.CommandManager;
+import dev.nextftc.core.units.Angle;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.extensions.pedro.*;
 import static dev.nextftc.extensions.pedro.PedroComponent.follower;
@@ -296,7 +297,7 @@ public class AutonBlueMotifJava extends NextFTCOpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                CommandManager.INSTANCE.scheduleCommand(new MagblockServoSubsystem.Open());
+                CommandManager.INSTANCE.scheduleCommand( MagblockServoSubsystem.open());
                 new FollowPath(robotStartPath);
                 setPathState(3); //for now 3
                 break;
@@ -340,7 +341,7 @@ public class AutonBlueMotifJava extends NextFTCOpMode {
                 break;
             case 5: //Motif PPG sequence 2 ( (INTAKE2 LOAD)
                 if (!follower().isBusy()) {
-                    CommandManager.INSTANCE.scheduleCommand(new MagblockServoSubsystem.Open());
+                    CommandManager.INSTANCE.scheduleCommand(MagblockServoSubsystem.open());
                     if (follower().atPose(motifPPGIntake2MidPos, 1, 1)) {
                         CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Forward()); //(TURNS ON INTAKE) temporary value
                     }
@@ -364,7 +365,7 @@ public class AutonBlueMotifJava extends NextFTCOpMode {
                     new FollowPath(motifGPPIntake2);
                     if (follower().atPose(motifGPPIntake1ToShoot, 1, 1)) {
                         CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Reverse()); //(TURNS OFF INTAKE) temporary value
-                        CommandManager.INSTANCE.scheduleCommand(new MagblockServoSubsystem.Open());
+                        CommandManager.INSTANCE.scheduleCommand(MagblockServoSubsystem.open());
                     }
                     if (follower().atPose(motifGPPIntake2Purp1Intaked, 5, 5)) {
                         CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Forward()); //(TURNS ON INTAKE) temporary value
@@ -394,7 +395,7 @@ public class AutonBlueMotifJava extends NextFTCOpMode {
             case 10: //Motif PGP sequence 2 (INTAKE2 LOAD)
                 if (!follower().isBusy()) {
                     new FollowPath(motifPGPIntake2);
-                    CommandManager.INSTANCE.scheduleCommand(new MagblockServoSubsystem.Open());
+                    CommandManager.INSTANCE.scheduleCommand(MagblockServoSubsystem.open());
                     if (follower().atPose(motifPGPIntake2Prep, 5, 5)) {
                         CommandManager.INSTANCE.scheduleCommand(new IntakeSubsystem.Forward()); //(TURNS ON INTAKE) temporary value
                     }
@@ -408,7 +409,7 @@ public class AutonBlueMotifJava extends NextFTCOpMode {
                 break;
             case 999: //Motif park for all, current case # is temporary
                 if (!follower().isBusy()) {
-                    CommandManager.INSTANCE.scheduleCommand(new MagblockServoSubsystem.Open());
+                    CommandManager.INSTANCE.scheduleCommand(MagblockServoSubsystem.open());
                     if (pathTimer.getElapsedTimeSeconds() > 2.5) {
                         new FollowPath(motifPark);
                     }
@@ -428,7 +429,7 @@ public class AutonBlueMotifJava extends NextFTCOpMode {
 //        if (pathTimer.getElapsedTimeSeconds() > 1) {
 //            CommandManager.INSTANCE.scheduleCommand(TurretSubsystem.INSTANCE.autoAim(telemetry));
 //        }
-        CommandManager.INSTANCE.scheduleCommand(new TurretSubsystem.AutoAim(0.0, 0.0, ));  // todo: wait for localization
+        CommandManager.INSTANCE.scheduleCommand(new TurretSubsystem.AutoAim(()->0.0, ()->0.0, (Double)-> {return Angle.fromDeg(0);}));  // todo: wait for localization
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState);
         telemetry.addData("x", follower().getPose().getX());

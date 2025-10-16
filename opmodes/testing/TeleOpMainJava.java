@@ -11,13 +11,10 @@ import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.hardware.driving.MecanumDriverControlled;
 import dev.nextftc.hardware.impl.MotorEx;
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.lower.MagazineSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem;
-
-import java.util.function.Supplier;
 
 public class TeleOpMainJava extends NextFTCOpMode {
   private MotorEx intakeMotor = new MotorEx("intake");
@@ -44,7 +41,7 @@ public class TeleOpMainJava extends NextFTCOpMode {
     );
 
     autoAimCommand = new TurretSubsystem.AutoAim( ()->0.0 ,  ()->0.0 , (this::angleByDistance));  // todo: connect with localization
-    manualAimCommand = new TurretSubsystem.DriverCommandNoDefaults(
+    manualAimCommand = new TurretSubsystem.DriverCommand(
       Gamepads.gamepad2().triangle(),
       Gamepads.gamepad2().cross(),
       Gamepads.gamepad2().dpadUp(),
@@ -52,10 +49,10 @@ public class TeleOpMainJava extends NextFTCOpMode {
       Gamepads.gamepad2().dpadLeft(),
       Gamepads.gamepad2().dpadRight(),
       Gamepads.gamepad2().circle(),
-      0.0,
-      58.0,
-      30.0,
-      45.0
+      Angle.fromDeg(0.0),
+      Angle.fromDeg(58.0),
+      Angle.fromDeg(30.0),
+      Angle.fromDeg(45.0)
 
       );
   }
@@ -79,8 +76,8 @@ public class TeleOpMainJava extends NextFTCOpMode {
     autoAimCommand.schedule();
 
     // circle --> shoot
-    Gamepads.gamepad1().circle().whenBecomesTrue(MagblockServoSubsystem.open);
-    Gamepads.gamepad1().circle().whenBecomesFalse(MagblockServoSubsystem.close);
+    Gamepads.gamepad1().circle().whenBecomesTrue(MagblockServoSubsystem.open());
+    Gamepads.gamepad1().circle().whenBecomesFalse(MagblockServoSubsystem.close());
 
     // g2 both bumpers --> toggle autoAim
     Gamepads.gamepad2().leftBumper().and(Gamepads.gamepad2().rightBumper()).whenBecomesTrue(new InstantCommand(()->

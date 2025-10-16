@@ -15,8 +15,9 @@ object MagazineMotorSubsystem : Subsystem {
 
     private var power = 0.0;
 
-    class Forward : InstantCommand({ power = POWER_FORWARD });
-    class Reverse : InstantCommand({ power = POWER_REVERSE });
+    @JvmStatic fun forward() : InstantCommand {return InstantCommand({power = POWER_FORWARD });}
+    @JvmStatic fun reverse() : InstantCommand {return InstantCommand({power = POWER_REVERSE });}
+
 
     override fun periodic() {
         SetPower(motor, power);
