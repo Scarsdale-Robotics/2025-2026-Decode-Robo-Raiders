@@ -13,19 +13,10 @@ object IntakeSubsystem : Subsystem {
     val REVERSE = -1.0;
     val FORWARD = 1.0;
 
-    var power = 1.0
-        set(value) {
-            field = value.coerceIn(-1.0, 1.0);
-        };
+    class SetPower(power: Double) : InstantCommand({ SetPower(motor, power); });
 
-    override fun periodic() {
-        SetPower(motor, power);
-    }
-
-    class SetPower(power: Double) : InstantCommand({ IntakeSubsystem.power = power });
-
-    class Forward : InstantCommand({ IntakeSubsystem.power = FORWARD });
-    class Reverse : InstantCommand({ IntakeSubsystem.power = REVERSE });
+    val forward = SetPower(FORWARD);
+    val reverse = SetPower(REVERSE);
 
     class DriverCommandDefaultOn(  // could be bad for power draw?
         private val reversePower: Supplier<Double>,
@@ -33,7 +24,7 @@ object IntakeSubsystem : Subsystem {
         override val isDone = false;
 
         override fun update() {
-            power = 1.0 - 2.0 * reversePower.get();
+            SetPower(1.0 - 2.0 * reversePower.get());
         }
     }
 
@@ -44,7 +35,7 @@ object IntakeSubsystem : Subsystem {
         override val isDone = false;
 
         override fun update() {
-            power = forwardPower.get() - reversePower.get();
+            SetPower(forwardPower.get() - reversePower.get());
         }
     }
 }

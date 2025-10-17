@@ -73,8 +73,8 @@ class TeleOpMain : NextFTCOpMode() {
         autoAimCommand.schedule();
 
         // circle --> shoot
-        Gamepads.gamepad1.circle whenBecomesTrue MagblockServoSubsystem.open();
-        Gamepads.gamepad1.circle whenBecomesFalse MagblockServoSubsystem.close();
+        Gamepads.gamepad1.circle whenBecomesTrue MagblockServoSubsystem.open;
+        Gamepads.gamepad1.circle whenBecomesFalse MagblockServoSubsystem.close;
 
         // g2 both bumpers --> toggle autoAim
         Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.rightBumper whenBecomesTrue {

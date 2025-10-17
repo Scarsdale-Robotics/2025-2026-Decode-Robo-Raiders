@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Auton
 
+import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
@@ -42,6 +43,8 @@ class AutonBlueMotif : NextFTCOpMode() {
         pathState = pState
         pathTimer?.resetTimer()
     }
+
+    val follower = PedroComponent.follower;
 
     /////////////////
     ////Positions////
@@ -155,7 +158,7 @@ class AutonBlueMotif : NextFTCOpMode() {
         )
 
         // 1st Pattern motif, Green-Purple-Purple
-        motifGPPIntake1 = PedroComponent.follower.pathBuilder()
+        motifGPPIntake1 = follower.pathBuilder()
             .addPath(
                 BezierCurve(
                     endBeforeMotifStartPose,
@@ -176,7 +179,7 @@ class AutonBlueMotif : NextFTCOpMode() {
             )
             .build()
 
-        motifGPPIntake2 = PedroComponent.follower.pathBuilder()
+        motifGPPIntake2 = follower.pathBuilder()
             .addPath(
                 BezierCurve(
                     motifGPPIntake1ToShoot,
@@ -223,7 +226,7 @@ class AutonBlueMotif : NextFTCOpMode() {
         )
 
         // 2nd Pattern motif, Purple-Green-Purple
-        motifPGPIntake1 = PedroComponent.follower.pathBuilder()
+        motifPGPIntake1 = follower.pathBuilder()
             .addPath(
                 BezierCurve(
                     endBeforeMotifStartPose,
@@ -263,7 +266,7 @@ class AutonBlueMotif : NextFTCOpMode() {
             )
             .build()
 
-        motifPGPIntake2 = PedroComponent.follower.pathBuilder()
+        motifPGPIntake2 = follower.pathBuilder()
             .addPath(
                 BezierCurve(
                     motifPGPIntake1FinalPos,
@@ -286,7 +289,7 @@ class AutonBlueMotif : NextFTCOpMode() {
             .build()
 
         // 3rd Pattern motif, Purple-Purple-Green for now all paths are combined, but in future this will probably be separated.
-        motifPPGIntake1Prep = PedroComponent.follower.pathBuilder()
+        motifPPGIntake1Prep = follower.pathBuilder()
             .addPath(
                 BezierLine(
                     endBeforeMotifStartPose,
@@ -317,7 +320,7 @@ class AutonBlueMotif : NextFTCOpMode() {
             motifPPGIntake1EndPos.heading
         )
 
-        motifPPGIntake2 = PedroComponent.follower.pathBuilder()
+        motifPPGIntake2 = follower.pathBuilder()
             .addPath(
                 BezierCurve(
                     motifPPGIntake1EndPos,
@@ -380,109 +383,109 @@ class AutonBlueMotif : NextFTCOpMode() {
     fun autonomousPathUpdate() {
         when (pathState) {
             0 -> {
-                open().schedule()
+                open.schedule()
                 FollowPath(robotStartPath!!)
                 setPathState(3) //for now 3
             }
 
-            1 -> if (!PedroComponent.follower.isBusy) {
-                IntakeSubsystem.Forward().schedule() //(TURNS ON INTAKE) temporary value
+            1 -> if (!follower.isBusy) {
+                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 FollowPath(motifGPPIntake1!!)
-                if (PedroComponent.follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
+                if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
                     setPathState(7)
                 }
             }
 
-            2 -> if (!PedroComponent.follower.isBusy) {
-                IntakeSubsystem.Forward().schedule() //(TURNS ON INTAKE) temporary value
+            2 -> if (!follower.isBusy) {
+                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 FollowPath(motifPGPIntake1!!)
-                if (PedroComponent.follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
+                if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
                     setPathState(9)
                 }
             }
 
-            3 -> if (!PedroComponent.follower.isBusy) {
-                IntakeSubsystem.Forward().schedule() //(TURNS ON INTAKE) temporary value
+            3 -> if (!follower.isBusy) {
+                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 FollowPath(motifPPGIntake1Prep!!)
-                if (PedroComponent.follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
+                if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
                     setPathState(4)
                 }
             }
 
-            4 -> if (!PedroComponent.follower.isBusy) {
+            4 -> if (!follower.isBusy) {
                 FollowPath(motifPPGIntake1!!)
-                if (PedroComponent.follower.atPose(motifPPGIntake1EndPos, 1.0, 1.0)) {
-                    IntakeSubsystem.Reverse().schedule() //(TURNS OFF INTAKE) temporary value
+                if (follower.atPose(motifPPGIntake1EndPos, 1.0, 1.0)) {
+                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
                 }
-                if (PedroComponent.follower.atPose(motifPPGIntake1EndPos, 1.0, 1.0)) {
+                if (follower.atPose(motifPPGIntake1EndPos, 1.0, 1.0)) {
                     setPathState(5)
                 }
             }
 
-            5 -> if (!PedroComponent.follower.isBusy) {
-                open().schedule()
-                if (PedroComponent.follower.atPose(motifPPGIntake2MidPos, 1.0, 1.0)) {
-                    IntakeSubsystem.Forward().schedule() //(TURNS ON INTAKE) temporary value
+            5 -> if (!follower.isBusy) {
+                open.schedule()
+                if (follower.atPose(motifPPGIntake2MidPos, 1.0, 1.0)) {
+                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 }
                 FollowPath(motifPPGIntake2!!)
-                if (PedroComponent.follower.atPose(motifPPGIntake2End, 1.0, 1.0)) {
-                    IntakeSubsystem.Reverse().schedule() //(TURNS OFF INTAKE) temporary value
+                if (follower.atPose(motifPPGIntake2End, 1.0, 1.0)) {
+                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
                 }
-                if (PedroComponent.follower.atPose(motifPPGIntake2End, 1.0, 1.0)) {
+                if (follower.atPose(motifPPGIntake2End, 1.0, 1.0)) {
                     setPathState(6)
                 }
             }
 
-            6 -> if (!PedroComponent.follower.isBusy) {
+            6 -> if (!follower.isBusy) {
                 FollowPath(motifPPGLastShot!!)
                 setPathState(999)
             }
 
-            7 -> if (!PedroComponent.follower.isBusy) {
+            7 -> if (!follower.isBusy) {
                 FollowPath(motifGPPIntake2!!)
-                if (PedroComponent.follower.atPose(motifGPPIntake1ToShoot, 1.0, 1.0)) {
-                    IntakeSubsystem.Reverse().schedule() //(TURNS OFF INTAKE) temporary value
-                    open().schedule()
+                if (follower.atPose(motifGPPIntake1ToShoot, 1.0, 1.0)) {
+                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
+                    open.schedule()
                 }
-                if (PedroComponent.follower.atPose(motifGPPIntake2Purp1Intaked, 5.0, 5.0)) {
-                    IntakeSubsystem.Forward().schedule() //(TURNS ON INTAKE) temporary value
+                if (follower.atPose(motifGPPIntake2Purp1Intaked, 5.0, 5.0)) {
+                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 }
-                if (PedroComponent.follower.atPose(motifGPPIntake2Intaked2, 1.0, 1.0)) {
+                if (follower.atPose(motifGPPIntake2Intaked2, 1.0, 1.0)) {
                     setPathState(8)
                 }
             }
 
-            8 -> if (!PedroComponent.follower.isBusy) {
+            8 -> if (!follower.isBusy) {
                 FollowPath(motifGPPLastShot!!)
                 setPathState(999)
             }
 
-            9 -> if (!PedroComponent.follower.isBusy) {
+            9 -> if (!follower.isBusy) {
                 FollowPath(motifPGPIntake1!!)
-                if (PedroComponent.follower.atPose(motifPGPIntake1FinalPos, 1.0, 1.0)) {
-                    IntakeSubsystem.Reverse().schedule() //(TURNS OFF INTAKE) temporary value
+                if (follower.atPose(motifPGPIntake1FinalPos, 1.0, 1.0)) {
+                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
                 }
-                if (PedroComponent.follower.atPose(motifPPGIntake1EndPos, 1.0, 1.0)) {
+                if (follower.atPose(motifPPGIntake1EndPos, 1.0, 1.0)) {
                     setPathState(10)
                 }
             }
 
-            10 -> if (!PedroComponent.follower.isBusy) {
+            10 -> if (!follower.isBusy) {
                 FollowPath(motifPGPIntake2!!)
-                open().schedule()
-                if (PedroComponent.follower.atPose(motifPGPIntake2Prep, 5.0, 5.0)) {
-                    IntakeSubsystem.Forward().schedule() //(TURNS ON INTAKE) temporary value
+                open.schedule()
+                if (follower.atPose(motifPGPIntake2Prep, 5.0, 5.0)) {
+                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 }
-                if (PedroComponent.follower.atPose(motifsShooterEnd, 1.0, 1.0)) {
-                    IntakeSubsystem.Reverse().schedule() //(TURNS OFF INTAKE) temporary value
+                if (follower.atPose(motifsShooterEnd, 1.0, 1.0)) {
+                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
                 }
-                if (PedroComponent.follower.atPose(motifsShooterEnd, 1.0, 1.0)) {
+                if (follower.atPose(motifsShooterEnd, 1.0, 1.0)) {
                     setPathState(999)
                 }
             }
 
-            999 -> if (!PedroComponent.follower.isBusy) {
-                open().schedule()
+            999 -> if (!follower.isBusy) {
+                open.schedule()
                 if (pathTimer!!.elapsedTimeSeconds > 2.5) {
                     FollowPath(motifPark!!)
                 }
@@ -506,9 +509,9 @@ class AutonBlueMotif : NextFTCOpMode() {
         ).schedule() // todo: wait for localization
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState)
-        telemetry.addData("x", PedroComponent.follower.pose.x)
-        telemetry.addData("y", PedroComponent.follower.pose.y)
-        telemetry.addData("heading", PedroComponent.follower.pose.heading)
+        telemetry.addData("x", follower.pose.x)
+        telemetry.addData("y", follower.pose.y)
+        telemetry.addData("heading", follower.pose.heading)
         telemetry.update()
     }
 
@@ -516,7 +519,7 @@ class AutonBlueMotif : NextFTCOpMode() {
     override fun onInit() {
         //        follower = Constants.createFollower(hardwareMap);
         buildPaths()
-        PedroComponent.follower.setStartingPose(startPose)
+        follower.setStartingPose(startPose)
     }
 
     /** This method is called continuously after Init while waiting for "play".  */

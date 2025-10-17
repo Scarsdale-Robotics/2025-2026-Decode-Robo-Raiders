@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 import com.acmerobotics.dashboard.config.Config
 import dev.nextftc.bindings.Button
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
@@ -34,7 +35,7 @@ object TurretThetaSubsystem : Subsystem {
                 servo,
                 (norm - 49.0.deg) / 9.0.deg *
                         (POS_58deg - POS_49deg) + POS_49deg
-            );
+            ).schedule();
         }
 
     class AutoAim(

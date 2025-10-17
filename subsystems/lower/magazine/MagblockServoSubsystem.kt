@@ -14,6 +14,6 @@ object MagblockServoSubsystem : Subsystem {
     private val servo = ServoEx("magblock");
 
     // using functions instead of fields makes the opmodes much cleaner: you don't need new each time, but the parentheses are still there to give meathod-vibes
-    @JvmStatic fun  open(): InstantCommand{ return  InstantCommand({SetPosition(servo, OPEN)});}
-    @JvmStatic fun  close(): InstantCommand{ return InstantCommand({SetPosition(servo, CLOSED)})};
+    @JvmStatic val open = SetPosition(servo, OPEN);
+    @JvmStatic val close = SetPosition(servo, CLOSED);
 }

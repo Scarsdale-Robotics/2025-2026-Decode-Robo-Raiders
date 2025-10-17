@@ -12,6 +12,7 @@ import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.hardware.impl.MotorEx
+import dev.nextftc.hardware.powerable.SetPower
 import org.firstinspires.ftc.teamcode.utils.SMO.SMOFilter
 import java.util.function.Supplier
 import kotlin.math.atan2
@@ -132,7 +133,7 @@ object TurretPhiSubsystem : Subsystem {
     }
 
     override fun periodic() {
-        motor.power = controlSystem.calculate(motor.state);
+        SetPower(motor, controlSystem.calculate(motor.state));
     }
 
 }
