@@ -149,8 +149,6 @@ class TeleOpMain: NextFTCOpMode() {
         telemetry.addData("Detected Motif: ", LocalizationSubsystem.getMotif().toString())
 
         telemetry.update()
-
-        telemetry.update()
     }
 
 }
