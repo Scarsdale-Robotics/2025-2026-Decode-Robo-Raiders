@@ -111,6 +111,8 @@ public class CVSubsystem{
 
 
 
+
+
   ///gets///
   public boolean getSide(){return side;}
   public double getRCx1(){return RCx1;}
@@ -125,6 +127,29 @@ public class CVSubsystem{
   }
   public boolean camStatus(){return cam.isRunning();}
 
+  ///in theory havent tested with limelight yet///
+  /// returns angle of camera offset to april tag using robot yaw///
+  private double wrapAngleRad(double a) {
+    a = (a + Math.PI) % (2.0 * Math.PI);
+    if (a < 0) a += 2.0 * Math.PI;
+    return a - Math.PI;
+  }
+
+  /// returns the left/right offset between turret heading and tag (radians)
+  /// + = tag is to the right, - = tag is to the left
+  public double getCameraOffset() {
+    double targetYawDeg = RCh;
+    double targetYawRad = Math.toRadians(targetYawDeg);
+    return wrapAngleRad(targetYawRad);
+  }
+
+  /// returns how much the turret should rotate to face the tag
+  /// returns angle required to change the heading of turret to look at the tag
+  public double getTurretAngleToTag() {
+    double offset = getCameraOffset();
+    double delta = wrapAngleRad(offset);
+    return delta;
+  }
 
 
 
