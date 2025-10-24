@@ -24,8 +24,8 @@ import kotlin.time.TimeSource
 object TurretThetaSubsystem : Subsystem {
     private val servo = ServoEx("turret_theta");
 
-    @JvmField var POS_58deg = 0.0;
-    @JvmField var POS_49deg = 0.5;  // todo: TUNE
+    @JvmField var POS_63deg = 0.0;
+    @JvmField var POS_45deg = 0.5;  // todo: TUNE
 
     var targetTheta: Angle = 0.0.rad
         set(value) {
@@ -33,8 +33,8 @@ object TurretThetaSubsystem : Subsystem {
             field = norm;
             SetPosition(
                 servo,
-                (norm - 49.0.deg) / 9.0.deg *
-                        (POS_58deg - POS_49deg) + POS_49deg
+                (norm - 45.0.deg) / 18.0.deg *
+                        (POS_63deg - POS_45deg) + POS_45deg
             ).schedule();
         }
 
