@@ -138,9 +138,8 @@ public class CVSubsystem{
   /// returns the left/right offset between turret heading and tag (radians)
   /// + = tag is to the right, - = tag is to the left
   public double getCameraOffset() {
-    double targetYawDeg = RCh;
-    double targetYawRad = Math.toRadians(targetYawDeg);
-    return wrapAngleRad(targetYawRad);
+    double offset = bin.getTx();
+    return offset;
   }
 
   /// returns how much the turret should rotate to face the tag

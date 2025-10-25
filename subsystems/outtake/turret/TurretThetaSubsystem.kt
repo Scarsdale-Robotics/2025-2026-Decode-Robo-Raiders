@@ -25,7 +25,7 @@ object TurretThetaSubsystem : Subsystem {
     private val servo = ServoEx("turret_theta");
 
     @JvmField var POS_63deg = 0.0;
-    @JvmField var POS_45deg = 0.5;  // todo: TUNE
+    @JvmField var POS_45deg = 0.51;  // todo: TUNE
 
     var targetTheta: Angle = 0.0.rad
         set(value) {

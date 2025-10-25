@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 class AutoAimTest : NextFTCOpMode() {
     @JvmField var shootAngleDegrees = 45.0;
 
+
     init {
         addComponents(
             SubsystemComponent(
