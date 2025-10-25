@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 public class QuadraticTheta {
 
-    // data: {distance (in), theta (rad)}
+    // {dist (in), angle (radans)}
     private final double[][] data;
 
     // degree (quad for now)
