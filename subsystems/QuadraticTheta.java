@@ -5,15 +5,15 @@ public class QuadraticTheta {
     // data: {distance (in), theta (rad)}
     private final double[][] data;
 
-    // Polynomial degree (quadratic)
+    // degree (quad for now)
     private final int degree;
 
-    // Output coefficients
+    // poly coefficants
     public double[] coeffs;
 
     public QuadraticTheta(double[][] Data) {
         this.data = Data;
-        this.degree = 2;
+        this.degree = 2; // change
         coeffs = fitPolynomial(data, degree);
     }
 
@@ -36,12 +36,12 @@ public class QuadraticTheta {
             }
         }
 
-        return solveNormalEquation(X, y);
+        return NormalEquation(X, y);
     }
 
 
     // this is from stevens math i dont know how it works but should supposedly give us the normal equation for each point so gaussian can solve it
-    private static double[] solveNormalEquation(double[][] X, double[] y) {
+    private static double[] NormalEquation(double[][] X, double[] y) {
         int n = X.length;
         int m = X[0].length;
 
@@ -61,6 +61,7 @@ public class QuadraticTheta {
 
 
 
+    //solves normal equations (:))
     private static double[] gaussianElimination(double[][] A, double[] b) {
         int n = b.length;
         for (int i = 0; i < n; i++) {
@@ -90,12 +91,35 @@ public class QuadraticTheta {
 
 
 
-    //returns theta using equation
-    public double evaluate(double distance) {
+    //returns theta using equation given dis
+    public double evaluate(double dist) {
         double theta = 0;
         for (int i = 0; i < coeffs.length; i++) {
-            theta += coeffs[i] * Math.pow(distance, i);
+            theta += coeffs[i] * Math.pow(dist, i);
         }
         return theta;
     }
+
+
+    //returns residuals given data and coeffs
+    public static double[][] calculateResiduals(double[][] data, double[] coeffs) {
+        int n = data.length;
+        double[][] residuals = new double[n][2]; // [dist, e]
+
+        for (int i = 0; i < n; i++) {
+            double distance = data[i][0];
+            double actualTheta = data[i][1];
+
+            double predictedTheta = 0;
+            for (int j = 0; j < coeffs.length; j++) {
+                predictedTheta += coeffs[j] * Math.pow(distance, j);
+            }
+
+            residuals[i][0] = distance;
+            residuals[i][1] = actualTheta - predictedTheta;
+        }
+
+        return residuals;
+    }
+
 }
