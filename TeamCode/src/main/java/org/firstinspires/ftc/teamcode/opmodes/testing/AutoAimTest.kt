@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.testing
 
 import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
 import dev.nextftc.ftc.NextFTCOpMode
@@ -18,16 +19,23 @@ class AutoAimTest : NextFTCOpMode() {
     init {
         addComponents(
             SubsystemComponent(
-                OuttakeSubsystem
+                ShooterSubsystem,
+                TurretThetaSubsystem
             )
         );
     }
 
     override fun onStartButtonPressed() {
-        ShooterSubsystem.Run().schedule();
+        telemetry.addData("111", "111");
+//        ShooterSubsystem.Run().schedule();
+        telemetry.addData("CM", CommandManager.snapshot.toString());
+        telemetry.update();
     }
 
     override fun onUpdate() {
+        telemetry.addData("AAA", "AAA");
         TurretThetaSubsystem.targetTheta = shootAngleDegrees.deg;
+        telemetry.addData("CM", CommandManager.snapshot.toString());
+        telemetry.update();
     }
 }
