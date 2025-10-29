@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 import com.acmerobotics.dashboard.config.Config
 import dev.nextftc.bindings.Button
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
+import dev.nextftc.ftc.ActiveOpMode.telemetry
 import dev.nextftc.hardware.impl.ServoEx
 import dev.nextftc.hardware.positionable.SetPosition
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem.targetPhi
@@ -27,15 +29,25 @@ object TurretThetaSubsystem : Subsystem {
     @JvmField var POS_63deg = 0.0;
     @JvmField var POS_45deg = 0.51;  // todo: TUNE
 
+    val open = SetPosition(servo, 0.1).requires(this)
+
     var targetTheta: Angle = 0.0.rad
         set(value) {
             val norm = atan2(sin(value.inRad), cos(value.inRad)).rad;
             field = norm;
+            telemetry.addData("targetThetaSet", norm);
+            telemetry.addData("servoPos", (norm - 45.0.deg) / 18.0.deg *
+                    (POS_63deg - POS_45deg) + POS_45deg);
+            telemetry.addData("servo", servo.position)
+            telemetry.addData("servo", servo.toString())
+            telemetry.addData("servo", servo.javaClass)
             SetPosition(
                 servo,
                 (norm - 45.0.deg) / 18.0.deg *
                         (POS_63deg - POS_45deg) + POS_45deg
-            ).schedule();
+            ).requires(this)();
+//            servo.servo.position = (norm - 45.0.deg) / 18.0.deg *
+//                    (POS_63deg - POS_45deg) + POS_45deg;
         }
 
     class AutoAim(
