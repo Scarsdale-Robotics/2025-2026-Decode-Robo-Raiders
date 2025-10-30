@@ -7,6 +7,9 @@ apply plugin: 'com.android.library'
 
 android {
 
+
+    compileSdk 34
+
     defaultConfig {
         minSdkVersion 24
         //noinspection ExpiredTargetSdkVersion
