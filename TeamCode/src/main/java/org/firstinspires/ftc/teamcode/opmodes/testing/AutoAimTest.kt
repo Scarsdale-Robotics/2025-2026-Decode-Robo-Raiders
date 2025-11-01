@@ -17,14 +17,16 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem.open
 
 @TeleOp(name = "Auto Aim Test")
-//@Config
+@Config
 class AutoAimTest : NextFTCOpMode() {
-//    @JvmField var shootAngleDegrees = 45.0;
+    companion object {
+        @JvmField var angleDegs = 45.0;
+    }
 
     init {
         addComponents(
             SubsystemComponent(
-//                ShooterSubsystem,
+                ShooterSubsystem,
                 TurretThetaSubsystem
             ),
             BulkReadComponent,
@@ -33,20 +35,11 @@ class AutoAimTest : NextFTCOpMode() {
     }
 
     override fun onStartButtonPressed() {
-        telemetry.addData("111", "111");
-//        ShooterSubsystem.Run();
-        telemetry.addData("CM", CommandManager.snapshot.toString());
-        telemetry.update();
+//        ShooterSubsystem.Run()
     }
 
     override fun onUpdate() {
-//        CommandManager.run()
-//        SequentialGroup(open).schedule()
-
-        telemetry.addData("AAA", "AAA");
-        telemetry.addData("sdas", ServoEx("turret_theta").servo.portNumber);
-        ServoEx("turret_theta").servo.position = 0.5
-//        TurretThetaSubsystem.targetTheta = shootAngleDegrees.deg;
+        TurretThetaSubsystem.targetTheta = angleDegs.deg;
         telemetry.addData("CM", CommandManager.snapshot.toString());
         telemetry.update();
     }
