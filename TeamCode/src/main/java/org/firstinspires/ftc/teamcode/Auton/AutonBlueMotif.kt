@@ -17,13 +17,13 @@ import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.open
+import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.close
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem
 
 class AutonBlueMotif : NextFTCOpMode() {
     private var pathTimer: Timer? = null
     val actionTimer: Timer? = null;
     var opmodeTimer: Timer? = null;
-    private var pathState = 0
 
     init {
         addComponents(
@@ -36,10 +36,31 @@ class AutonBlueMotif : NextFTCOpMode() {
         opmodeTimer!!.resetTimer()
     }
 
+    enum class AutonPath {
+        StartingPath, //the starting path of the robot
+
+        GPPPathIntake1, //GPP Intakes 1st row of artifacts and then goes shoot
+        GPPPathIntake2, //GPP Intakes 2nd row of artifacts
+        GPPPathLastShoot, //GPP last thing to shoot before going to go park
+
+        PGPPathStart, //PGP start path
+        PGPPathIntake1, //PGP Intakes 1st row of artifacts and then goes shoot and prepares to intake 2
+        PGPPathIntake2, //PGP Intakes 2nd row of artifacts and then goes shoot before parking
+
+        PPGPathIntakePrep1, //PPG what it does before it starts to intake
+        PPGPathIntake1, //PPG Intakes 1st row of artifacts and then goes shoot
+        PPGPathIntake2, //PPG Intakes 2nd row of artifacts
+        PPGPathLastShoot, //PPG last thing to shoot before going to go park
+
+        ParkPath, //the last path of the robot, goes park
+        EndAuton
+    }
+    private var pathState: AutonPath = AutonPath.StartingPath
+
     /**
      * These change the states of the paths and actions. It will also reset the timers of the individual switches
      */
-    fun setPathState(pState: Int) {
+    fun setPathState(pState: AutonPath) {
         pathState = pState
         pathTimer?.resetTimer()
     }
@@ -382,49 +403,101 @@ class AutonBlueMotif : NextFTCOpMode() {
     // Controls which path the robot will take after finishing a specific path.
     fun autonomousPathUpdate() {
         when (pathState) {
-            0 -> {
+            AutonPath.StartingPath -> {
                 open.schedule()
                 FollowPath(robotStartPath!!)
-                setPathState(3) //for now 3
+                setPathState(AutonPath.GPPPathIntake1) //for now 3
             }
-
-            1 -> if (!follower.isBusy) {
+            //GPP PATHS (START)
+            AutonPath.GPPPathIntake1 -> if (!follower.isBusy) {
+                close.schedule()
                 IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 FollowPath(motifGPPIntake1!!)
                 if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
-                    setPathState(7)
+                    setPathState(AutonPath.GPPPathIntake2)
                 }
             }
 
-            2 -> if (!follower.isBusy) {
+            AutonPath.GPPPathIntake2 -> if (!follower.isBusy) {
+                FollowPath(motifGPPIntake2!!)
+                if (follower.atPose(motifGPPIntake1ToShoot, 1.0, 1.0)) {
+                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
+                    open.schedule()
+                }
+                if (follower.atPose(motifGPPIntake2Purp1Intaked, 5.0, 5.0)) {
+                    close.schedule()
+                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+                }
+                if (follower.atPose(motifGPPIntake2Intaked2, 1.0, 1.0)) {
+                    setPathState(AutonPath.GPPPathLastShoot)
+                }
+            }
+
+            AutonPath.GPPPathLastShoot -> if (!follower.isBusy) {
+                FollowPath(motifGPPLastShot!!)
+                setPathState(AutonPath.ParkPath)
+            }
+            //GPP PATHS (END)
+
+            //PGP PATHS (START)
+            AutonPath.PGPPathStart -> if (!follower.isBusy) {
+                close.schedule()
                 IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
-                FollowPath(motifPGPIntake1!!)
-                if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
-                    setPathState(9)
-                }
+//                FollowPath(motifPGPIntake1!!)
+                setPathState(AutonPath.PGPPathIntake1)
+//                if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
+//
+//                }
             }
 
-            3 -> if (!follower.isBusy) {
+            AutonPath.PGPPathIntake1 -> if (!follower.isBusy) {
+                FollowPath(motifPGPIntake1!!)
+                if (follower.atPose(motifPGPIntake1FinalPos, 1.0, 1.0)) {
+                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
+                }
+                setPathState(AutonPath.PGPPathIntake2)
+            }
+
+            AutonPath.PGPPathIntake2 -> if (!follower.isBusy) {
+                FollowPath(motifPGPIntake2!!)
+                open.schedule()
+                if (follower.atPose(motifPGPIntake2Prep, 5.0, 5.0)) {
+                    close.schedule()
+                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+                }
+                if (follower.atPose(motifsShooterEnd, 1.0, 1.0)) {
+                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
+                }
+                if (follower.atPose(motifsShooterEnd, 1.0, 1.0)) {
+                    setPathState(AutonPath.ParkPath)
+                }
+            }
+            //PGP PATHS (END)
+
+            //PPG PATHS (START)
+            AutonPath.PPGPathIntakePrep1 -> if (!follower.isBusy) {
+                close.schedule()
                 IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 FollowPath(motifPPGIntake1Prep!!)
                 if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
-                    setPathState(4)
+                    setPathState(AutonPath.PPGPathIntake1)
                 }
             }
 
-            4 -> if (!follower.isBusy) {
+            AutonPath.PPGPathIntake1 -> if (!follower.isBusy) {
                 FollowPath(motifPPGIntake1!!)
                 if (follower.atPose(motifPPGIntake1EndPos, 1.0, 1.0)) {
                     IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
                 }
                 if (follower.atPose(motifPPGIntake1EndPos, 1.0, 1.0)) {
-                    setPathState(5)
+                    setPathState(AutonPath.PPGPathIntake2)
                 }
             }
 
-            5 -> if (!follower.isBusy) {
+            AutonPath.PPGPathIntake2 -> if (!follower.isBusy) {
                 open.schedule()
                 if (follower.atPose(motifPPGIntake2MidPos, 1.0, 1.0)) {
+                    close.schedule()
                     IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 }
                 FollowPath(motifPPGIntake2!!)
@@ -432,64 +505,26 @@ class AutonBlueMotif : NextFTCOpMode() {
                     IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
                 }
                 if (follower.atPose(motifPPGIntake2End, 1.0, 1.0)) {
-                    setPathState(6)
+                    setPathState(AutonPath.PPGPathLastShoot)
                 }
             }
 
-            6 -> if (!follower.isBusy) {
+            AutonPath.PPGPathLastShoot -> if (!follower.isBusy) {
                 FollowPath(motifPPGLastShot!!)
-                setPathState(999)
+                setPathState(AutonPath.ParkPath)
             }
+            //PPG PATHS (END)
 
-            7 -> if (!follower.isBusy) {
-                FollowPath(motifGPPIntake2!!)
-                if (follower.atPose(motifGPPIntake1ToShoot, 1.0, 1.0)) {
-                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
-                    open.schedule()
-                }
-                if (follower.atPose(motifGPPIntake2Purp1Intaked, 5.0, 5.0)) {
-                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
-                }
-                if (follower.atPose(motifGPPIntake2Intaked2, 1.0, 1.0)) {
-                    setPathState(8)
-                }
-            }
-
-            8 -> if (!follower.isBusy) {
-                FollowPath(motifGPPLastShot!!)
-                setPathState(999)
-            }
-
-            9 -> if (!follower.isBusy) {
-                FollowPath(motifPGPIntake1!!)
-                if (follower.atPose(motifPGPIntake1FinalPos, 1.0, 1.0)) {
-                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
-                }
-                if (follower.atPose(motifPPGIntake1EndPos, 1.0, 1.0)) {
-                    setPathState(10)
-                }
-            }
-
-            10 -> if (!follower.isBusy) {
-                FollowPath(motifPGPIntake2!!)
-                open.schedule()
-                if (follower.atPose(motifPGPIntake2Prep, 5.0, 5.0)) {
-                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
-                }
-                if (follower.atPose(motifsShooterEnd, 1.0, 1.0)) {
-                    IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
-                }
-                if (follower.atPose(motifsShooterEnd, 1.0, 1.0)) {
-                    setPathState(999)
-                }
-            }
-
-            999 -> if (!follower.isBusy) {
+            AutonPath.ParkPath -> if (!follower.isBusy) {
                 open.schedule()
                 if (pathTimer!!.elapsedTimeSeconds > 2.5) {
                     FollowPath(motifPark!!)
                 }
-                setPathState(-1) //last path
+                setPathState(AutonPath.EndAuton) //last path
+            }
+
+            AutonPath.EndAuton -> {
+                //do jack
             }
         }
     }
@@ -529,7 +564,7 @@ class AutonBlueMotif : NextFTCOpMode() {
      * It runs all the setup actions, including building paths and starting the path system  */
     override fun onStartButtonPressed() {
         opmodeTimer!!.resetTimer()
-        setPathState(0)
+        setPathState(AutonPath.StartingPath)
     }
 
     /** We do not use this because everything should automatically disable  */
