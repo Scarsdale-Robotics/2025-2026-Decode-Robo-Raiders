@@ -1,0 +1,184 @@
+package org.firstinspires.ftc.teamcode.subsystems.localization;
+
+import androidx.annotation.Nullable;
+
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
+import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.List;
+///re written with Vision Portal supposedly the exact same thing
+public class CVSubsystem_VisionPortal {
+    private final VisionPortal visionPortal;
+    private final AprilTagProcessor aprilTagProcessor;
+    private final IMU imu;
+
+    // Robot’s current pose (in inches)
+    private double RCx1;
+    private double RCy1;
+    private double RCh; // heading in radians
+
+    private boolean side; // True = blue, False = red
+
+    private motif currentMotif;
+    private AprilTagDetection lastDetection;
+
+    public CVSubsystem_VisionPortal(double x1, double y1, double h, boolean side, HardwareMap hm) {
+
+        // Initialize IMU
+        imu = hm.get(IMU.class, "imu");
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+        );
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
+        AprilTagLibrary.Builder myAprilTagLibraryBuilder = new AprilTagLibrary.Builder();
+        myAprilTagLibraryBuilder.addTags(AprilTagGameDatabase.getCurrentGameTagLibrary());
+        myAprilTagLibraryBuilder.build();
+
+        // Create AprilTag processor
+        aprilTagProcessor = new AprilTagProcessor.Builder()
+                .setTagLibrary(myAprilTagLibraryBuilder.build()) ///check to make sure this works
+                .setDrawTagOutline(true)
+                .setDrawAxes(true)
+                .build();
+
+        // Create Vision Portal (using built-in or webcam)
+        WebcamName webcamName = hm.get(WebcamName.class, "Cam");  ///has to be called Cam
+        visionPortal = new VisionPortal.Builder()
+                .setCamera(webcamName)
+                .addProcessor(aprilTagProcessor)
+                .setCameraResolution(new android.util.Size(640, 480))
+                .setCamera(BuiltinCameraDirection.BACK) // fallback if internal
+                .build();
+
+        this.RCx1 = x1;
+        this.RCy1 = y1;
+        this.RCh = h;
+        this.side = side;
+
+        init();
+    }
+
+    public void init() {
+        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            visionPortal.resumeStreaming();
+        }
+        imu.resetYaw();
+    }
+
+    public void closeCam() {
+        visionPortal.close();
+        imu.resetYaw();
+    }
+
+    /** Reads latest AprilTag and sets the motif if any valid detection */
+    public motif getMotifc() {
+        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+
+        if (detections != null && !detections.isEmpty()) {
+            AprilTagDetection tag = detections.get(0);
+            int id = tag.id;
+            currentMotif = motif.FD(id);
+            lastDetection = tag;
+            return currentMotif;
+        }
+
+        return motif.Na;
+    }
+
+    /** Updates the robot's camera-based pose */
+    public void updateCV() {
+        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+
+        if (detections == null || detections.isEmpty()) return;
+
+        AprilTagDetection tag = detections.get(0);
+        lastDetection = tag;
+
+        // Use team-specific tags
+        if ((tag.id == 20 && side) || (tag.id == 24 && !side)) {
+            Pose3D pose = tag.robotPose;
+            if (pose != null) {
+                RCx1 = pose.getPosition().x * 39.37;
+                RCy1 = pose.getPosition().y * 39.37;
+                RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
+            }
+        }
+    }
+
+    public void setCv(double x1, double y1, double h) {
+        this.RCx1 = x1;
+        this.RCy1 = y1;
+        this.RCh = h;
+    }
+
+    /// Getters ///
+    public boolean getSide() { return side; }
+    public double getRCx1() { return RCx1; }
+    public double getRCy1() { return RCy1; }
+    public double getRCh() { return RCh; }
+
+    @Nullable
+    public AprilTagDetection getLastDetection() { return lastDetection; }
+
+    public boolean camStatus() {
+        return visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING;
+    }
+
+    /// Angle helpers ///
+    private double wrapAngleRad(double a) {
+        a = (a + Math.PI) % (2.0 * Math.PI);
+        if (a < 0) a += 2.0 * Math.PI;
+        return a - Math.PI;
+    }
+
+    /** Returns horizontal offset from camera center (radians) */
+    public double getCameraOffset() {
+        if (lastDetection != null)
+            return Math.toRadians(lastDetection.ftcPose.x); // horizontal offset (degrees → rad)
+        return 0.0;
+    }
+
+    /** Returns how much turret must rotate to face the tag */
+    public double getTurretAngleToTag() {
+        return wrapAngleRad(getCameraOffset());
+    }
+
+    /** Motif enum, same as before */
+    public enum motif {
+        GPP(1, 21),
+        PGP(2, 22),
+        PPG(3, 23),
+        Na(0, -1);
+
+        private final int motifValue;
+        private final int num;
+
+        motif(int motifValue, int num) {
+            this.motifValue = motifValue;
+            this.num = num;
+        }
+
+        public int getMotifValue() { return motifValue; }
+        public int getInputID() { return num; }
+
+        public static motif FD(int num) {
+            for (motif m : values()) {
+                if (m.num == num) return m;
+            }
+            return Na;
+        }
+    }
+}
