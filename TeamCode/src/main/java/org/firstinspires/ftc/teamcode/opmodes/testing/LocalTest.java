@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
 
@@ -10,10 +11,13 @@ public class LocalTest extends LinearOpMode {
 
     private OdometrySubsystem odom;
 
+
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addLine("Initializing Odometry Subsystem...");
         telemetry.update();
+
+
 
         try {
             odom = new OdometrySubsystem(0, 0, 0, hardwareMap);
