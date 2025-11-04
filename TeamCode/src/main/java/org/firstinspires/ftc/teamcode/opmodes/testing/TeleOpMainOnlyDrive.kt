@@ -26,18 +26,6 @@ class TeleOpMainOnlyDrive: NextFTCOpMode() {
 
 
 
-    init {
-        addComponents(
-            SubsystemComponent(
-//                OuttakeSubsystem,
-//                LowerSubsystem
-            )
-        )
-
-
-
-    }
-
     override fun onStartButtonPressed(): Unit {
 //        IntakeSubsystem.DriverCommandDefaultOn(
 //            Gamepads.gamepad1.leftTrigger,
