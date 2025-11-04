@@ -16,10 +16,10 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class LocalTest extends NextFTCOpMode {
 
     private OdometrySubsystem odom;
-    private final MotorEx frontLeftMotor = new MotorEx("front_left").reversed();
-    private final MotorEx frontRightMotor = new MotorEx("front_right");
-    private final MotorEx backLeftMotor = new MotorEx("back_left").reversed();
-    private final MotorEx backRightMotor = new MotorEx("back_right");
+    private final MotorEx frontLeftMotor = new MotorEx("FL").reversed();
+    private final MotorEx frontRightMotor = new MotorEx("FR");
+    private final MotorEx backLeftMotor = new MotorEx("BL").reversed();
+    private final MotorEx backRightMotor = new MotorEx("BR");
 
     @Override
     public void onStartButtonPressed() {
