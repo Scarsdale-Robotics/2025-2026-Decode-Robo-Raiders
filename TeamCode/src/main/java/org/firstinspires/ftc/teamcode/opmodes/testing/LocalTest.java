@@ -28,7 +28,7 @@ public class LocalTest extends NextFTCOpMode {
                 frontRightMotor,
                 backLeftMotor,
                 backRightMotor,
-                Gamepads.gamepad1().leftStickY().negate(), // forward/backward
+                Gamepads.gamepad1().leftStickY(), // forward/backward
                 Gamepads.gamepad1().leftStickX(),          // strafe
                 Gamepads.gamepad1().rightStickX()          // turn
         );
