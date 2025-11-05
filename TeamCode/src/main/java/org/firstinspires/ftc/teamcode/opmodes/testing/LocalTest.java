@@ -55,6 +55,18 @@ public class LocalTest extends NextFTCOpMode {
 
         waitForStart();
 
+        // ✅ Move driverControlled creation here so Gamepads inputs are active
+        driverControlled = new MecanumDriverControlled(
+                frontLeftMotor,
+                frontRightMotor,
+                backLeftMotor,
+                backRightMotor,
+                Gamepads.gamepad1().leftStickY().negate(), // forward/backward
+                Gamepads.gamepad1().leftStickX(),          // strafe
+                Gamepads.gamepad1().rightStickX()          // turn
+        );
+        driverControlled.schedule();
+
         while (opModeIsActive()) {
             if (driverControlled != null) {
                 driverControlled.update();
@@ -71,4 +83,5 @@ public class LocalTest extends NextFTCOpMode {
             sleep(50); // ~20Hz loop
         }
     }
+
 }
