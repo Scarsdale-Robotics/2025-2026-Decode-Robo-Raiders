@@ -20,7 +20,6 @@ public class LocalTest extends NextFTCOpMode {
     private final MotorEx frontRightMotor = new MotorEx("FR"); //0
     private final MotorEx backLeftMotor = new MotorEx("BL").reversed(); //3
     private final MotorEx backRightMotor = new MotorEx("BR"); //1
-    private Command driverControlled1;
 
     @Override
     public void onStartButtonPressed() {
@@ -58,8 +57,8 @@ public class LocalTest extends NextFTCOpMode {
 
 
         while (opModeIsActive()) {
-            driverControlled.update();
-            odom.updateOdom();
+            driverControlled.update(); //driver update
+             //odom update
 
             telemetry.addData("x (inch)", odom.getROx1());
             telemetry.addData("y (inch)", odom.getROy1());
