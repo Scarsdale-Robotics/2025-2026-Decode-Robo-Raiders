@@ -33,10 +33,6 @@ public class LocalTest extends NextFTCOpMode {
                 Gamepads.gamepad1().rightStickX()          // turn
         );
         driverControlled.schedule();
-    }
-
-    @Override
-    public void runOpMode() {
         telemetry.addLine("Initializing Odometry Subsystem...");
         telemetry.update();
 
@@ -49,13 +45,14 @@ public class LocalTest extends NextFTCOpMode {
             telemetry.update();
             return;
         }
-
         telemetry.addLine("Press PLAY to start tracking...");
         telemetry.update();
+    }
 
-        waitForStart();
 
-
+    @Override
+    public void onUpdate() {
+        super.onUpdate();
         while (opModeIsActive()) {
             odom.updateOdom();
 
@@ -73,5 +70,4 @@ public class LocalTest extends NextFTCOpMode {
             sleep(50); // ~20Hz loop
         }
     }
-
 }
