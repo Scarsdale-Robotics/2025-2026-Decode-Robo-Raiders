@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
 
@@ -16,32 +14,31 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class LocalTest extends NextFTCOpMode {
 
     private OdometrySubsystem odom;
-    private final MotorEx frontLeftMotor = new MotorEx("FL").reversed();
-    private final MotorEx frontRightMotor = new MotorEx("FR");
-    private final MotorEx backLeftMotor = new MotorEx("BL").reversed();
-    private final MotorEx backRightMotor = new MotorEx("BR");
+    private Command driverControlled;
+
+    private final MotorEx frontLeftMotor = new MotorEx("FL").reversed(); //2
+    private final MotorEx frontRightMotor = new MotorEx("FR"); //0
+    private final MotorEx backLeftMotor = new MotorEx("BL").reversed(); //3
+    private final MotorEx backRightMotor = new MotorEx("BR"); //1
 
     @Override
     public void onStartButtonPressed() {
-        Command driverControlled = new MecanumDriverControlled(
+        driverControlled = new MecanumDriverControlled(
                 frontLeftMotor,
                 frontRightMotor,
                 backLeftMotor,
                 backRightMotor,
-                Gamepads.gamepad1().leftStickY().negate(),
-                Gamepads.gamepad1().leftStickX(),
-                Gamepads.gamepad1().rightStickX()
+                Gamepads.gamepad1().leftStickY().negate(), // forward/backward
+                Gamepads.gamepad1().leftStickX(),          // strafe
+                Gamepads.gamepad1().rightStickX()          // turn
         );
         driverControlled.schedule();
     }
 
-
     @Override
-    public void runOpMode(){
+    public void runOpMode() {
         telemetry.addLine("Initializing Odometry Subsystem...");
         telemetry.update();
-
-
 
         try {
             odom = new OdometrySubsystem(0, 0, 0, hardwareMap);
@@ -50,7 +47,7 @@ public class LocalTest extends NextFTCOpMode {
         } catch (Exception e) {
             telemetry.addLine("Error initializing Odometry: " + e.getMessage());
             telemetry.update();
-            return; // stop here to prevent crash
+            return;
         }
 
         telemetry.addLine("Press PLAY to start tracking...");
@@ -58,8 +55,11 @@ public class LocalTest extends NextFTCOpMode {
 
         waitForStart();
 
-        // Loop while OpMode is active
         while (opModeIsActive()) {
+            if (driverControlled != null) {
+                driverControlled.update();
+            }
+
             odom.updateOdom();
 
             telemetry.addData("x (inch)", odom.getROx1());
@@ -68,7 +68,7 @@ public class LocalTest extends NextFTCOpMode {
             telemetry.addData("distance", odom.getDistance());
             telemetry.update();
 
-            sleep(50); // update rate ~20Hz
+            sleep(50); // ~20Hz loop
         }
     }
 }
