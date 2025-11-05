@@ -50,22 +50,13 @@ public class LocalTest extends NextFTCOpMode {
             return;
         }
 
-        telemetry.addLine("Press PLAY to start tracking...");
+        telemetry.addLine("Press PLAY to start tracking.. 8.");
         telemetry.update();
 
         waitForStart();
 
-        // ✅ Move driverControlled creation here so Gamepads inputs are active
-        driverControlled = new MecanumDriverControlled(
-                frontLeftMotor,
-                frontRightMotor,
-                backLeftMotor,
-                backRightMotor,
-                Gamepads.gamepad1().leftStickY().negate(), // forward/backward
-                Gamepads.gamepad1().leftStickX(),          // strafe
-                Gamepads.gamepad1().rightStickX()          // turn
-        );
-        driverControlled.schedule();
+        
+        driverControlled.update();
 
         while (opModeIsActive()) {
             if (driverControlled != null) {
