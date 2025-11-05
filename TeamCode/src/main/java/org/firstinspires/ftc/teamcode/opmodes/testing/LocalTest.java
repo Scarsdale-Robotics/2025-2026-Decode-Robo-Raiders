@@ -57,8 +57,7 @@ public class LocalTest extends NextFTCOpMode {
 
 
         while (opModeIsActive()) {
-            driverControlled.update(); //driver update
-             //odom update
+            odom.updateOdom();
 
             telemetry.addData("x (inch)", odom.getROx1());
             telemetry.addData("y (inch)", odom.getROy1());
