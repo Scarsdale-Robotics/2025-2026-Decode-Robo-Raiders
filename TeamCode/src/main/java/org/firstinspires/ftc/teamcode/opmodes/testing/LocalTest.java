@@ -20,6 +20,7 @@ public class LocalTest extends NextFTCOpMode {
     private final MotorEx frontRightMotor = new MotorEx("FR"); //0
     private final MotorEx backLeftMotor = new MotorEx("BL").reversed(); //3
     private final MotorEx backRightMotor = new MotorEx("BR"); //1
+    private Command driverControlled1;
 
     @Override
     public void onStartButtonPressed() {
@@ -55,23 +56,9 @@ public class LocalTest extends NextFTCOpMode {
 
         waitForStart();
 
-        // ✅ Move driverControlled creation here so Gamepads inputs are active
-        driverControlled = new MecanumDriverControlled(
-                frontLeftMotor,
-                frontRightMotor,
-                backLeftMotor,
-                backRightMotor,
-                Gamepads.gamepad1().leftStickY().negate(), // forward/backward
-                Gamepads.gamepad1().leftStickX(),          // strafe
-                Gamepads.gamepad1().rightStickX()          // turn
-        );
-        driverControlled.schedule();
 
         while (opModeIsActive()) {
-            if (driverControlled != null) {
-                driverControlled.update();
-            }
-
+            driverControlled.update();
             odom.updateOdom();
 
             telemetry.addData("x (inch)", odom.getROx1());
@@ -79,6 +66,11 @@ public class LocalTest extends NextFTCOpMode {
             telemetry.addData("h (radians)", odom.getROh());
             telemetry.addData("distance", odom.getDistance());
             telemetry.update();
+
+
+            telemetry.addData("LY", Gamepads.gamepad1().leftStickY());
+            telemetry.addData("LX", Gamepads.gamepad1().leftStickX());
+            telemetry.addData("RX", Gamepads.gamepad1().rightStickX());
 
             sleep(50); // ~20Hz loop
         }
