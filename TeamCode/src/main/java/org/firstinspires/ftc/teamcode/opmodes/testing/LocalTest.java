@@ -1,26 +1,87 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
 
-public class LocalTest extends LinearOpMode {
-    LocalizationSubsystem test;
+import dev.nextftc.core.commands.Command;
+import dev.nextftc.ftc.Gamepads;
+import dev.nextftc.ftc.NextFTCOpMode;
+import dev.nextftc.hardware.driving.MecanumDriverControlled;
+import dev.nextftc.hardware.impl.MotorEx;
 
-    public LocalTest() {
-        test = new LocalizationSubsystem(0,0,0,true,hardwareMap);
-    }
+@TeleOp(name = "AutoTest", group = "Testing")
+public class LocalTest extends NextFTCOpMode {
 
-    public void UpEtelemetry() {
-        /** postion (inch)/// */
-        telemetry.addData("x (inch): ", test.getX());
-        telemetry.addData("y (inch): ", test.getY());
-        telemetry.addData("h (radians): ", test.getH());
+    private OdometrySubsystem odom;
+    private Command driverControlled;
+
+    private final MotorEx frontLeftMotor = new MotorEx("FL").reversed(); //2
+    private final MotorEx frontRightMotor = new MotorEx("FR"); //0
+    private final MotorEx backLeftMotor = new MotorEx("BL").reversed(); //3
+    private final MotorEx backRightMotor = new MotorEx("BR"); //1
+
+    @Override
+    public void onStartButtonPressed() {
+        driverControlled = new MecanumDriverControlled(
+                frontLeftMotor,
+                frontRightMotor,
+                backLeftMotor,
+                backRightMotor,
+                Gamepads.gamepad1().leftStickY().negate(), // forward/backward
+                Gamepads.gamepad1().leftStickX(),          // strafe
+                Gamepads.gamepad1().rightStickX()          // turn
+        );
+        driverControlled.schedule();
     }
 
     @Override
-    public void runOpMode() throws InterruptedException {
-        test.updateLocalization();
-        this.UpEtelemetry();
+    public void runOpMode() {
+        telemetry.addLine("Initializing Odometry Subsystem...");
+        telemetry.update();
+
+        try {
+            odom = new OdometrySubsystem(0, 0, 0, hardwareMap);
+            telemetry.addLine("Odometry initialization successful!");
+            telemetry.update();
+        } catch (Exception e) {
+            telemetry.addLine("Error initializing Odometry: " + e.getMessage());
+            telemetry.update();
+            return;
+        }
+
+        telemetry.addLine("Press PLAY to start tracking...");
+        telemetry.update();
+
+        waitForStart();
+
+        // ✅ Move driverControlled creation here so Gamepads inputs are active
+        driverControlled = new MecanumDriverControlled(
+                frontLeftMotor,
+                frontRightMotor,
+                backLeftMotor,
+                backRightMotor,
+                Gamepads.gamepad1().leftStickY().negate(), // forward/backward
+                Gamepads.gamepad1().leftStickX(),          // strafe
+                Gamepads.gamepad1().rightStickX()          // turn
+        );
+        driverControlled.schedule();
+
+        while (opModeIsActive()) {
+            if (driverControlled != null) {
+                driverControlled.update();
+            }
+
+            odom.updateOdom();
+
+            telemetry.addData("x (inch)", odom.getROx1());
+            telemetry.addData("y (inch)", odom.getROy1());
+            telemetry.addData("h (radians)", odom.getROh());
+            telemetry.addData("distance", odom.getDistance());
+            telemetry.update();
+
+            sleep(50); // ~20Hz loop
+        }
     }
+
 }
