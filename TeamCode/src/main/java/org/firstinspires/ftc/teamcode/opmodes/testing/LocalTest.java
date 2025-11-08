@@ -55,7 +55,6 @@ public class LocalTest extends NextFTCOpMode {
 
         waitForStart();
 
-        // ✅ Move driverControlled creation here so Gamepads inputs are active
         driverControlled = new MecanumDriverControlled(
                 frontLeftMotor,
                 frontRightMotor,

@@ -139,7 +139,7 @@ public class LocalizationSubsystem {
   public double getKalmangainX(){return kalmanX.getKalmanGain();}
   public double getKalmangainY(){return  kalmanY.getKalmanGain();}
 
-  public CVSubsystem.motif getMotif() { return cv.getMotifc(); }
+  public CVSubsystem_VisionPortal.motif getMotif() { return cv.getMotifc(); }
 
   public double getCameraOffset(){return cv.getCameraOffset();}
   public double getTurretAngleToTag(){return cv.getTurretAngleToTag();}
