@@ -41,7 +41,7 @@ public class LocalTest extends NextFTCOpMode {
         telemetry.update();
 
         try {
-            odom = new OdometrySubsystem(0, 0, 0, hardwareMap);
+//            odom = new OdometrySubsystem(0, 0, 0, hardwareMap);
             telemetry.addLine("Odometry initialization successful!");
             telemetry.update();
         } catch (Exception e) {
