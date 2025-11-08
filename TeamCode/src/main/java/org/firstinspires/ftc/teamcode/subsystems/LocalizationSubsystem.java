@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem_VisionPortal;
 import org.firstinspires.ftc.teamcode.subsystems.localization.Kalman;
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
 
@@ -18,7 +19,7 @@ public class LocalizationSubsystem {
   double Ax;
   double Ay;
   double Ah;
-  CVSubsystem cv;
+  CVSubsystem_VisionPortal cv;
   OdometrySubsystem odom;
   Kalman kalmanX;
   Kalman kalmanY;
@@ -35,7 +36,7 @@ public class LocalizationSubsystem {
   private final LinkedList<Double> tHistory = new LinkedList<>();
 
   public LocalizationSubsystem(double x1, double y1, double h, boolean side, HardwareMap hm) {
-    cv = new CVSubsystem(x1, y1, h, side, hm);
+    cv = new CVSubsystem_VisionPortal(x1, y1, h, side, hm);
     odom = new OdometrySubsystem(x1, y1, h, hm);
     kalmanX = new Kalman(x1, 0.05, 0.3, 0.7);// tune - (0.3q = 70% trust odom)
     kalmanY = new Kalman(y1, 0.05, 0.3, 0.7);// tune - (0.3q = 70% trust odom

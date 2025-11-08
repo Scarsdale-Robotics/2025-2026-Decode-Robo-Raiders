@@ -14,74 +14,74 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class LocalTest extends NextFTCOpMode {
 
     private OdometrySubsystem odom;
-    private MecanumDriverControlled driverControlled;
+    private Command driverControlled;
 
-    // Motors
-    private MotorEx frontLeftMotor;
-    private MotorEx frontRightMotor;
-    private MotorEx backLeftMotor;
-    private MotorEx backRightMotor;
+    private final MotorEx frontLeftMotor = new MotorEx("FL").reversed(); //2
+    private final MotorEx frontRightMotor = new MotorEx("FR"); //0
+    private final MotorEx backLeftMotor = new MotorEx("BL").reversed(); //3
+    private final MotorEx backRightMotor = new MotorEx("BR"); //1
 
-
-    public void initHardware() {
-        // Initialize motors
-        frontLeftMotor = new MotorEx("FL").reversed().zeroed().brakeMode();
-        frontRightMotor = new MotorEx("FR").zeroed().brakeMode();
-        backLeftMotor = new MotorEx("BL").reversed().zeroed().brakeMode();
-        backRightMotor = new MotorEx("BR").zeroed().brakeMode();
-
-        // Create robot-centric mecanum driver
+    @Override
+    public void onStartButtonPressed() {
         driverControlled = new MecanumDriverControlled(
                 frontLeftMotor,
                 frontRightMotor,
                 backLeftMotor,
                 backRightMotor,
-                Gamepads.gamepad1().leftStickY().negate(), // forward/back
+                Gamepads.gamepad1().leftStickY().negate(), // forward/backward
                 Gamepads.gamepad1().leftStickX(),          // strafe
                 Gamepads.gamepad1().rightStickX()          // turn
         );
-
-        // Schedule driver control
         driverControlled.schedule();
     }
 
     @Override
     public void runOpMode() {
-        // Initialize odometry
         telemetry.addLine("Initializing Odometry Subsystem...");
         telemetry.update();
-        this.initHardware();
 
         try {
             odom = new OdometrySubsystem(0, 0, 0, hardwareMap);
-            telemetry.addLine("Odometry initialized successfully!");
+            telemetry.addLine("Odometry initialization successful!");
+            telemetry.update();
         } catch (Exception e) {
-            telemetry.addLine("Odometry initialization failed: " + e.getMessage());
+            telemetry.addLine("Error initializing Odometry: " + e.getMessage());
             telemetry.update();
             return;
         }
 
-        telemetry.addLine("Press PLAY to start driving...");
+        telemetry.addLine("Press PLAY to start tracking...");
         telemetry.update();
 
         waitForStart();
 
-        while (opModeIsActive()) {
-            // Update driver (reads joystick values automatically)
-            driverControlled.update();
+        // ✅ Move driverControlled creation here so Gamepads inputs are active
+        driverControlled = new MecanumDriverControlled(
+                frontLeftMotor,
+                frontRightMotor,
+                backLeftMotor,
+                backRightMotor,
+                Gamepads.gamepad1().leftStickY().negate(), // forward/backward
+                Gamepads.gamepad1().leftStickX(),          // strafe
+                Gamepads.gamepad1().rightStickX()          // turn
+        );
+        driverControlled.schedule();
 
-            // Update odometry
+        while (opModeIsActive()) {
+            if (driverControlled != null) {
+                driverControlled.update();
+            }
+
             odom.updateOdom();
 
-            // Telemetry
             telemetry.addData("x (inch)", odom.getROx1());
             telemetry.addData("y (inch)", odom.getROy1());
             telemetry.addData("h (radians)", odom.getROh());
             telemetry.addData("distance", odom.getDistance());
             telemetry.update();
 
-            // Loop at ~20Hz
-            sleep(50);
+            sleep(50); // ~20Hz loop
         }
     }
+
 }
