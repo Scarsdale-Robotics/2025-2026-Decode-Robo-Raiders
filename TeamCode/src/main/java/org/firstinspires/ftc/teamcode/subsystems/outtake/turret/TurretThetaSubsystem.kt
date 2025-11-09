@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 
 import com.acmerobotics.dashboard.config.Config
+import com.bylazar.configurables.annotations.Configurable
+import com.bylazar.telemetry.PanelsTelemetry.telemetry
 import dev.nextftc.bindings.Button
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.groups.SequentialGroup
@@ -9,46 +11,48 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
-import dev.nextftc.ftc.ActiveOpMode.telemetry
 import dev.nextftc.hardware.impl.ServoEx
 import dev.nextftc.hardware.positionable.SetPosition
+import dev.nextftc.hardware.positionable.SetPositions
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem.targetPhi
 import java.util.function.Supplier
+import kotlin.div
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.time.ComparableTimeMark
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
+import kotlin.times
 
 // up-down
-@Config
+@Configurable
+// to reset servo, place at pos zero, then lay hood on, then inc servo value
 object TurretThetaSubsystem : Subsystem {
     private val servo = ServoEx("turret_theta");
 
-    @JvmField var POS_63deg = 0.0;
-    @JvmField var POS_45deg = 0.51;  // todo: TUNE
+    @JvmField var POS_63deg = 0.6;
+    @JvmField var POS_45deg = 0.1;
 
     val open = SetPosition(servo, 0.1).requires(this)
 
     var targetTheta: Angle = 0.0.rad
-        set(value) {
-            val norm = atan2(sin(value.inRad), cos(value.inRad)).rad;
-            field = norm;
-            telemetry.addData("targetThetaSet", norm);
-            telemetry.addData("servoPos", (norm - 45.0.deg) / 18.0.deg *
-                    (POS_63deg - POS_45deg) + POS_45deg);
-            telemetry.addData("servo", servo.position)
-            telemetry.addData("servo", servo.toString())
-            telemetry.addData("servo", servo.javaClass)
-            SetPosition(
-                servo,
-                (norm - 45.0.deg) / 18.0.deg *
-                        (POS_63deg - POS_45deg) + POS_45deg
-            ).requires(this)();
-//            servo.servo.position = (norm - 45.0.deg) / 18.0.deg *
-//                    (POS_63deg - POS_45deg) + POS_45deg;
+        get() {
+            return norm(
+                18.0.deg *
+                        ((servo.position - POS_45deg) / (POS_63deg - POS_45deg))
+                        + 45.0.deg
+            )
         }
+        private set
+
+    fun norm(angle: Angle): Angle {
+        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
+    }
+
+    class SetTargetTheta(val angle: Angle) : SetPositions(
+        servo to ((norm(angle) - 45.0.deg) / 18.0.deg * (POS_63deg - POS_45deg) + POS_45deg)
+    )
 
     class AutoAim(
         private val dxy: Supplier<Double>,
