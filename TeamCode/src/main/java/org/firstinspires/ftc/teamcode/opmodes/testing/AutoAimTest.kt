@@ -25,6 +25,10 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 class AutoAimTest : NextFTCOpMode() {
     companion object {
         @JvmField var shootAngleDegrees = 45.0;
+@Config
+class AutoAimTest : NextFTCOpMode() {
+    companion object {
+        @JvmField var angleDegs = 45.0;
     }
 
     init {
@@ -58,6 +62,11 @@ class AutoAimTest : NextFTCOpMode() {
 //        TurretThetaSubsystem.targetTheta = shootAngleDegrees.deg;
         PanelsTelemetry.telemetry.addData("CM", CommandManager.snapshot.toString());
         PanelsTelemetry.telemetry.update();
+//        ShooterSubsystem.Run()
+    }
+
+    override fun onUpdate() {
+        TurretThetaSubsystem.targetTheta = angleDegs.deg;
         telemetry.addData("CM", CommandManager.snapshot.toString());
         telemetry.update();
     }

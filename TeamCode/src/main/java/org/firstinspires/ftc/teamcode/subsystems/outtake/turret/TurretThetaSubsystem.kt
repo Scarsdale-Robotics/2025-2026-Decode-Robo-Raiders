@@ -34,8 +34,6 @@ object TurretThetaSubsystem : Subsystem {
     @JvmField var POS_63deg = 0.6;
     @JvmField var POS_45deg = 0.1;
 
-    val open = SetPosition(servo, 0.1).requires(this)
-
     var targetTheta: Angle = 0.0.rad
         get() {
             return norm(
@@ -43,6 +41,20 @@ object TurretThetaSubsystem : Subsystem {
                         ((servo.position - POS_45deg) / (POS_63deg - POS_45deg))
                         + 45.0.deg
             )
+        set(value) {
+            val norm = atan2(sin(value.inRad), cos(value.inRad)).rad;
+            field = norm;
+//            telemetry.addData("targetThetaSet", norm);
+//            telemetry.addData("servoPos", (norm - 45.0.deg) / 18.0.deg *
+//                    (POS_63deg - POS_45deg) + POS_45deg);
+//            telemetry.addData("servo", servo.position)
+//            telemetry.addData("servo", servo.toString())
+//            telemetry.addData("servo", servo.javaClass)
+            SetPosition(
+                servo,
+                (norm - 45.0.deg) / 18.0.deg *
+                        (POS_63deg - POS_45deg) + POS_45deg
+            ).requires(this)();
         }
         private set
 
