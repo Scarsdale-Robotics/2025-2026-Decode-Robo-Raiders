@@ -24,7 +24,7 @@ object ShooterSubsystem : Subsystem {
     private val motor = MotorEx("shooter").reversed();
 
     @JvmField var ffCoefficients = BasicFeedforwardParameters(0.03, 0.02, 0.01);
-    @JvmField var squidCoefficients = PIDCoefficients(0.022, 0.0, 0.005)
+    @JvmField var squidCoefficients = PIDCoefficients(0.016, 0.0, 0.000)
 
 //    @JvmField var MAX_VELOCITY = -1000.0;  // rotational velocity
 //    @JvmField var NO_VELOCITY = 0.0;
@@ -42,7 +42,9 @@ object ShooterSubsystem : Subsystem {
         }
     }
 
-    @JvmField var on = RunToVelocity(controller, 1423.0).requires(this).named("FlywheelOn").setInterruptible(true);
+//    @JvmField var MAX_SPEED = 1423.0;
+
+    @JvmField var on = RunToVelocity(controller, 1600.0).requires(this).named("FlywheelOn").setInterruptible(true);
     @JvmField var off = RunToVelocity(controller, 0.0).requires(this).named("FlywheelOff").setInterruptible(true);
 
     var lastPos = 0.0;
