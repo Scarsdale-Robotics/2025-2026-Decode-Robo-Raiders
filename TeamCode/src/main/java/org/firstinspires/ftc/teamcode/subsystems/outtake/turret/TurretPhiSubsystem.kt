@@ -11,16 +11,22 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
+import dev.nextftc.hardware.controllable.RunToPosition
+import dev.nextftc.hardware.controllable.RunToState
 import dev.nextftc.hardware.impl.MotorEx
+import dev.nextftc.hardware.positionable.SetPositions
 import dev.nextftc.hardware.powerable.SetPower
 import org.firstinspires.ftc.teamcode.utils.SMO.SMOFilter
 import java.util.function.Supplier
+import kotlin.div
+import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.time.ComparableTimeMark
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
+import kotlin.times
 
 // left-right
 @Config
@@ -49,14 +55,25 @@ object TurretPhiSubsystem : Subsystem {
     }
 
     var targetPhi: Angle = 0.0.rad
-        set(value) {
-            val norm = atan2(sin(value.inRad), cos(value.inRad)).rad;
-            field = norm;
-            controlSystem.goal = KineticState(
-                norm / kotlin.math.PI.rad *
-                        (ENCODERS_FORWARD - ENCODERS_BACKWARD) + ENCODERS_FORWARD
-            );
+        get() {
+            return norm(
+                PI.rad * (motor.currentPosition - ENCODERS_FORWARD) /
+                        (ENCODERS_FORWARD - ENCODERS_BACKWARD)
+            )
         }
+        private set;
+
+    fun norm(angle: Angle): Angle {
+        return atan2(sin(angle.inRad), cos(angle.inRad)).rad
+    }
+
+    class SetTargetPhi(val angle: Angle) : RunToState(
+        controlSystem,
+        KineticState(
+            norm(angle) / PI.rad *
+            (ENCODERS_FORWARD - ENCODERS_BACKWARD) + ENCODERS_FORWARD
+        )
+    )
 
     class AutoAim(
         private val dx: Supplier<Double>,
