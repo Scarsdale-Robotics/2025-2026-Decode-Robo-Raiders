@@ -26,9 +26,10 @@ object TurretSubsystem : SubsystemGroup(
     class AutoAim(
         private val dx: Supplier<Double>,  // distance from turret to goal in x axis; positive means goal is right of turret
         private val dy: Supplier<Double>,
+        rh: Supplier<Angle>,
         angleByDistance: (Double) -> Angle,
     ) : ParallelGroup(
-        TurretPhiSubsystem.AutoAim(dx, dy),
+        TurretPhiSubsystem.AutoAim(dx, dy, rh),
         TurretThetaSubsystem.AutoAim({ hypot(dx.get(), dy.get()) }, angleByDistance),
     )
 

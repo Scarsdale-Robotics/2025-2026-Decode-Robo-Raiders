@@ -1,23 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystems.outtake
 
-import com.acmerobotics.dashboard.FtcDashboard
-import com.acmerobotics.dashboard.config.Config
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry.telemetry
 import com.qualcomm.robotcore.util.ElapsedTime
 import dev.nextftc.control.ControlSystem
 import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
-import dev.nextftc.control.feedback.FeedbackType
 import dev.nextftc.control.feedback.PIDCoefficients
 import dev.nextftc.control.feedforward.BasicFeedforwardParameters
-import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.controllable.RunToState
 import dev.nextftc.hardware.controllable.RunToVelocity
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
-import org.firstinspires.ftc.teamcode.utils.SMO.SMOFilter
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 
 
 @Configurable
@@ -25,7 +21,7 @@ object ShooterSubsystem : Subsystem {
     private val motor = MotorEx("shooter").reversed();
 
     @JvmField var ffCoefficients = BasicFeedforwardParameters(0.03, 0.02, 0.01);
-    @JvmField var squidCoefficients = PIDCoefficients(0.016, 0.0, 0.000)
+    @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.000)
 
 //    @JvmField var MAX_VELOCITY = -1000.0;  // rotational velocity
 //    @JvmField var NO_VELOCITY = 0.0;
@@ -39,8 +35,11 @@ object ShooterSubsystem : Subsystem {
 //            velFilter { filter -> filter.custom(velSMO).build() }
 //            basicFF(ffCoefficients)
 
-            velPid(squidCoefficients)
+            velPid(pidCoefficients)
         }
+        controller.goal = KineticState()
+
+        motor.zero()
     }
 
     @JvmField var FAR_SPEED = 1488.0;

@@ -505,6 +505,7 @@ class AutonBlueMotif : NextFTCOpMode() {
         TurretSubsystem.AutoAim(
             { 0.0 },
             { 0.0 },
+            {0.0.rad},
             { 0.0.rad }
         ).schedule() // todo: wait for localization
         // Feedback to Driver Hub for debugging

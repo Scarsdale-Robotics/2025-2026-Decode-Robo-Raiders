@@ -44,7 +44,7 @@ class TeleOpMain: NextFTCOpMode() {
 
 
         autoAimCommand = TurretSubsystem.AutoAim(
-            { 0.0 }, { 0.0 }, {0.0.rad}
+            { 0.0 }, { 0.0 }, {0.0.rad}, {0.0.rad}
         );  // todo: connect with localization
         manualAimCommand = TurretSubsystem.DriverCommand(
             Gamepads.gamepad2.triangle,

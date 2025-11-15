@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.localization;
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -16,6 +17,7 @@ public class OdometrySubsystem {
   private double ROx1;
   private double ROy1;
   private double ROh;
+  private double Vx, Vy, omega;
   private double distance;
 
   public OdometrySubsystem(double x1, double y1, double h, HardwareMap hm) {
@@ -53,14 +55,27 @@ public class OdometrySubsystem {
     updateOdom();
   }
 
+  ElapsedTime time = null;
+  double rxl = 0.0, ryl = 0.0, rhl = 0.0;
   public void updateOdom() {
     if (pinpoint == null) return;
 
     pinpoint.update();
+    rxl = ROx1; ryl = ROy1; rhl = ROh;
     ROx1 = pinpoint.getPosition().getX(INCH);
     ROy1 = pinpoint.getPosition().getY(INCH);
     ROh = pinpoint.getPosition().getHeading(AngleUnit.RADIANS);
-    distance = Math.hypot(ROx1, ROy1);
+
+    if (time != null) {
+      Vx = (ROx1 - rxl) / time.seconds();
+      Vy = (ROy1 - ryl) / time.seconds();
+      omega = (ROh - rhl) / time.seconds();
+      time.reset();
+    } else {
+      time = new ElapsedTime();
+    }
+
+    distance = Math.hypot(ROx1, ROy1);  // dist a little misleading: this is not dist travelled, this is dist from (0, 0)
   }
 
   public void setPinpoint(double x1, double y1, double h) {
@@ -78,5 +93,18 @@ public class OdometrySubsystem {
   public double getROh() { return ROh; }
   public double getROx1() { return ROx1; }
   public double getROy1() { return ROy1; }
+
+  public double getVx() {
+    return Vx;
+  }
+
+  public double getVy() {
+    return Vy;
+  }
+
+  public double getOmega() {
+    return omega;
+  }
+
   public double getDistance() { return distance; }
 }

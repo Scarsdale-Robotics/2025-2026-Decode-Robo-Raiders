@@ -1,24 +1,21 @@
 package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 
-import com.acmerobotics.dashboard.config.Config
+import com.bylazar.configurables.annotations.Configurable
+import com.bylazar.telemetry.PanelsTelemetry
 import dev.nextftc.bindings.Button
 import dev.nextftc.control.ControlSystem
 import dev.nextftc.control.KineticState
-import dev.nextftc.control.feedback.FeedbackType
 import dev.nextftc.control.feedback.PIDCoefficients
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
-import dev.nextftc.hardware.controllable.RunToPosition
 import dev.nextftc.hardware.controllable.RunToState
 import dev.nextftc.hardware.impl.MotorEx
-import dev.nextftc.hardware.positionable.SetPositions
 import dev.nextftc.hardware.powerable.SetPower
-import org.firstinspires.ftc.teamcode.utils.SMO.SMOFilter
 import java.util.function.Supplier
-import kotlin.div
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -26,34 +23,38 @@ import kotlin.math.sin
 import kotlin.time.ComparableTimeMark
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
-import kotlin.times
 
 // left-right
-@Config
+@Configurable
 object TurretPhiSubsystem : Subsystem {
     private val motor = MotorEx("turret_phi");
 
     @JvmField var ENCODERS_FORWARD = 0.0;
-    @JvmField var ENCODERS_BACKWARD = 3000.0;  // todo: TUNE
+    @JvmField var ENCODERS_BACKWARD = 1357.0;  // todo: TUNE
 
-    private val controlSystem: ControlSystem;
+    private val controller: ControlSystem;
 
-    @JvmField var kSqu = 0.0;
-    @JvmField var kI = 0.0;
-    @JvmField var kD = 0.0;
+    @JvmField var squidCoefficients = PIDCoefficients(0.01, 0.0, 0.0);
 
-    @JvmField var Ls = 0.0;
-    @JvmField var Lv = 0.0;
+//    @JvmField var Ls = 0.0;
+//    @JvmField var Lv = 0.0;
 
     init {
 //        val posSMO = SMOFilter(FeedbackType.POSITION, Lv, Ls);
 
-        controlSystem = ControlSystem()
+        controller = ControlSystem()
 //            .posFilter { filter -> filter.custom(posSMO).build(); }
-            .posSquID(PIDCoefficients(kSqu, kI, kD))
+            .posSquID(squidCoefficients)
             .build();
+
+        controller.goal = KineticState()
     }
 
+    override fun initialize() {
+        motor.zero()
+    }
+
+    // 0.0 --> robot forward
     var targetPhi: Angle = 0.0.rad
         get() {
             return norm(
@@ -67,8 +68,8 @@ object TurretPhiSubsystem : Subsystem {
         return atan2(sin(angle.inRad), cos(angle.inRad)).rad
     }
 
-    class SetTargetPhi(val angle: Angle) : RunToState(
-        controlSystem,
+    open class SetTargetPhi(val angle: Angle) : RunToState(
+        controller,
         KineticState(
             norm(angle) / PI.rad *
             (ENCODERS_FORWARD - ENCODERS_BACKWARD) + ENCODERS_FORWARD
@@ -78,11 +79,23 @@ object TurretPhiSubsystem : Subsystem {
     class AutoAim(
         private val dx: Supplier<Double>,
         private val dy: Supplier<Double>,
+        private val rh: Supplier<Angle>,
     ) : Command() {
         override val isDone = false;
 
+        var lastCommand: Command? = null;
+
+        override fun start() {
+            SetTargetPhi(0.0.rad)();
+        }
+
         override fun update() {
-            targetPhi = atan2(dy.get(), dx.get()).rad;
+            if (lastCommand != null) {
+                CommandManager.cancelCommand(lastCommand!!)
+            }
+            val currCommand = SetTargetPhi(atan2(dy.get(), dx.get()).rad - rh.get());
+            currCommand();
+            lastCommand = currCommand;
         }
     }
 
@@ -150,7 +163,15 @@ object TurretPhiSubsystem : Subsystem {
     }
 
     override fun periodic() {
-        SetPower(motor, controlSystem.calculate(motor.state));
+        val power = controller.calculate(
+            motor.state
+        )
+        SetPower(motor, power).setInterruptible(true)()
+
+        PanelsTelemetry.telemetry.addData("enc", motor.currentPosition)
+        PanelsTelemetry.telemetry.addData("ref", controller.reference)
+        PanelsTelemetry.telemetry.addData("goal", controller.goal)
+        PanelsTelemetry.telemetry.addData("lm", controller.lastMeasurement)
     }
 
 }

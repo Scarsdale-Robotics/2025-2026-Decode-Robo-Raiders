@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.lower
 
+import com.bylazar.configurables.annotations.Configurable
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
