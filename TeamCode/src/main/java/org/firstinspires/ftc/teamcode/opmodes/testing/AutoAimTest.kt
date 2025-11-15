@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 class AutoAimTest : NextFTCOpMode() {
     companion object {
         @JvmField var shootAngleDegrees = 45.0;
+        @JvmField var speed = 1423.0;
     }
 
     init {
@@ -41,9 +42,6 @@ class AutoAimTest : NextFTCOpMode() {
     override fun onStartButtonPressed() {
 //        telemetry.addData("111", "111");
 //        ShooterSubsystem.on();
-        Gamepads.gamepad1.circle whenBecomesTrue ShooterSubsystem.on
-        Gamepads.gamepad1.square whenBecomesTrue ShooterSubsystem.off
-        Gamepads.gamepad1.triangle whenBecomesTrue TurretThetaSubsystem.SetTargetTheta(shootAngleDegrees.deg)
     }
 
     override fun onUpdate() {
@@ -51,6 +49,9 @@ class AutoAimTest : NextFTCOpMode() {
 //        val dashboardTelemetry = dashboard.telemetry
 //        CommandManager.run()
 //        SequentialGroup(open).schedule()
+        CommandManager.cancelAll()
+        ShooterSubsystem.On(speed).setInterruptible(true)()
+        TurretThetaSubsystem.SetTargetTheta(shootAngleDegrees.deg)()
 
 //        telemetry.addData("AAA", "AAA");
 //        telemetry.addData("sdas", ServoEx("turret_theta").servo.portNumber);

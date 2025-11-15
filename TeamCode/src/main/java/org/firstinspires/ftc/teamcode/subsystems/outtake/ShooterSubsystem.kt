@@ -13,6 +13,7 @@ import dev.nextftc.control.feedback.PIDCoefficients
 import dev.nextftc.control.feedforward.BasicFeedforwardParameters
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
+import dev.nextftc.hardware.controllable.RunToState
 import dev.nextftc.hardware.controllable.RunToVelocity
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
@@ -38,13 +39,14 @@ object ShooterSubsystem : Subsystem {
 //            velFilter { filter -> filter.custom(velSMO).build() }
 //            basicFF(ffCoefficients)
 
-            velSquID(squidCoefficients)
+            velPid(squidCoefficients)
         }
     }
 
-//    @JvmField var MAX_SPEED = 1423.0;
+    @JvmField var FAR_SPEED = 1488.0;
+    @JvmField var CLOSE_SPEED = 1000.0;
 
-    @JvmField var on = RunToVelocity(controller, 1600.0).requires(this).named("FlywheelOn").setInterruptible(true);
+    class On(speed: Double) : RunToState(controller, KineticState(velocity=speed))
     @JvmField var off = RunToVelocity(controller, 0.0).requires(this).named("FlywheelOff").setInterruptible(true);
 
     var lastPos = 0.0;

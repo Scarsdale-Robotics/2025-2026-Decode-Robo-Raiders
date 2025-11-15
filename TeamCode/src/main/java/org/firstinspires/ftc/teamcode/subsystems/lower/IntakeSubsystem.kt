@@ -23,8 +23,12 @@ object IntakeSubsystem : Subsystem {
     ) : Command() {
         override val isDone = false;
 
+        override fun start() {
+            motor.power = 0.0;
+        }
+
         override fun update() {
-            SetPower(1.0 - 2.0 * reversePower.get());
+            motor.power = 1.0 - 2.0 * reversePower.get();
         }
     }
 
@@ -34,8 +38,12 @@ object IntakeSubsystem : Subsystem {
     ) : Command() {
         override val isDone = false;
 
+        override fun start() {
+            motor.power = 0.0;
+        }
+
         override fun update() {
-            SetPower(forwardPower.get() - reversePower.get());
+            motor.power = forwardPower.get() - reversePower.get();
         }
     }
 }
