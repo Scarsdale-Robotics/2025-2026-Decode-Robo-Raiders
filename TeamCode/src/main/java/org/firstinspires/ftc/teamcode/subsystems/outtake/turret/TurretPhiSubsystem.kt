@@ -46,10 +46,10 @@ object TurretPhiSubsystem : Subsystem {
     @JvmField var Lv = 0.0;
 
     init {
-        val posSMO = SMOFilter(FeedbackType.POSITION, Lv, Ls);
+//        val posSMO = SMOFilter(FeedbackType.POSITION, Lv, Ls);
 
         controlSystem = ControlSystem()
-            .posFilter { filter -> filter.custom(posSMO).build(); }
+//            .posFilter { filter -> filter.custom(posSMO).build(); }
             .posSquID(PIDCoefficients(kSqu, kI, kD))
             .build();
     }

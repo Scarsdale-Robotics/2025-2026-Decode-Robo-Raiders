@@ -59,7 +59,7 @@ object TurretThetaSubsystem : Subsystem {
         private val angleByDistance: (Double) -> Angle,  // get by running curve of best fit on collected data
     ) : Command() {
         override val isDone = false;
-
+        
         override fun update() {
             targetTheta = angleByDistance(dxy.get());
         }

@@ -42,13 +42,12 @@ public class OdometrySubsystem {
     Pose2D initPose = new Pose2D(INCH, x1, y1, AngleUnit.RADIANS, h);
 
     // Configure sensors and set initial position
-    pinpoint.setOffsets(1, 3, INCH);
+    pinpoint.setOffsets(-5.0, -3.1496, INCH);
     pinpoint.setEncoderDirections(
             GoBildaPinpointDriver.EncoderDirection.FORWARD,
-            GoBildaPinpointDriver.EncoderDirection.REVERSED
+            GoBildaPinpointDriver.EncoderDirection.FORWARD
     );
     pinpoint.setPosition(initPose);
-    pinpoint.update();
 
     // Set initial values
     updateOdom();
