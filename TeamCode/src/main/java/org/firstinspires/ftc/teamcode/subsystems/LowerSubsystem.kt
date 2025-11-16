@@ -7,7 +7,7 @@ import dev.nextftc.core.subsystems.SubsystemGroup
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem.DriverCommandDefaultOn
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagazineSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -20,11 +20,11 @@ object LowerSubsystem : SubsystemGroup(
     @JvmField var fixJam = SequentialGroup(
         ParallelGroup(
             DriverCommandDefaultOn { 1.0 },  // 1.0 --> full reverse
-            MagazineMotorSubsystem.reverse,
+            MagazineServoSubsystem.reverse,
         ),
         MagblockServoSubsystem.open,
         Delay(FIX_JAM_DELAY_MS.milliseconds),
         MagblockServoSubsystem.close,
-        MagazineMotorSubsystem.forward,  // doesn't reset intake b/c we don't know what intake was set at
+        MagazineServoSubsystem.forward,  // doesn't reset intake b/c we don't know what intake was set at
     ).setInterruptible(false);
 }

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 
 import com.acmerobotics.dashboard.config.Config
 import com.bylazar.configurables.annotations.Configurable
+import com.bylazar.telemetry.PanelsTelemetry
 import com.bylazar.telemetry.PanelsTelemetry.telemetry
 import dev.nextftc.bindings.Button
 import dev.nextftc.core.commands.Command
@@ -59,9 +60,15 @@ object TurretThetaSubsystem : Subsystem {
         private val angleByDistance: (Double) -> Angle,  // get by running curve of best fit on collected data
     ) : Command() {
         override val isDone = false;
+
+        override fun start() {
+            SetTargetTheta(45.0.deg);
+        }
         
         override fun update() {
-            targetTheta = angleByDistance(dxy.get());
+            SetTargetTheta(angleByDistance(dxy.get()))();
+            PanelsTelemetry.telemetry.addData("s", dxy.get())
+            PanelsTelemetry.telemetry.addData("theta goal", angleByDistance(dxy.get()))
         }
     }
 

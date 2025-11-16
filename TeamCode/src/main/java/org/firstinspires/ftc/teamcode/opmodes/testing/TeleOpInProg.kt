@@ -6,20 +6,27 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem.CLOSE_SPEED
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import kotlin.math.atan2
+import kotlin.math.hypot
 
 @TeleOp(name = "Tele Op In Prog")
 @Configurable
 class TeleOpInProg : NextFTCOpMode() {
     companion object {
         var overaimSecs = 0.0;
+        var speed = 1100.0;
     }
     private var odom: OdometrySubsystem? = null
 
@@ -28,6 +35,8 @@ class TeleOpInProg : NextFTCOpMode() {
             SubsystemComponent(
                 IntakeSubsystem,
                 TurretPhiSubsystem,
+                MagazineServoSubsystem,
+                ShooterSubsystem,
             ),
             BulkReadComponent,
             BindingsComponent
@@ -47,8 +56,23 @@ class TeleOpInProg : NextFTCOpMode() {
         );
         intakeDrive.schedule();
 
+        val magDrive = MagazineServoSubsystem.DriverCommandDefaultOn(
+            Gamepads.gamepad1.leftTrigger
+        );
+        magDrive.schedule();
+
         val goalX = 12.0;
         val goalY = 144.0-12.0;
+        val thetaAim = TurretThetaSubsystem.AutoAim(
+            {
+                hypot(
+                    goalX - odom!!.rOx1 + odom!!.vx * overaimSecs,
+                    goalY - odom!!.rOy1 + odom!!.vy * overaimSecs,
+                )
+            },
+            { (-0.123 * it + 63.0).coerceIn(45.0, 63.0).deg }
+        )
+        thetaAim();
 
         val autoAimPhi = TurretPhiSubsystem.AutoAim(
             { goalX - odom!!.rOx1 + odom!!.vx * overaimSecs },
@@ -63,6 +87,7 @@ class TeleOpInProg : NextFTCOpMode() {
 
         val goalX = 12.0;
         val goalY = 144.0-12.0;
+        ShooterSubsystem.On(speed)();
         PanelsTelemetry.telemetry.addData("ang degs", (atan2(goalY - odom!!.rOy1, goalX - odom!!.rOx1).rad - odom!!.rOh.rad).inDeg)
 
         PanelsTelemetry.telemetry.addData("x (inch)", odom!!.rOx1)
