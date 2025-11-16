@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.lower
 
 import com.bylazar.configurables.annotations.Configurable
+import dev.nextftc.control.KineticState
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
@@ -19,13 +20,19 @@ object IntakeSubsystem : Subsystem {
     val forward = SetPower(FORWARD);
     val reverse = SetPower(REVERSE);
 
+    override fun initialize() {
+        motor.zero()
+        motor.power = 0.0
+    }
+
     class DriverCommandDefaultOn(  // could be bad for power draw?
         private val reversePower: Supplier<Double>,
     ) : Command() {
         override val isDone = false;
 
-        override fun start() {
-            motor.power = 0.0;
+        init {
+            setInterruptible(true);
+            setRequirements(IntakeSubsystem);
         }
 
         override fun update() {
@@ -39,8 +46,9 @@ object IntakeSubsystem : Subsystem {
     ) : Command() {
         override val isDone = false;
 
-        override fun start() {
-            motor.power = 0.0;
+        init {
+            setInterruptible(true);
+            setRequirements(IntakeSubsystem);
         }
 
         override fun update() {

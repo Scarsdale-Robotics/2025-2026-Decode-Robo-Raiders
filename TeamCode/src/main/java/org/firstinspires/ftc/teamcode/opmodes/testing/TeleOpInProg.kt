@@ -15,7 +15,6 @@ import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem.CLOSE_SPEED
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import kotlin.math.atan2
@@ -27,6 +26,8 @@ class TeleOpInProg : NextFTCOpMode() {
     companion object {
         var overaimSecs = 0.0;
         var speed = 1100.0;
+        var goalX = 12.0;
+        var goalY = 144.0-12.0;
     }
     private var odom: OdometrySubsystem? = null
 
@@ -51,8 +52,9 @@ class TeleOpInProg : NextFTCOpMode() {
         // Initialize the device
         odom!!.setPinpoint(24.0*3.0, 24.0*3.0, Math.PI / 2.0);
 
-        val intakeDrive = IntakeSubsystem.DriverCommandDefaultOn(
+        val intakeDrive = IntakeSubsystem.DriverCommand(
             Gamepads.gamepad1.leftTrigger,
+            Gamepads.gamepad1.rightTrigger
         );
         intakeDrive.schedule();
 
@@ -61,8 +63,6 @@ class TeleOpInProg : NextFTCOpMode() {
         );
         magDrive.schedule();
 
-        val goalX = 12.0;
-        val goalY = 144.0-12.0;
         val thetaAim = TurretThetaSubsystem.AutoAim(
             {
                 hypot(
@@ -85,8 +85,6 @@ class TeleOpInProg : NextFTCOpMode() {
     override fun onUpdate() {
         odom!!.updateOdom()
 
-        val goalX = 12.0;
-        val goalY = 144.0-12.0;
         ShooterSubsystem.On(speed)();
         PanelsTelemetry.telemetry.addData("ang degs", (atan2(goalY - odom!!.rOy1, goalX - odom!!.rOx1).rad - odom!!.rOh.rad).inDeg)
 

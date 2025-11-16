@@ -502,11 +502,12 @@ class AutonBlueMotif : NextFTCOpMode() {
         //        if (pathTimer.getElapsedTimeSeconds() > 1) {
 //            CommandManager.INSTANCE.scheduleCommand(TurretSubsystem.INSTANCE.autoAim(telemetry));
 //        }
-        TurretSubsystem.AutoAim(
+        OuttakeSubsystem.AutoAim(
             { 0.0 },
             { 0.0 },
             {0.0.rad},
-            { 0.0.rad }
+            { 0.0.rad },
+            { 0.0 },
         ).schedule() // todo: wait for localization
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState)

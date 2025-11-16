@@ -6,6 +6,7 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.CRServoEx
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
+import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import java.util.function.Supplier
 
 @Config
@@ -18,18 +19,34 @@ object MagazineServoSubsystem : Subsystem {
     @JvmStatic val forward = SetPower(servo, FORWARD);
     @JvmStatic val reverse = SetPower(servo, REVERSE);
 
-
     class DriverCommandDefaultOn(  // could be bad for power draw?
         private val reversePower: Supplier<Double>,
     ) : Command() {
         override val isDone = false;
 
-        override fun start() {
-            servo.power = 0.0;
+        init {
+            setInterruptible(true);
+            setRequirements(MagazineServoSubsystem);
         }
 
         override fun update() {
             servo.power = 1.0 - 2.0 * reversePower.get();
+        }
+    }
+
+    class DriverCommand(
+        private val forwardPower: Supplier<Double>,
+        private val reversePower: Supplier<Double>,
+    ) : Command() {
+        override val isDone = false;
+
+        init {
+            setInterruptible(true);
+            setRequirements(MagazineServoSubsystem);
+        }
+
+        override fun update() {
+            servo.power = forwardPower.get() - reversePower.get();
         }
     }
 }
