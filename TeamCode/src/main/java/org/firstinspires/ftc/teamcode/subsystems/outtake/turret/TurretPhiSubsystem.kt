@@ -34,7 +34,7 @@ object TurretPhiSubsystem : Subsystem {
 
     private val controller: ControlSystem;
 
-    @JvmField var squidCoefficients = PIDCoefficients(0.01, 0.0, 0.0);
+    @JvmField var squidCoefficients = PIDCoefficients(0.001, 0.0, 0.0);
 
 //    @JvmField var Ls = 0.0;
 //    @JvmField var Lv = 0.0;
@@ -86,7 +86,7 @@ object TurretPhiSubsystem : Subsystem {
         var lastCommand: Command? = null;
 
         override fun start() {
-            SetTargetPhi(0.0.rad)();
+            motor.zero()
         }
 
         override fun update() {
