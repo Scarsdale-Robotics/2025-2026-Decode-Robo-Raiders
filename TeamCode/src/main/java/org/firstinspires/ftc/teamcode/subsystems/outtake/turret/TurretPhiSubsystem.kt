@@ -15,6 +15,7 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.hardware.controllable.RunToState
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -52,6 +53,9 @@ object TurretPhiSubsystem : Subsystem {
 
     override fun initialize() {
         motor.zero()
+        controller.reset()
+        controller.goal = KineticState()
+        motor.power = 0.0
     }
 
     // 0.0 --> robot forward

@@ -8,12 +8,16 @@ import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.control.feedback.PIDCoefficients
 import dev.nextftc.control.feedforward.BasicFeedforwardParameters
+import dev.nextftc.core.commands.Command
 import dev.nextftc.core.subsystems.Subsystem
+import dev.nextftc.core.units.Angle
 import dev.nextftc.hardware.controllable.RunToState
 import dev.nextftc.hardware.controllable.RunToVelocity
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem.targetTheta
+import java.util.function.Supplier
 
 
 @Configurable
@@ -37,16 +41,31 @@ object ShooterSubsystem : Subsystem {
 
             velPid(pidCoefficients)
         }
-        controller.goal = KineticState()
-
-        motor.zero()
     }
 
-    @JvmField var FAR_SPEED = 1488.0;
-    @JvmField var CLOSE_SPEED = 1000.0;
+    override fun initialize() {
+        motor.zero()
+        controller.reset()
+        controller.goal = KineticState()
+        motor.power = 0.0
+    }
+
+//    @JvmField var FAR_SPEED = 1488.0;
+//    @JvmField var CLOSE_SPEED = 1000.0;
 
     class On(speed: Double) : RunToState(controller, KineticState(velocity=speed))
     @JvmField var off = RunToVelocity(controller, 0.0).requires(this).named("FlywheelOff").setInterruptible(true);
+
+    class AutoAim(
+        private val dxy: Supplier<Double>,
+        private val powerByDistance: (Double) -> Double,  // get by running curve of best fit on collected data
+    ) : Command() {
+        override val isDone = false;
+
+        override fun update() {
+            controller.goal = KineticState(velocity=powerByDistance(dxy.get()));
+        }
+    }
 
     var lastPos = 0.0;
     var elapsedTime: ElapsedTime = ElapsedTime();
