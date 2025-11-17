@@ -21,7 +21,7 @@ public class exampleTelopWithLocalization extends LinearOpMode {
 
     waitForStart();
 
-    this.onUpdate();
+    while (opModeIsActive()) this.onUpdate();
 
   }
 
@@ -30,6 +30,7 @@ public class exampleTelopWithLocalization extends LinearOpMode {
     public void onUpdate() {
 
         this.telemetry();
+        localizationSubsystem.updateLocalization();
 
         ///Make sure ur facing the motif before clicking circle otherwise it yells at you///
         boolean circle = true;

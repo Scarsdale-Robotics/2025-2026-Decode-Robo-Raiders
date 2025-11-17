@@ -36,10 +36,14 @@ public class CVSubsystem_VisionPortal {
     private motif currentMotif;
     private AprilTagDetection lastDetection;
 
+    public HardwareMap hm1;
+
     public CVSubsystem_VisionPortal(double x1, double y1, double h, boolean side, HardwareMap hm) {
 
+        hm1 = hm;
+
         // Initialize IMU
-        imu = hm.get(IMU.class, "imu");
+        imu = hm1.get(IMU.class, "imu");
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
@@ -65,8 +69,8 @@ public class CVSubsystem_VisionPortal {
                 .setCameraResolution(new android.util.Size(640, 480))
                 .setCamera(BuiltinCameraDirection.BACK)// fallback if internal
                 .setAutoStartStreamOnBuild(true)
-                .setLiveViewContainerId(hardwareMap.appContext.getResources().getIdentifier(
-                  "cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName()
+                .setLiveViewContainerId(hm1.appContext.getResources().getIdentifier(
+                  "cameraMonitorViewId", "id", hm1.appContext.getPackageName()
                 ))
                 .build();
 
