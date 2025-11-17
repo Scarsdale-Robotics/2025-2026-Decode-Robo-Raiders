@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.localization;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -10,23 +11,23 @@ import dev.nextftc.ftc.NextFTCOpMode;
 
 
 @TeleOp(name = "Cv+Odom_Test", group = "Testing")
-public class exampleTelopWithLocalization extends NextFTCOpMode {
+public class exampleTelopWithLocalization extends LinearOpMode {
 
     LocalizationSubsystem localizationSubsystem;
 
-    @Override
-    public void onInit() {
-        super.onInit();
-        localizationSubsystem = new LocalizationSubsystem(3.0,4.0, Math.PI, true, hardwareMap);
-        /// robot at (3,4) inches - origin is (0,0) center of field ///
-        /// robot heading facing south Normalized to [-pi,pi] ///
-        /// true = blue side | false = red side ///
-    }
+  @Override
+  public void runOpMode() throws InterruptedException {
+    localizationSubsystem = new LocalizationSubsystem(0, 0, Math.PI, true, hardwareMap);
+
+    waitForStart();
+
+    this.onUpdate();
+
+  }
 
 
-    @Override
+
     public void onUpdate() {
-        super.onUpdate();
 
         this.telemetry();
 
