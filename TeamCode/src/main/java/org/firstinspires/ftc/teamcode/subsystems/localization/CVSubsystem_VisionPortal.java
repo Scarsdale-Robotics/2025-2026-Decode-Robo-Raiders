@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.localization;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import androidx.annotation.Nullable;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -58,10 +60,17 @@ public class CVSubsystem_VisionPortal {
         WebcamName webcamName = hm.get(WebcamName.class, "Cam");  ///has to be called Cam
         visionPortal = new VisionPortal.Builder()
                 .setCamera(webcamName)
+                .enableLiveView(true)
                 .addProcessor(aprilTagProcessor)
                 .setCameraResolution(new android.util.Size(640, 480))
-                .setCamera(BuiltinCameraDirection.BACK) // fallback if internal
+                .setCamera(BuiltinCameraDirection.BACK)// fallback if internal
+                .setAutoStartStreamOnBuild(true)
+                .setLiveViewContainerId(hardwareMap.appContext.getResources().getIdentifier(
+                  "cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName()
+                ))
                 .build();
+
+
 
         this.RCx1 = x1;
         this.RCy1 = y1;
