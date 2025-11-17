@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.lower
 
-import com.bylazar.configurables.annotations.Configurable
-import dev.nextftc.control.KineticState
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
@@ -15,10 +13,11 @@ object IntakeSubsystem : Subsystem {
     val REVERSE = -1.0;
     val FORWARD = 1.0;
 
-    class SetPower(power: Double) : InstantCommand({ SetPower(motor, power); });
+    class Power(power: Double) : InstantCommand({ motor.power = power })
 
-    val forward = SetPower(FORWARD);
-    val reverse = SetPower(REVERSE);
+    val forward = SetPower(motor, FORWARD);
+    val reverse = SetPower(motor, REVERSE);
+    val stop = SetPower(motor, 0.0);
 
     override fun initialize() {
         motor.zero()

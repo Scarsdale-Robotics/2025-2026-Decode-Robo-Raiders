@@ -16,8 +16,9 @@ object MagazineServoSubsystem : Subsystem {
 
     private val servo = CRServoEx("magazine");
 
-    @JvmStatic val forward = SetPower(servo, FORWARD);
-    @JvmStatic val reverse = SetPower(servo, REVERSE);
+    val forward = SetPower(servo, FORWARD);
+    val reverse = SetPower(servo, REVERSE);
+    val stop = SetPower(servo, 0.0);
 
     class DriverCommandDefaultOn(  // could be bad for power draw?
         private val reversePower: Supplier<Double>,

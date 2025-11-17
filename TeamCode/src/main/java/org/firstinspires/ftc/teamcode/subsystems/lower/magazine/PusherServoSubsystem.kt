@@ -14,5 +14,5 @@ object PusherServoSubsystem : Subsystem {
     val push = SequentialGroup(
         SetPosition(servo, OUT),
         SetPosition(servo, IN)
-    ).setInterruptible(true).requires(this);
+    ).requires(this);
 }

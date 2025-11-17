@@ -39,6 +39,8 @@ object LowerSubsystem : SubsystemGroup(
             )
         ),
         Delay(EXTRA_DELAY_BETWEEN_LAUNCHES_MS.milliseconds),
+        MagazineServoSubsystem.stop,
+        IntakeSubsystem.stop,
     ).setInterruptible(false).requires(
         PusherServoSubsystem,
         MagazineServoSubsystem,
