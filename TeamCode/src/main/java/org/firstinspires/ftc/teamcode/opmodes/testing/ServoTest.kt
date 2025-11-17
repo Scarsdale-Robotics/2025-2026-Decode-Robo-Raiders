@@ -13,6 +13,8 @@ class ServoTest : NextFTCOpMode() {
     companion object {
         @JvmField var servoPos = 0.0;
     }
+
+
     val servo = ServoEx("turret_theta")
 
     override fun onStartButtonPressed() { }

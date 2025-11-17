@@ -18,6 +18,8 @@ public class LocalTest extends NextFTCOpMode {
     private OdometrySubsystem odom;
     private Command driverControlled;
 
+
+
     private final MotorEx frontLeftMotor = new MotorEx("FL").reversed(); //2
     private final MotorEx frontRightMotor = new MotorEx("FR"); //0
     private final MotorEx backLeftMotor = new MotorEx("BL").reversed(); //3
@@ -43,18 +45,9 @@ public class LocalTest extends NextFTCOpMode {
                 Gamepads.gamepad1().rightStickX()          // turn
         );
         driverControlled.schedule();
-        telemetry.addLine("Initializing Odometry Subsystem...");
-        telemetry.update();
 
-        try {
-            odom = new OdometrySubsystem(0, 0, 0, hardwareMap);
-            telemetry.addLine("Odometry initialization successful!");
-            telemetry.update();
-        } catch (Exception e) {
-            telemetry.addLine("Error initializing Odometry: " + e.getMessage());
-            telemetry.update();
-            return;
-        }
+        //let it crash if it fails to init
+        odom = new OdometrySubsystem(0, 0, 0, hardwareMap);
         telemetry.addLine("Press PLAY to start tracking...");
         telemetry.update();
     }

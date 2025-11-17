@@ -49,8 +49,10 @@ class TeleOpInProg : NextFTCOpMode() {
     }
 
     override fun onStartButtonPressed() {
+        var startposx = 24.0;
+        var startposy = 24.0;
         // Initialize the device
-        odom!!.setPinpoint(24.0*3.0, 24.0*3.0, Math.PI / 2.0);
+        odom!!.setPinpoint(startposx*3.0, startposy*3.0, Math.PI / 2.0);
 
         val intakeDrive = IntakeSubsystem.DriverCommand(
             Gamepads.gamepad1.leftTrigger,
@@ -58,10 +60,13 @@ class TeleOpInProg : NextFTCOpMode() {
         );
         intakeDrive.schedule();
 
+
         val magDrive = MagazineServoSubsystem.DriverCommandDefaultOn(
             Gamepads.gamepad1.leftTrigger
         );
         magDrive.schedule();
+
+
 
         val thetaAim = TurretThetaSubsystem.AutoAim(
             {
@@ -72,7 +77,9 @@ class TeleOpInProg : NextFTCOpMode() {
             },
             { (-0.123 * it + 63.0).coerceIn(45.0, 63.0).deg }
         )
-        thetaAim();
+        thetaAim(); // can tbis just be turned into calling it on the previous line?
+
+
 
         val autoAimPhi = TurretPhiSubsystem.AutoAim(
             { goalX - odom!!.rOx1 + odom!!.vx * overaimSecs },

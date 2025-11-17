@@ -11,6 +11,17 @@ import dev.nextftc.hardware.impl.MotorEx
 
 @TeleOp(name = "LocalerTest")
 class LocalerTest : NextFTCOpMode() {
+
+
+
+
+
+    val frontLeft = MotorEx("frontLeft")
+    val frontRight = MotorEx("frontRight").reversed()
+    val backLeft = MotorEx("backLeft")
+    val backRight = MotorEx("backRight").reversed()
+
+
     init {
         addComponents(
             BulkReadComponent,
@@ -18,10 +29,7 @@ class LocalerTest : NextFTCOpMode() {
         )
     }
 
-    val frontLeft = MotorEx("frontLeft")
-    val frontRight = MotorEx("frontRight").reversed()
-    val backLeft = MotorEx("backLeft")
-    val backRight = MotorEx("backRight").reversed()
+
 
     override fun onStartButtonPressed() {
         val driverControlled = MecanumDriverControlled(

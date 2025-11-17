@@ -28,6 +28,14 @@ class AutoAimTest : NextFTCOpMode() {
         @JvmField var speed = 1423.0;
     }
 
+
+
+
+
+
+
+
+
     init {
         addComponents(
             SubsystemComponent(
