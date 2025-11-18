@@ -1,13 +1,11 @@
-package org.firstinspires.ftc.teamcode.subsystems.localization;
+package org.firstinspires.ftc.teamcode.opmodes.testing;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
 
 import dev.nextftc.ftc.Gamepads;
-import dev.nextftc.ftc.NextFTCOpMode;
 
 
 @TeleOp(name = "Cv+Odom_Test", group = "Testing")
@@ -15,21 +13,22 @@ public class exampleTelopWithLocalization extends LinearOpMode {
 
     LocalizationSubsystem localizationSubsystem;
 
-  @Override
-  public void runOpMode() throws InterruptedException {
-    localizationSubsystem = new LocalizationSubsystem(0, 0, Math.PI, true, hardwareMap);
+    @Override
+    public void runOpMode() throws InterruptedException {
+        localizationSubsystem = new LocalizationSubsystem(0, 0, Math.PI, true, hardwareMap);
 
-    waitForStart();
+        waitForStart();
 
-    this.onUpdate();
+        while (opModeIsActive()) this.onUpdate();
 
-  }
+    }
 
 
 
     public void onUpdate() {
 
         this.telemetry();
+        localizationSubsystem.updateLocalization();
 
         ///Make sure ur facing the motif before clicking circle otherwise it yells at you///
         boolean circle = true;
