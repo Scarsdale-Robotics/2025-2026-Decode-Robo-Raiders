@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing
 
 import com.qualcomm.robotcore.hardware.Gamepad
-import com.qualcomm.robotcore.hardware.HardwareMap
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
@@ -30,7 +29,7 @@ class TeleOpMain: NextFTCOpMode() {
     private val autoAimCommand: Command;
     private val manualAimCommand: Command;
 
-    var LocalizationSubsystem: LocalizationSubsystem;
+    var localizationSubsystem: LocalizationSubsystem
 
 
     init {
@@ -40,7 +39,7 @@ class TeleOpMain: NextFTCOpMode() {
                 LowerSubsystem
             )  // todo: consider add localization subsystem
         )
-        LocalizationSubsystem = LocalizationSubsystem(1.0,1.0,1.0,true, hardwareMap);
+        localizationSubsystem = LocalizationSubsystem(1.0,1.0,1.0,true, hardwareMap);
 
 
         autoAimCommand = TurretSubsystem.AutoAim(
@@ -118,35 +117,37 @@ class TeleOpMain: NextFTCOpMode() {
 
     fun telemetry() {
         /** postion (inch)/// */
-        telemetry.addData("x (inch): ", LocalizationSubsystem.getX())
-        telemetry.addData("y (inch): ", LocalizationSubsystem.getY())
-        telemetry.addData("h (radians): ", LocalizationSubsystem.getH())
+        telemetry.addData("x (inch): ", localizationSubsystem.getX())
+        telemetry.addData("y (inch): ", localizationSubsystem.getY())
+        telemetry.addData("h (radians): ", localizationSubsystem.getH())
 
         /** velocities (inch/ms)/// */
-        telemetry.addData("Vx (inch/ms): ", LocalizationSubsystem.getVX())
-        telemetry.addData("Vy (inch/ms): ", LocalizationSubsystem.getVY())
-        telemetry.addData("Vh (rad/ms): ", LocalizationSubsystem.getVH())
+        telemetry.addData("Vx (inch/ms): ", localizationSubsystem.getVX())
+        telemetry.addData("Vy (inch/ms): ", localizationSubsystem.getVY())
+        telemetry.addData("Vh (rad/ms): ", localizationSubsystem.getVH())
 
         /** accelerations (inch/ms^2) /// */
-        telemetry.addData("Ax (inch/ms^2): ", LocalizationSubsystem.getAX())
-        telemetry.addData("Ay (inch/ms^2): ", LocalizationSubsystem.getAY())
-        telemetry.addData("Ah (rad/ms^2): ", LocalizationSubsystem.getAH())
+        telemetry.addData("Ax (inch/ms^2): ", localizationSubsystem.getAX())
+        telemetry.addData("Ay (inch/ms^2): ", localizationSubsystem.getAY())
+        telemetry.addData("Ah (rad/ms^2): ", localizationSubsystem.getAH())
 
         /** Time info /// */
         telemetry.addData(
             "Time since last update (ms): ",
-            LocalizationSubsystem.getTimeSinceLastUpdate()
+            localizationSubsystem.getTimeSinceLastUpdate()
         )
-        telemetry.addData("Clock (ms): ", LocalizationSubsystem.getClock())
-        telemetry.addData("Clock (s): ", LocalizationSubsystem.getTimeS())
-        telemetry.addData("Last update time (ms): ", LocalizationSubsystem.getLastUpdateTime())
+        telemetry.addData("Clock (ms): ", localizationSubsystem.getClock())
+        telemetry.addData("Clock (s): ", localizationSubsystem.getTimeS())
+        telemetry.addData("Last update time (ms): ", localizationSubsystem.getLastUpdateTime())
 
         /** Kalman /// */
-        telemetry.addData("Kalman Gain X: ", LocalizationSubsystem.getKalmangainX())
-        telemetry.addData("Kalman Gain Y: ", LocalizationSubsystem.getKalmangainY())
+        telemetry.addData("Kalman Gain X: ", localizationSubsystem.getKalmangainX())
+        telemetry.addData("Kalman Gain Y: ", localizationSubsystem.getKalmangainY())
 
         /** motif /// */
-        telemetry.addData("Detected Motif: ", LocalizationSubsystem.getMotif().toString())
+        telemetry.addData("Detected Motif: ", localizationSubsystem.getMotif().toString())
+
+        telemetry.update()
 
         telemetry.update()
     }
