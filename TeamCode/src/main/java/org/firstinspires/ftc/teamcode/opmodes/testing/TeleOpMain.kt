@@ -104,6 +104,9 @@ class TeleOpMain: NextFTCOpMode() {
     }
 
     override fun onUpdate() {
+
+        localizationSubsystem.updateLocalization()
+        this.telemetryUp()
         // indicators
         if (!autoAimEnabled) {
             gamepad2.setLedColor(
@@ -115,7 +118,7 @@ class TeleOpMain: NextFTCOpMode() {
 
     }
 
-    fun telemetry() {
+    fun telemetryUp() {
         /** postion (inch)/// */
         telemetry.addData("x (inch): ", localizationSubsystem.getX())
         telemetry.addData("y (inch): ", localizationSubsystem.getY())
@@ -146,8 +149,6 @@ class TeleOpMain: NextFTCOpMode() {
 
         /** motif /// */
         telemetry.addData("Detected Motif: ", localizationSubsystem.getMotif().toString())
-
-        telemetry.update()
 
         telemetry.update()
     }
