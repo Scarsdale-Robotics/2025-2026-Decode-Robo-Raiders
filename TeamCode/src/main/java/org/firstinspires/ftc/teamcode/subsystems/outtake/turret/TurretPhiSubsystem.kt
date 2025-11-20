@@ -87,6 +87,10 @@ object TurretPhiSubsystem : Subsystem {
     ) : Command() {
         override val isDone = false;
 
+        init {
+            setName("Auto Aim Phi")
+        }
+
         var lastCommand: Command? = null;
 
         override fun start() {

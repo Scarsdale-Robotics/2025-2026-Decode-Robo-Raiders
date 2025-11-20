@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Auton
 
-import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
@@ -17,7 +16,6 @@ import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.open
-import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem
 
 class AutonBlueMotif : NextFTCOpMode() {
     private var pathTimer: Timer? = null
@@ -389,7 +387,7 @@ class AutonBlueMotif : NextFTCOpMode() {
             }
 
             1 -> if (!follower.isBusy) {
-                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+                IntakeSubsystem.intake.schedule() //(TURNS ON INTAKE) temporary value
                 FollowPath(motifGPPIntake1!!)
                 if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
                     setPathState(7)
@@ -397,7 +395,7 @@ class AutonBlueMotif : NextFTCOpMode() {
             }
 
             2 -> if (!follower.isBusy) {
-                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+                IntakeSubsystem.intake.schedule() //(TURNS ON INTAKE) temporary value
                 FollowPath(motifPGPIntake1!!)
                 if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
                     setPathState(9)
@@ -405,7 +403,7 @@ class AutonBlueMotif : NextFTCOpMode() {
             }
 
             3 -> if (!follower.isBusy) {
-                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+                IntakeSubsystem.intake.schedule() //(TURNS ON INTAKE) temporary value
                 FollowPath(motifPPGIntake1Prep!!)
                 if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
                     setPathState(4)
@@ -425,7 +423,7 @@ class AutonBlueMotif : NextFTCOpMode() {
             5 -> if (!follower.isBusy) {
                 open.schedule()
                 if (follower.atPose(motifPPGIntake2MidPos, 1.0, 1.0)) {
-                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+                    IntakeSubsystem.intake.schedule() //(TURNS ON INTAKE) temporary value
                 }
                 FollowPath(motifPPGIntake2!!)
                 if (follower.atPose(motifPPGIntake2End, 1.0, 1.0)) {
@@ -448,7 +446,7 @@ class AutonBlueMotif : NextFTCOpMode() {
                     open.schedule()
                 }
                 if (follower.atPose(motifGPPIntake2Purp1Intaked, 5.0, 5.0)) {
-                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+                    IntakeSubsystem.intake.schedule() //(TURNS ON INTAKE) temporary value
                 }
                 if (follower.atPose(motifGPPIntake2Intaked2, 1.0, 1.0)) {
                     setPathState(8)
@@ -474,7 +472,7 @@ class AutonBlueMotif : NextFTCOpMode() {
                 FollowPath(motifPGPIntake2!!)
                 open.schedule()
                 if (follower.atPose(motifPGPIntake2Prep, 5.0, 5.0)) {
-                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+                    IntakeSubsystem.intake.schedule() //(TURNS ON INTAKE) temporary value
                 }
                 if (follower.atPose(motifsShooterEnd, 1.0, 1.0)) {
                     IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value

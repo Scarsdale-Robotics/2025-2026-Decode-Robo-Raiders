@@ -6,21 +6,24 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.hardware.impl.CRServoEx
-import dev.nextftc.hardware.impl.ServoEx
-import dev.nextftc.hardware.positionable.SetPosition
 import dev.nextftc.hardware.powerable.SetPower
 
 @TeleOp(name = "Mag Servo Test", group = "Config")
 @Configurable
 class MagServoTest : NextFTCOpMode() {
-    private val servo = CRServoEx("magazine");
+    private val servoL = CRServoEx("mwl");
+    private val servoR = CRServoEx("mwr");
 
     companion object {
-        var position = 0.0;
+        var powerL = 0.0;
+        var powerR = 0.0;
     }
 
     override fun onUpdate() {
-        SetPower(servo, position)();
+        if (powerL != 0.0)
+            SetPower(servoL, powerL)();
+        if (powerR != 0.0)
+            SetPower(servoR, -powerR)();
 
         PanelsTelemetry.telemetry.addData("CM", CommandManager.snapshot);
         PanelsTelemetry.telemetry.update();

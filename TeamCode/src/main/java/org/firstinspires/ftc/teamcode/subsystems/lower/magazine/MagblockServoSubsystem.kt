@@ -1,15 +1,16 @@
 package org.firstinspires.ftc.teamcode.subsystems.lower.magazine
 
 import com.acmerobotics.dashboard.config.Config
+import com.bylazar.configurables.annotations.Configurable
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.ServoEx
 import dev.nextftc.hardware.positionable.SetPosition
 
-@Config
+@Configurable
 object MagblockServoSubsystem : Subsystem {
-    @JvmField var OPEN = 1.0;
-    @JvmField var CLOSED = 0.0;
+    @JvmField var OPEN = 0.2;
+    @JvmField var CLOSED = 0.5;
 
     private val servo = ServoEx("magblock");
 

@@ -98,7 +98,7 @@ class TeleOpMain: NextFTCOpMode() {
         }
 
         // g2 square --> try to clear balls, fix jam
-        Gamepads.gamepad2.square whenBecomesTrue LowerSubsystem.fixJam;
+//        Gamepads.gamepad2.square whenBecomesTrue LowerSubsystem.fixJam;
 
         // todo: localization reset
         // todo: auto aim test teleop

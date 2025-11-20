@@ -32,6 +32,7 @@ class MotorTest : NextFTCOpMode() {
 
         PanelsTelemetry.telemetry.addData("CM", CommandManager.snapshot);
         PanelsTelemetry.telemetry.addData("enc", motor.currentPosition);
+        PanelsTelemetry.telemetry.addData("time", runtime);
         PanelsTelemetry.telemetry.update();
     }
 }

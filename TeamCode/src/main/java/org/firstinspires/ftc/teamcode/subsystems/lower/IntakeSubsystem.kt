@@ -10,13 +10,13 @@ import java.util.function.Supplier
 object IntakeSubsystem : Subsystem {
     private val motor = MotorEx("intake");
 
-    val REVERSE = -1.0;
-    val FORWARD = 1.0;
+    val OUT = -1.0;
+    val IN = 1.0;
 
     class Power(power: Double) : InstantCommand({ motor.power = power })
 
-    val forward = SetPower(motor, FORWARD);
-    val reverse = SetPower(motor, REVERSE);
+    val intake = SetPower(motor, IN);
+    val reverse = SetPower(motor, OUT);
     val stop = SetPower(motor, 0.0);
 
     override fun initialize() {
@@ -25,7 +25,7 @@ object IntakeSubsystem : Subsystem {
     }
 
     class DriverCommandDefaultOn(  // could be bad for power draw?
-        private val reversePower: Supplier<Double>,
+        private val outPower: Supplier<Double>,
     ) : Command() {
         override val isDone = false;
 
@@ -35,23 +35,24 @@ object IntakeSubsystem : Subsystem {
         }
 
         override fun update() {
-            motor.power = 1.0 - 2.0 * reversePower.get();
+            motor.power = 1.0 - 2.0 * outPower.get();
         }
     }
 
     class DriverCommand(
-        private val forwardPower: Supplier<Double>,
-        private val reversePower: Supplier<Double>,
+        private val inPower: Supplier<Double>,
+        private val outPower: Supplier<Double>,
     ) : Command() {
         override val isDone = false;
 
         init {
-            setInterruptible(true);
+            setName("Intake Drive")
+//            setInterruptible(true);
             setRequirements(IntakeSubsystem);
         }
 
         override fun update() {
-            motor.power = forwardPower.get() - reversePower.get();
+            motor.power = inPower.get() - outPower.get();
         }
     }
 }

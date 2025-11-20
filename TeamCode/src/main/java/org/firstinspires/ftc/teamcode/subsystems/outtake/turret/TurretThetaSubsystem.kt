@@ -61,6 +61,10 @@ object TurretThetaSubsystem : Subsystem {
     ) : Command() {
         override val isDone = false;
 
+        init {
+            setName("Auto Aim Theta")
+        }
+
         override fun start() {
             SetTargetTheta(45.0.deg);
         }
