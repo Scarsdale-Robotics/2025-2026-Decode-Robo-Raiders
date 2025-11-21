@@ -1,13 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 
-import com.acmerobotics.dashboard.config.Config
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.bylazar.telemetry.PanelsTelemetry.telemetry
 import dev.nextftc.bindings.Button
 import dev.nextftc.core.commands.Command
-import dev.nextftc.core.commands.groups.SequentialGroup
-import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
@@ -17,14 +13,12 @@ import dev.nextftc.hardware.positionable.SetPosition
 import dev.nextftc.hardware.positionable.SetPositions
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem.targetPhi
 import java.util.function.Supplier
-import kotlin.div
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.time.ComparableTimeMark
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
-import kotlin.times
 
 // up-down
 @Configurable
@@ -32,17 +26,17 @@ import kotlin.times
 object TurretThetaSubsystem : Subsystem {
     private val servo = ServoEx("turret_theta");
 
-    @JvmField var POS_63deg = 0.6;
-    @JvmField var POS_45deg = 0.1;
+    @JvmField var POS_63deg = 0.65;
+    @JvmField var POS_55deg = 0.4;
 
     val open = SetPosition(servo, 0.1).requires(this)
 
     var targetTheta: Angle = 0.0.rad
         get() {
             return norm(
-                18.0.deg *
-                        ((servo.position - POS_45deg) / (POS_63deg - POS_45deg))
-                        + 45.0.deg
+                8.0.deg *
+                        ((servo.position - POS_55deg) / (POS_63deg - POS_55deg))
+                        + 55.0.deg
             )
         }
         private set
@@ -52,7 +46,7 @@ object TurretThetaSubsystem : Subsystem {
     }
 
     class SetTargetTheta(val angle: Angle) : SetPositions(
-        servo to ((norm(angle) - 45.0.deg) / 18.0.deg * (POS_63deg - POS_45deg) + POS_45deg)
+        servo to ((norm(angle) - 55.0.deg) / 8.0.deg * (POS_63deg - POS_55deg) + POS_55deg)
     )
 
     class AutoAim(
@@ -66,7 +60,7 @@ object TurretThetaSubsystem : Subsystem {
         }
 
         override fun start() {
-            SetTargetTheta(45.0.deg);
+            SetTargetTheta(55.0.deg);
         }
         
         override fun update() {

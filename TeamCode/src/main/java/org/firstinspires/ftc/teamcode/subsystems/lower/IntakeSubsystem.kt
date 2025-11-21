@@ -47,7 +47,6 @@ object IntakeSubsystem : Subsystem {
 
         init {
             setName("Intake Drive")
-//            setInterruptible(true);
             setRequirements(IntakeSubsystem);
         }
 

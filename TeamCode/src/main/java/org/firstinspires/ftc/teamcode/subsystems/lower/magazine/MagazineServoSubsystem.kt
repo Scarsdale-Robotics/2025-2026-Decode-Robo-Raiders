@@ -18,11 +18,11 @@ object MagazineServoSubsystem : Subsystem {
 
     val forward = ParallelGroup(
         SetPower(servoL, -FORWARD),
-        SetPower(servoR, FORWARD)
+//        SetPower(servoR, FORWARD)
     );
     val reverse = ParallelGroup(
         SetPower(servoL, -REVERSE),
-        SetPower(servoR, REVERSE)
+//        SetPower(servoR, REVERSE)
     );
     val stop = ParallelGroup(
         SetPower(servoL, -0.0),
@@ -42,7 +42,7 @@ object MagazineServoSubsystem : Subsystem {
         override fun update() {
             val power =  1.0 - 2.0 * outPower.get();
             servoL.power = -power;
-            servoR.power = power;
+//            servoR.power = power;
         }
     }
 
@@ -53,14 +53,13 @@ object MagazineServoSubsystem : Subsystem {
         override val isDone = false;
 
         init {
-            setInterruptible(true);
             setRequirements(MagazineServoSubsystem);
         }
 
         override fun update() {
             val power = inPower.get() - outPower.get();
             servoL.power = -power;
-            servoR.power = power;
+//            servoR.power = power;
         }
     }
 }

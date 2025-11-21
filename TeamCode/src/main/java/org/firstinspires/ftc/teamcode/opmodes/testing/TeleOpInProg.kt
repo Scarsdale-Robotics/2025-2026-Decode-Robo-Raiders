@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.opmodes.testing
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
+import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
@@ -11,6 +13,9 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import dev.nextftc.hardware.driving.FieldCentric
+import dev.nextftc.hardware.driving.MecanumDriverControlled
+import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
@@ -37,6 +42,14 @@ class TeleOpInProg : NextFTCOpMode() {
     }
 //    private var odom: LocalizationSubsystem? = null
     private var odom: OdometrySubsystem? = null;
+
+    private val lfw = MotorEx("lfw").reversed();
+    private val lbw = MotorEx("lbw").reversed();
+    private val rfw = MotorEx("rfw");
+    private val rbw = MotorEx("rbw");
+
+    private var magDrive: Command? = null;
+    private var intakeDrive: Command? = null;
 
     init {
         addComponents(
@@ -67,45 +80,65 @@ class TeleOpInProg : NextFTCOpMode() {
 
         // Initialize the device
         odom!!.setPinpoint(startX, startY, Math.PI / 2.0);
+        Gamepads.gamepad1.leftBumper and Gamepads.gamepad1.rightBumper whenBecomesTrue
+                { odom!!.setPinpoint(startX, startY, Math.PI / 2.0); }
 
-        val intakeDrive = IntakeSubsystem.DriverCommand(
+        intakeDrive = IntakeSubsystem.DriverCommand(
             Gamepads.gamepad1.rightTrigger,
             Gamepads.gamepad1.leftTrigger
         );
-        intakeDrive.schedule();
+        intakeDrive!!.schedule();
 
 
-        val magDrive = MagazineServoSubsystem.DriverCommand(
-            Gamepads.gamepad1.rightTrigger,
+        magDrive = MagazineServoSubsystem.DriverCommandDefaultOn(
             Gamepads.gamepad1.leftTrigger
         );
-        magDrive.schedule();
+        magDrive!!.schedule();
+
+
+        val mecanum = MecanumDriverControlled(
+            lfw,
+            rfw,
+            lbw,
+            rbw,
+            -Gamepads.gamepad1.leftStickY,
+            Gamepads.gamepad1.leftStickX,
+            Gamepads.gamepad1.rightStickX,
+//            FieldCentric({ odom!!.rOh.rad })
+        )
+        mecanum();
 
 
 
-//        val thetaAim = TurretThetaSubsystem.AutoAim(
-//            {
-//                hypot(
-//                    goalX - odom!!.rOx1 + odom!!.vx * overaimSecs,
-//                    goalY - odom!!.rOy1 + odom!!.vy * overaimSecs,
-//                )
-//            },
-//            { (-0.123 * it + 63.0).coerceIn(45.0, 63.0).deg }
-//        )
-//        thetaAim(); // can tbis just be turned into calling it on the previous line?
+        val thetaAim = TurretThetaSubsystem.AutoAim(
+            {
+                hypot(
+                    goalX - odom!!.rOx1 + odom!!.vx * overaimSecs,
+                    goalY - odom!!.rOy1 + odom!!.vy * overaimSecs,
+                )
+            },
+            { (-0.058 * it + 63.0).coerceIn(55.0, 63.0).deg }
+        )
+        thetaAim();
+
+
+        val autoAimPhi = TurretPhiSubsystem.AutoAim(
+            { goalX - odom!!.rOx1 + odom!!.vx * overaimSecs },
+            { goalY - odom!!.rOy1 + odom!!.vy * overaimSecs },
+            { odom!!.rOh.rad + odom!!.omega.rad * overaimSecs }
+        );
+        autoAimPhi.schedule();
 
 
 
-//        val autoAimPhi = TurretPhiSubsystem.AutoAim(
-//            { goalX - odom!!.rOx1 + odom!!.vx * overaimSecs },
-//            { goalY - odom!!.rOy1 + odom!!.vy * overaimSecs },
-//            { odom!!.rOh.rad + odom!!.omega.rad * overaimSecs }
-//        );
-//        autoAimPhi.schedule();
+        Gamepads.gamepad1.square whenBecomesTrue SequentialGroup(
+            LowerSubsystem.launch,
+            magDrive!!,
+            intakeDrive!!
+        )
 
-
-
-        Gamepads.gamepad1.square whenBecomesTrue LowerSubsystem.launch
+        MagblockServoSubsystem.close()
+        PusherServoSubsystem.out()
     }
 
     var onCmd: ShooterSubsystem.On? = null;

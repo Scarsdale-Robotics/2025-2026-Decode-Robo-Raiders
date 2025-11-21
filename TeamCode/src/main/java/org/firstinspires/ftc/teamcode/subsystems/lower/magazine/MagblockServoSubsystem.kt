@@ -9,12 +9,12 @@ import dev.nextftc.hardware.positionable.SetPosition
 
 @Configurable
 object MagblockServoSubsystem : Subsystem {
-    @JvmField var OPEN = 0.2;
-    @JvmField var CLOSED = 0.5;
+    @JvmField var OPEN: Double? = 0.2;
+    @JvmField var CLOSED: Double? = 0.5;
 
     private val servo = ServoEx("magblock");
 
     // using functions instead of fields makes the opmodes much cleaner: you don't need new each time, but the parentheses are still there to give meathod-vibes
-    @JvmStatic val open = SetPosition(servo, OPEN);
-    @JvmStatic val close = SetPosition(servo, CLOSED);
+    val open = SetPosition(servo, OPEN!!);
+    val close = SetPosition(servo, CLOSED!!);
 }

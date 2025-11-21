@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @Configurable
 object PusherServoSubsystem : Subsystem {
     @JvmField var OUT = 0.34;
-    @JvmField var IN = 0.1;
+    @JvmField var IN = 0.08;
     @JvmField var DELAY_MS_PUSH = 1000;
 
     private val servo = ServoEx("magpush");
@@ -21,4 +21,7 @@ object PusherServoSubsystem : Subsystem {
         Delay(DELAY_MS_PUSH.milliseconds),
         SetPosition(servo, OUT)
     ).requires(this);
+
+    val out = SetPosition(servo, OUT);
+    val `in` = SetPosition(servo, IN);
 }

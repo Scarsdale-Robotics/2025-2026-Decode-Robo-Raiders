@@ -22,7 +22,7 @@ object LowerSubsystem : SubsystemGroup(
 
     @JvmField var BALL_UP_DELAY_MS = 2000;
 
-    @JvmField var TOP_RISE_DELAY_MS = 1000;
+    @JvmField var TOP_RISE_DELAY_MS = 2000;
 
 //    var fixJam = SequentialGroup(
 ////        ParallelGroup(
@@ -43,9 +43,9 @@ object LowerSubsystem : SubsystemGroup(
         Delay(BALL_UP_DELAY_MS.milliseconds),
         MagblockServoSubsystem.close,
         IntakeSubsystem.intake,
-        Delay(EXTRA_DELAY_BETWEEN_LAUNCHES_MS.milliseconds),
-        MagazineServoSubsystem.stop,
-        IntakeSubsystem.stop,
+//        Delay(EXTRA_DELAY_BETWEEN_LAUNCHES_MS.milliseconds),
+//        MagazineServoSubsystem.stop,
+//        IntakeSubsystem.stop,
     ).setInterruptible(false).requires(
         PusherServoSubsystem,
         MagazineServoSubsystem,

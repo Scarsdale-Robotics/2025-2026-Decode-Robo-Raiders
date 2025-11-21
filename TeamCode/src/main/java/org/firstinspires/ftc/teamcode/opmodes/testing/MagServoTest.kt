@@ -21,9 +21,9 @@ class MagServoTest : NextFTCOpMode() {
 
     override fun onUpdate() {
         if (powerL != 0.0)
-            SetPower(servoL, powerL)();
+            SetPower(servoL, -powerL)();
         if (powerR != 0.0)
-            SetPower(servoR, -powerR)();
+            SetPower(servoR, powerR)();
 
         PanelsTelemetry.telemetry.addData("CM", CommandManager.snapshot);
         PanelsTelemetry.telemetry.update();
