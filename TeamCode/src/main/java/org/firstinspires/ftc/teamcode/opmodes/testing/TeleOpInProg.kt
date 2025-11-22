@@ -5,7 +5,6 @@ import com.bylazar.telemetry.PanelsTelemetry
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
-import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
@@ -13,6 +12,7 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import dev.nextftc.hardware.driving.FieldCentric
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
@@ -24,9 +24,9 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsy
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.hypot
-import kotlin.math.sqrt
 
 @TeleOp(name = "Tele Op In Prog")
 @Configurable
@@ -72,37 +72,51 @@ class TeleOpInProg : NextFTCOpMode() {
         odom = OdometrySubsystem(0.0, 0.0, 0.0, hardwareMap)
     }
 
+//    var ballCnt = 0;
     override fun onStartButtonPressed() {
         val startX = 24.0*3.0;
         val startY = 24.0*3.0;
+        val dd = true;  // dual driver?
 
         // Initialize the device
         odom!!.setPinpoint(startX, startY, -Math.PI / 2.0);
 
         // Push towards goal
-        var xs = 0.0;
-        var ys = 0.0;
-        Gamepads.gamepad1.dpadUp whenTrue { ys -= ODOM_SHIFT_SPEED }
-        Gamepads.gamepad1.dpadDown whenTrue { ys += ODOM_SHIFT_SPEED }
-        Gamepads.gamepad1.dpadLeft whenTrue { xs -= ODOM_SHIFT_SPEED }
-        Gamepads.gamepad1.dpadRight whenTrue { xs += ODOM_SHIFT_SPEED }
+//        var xs = 0.0;
+//        var ys = 0.0;
+//        Gamepads.gamepad1.dpadUp whenTrue { ys -= ODOM_SHIFT_SPEED }
+//        Gamepads.gamepad1.dpadDown whenTrue { ys += ODOM_SHIFT_SPEED }
+//        Gamepads.gamepad1.dpadLeft whenTrue { xs -= ODOM_SHIFT_SPEED }
+//        Gamepads.gamepad1.dpadRight whenTrue { xs += ODOM_SHIFT_SPEED }
+//        if (xs != 0.0 || ys != 0.0) {
+//
+//        }
 
         // Reset Odom
-        Gamepads.gamepad1.leftBumper and Gamepads.gamepad1.rightBumper whenBecomesTrue
-                { odom!!.setPinpoint(startX, startY, -Math.PI / 2.0); }
+        if (dd) (Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.rightBumper)
+        else (Gamepads.gamepad1.leftBumper and Gamepads.gamepad1.rightBumper)
+            .whenBecomesTrue {
+                odom!!.setPinpoint(startX, startY, -Math.PI / 2.0);
+            }
 
         intakeDrive = IntakeSubsystem.DriverCommand(
-            Gamepads.gamepad1.rightTrigger,
-            Gamepads.gamepad1.leftTrigger
+            if (dd) Gamepads.gamepad2.rightTrigger else Gamepads.gamepad1.rightTrigger,
+            if (dd) Gamepads.gamepad2.leftTrigger else Gamepads.gamepad1.leftTrigger
         );
         intakeDrive!!.schedule();
 
 
         magDrive = MagazineServoSubsystem.DriverCommandDefaultOn(
-            Gamepads.gamepad1.leftTrigger
+            if (dd) Gamepads.gamepad2.leftTrigger else Gamepads.gamepad1.leftTrigger
         );
         magDrive!!.schedule();
 
+        Gamepads.gamepad2.circle or Gamepads.gamepad1.circle
+            .whenBecomesTrue(MagblockServoSubsystem.open)
+        Gamepads.gamepad2.circle or Gamepads.gamepad1.circle
+            .whenBecomesFalse(MagblockServoSubsystem.close)
+        Gamepads.gamepad1.cross whenBecomesTrue PusherServoSubsystem.`in`
+        Gamepads.gamepad1.cross whenBecomesFalse PusherServoSubsystem.out
 
         val mecanum = MecanumDriverControlled(
             lfw,
@@ -112,7 +126,9 @@ class TeleOpInProg : NextFTCOpMode() {
             -Gamepads.gamepad1.leftStickY,
             Gamepads.gamepad1.leftStickX,
             Gamepads.gamepad1.rightStickX,
-//            FieldCentric({ odom!!.rOh.rad })
+            FieldCentric({
+                if (isBlue) (odom!!.rOh - PI).rad else odom!!.rOh.rad
+            })
         )
         mecanum();
 
@@ -144,10 +160,6 @@ class TeleOpInProg : NextFTCOpMode() {
 //            magDrive!!,
 //            intakeDrive!!
 //        )
-        Gamepads.gamepad1.circle whenBecomesTrue MagblockServoSubsystem.open
-        Gamepads.gamepad1.circle whenBecomesFalse MagblockServoSubsystem.close
-        Gamepads.gamepad1.cross whenBecomesTrue PusherServoSubsystem.`in`
-        Gamepads.gamepad1.cross whenBecomesFalse PusherServoSubsystem.out
 
         val shooterAutoAim = ShooterSubsystem.AutoAim(
             { hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1) },

@@ -30,8 +30,8 @@ import kotlin.time.TimeSource
 object TurretPhiSubsystem : Subsystem {
     private val motor = MotorEx("turret_phi");
 
-    @JvmField var ENCODERS_FORWARD = 0.0;
-    @JvmField var ENCODERS_BACKWARD = 1367.0;  // todo: TUNE
+    @JvmField var ENCODERS_FORWARD = -1367.0;
+    @JvmField var ENCODERS_BACKWARD = 0.0;  // todo: TUNE
 
     private val controller: ControlSystem;
 
@@ -69,11 +69,19 @@ object TurretPhiSubsystem : Subsystem {
         private set;
 
     fun norm(angle: Angle): Angle {
-        var a = atan2(sin(angle.inRad), cos(angle.inRad));
-        if (a < -5*PI/4) {
-            a = 2 * PI + a;
+        var a = angle.inRad % (2 * PI);
+        if (a > PI / 2) {
+            a -= 2 * PI;
         }
-        return a.coerceIn(-5*PI/4, 0.0).rad;
+        return a.coerceIn(-5*PI/4, 0.0).rad
+//        var a = atan2(sin(angle.inRad), cos(angle.inRad));
+////        if (a < -5*PI/4) {
+////            a = 2 * PI + a;
+////        }
+//        if (a > 0.0) {
+//            a -= 2 * PI;
+//        }
+//        return a.coerceIn(-5*PI/4, 0.0).rad;
     }
 
     open class SetTargetPhi(val angle: Angle) : RunToState(
