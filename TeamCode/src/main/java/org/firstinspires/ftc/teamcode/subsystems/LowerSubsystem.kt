@@ -19,6 +19,7 @@ object LowerSubsystem : SubsystemGroup(
     @JvmField var FIX_JAM_DELAY_MS = 1000;
 
     @JvmField var EXTRA_DELAY_BETWEEN_LAUNCHES_MS = 500;
+    @JvmField var LAUNCH_ALL_TIME_BEFORE_LAST_SHOOT_MS = 2000;
 
     @JvmField var BALL_UP_DELAY_MS = 2000;
 
@@ -35,10 +36,17 @@ object LowerSubsystem : SubsystemGroup(
 ////        MagazineServoSubsystem.forward,  // doesn't reset intake b/c we don't know what intake was set at
 //    ).setInterruptible(false);
 
-    val launch = SequentialGroup(
+    val launchAll = SequentialGroup(
+        MagblockServoSubsystem.open,
+        Delay(LAUNCH_ALL_TIME_BEFORE_LAST_SHOOT_MS.milliseconds),
+        PusherServoSubsystem.pushMult,
+        MagblockServoSubsystem.close
+    )
+
+    val launchOne = SequentialGroup(
         MagazineServoSubsystem.forward,
         Delay(TOP_RISE_DELAY_MS.milliseconds),
-        PusherServoSubsystem.push,
+        PusherServoSubsystem.pushMult,
         MagblockServoSubsystem.open,
         Delay(BALL_UP_DELAY_MS.milliseconds),
         MagblockServoSubsystem.close,

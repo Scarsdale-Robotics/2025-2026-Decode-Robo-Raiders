@@ -18,16 +18,21 @@ object MagazineServoSubsystem : Subsystem {
 
     val forward = ParallelGroup(
         SetPower(servoL, -FORWARD),
-//        SetPower(servoR, FORWARD)
+        SetPower(servoR, FORWARD)
     );
     val reverse = ParallelGroup(
         SetPower(servoL, -REVERSE),
-//        SetPower(servoR, REVERSE)
+        SetPower(servoR, REVERSE)
     );
     val stop = ParallelGroup(
         SetPower(servoL, -0.0),
         SetPower(servoR, 0.0)
     );
+
+    init {
+        servoL.power = 0.0;
+        servoR.power = 0.0;
+    }
 
     class DriverCommandDefaultOn(  // could be bad for power draw?
         private val outPower: Supplier<Double>,
@@ -42,7 +47,7 @@ object MagazineServoSubsystem : Subsystem {
         override fun update() {
             val power =  1.0 - 2.0 * outPower.get();
             servoL.power = -power;
-//            servoR.power = power;
+            servoR.power = power;
         }
     }
 
@@ -59,7 +64,7 @@ object MagazineServoSubsystem : Subsystem {
         override fun update() {
             val power = inPower.get() - outPower.get();
             servoL.power = -power;
-//            servoR.power = power;
+            servoR.power = power;
         }
     }
 }

@@ -83,6 +83,13 @@ public class OdometrySubsystem {
     pinpoint.setPosition(new Pose2D(INCH, x1, y1, AngleUnit.RADIANS, h));
   }
 
+  public void shiftPinpoint(double x1, double y1, double h) {
+    if (pinpoint == null) return;
+    pinpoint.setPosition(
+            new Pose2D(INCH, ROx1 + x1, ROy1 + y1, AngleUnit.RADIANS, ROh + h)
+    );
+  }
+
   public void resetPinpoint() {
     if (pinpoint == null) return;
     pinpoint.resetPosAndIMU();

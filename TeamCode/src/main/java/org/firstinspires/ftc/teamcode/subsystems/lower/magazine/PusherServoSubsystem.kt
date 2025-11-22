@@ -10,16 +10,30 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Configurable
 object PusherServoSubsystem : Subsystem {
-    @JvmField var OUT = 0.34;
-    @JvmField var IN = 0.08;
-    @JvmField var DELAY_MS_PUSH = 1000;
+    @JvmField var OUT = 0.39;
+    @JvmField var IN = 0.09;
+    @JvmField var DELAY_MS_PUSH: Double? = 1000.0;
 
     private val servo = ServoEx("magpush");
 
+    val pushMult = SequentialGroup(
+        SetPosition(servo, IN),
+        Delay(DELAY_MS_PUSH!!.milliseconds),
+        SetPosition(servo, OUT),
+        Delay(DELAY_MS_PUSH!!.milliseconds),
+        SetPosition(servo, IN),
+        Delay(DELAY_MS_PUSH!!.milliseconds),
+        SetPosition(servo, OUT),
+        Delay(DELAY_MS_PUSH!!.milliseconds),
+        SetPosition(servo, IN),
+        Delay(DELAY_MS_PUSH!!.milliseconds),
+        SetPosition(servo, OUT)
+    ).requires(this);
+
     val push = SequentialGroup(
         SetPosition(servo, IN),
-        Delay(DELAY_MS_PUSH.milliseconds),
-        SetPosition(servo, OUT)
+        Delay(DELAY_MS_PUSH!!.milliseconds),
+        SetPosition(servo, OUT),
     ).requires(this);
 
     val out = SetPosition(servo, OUT);

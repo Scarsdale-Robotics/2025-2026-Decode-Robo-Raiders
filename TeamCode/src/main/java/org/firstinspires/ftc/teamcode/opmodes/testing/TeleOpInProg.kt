@@ -13,14 +13,11 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import dev.nextftc.hardware.driving.FieldCentric
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.MagazineSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsystem
@@ -35,10 +32,11 @@ import kotlin.math.hypot
 class TeleOpInProg : NextFTCOpMode() {
     companion object {
         var overaimSecs = 0.0;
-        var speed = 1100.0;
+        var speed = 1234.0;
         var goalX = 12.0;
         var goalY = 144.0-12.0;
         var isBlue = true;
+        var ODOM_SHIFT_SPEED = 0.1;
     }
 //    private var odom: LocalizationSubsystem? = null
     private var odom: OdometrySubsystem? = null;
@@ -77,9 +75,18 @@ class TeleOpInProg : NextFTCOpMode() {
         val startX = 24.0*3.0;
         val startY = 24.0*3.0;
 
-
         // Initialize the device
         odom!!.setPinpoint(startX, startY, Math.PI / 2.0);
+
+        // Push towards goal
+        var xs = 0.0;
+        var ys = 0.0;
+        Gamepads.gamepad1.dpadUp whenTrue { ys -= ODOM_SHIFT_SPEED }
+        Gamepads.gamepad1.dpadDown whenTrue { ys += ODOM_SHIFT_SPEED }
+        Gamepads.gamepad1.dpadLeft whenTrue { xs -= ODOM_SHIFT_SPEED }
+        Gamepads.gamepad1.dpadRight whenTrue { xs += ODOM_SHIFT_SPEED }
+
+        // Reset Odom
         Gamepads.gamepad1.leftBumper and Gamepads.gamepad1.rightBumper whenBecomesTrue
                 { odom!!.setPinpoint(startX, startY, Math.PI / 2.0); }
 
@@ -132,10 +139,15 @@ class TeleOpInProg : NextFTCOpMode() {
 
 
         Gamepads.gamepad1.square whenBecomesTrue SequentialGroup(
-            LowerSubsystem.launch,
+            LowerSubsystem.launchAll,
             magDrive!!,
             intakeDrive!!
         )
+        Gamepads.gamepad1.circle whenBecomesTrue MagblockServoSubsystem.open
+        Gamepads.gamepad1.circle whenBecomesFalse MagblockServoSubsystem.close
+        Gamepads.gamepad1.cross whenBecomesTrue PusherServoSubsystem.`in`
+        Gamepads.gamepad1.cross whenBecomesFalse PusherServoSubsystem.out
+
 
         MagblockServoSubsystem.close()
         PusherServoSubsystem.out()
