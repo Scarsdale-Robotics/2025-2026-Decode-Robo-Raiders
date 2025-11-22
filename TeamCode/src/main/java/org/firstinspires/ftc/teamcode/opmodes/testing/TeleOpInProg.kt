@@ -26,13 +26,14 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsyst
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import kotlin.math.atan2
 import kotlin.math.hypot
+import kotlin.math.sqrt
 
 @TeleOp(name = "Tele Op In Prog")
 @Configurable
 class TeleOpInProg : NextFTCOpMode() {
     companion object {
         var overaimSecs = 0.0;
-        var speed = 1234.0;
+//        var speed = 1234.0;
         var goalX = 12.0;
         var goalY = 144.0-12.0;
         var isBlue = true;
@@ -76,7 +77,7 @@ class TeleOpInProg : NextFTCOpMode() {
         val startY = 24.0*3.0;
 
         // Initialize the device
-        odom!!.setPinpoint(startX, startY, Math.PI / 2.0);
+        odom!!.setPinpoint(startX, startY, -Math.PI / 2.0);
 
         // Push towards goal
         var xs = 0.0;
@@ -88,7 +89,7 @@ class TeleOpInProg : NextFTCOpMode() {
 
         // Reset Odom
         Gamepads.gamepad1.leftBumper and Gamepads.gamepad1.rightBumper whenBecomesTrue
-                { odom!!.setPinpoint(startX, startY, Math.PI / 2.0); }
+                { odom!!.setPinpoint(startX, startY, -Math.PI / 2.0); }
 
         intakeDrive = IntakeSubsystem.DriverCommand(
             Gamepads.gamepad1.rightTrigger,
@@ -138,29 +139,35 @@ class TeleOpInProg : NextFTCOpMode() {
 
 
 
-        Gamepads.gamepad1.square whenBecomesTrue SequentialGroup(
-            LowerSubsystem.launchAll,
-            magDrive!!,
-            intakeDrive!!
-        )
+//        Gamepads.gamepad1.square whenBecomesTrue SequentialGroup(
+//            LowerSubsystem.launchAll,
+//            magDrive!!,
+//            intakeDrive!!
+//        )
         Gamepads.gamepad1.circle whenBecomesTrue MagblockServoSubsystem.open
         Gamepads.gamepad1.circle whenBecomesFalse MagblockServoSubsystem.close
         Gamepads.gamepad1.cross whenBecomesTrue PusherServoSubsystem.`in`
         Gamepads.gamepad1.cross whenBecomesFalse PusherServoSubsystem.out
+
+        val shooterAutoAim = ShooterSubsystem.AutoAim(
+            { hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1) },
+            { (912 + 1.85*it + 0.0148*it*it).coerceIn(0.0, 1800.0) }
+        )
+        shooterAutoAim.schedule();
 
 
         MagblockServoSubsystem.close()
         PusherServoSubsystem.out()
     }
 
-    var onCmd: ShooterSubsystem.On? = null;
+//    var onCmd: ShooterSubsystem.On? = null;
     override fun onUpdate() {
         odom!!.updateOdom()
 
-        if (onCmd != null) CommandManager.cancelCommand(onCmd!!)
-        val cmd = ShooterSubsystem.On(speed);
-        cmd();
-        onCmd = cmd;
+//        if (onCmd != null) CommandManager.cancelCommand(onCmd!!)
+//        val cmd = ShooterSubsystem.On(speed);
+//        cmd();
+//        onCmd = cmd;
 
         PanelsTelemetry.telemetry.addData("ang degs", (atan2(goalY - odom!!.rOy1, goalX - odom!!.rOx1).rad - odom!!.rOh.rad).inDeg)
 
