@@ -37,6 +37,7 @@ class TeleOpInProg : NextFTCOpMode() {
         var goalX = 12.0;
         var goalY = 144.0-12.0;
         var isBlue = true;
+        var startFar = true;
         var ODOM_SHIFT_SPEED = 0.1;
     }
 //    private var odom: LocalizationSubsystem? = null
@@ -74,8 +75,26 @@ class TeleOpInProg : NextFTCOpMode() {
 
 //    var ballCnt = 0;
     override fun onStartButtonPressed() {
-        val startX = 24.0*3.0;
-        val startY = 24.0*3.0;
+        var startX: Double;
+        var startY: Double;
+        if (isBlue) {
+            if (startFar) {
+                startX = 24.0*3.0-16;
+                startY = 24.0*3.0-61;
+            } else {
+                startX = 24.0*3.0-16;
+                startY = 24.0*3.0+61;
+            }
+        } else {
+            if (startFar) {
+                startX = 24.0*3.0+16;
+                startY = 24.0*3.0-61;
+            } else {
+                startX = 24.0*3.0+16;
+                startY = 24.0*3.0+61;
+            }
+        }
+
         val dd = true;  // dual driver?
 
         // Initialize the device
@@ -127,7 +146,7 @@ class TeleOpInProg : NextFTCOpMode() {
             Gamepads.gamepad1.leftStickX,
             Gamepads.gamepad1.rightStickX,
             FieldCentric({
-                if (isBlue) (odom!!.rOh - PI).rad else odom!!.rOh.rad
+                if (isBlue) (odom!!.rOh - PI).rad else (odom!!.rOh).rad
             })
         )
         mecanum();
