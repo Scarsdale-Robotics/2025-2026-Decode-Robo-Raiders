@@ -5,6 +5,7 @@ import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
+import kotlinx.coroutines.Runnable
 import java.util.function.Supplier
 
 object IntakeSubsystem : Subsystem {
@@ -42,6 +43,9 @@ object IntakeSubsystem : Subsystem {
     class DriverCommand(
         private val inPower: Supplier<Double>,
         private val outPower: Supplier<Double>,
+        private val callbackOnIntake: Runnable = Runnable {  },
+        private val callbackOnReverse: Runnable = Runnable {  },
+        private val callbackOnRest: Runnable = Runnable {  }
     ) : Command() {
         override val isDone = false;
 
@@ -50,8 +54,18 @@ object IntakeSubsystem : Subsystem {
             setRequirements(IntakeSubsystem);
         }
 
+        var lastPower = 0.0;
         override fun update() {
-            motor.power = inPower.get() - outPower.get();
+            val power = inPower.get() - outPower.get();
+            motor.power = power;
+            if (power > 0.0 && lastPower <= 0.0) {
+                callbackOnIntake.run();
+            } else if (power < 0.0 && lastPower >= 0.0) {
+                callbackOnReverse.run();
+            } else if (power == 0.0 && lastPower != 0.0) {
+                callbackOnRest.run();
+            }
+            lastPower = power;
         }
     }
 }

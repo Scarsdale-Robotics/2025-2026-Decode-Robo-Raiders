@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.I
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Supplier;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
@@ -19,6 +20,9 @@ public class OdometrySubsystem {
   private double ROh;
   private double Vx, Vy, omega;
   private double distance;
+
+//  private Supplier<Double> ofsXSupplier, ofsYSupplier;
+//  private double ofsX, ofsY;
 
   public OdometrySubsystem(double x1, double y1, double h, HardwareMap hm) {
     if (hm == null) {
@@ -55,6 +59,11 @@ public class OdometrySubsystem {
     updateOdom();
   }
 
+//  public void setOffsetSuppliers(Supplier<Double> ofsXSupplier, Supplier<Double> ofsYSupplier) {
+//    this.ofsXSupplier = ofsXSupplier;
+//    this.ofsYSupplier = ofsYSupplier;
+//  }
+
   ElapsedTime time = null;
   double rxl = 0.0, ryl = 0.0, rhl = 0.0;
   public void updateOdom() {
@@ -70,6 +79,7 @@ public class OdometrySubsystem {
       Vx = (ROx1 - rxl) / time.seconds();
       Vy = (ROy1 - ryl) / time.seconds();
       omega = (ROh - rhl) / time.seconds();
+
       time.reset();
     } else {
       time = new ElapsedTime();
@@ -81,13 +91,6 @@ public class OdometrySubsystem {
   public void setPinpoint(double x1, double y1, double h) {
     if (pinpoint == null) return;
     pinpoint.setPosition(new Pose2D(INCH, x1, y1, AngleUnit.RADIANS, h));
-  }
-
-  public void shiftPinpoint(double x1, double y1, double h) {
-    if (pinpoint == null) return;
-    pinpoint.setPosition(
-            new Pose2D(INCH, ROx1 + x1, ROy1 + y1, AngleUnit.RADIANS, ROh + h)
-    );
   }
 
   public void resetPinpoint() {
