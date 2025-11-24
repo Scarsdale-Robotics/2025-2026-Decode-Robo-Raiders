@@ -9,8 +9,8 @@ import dev.nextftc.hardware.positionable.SetPosition
 
 @Configurable
 object MagblockServoSubsystem : Subsystem {
-    @JvmField var OPEN: Double? = 0.25;
-    @JvmField var CLOSED: Double? = 0.0;
+    @JvmField var OPEN: Double? = 0.4;
+    @JvmField var CLOSED: Double? = 0.12;
 
     private val servo = ServoEx("magblock");
 

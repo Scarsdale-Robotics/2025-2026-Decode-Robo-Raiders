@@ -10,8 +10,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Configurable
 object PusherServoSubsystem : Subsystem {
-    @JvmField var OUT = 0.0;
-    @JvmField var IN = 0.38;
+    @JvmField var OUT = 0.15;
+    @JvmField var IN = 0.56;
     @JvmField var DELAY_MS_PUSH: Double? = 1000.0;
 
     private val servo = ServoEx("magpush");
