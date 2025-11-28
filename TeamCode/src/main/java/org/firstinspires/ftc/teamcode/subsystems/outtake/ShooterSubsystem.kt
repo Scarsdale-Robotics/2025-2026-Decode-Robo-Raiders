@@ -25,7 +25,7 @@ object ShooterSubsystem : Subsystem {
     private val motor = MotorEx("shooter").reversed();
 
     @JvmField var ffCoefficients = BasicFeedforwardParameters(0.03, 0.02, 0.01);
-    @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.000)
+    @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
 
 //    @JvmField var MAX_VELOCITY = -1000.0;  // rotational velocity
 //    @JvmField var NO_VELOCITY = 0.0;

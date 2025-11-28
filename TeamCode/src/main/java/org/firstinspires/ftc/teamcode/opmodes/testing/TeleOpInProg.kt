@@ -35,7 +35,7 @@ import kotlin.math.hypot
 class TeleOpInProg : NextFTCOpMode() {
     companion object {
         var overaimSecs = 0.0;
-//        var speed = 1234.0;
+        var speed = 1234.0;
         var goalX = 12.0;
         var goalY = 144.0-12.0;
         var isBlue = true;
@@ -209,7 +209,7 @@ class TeleOpInProg : NextFTCOpMode() {
 
         val shooterAutoAim = ShooterSubsystem.AutoAim(
             { hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1) },
-            { (912 + 1.85*it + 0.0148*it*it).coerceIn(0.0, 1800.0) }
+            { (442 + 13.3*it - 0.0427*it*it).coerceIn(0.0, 1500.0) }
         )
         shooterAutoAim.schedule();
 
@@ -218,7 +218,7 @@ class TeleOpInProg : NextFTCOpMode() {
         PusherServoSubsystem.out()
     }
 
-//    var onCmd: ShooterSubsystem.On? = null;
+    var onCmd: ShooterSubsystem.On? = null;
     var lastRuntime = 0.0;
     override fun onUpdate() {
         val dt = runtime - lastRuntime;
@@ -256,6 +256,8 @@ class TeleOpInProg : NextFTCOpMode() {
         telemetry.addData("X POS (inch)", odom!!.rOx1 + ofsX)
         telemetry.addData("Y POS (inch)", odom!!.rOy1 + ofsY)
         telemetry.addData("H (degrees)", odom!!.rOh.rad.inDeg + ofsH.rad.inDeg)
+
+        telemetry.addData("distance to goal (inches)", hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1))
 
         telemetry.update()
     }
