@@ -55,7 +55,7 @@ public class AutonBlueFarBackup extends NextFTCOpMode {
     ////Positions////
     /////////////////
     // Positions the robot will be in during Auton
-    private final Pose startPose = new Pose(26, 132, Math.toRadians(324)); // Start Pose of our robot.
+    private final Pose startPose = new Pose(33, 136, Math.toRadians(0.0)); // Start Pose of our robot.
     private final Pose endPose = new Pose(36, 120, Math.toRadians(270)); // End Pose of our robot.
 
     /////////////

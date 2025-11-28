@@ -112,6 +112,7 @@ public class AutonBlueCloseBackup extends NextFTCOpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
 //        follower = Constants.createFollower(hardwareMap);
+
         buildPaths();
 //        follower.setStartingPose(startPose);
     }
