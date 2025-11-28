@@ -158,12 +158,11 @@ class TeleOpInProg : NextFTCOpMode() {
         );
         magDrive!!.schedule();
 
-        Gamepads.gamepad2.circle or Gamepads.gamepad1.circle
-            .whenBecomesTrue(MagblockServoSubsystem.open)
-        Gamepads.gamepad2.circle or Gamepads.gamepad1.circle
-            .whenBecomesFalse(MagblockServoSubsystem.close)
-        Gamepads.gamepad1.cross whenBecomesTrue PusherServoSubsystem.`in`
-        Gamepads.gamepad1.cross whenBecomesFalse PusherServoSubsystem.out
+        // could do the if (dd) s below but lazy hehehehe
+        Gamepads.gamepad2.circle whenBecomesTrue MagblockServoSubsystem.open
+        Gamepads.gamepad2.circle whenBecomesFalse MagblockServoSubsystem.close
+        Gamepads.gamepad2.cross whenBecomesTrue PusherServoSubsystem.`in`
+        Gamepads.gamepad2.cross whenBecomesFalse PusherServoSubsystem.out
 
         val mecanum = MecanumDriverControlled(
             lfw,

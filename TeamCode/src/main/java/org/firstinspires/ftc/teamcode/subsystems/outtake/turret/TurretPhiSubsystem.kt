@@ -69,19 +69,16 @@ object TurretPhiSubsystem : Subsystem {
         private set;
 
     fun norm(angle: Angle): Angle {
-        var a = angle.inRad % (2 * PI);
-        if (a > PI / 2) {
+//        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
+        val tolerance = PI / 6;
+        var a = angle.inRad;
+
+        if (a < -2 * PI - tolerance) {
+            a += 2 * PI;
+        } else if (a > 0.0 + tolerance) {
             a -= 2 * PI;
         }
-        return a.coerceIn(-5*PI/4, 0.0).rad
-//        var a = atan2(sin(angle.inRad), cos(angle.inRad));
-////        if (a < -5*PI/4) {
-////            a = 2 * PI + a;
-////        }
-//        if (a > 0.0) {
-//            a -= 2 * PI;
-//        }
-//        return a.coerceIn(-5*PI/4, 0.0).rad;
+        return a.rad
     }
 
     open class SetTargetPhi(val angle: Angle) : RunToState(
@@ -104,10 +101,6 @@ object TurretPhiSubsystem : Subsystem {
         }
 
         var lastCommand: Command? = null;
-
-        override fun start() {
-            motor.zero()
-        }
 
         override fun update() {
             if (lastCommand != null) {
@@ -188,9 +181,10 @@ object TurretPhiSubsystem : Subsystem {
         )
         SetPower(motor, power).setInterruptible(true)()
 
-        PanelsTelemetry.telemetry.addData("enc", motor.currentPosition)
+        PanelsTelemetry.telemetry.addData("phi enc", motor.currentPosition)
         PanelsTelemetry.telemetry.addData("ref", controller.reference)
         PanelsTelemetry.telemetry.addData("goal", controller.goal)
+        PanelsTelemetry.telemetry.addData("turret phi", targetPhi)
         PanelsTelemetry.telemetry.addData("lm", controller.lastMeasurement)
     }
 
