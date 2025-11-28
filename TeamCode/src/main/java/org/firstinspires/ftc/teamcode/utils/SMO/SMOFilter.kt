@@ -18,7 +18,7 @@ class SMOFilter @JvmOverloads constructor(
     private var lastTimestamp: ComparableTimeMark? = null;
     private var estimate: KineticState = initial;
 
-    override fun filter(positionMeasurement: Double): Double {
+    override fun filter(sensorMeasurement: Double): Double {
         val timestamp = timeSource.markNow();
 
         if (lastTimestamp == null) {
@@ -34,7 +34,7 @@ class SMOFilter @JvmOverloads constructor(
             )
         );
 
-        val errPos = positionMeasurement - estimate.position;
+        val errPos = sensorMeasurement - estimate.position;
 
         estimate.plus(
             KineticState(

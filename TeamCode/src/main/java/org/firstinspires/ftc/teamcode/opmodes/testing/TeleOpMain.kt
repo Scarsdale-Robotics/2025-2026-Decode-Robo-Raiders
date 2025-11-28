@@ -27,7 +27,7 @@ class TeleOpMain: NextFTCOpMode() {
 
     private var autoAimEnabled = true;
 
-    private val autoAimCommand: Command;
+    private var autoAimCommand: Command;
     private val manualAimCommand: Command;
 
     var LocalizationSubsystem: LocalizationSubsystem;
@@ -44,7 +44,7 @@ class TeleOpMain: NextFTCOpMode() {
 
 
         autoAimCommand = TurretSubsystem.AutoAim(
-            { 0.0 }, { 0.0 }, {0.0.rad}
+            { 0.0 }, { 0.0 }, {0.0.rad}, {0.0.rad}
         );  // todo: connect with localization
         manualAimCommand = TurretSubsystem.DriverCommand(
             Gamepads.gamepad2.triangle,
@@ -98,7 +98,7 @@ class TeleOpMain: NextFTCOpMode() {
         }
 
         // g2 square --> try to clear balls, fix jam
-        Gamepads.gamepad2.square whenBecomesTrue LowerSubsystem.fixJam;
+//        Gamepads.gamepad2.square whenBecomesTrue LowerSubsystem.fixJam;
 
         // todo: localization reset
         // todo: auto aim test teleop
@@ -117,7 +117,11 @@ class TeleOpMain: NextFTCOpMode() {
     }
 
     fun telemetry() {
-        /** postion (inch)/// */
+
+      //That's a lot of data
+
+
+      /** postion (inch)/// */
         telemetry.addData("x (inch): ", LocalizationSubsystem.getX())
         telemetry.addData("y (inch): ", LocalizationSubsystem.getY())
         telemetry.addData("h (radians): ", LocalizationSubsystem.getH())
@@ -147,6 +151,8 @@ class TeleOpMain: NextFTCOpMode() {
 
         /** motif /// */
         telemetry.addData("Detected Motif: ", LocalizationSubsystem.getMotif().toString())
+
+        // scarsdale robotics if we dont get 300 lines of telemetry: (explodes)
 
         telemetry.update()
     }

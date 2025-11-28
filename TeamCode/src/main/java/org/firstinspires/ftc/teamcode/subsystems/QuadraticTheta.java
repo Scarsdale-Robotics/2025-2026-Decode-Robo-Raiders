@@ -122,4 +122,17 @@ public class QuadraticTheta {
         return residuals;
     }
 
+    public static double calculateRMSE(double[][] data, double[] coeffs) {
+        double[][] residuals = calculateResiduals(data, coeffs);
+        int n = residuals.length;
+        double sumSquared = 0;
+
+        for (int i = 0; i < n; i++) {
+            double residual = residuals[i][1];
+            sumSquared += residual * residual;
+        }
+
+        return Math.sqrt(sumSquared / n);
+    }
+
 }
