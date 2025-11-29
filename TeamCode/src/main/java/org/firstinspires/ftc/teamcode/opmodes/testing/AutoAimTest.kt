@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 @Configurable
 class AutoAimTest : NextFTCOpMode() {
     companion object {
-        @JvmField var shootAngleDegrees = 45.0;
+        @JvmField var shootAngleDegrees = 57.0;
         @JvmField var speed = 1423.0;
     }
 

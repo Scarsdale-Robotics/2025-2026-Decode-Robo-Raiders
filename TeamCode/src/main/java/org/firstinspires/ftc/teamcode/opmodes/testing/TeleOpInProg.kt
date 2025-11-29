@@ -103,25 +103,25 @@ class TeleOpInProg : NextFTCOpMode() {
     override fun onStartButtonPressed() {
 //        setGamepadColors(WHITE)
 
-        var startX: Double;
-        var startY: Double;
-        if (isBlue) {
-            if (startFar) {
-                startX = 24.0*3.0-16;
-                startY = 24.0*3.0-61;
-            } else {
-                startX = 24.0*3.0-16;
-                startY = 24.0*3.0+61;
-            }
-        } else {
-            if (startFar) {
-                startX = 24.0*3.0+16;
-                startY = 24.0*3.0-61;
-            } else {
-                startX = 24.0*3.0+16;
-                startY = 24.0*3.0+61;
-            }
-        }
+        var startX: Double = 72.0;
+        var startY: Double = 72.0;
+//        if (isBlue) {
+//            if (startFar) {
+//                startX = 24.0*3.0-16;
+//                startY = 24.0*3.0-61;
+//            } else {
+//                startX = 24.0*3.0-16;
+//                startY = 24.0*3.0+61;
+//            }
+//        } else {
+//            if (startFar) {
+//                startX = 24.0*3.0+16;
+//                startY = 24.0*3.0-61;
+//            } else {
+//                startX = 24.0*3.0+16;
+//                startY = 24.0*3.0+61;
+//            }
+//        }
 
         // Initialize the device
         odom!!.setPinpoint(startX, startY, -Math.PI / 2.0);
@@ -164,6 +164,8 @@ class TeleOpInProg : NextFTCOpMode() {
         Gamepads.gamepad2.cross whenBecomesTrue PusherServoSubsystem.`in`
         Gamepads.gamepad2.cross whenBecomesFalse PusherServoSubsystem.out
 
+
+    // todo: tune shooter pid, auto aim retune and test, auto aim with velo test
         val mecanum = MecanumDriverControlled(
             lfw,
             rfw,
@@ -172,9 +174,9 @@ class TeleOpInProg : NextFTCOpMode() {
             -Gamepads.gamepad1.leftStickY,
             Gamepads.gamepad1.leftStickX,
             Gamepads.gamepad1.rightStickX,
-            FieldCentric({
-                if (isBlue) (odom!!.rOh - PI).rad else (odom!!.rOh).rad
-            })
+//            FieldCentric({
+//                if (isBlue) (odom!!.rOh - PI).rad else (odom!!.rOh).rad
+//            })
         )
         mecanum();
 
@@ -207,11 +209,11 @@ class TeleOpInProg : NextFTCOpMode() {
 //            intakeDrive!!
 //        )
 
-        val shooterAutoAim = ShooterSubsystem.AutoAim(
-            { hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1) },
-            { (442 + 13.3*it - 0.0427*it*it).coerceIn(0.0, 1500.0) }
-        )
-        shooterAutoAim.schedule();
+//        val shooterAutoAim = ShooterSubsystem.AutoAim(
+//            { hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1) },
+//            { (400 + 13.3*it - 0.0427*it*it).coerceIn(0.0, 1500.0) }
+//        )
+//        shooterAutoAim.schedule();
 
 
         MagblockServoSubsystem.close()
