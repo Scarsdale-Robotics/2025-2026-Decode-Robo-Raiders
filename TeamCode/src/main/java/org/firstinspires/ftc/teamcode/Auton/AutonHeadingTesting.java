@@ -1,41 +1,22 @@
 package org.firstinspires.ftc.teamcode.Auton;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.pedropathing.follower.Follower;
+import static dev.nextftc.extensions.pedro.PedroComponent.follower;
+
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
 import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
-import dev.nextftc.core.components.BindingsComponent;
-import dev.nextftc.ftc.NextFTCOpMode;
-import dev.nextftc.extensions.pedro.*;
-import static dev.nextftc.extensions.pedro.PedroComponent.follower;
+
+import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
-import dev.nextftc.core.commands.Command;
-import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
-import dev.nextftc.core.commands.groups.SequentialGroup;
-import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.ftc.NextFTCOpMode;
 
-//Auton Naming Convention
-//total slots = 4: __ __ __ __
-//First slot = Name Type: Auton
-//2nd slot = Side type: Blue, Red
-//3rd slot = Classifier type (There can be multiple types on the same auto):
-//1. Leaving it blank
-//2. Wait (only for shooter type autons)
-//3. Far (only for shooter and backup type autons)
-//4. Close (only for shooter and backup type autons)
-//4th slot = Auton type: Motif, Backup, Shooter
-//Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
-//Main Autons should be: Auton__WaitFarShooter & Auton__Motif
-
-@Autonomous(name = "Auton Blue Close Backup", group = "Auton")
-public class AutonBlueCloseBackup extends NextFTCOpMode {
-    public AutonBlueCloseBackup() {
+@Autonomous(name = "Auton Heading Testing", group = "Auton")
+public class AutonHeadingTesting extends NextFTCOpMode {
+    public AutonHeadingTesting() {
         addComponents(
                 new PedroComponent(Constants::createFollower)
         );
@@ -47,8 +28,8 @@ public class AutonBlueCloseBackup extends NextFTCOpMode {
         pathState = pState;
         pathTimer.resetTimer();
     }
-    public static double DISTANCE = 20;
 
+    private static double DISTANCE = 40;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
@@ -57,7 +38,7 @@ public class AutonBlueCloseBackup extends NextFTCOpMode {
     /////////////////
     // Positions the robot will be in during Auton
     private final Pose startPose = new Pose(0, 0, Math.toRadians(0)); // Start Pose of our robot.
-    private final Pose endPose = new Pose(DISTANCE, 0, Math.toRadians(0)); // End Pose of our robot.
+    private final Pose endPose = new Pose(DISTANCE, 0, Math.toRadians(90)); // End Pose of our robot.
 
     /////////////
     ////Paths////
@@ -76,7 +57,7 @@ public class AutonBlueCloseBackup extends NextFTCOpMode {
         robotPark.setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading());
 
         repeatedSideSteps = new Path(new BezierLine(endPose, startPose));
-        robotPark.setLinearHeadingInterpolation(endPose.getHeading(), startPose.getHeading());
+        repeatedSideSteps.setLinearHeadingInterpolation(endPose.getHeading(), startPose.getHeading());
     }
 
 
@@ -94,9 +75,11 @@ public class AutonBlueCloseBackup extends NextFTCOpMode {
                     break;
                 }
             case 1:
-//                new FollowPath(repeatedSideSteps);
-                setPathState(-1);
-                break;
+                if (!follower().isBusy()) {
+                    new FollowPath(repeatedSideSteps);
+                    setPathState(0);
+                    break;
+                }
         }
     }
 

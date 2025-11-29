@@ -29,6 +29,8 @@
 //import java.util.ArrayList;
 //import java.util.List;
 //
+//import dev.nextftc.ftc.NextFTCOpMode;
+//
 ///**
 // * This is the Tuning class. It contains a selection menu for various tuning OpModes.
 // *
@@ -126,7 +128,7 @@
 // * @author Baron Henderson - 20077 The Indubitables
 // * @version 1.0, 5/6/2024
 // */
-//class LocalizationTest extends OpMode {
+//class LocalizationTest extends NextFTCOpMode {
 //    @Override
 //    public void init() {}
 //
@@ -738,6 +740,9 @@
 //    private Path forwards;
 //    private Path backwards;
 //
+//    private Pose startPos = new Pose(0,0);
+//    private Pose endPos = new Pose (DISTANCE,0);
+//
 //    @Override
 //    public void init() {}
 //
@@ -756,7 +761,7 @@
 //    public void start() {
 //        follower.deactivateAllPIDFs();
 //        follower.activateTranslational();
-//        forwards = new Path(new BezierLine(new Pose(0,0), new Pose(DISTANCE,0)));
+//        forwards = new Path(new BezierLine(startPos, endPos));
 //        forwards.setConstantHeadingInterpolation(0);
 //        backwards = new Path(new BezierLine(new Pose(DISTANCE,0), new Pose(0,0)));
 //        backwards.setConstantHeadingInterpolation(0);

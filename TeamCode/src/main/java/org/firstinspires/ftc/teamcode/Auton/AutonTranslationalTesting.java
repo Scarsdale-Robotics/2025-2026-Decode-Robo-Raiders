@@ -1,41 +1,23 @@
 package org.firstinspires.ftc.teamcode.Auton;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.pedropathing.follower.Follower;
+import static dev.nextftc.extensions.pedro.PedroComponent.follower;
+
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
 import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
-import dev.nextftc.core.components.BindingsComponent;
-import dev.nextftc.ftc.NextFTCOpMode;
-import dev.nextftc.extensions.pedro.*;
-import static dev.nextftc.extensions.pedro.PedroComponent.follower;
+
+import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
-import dev.nextftc.core.commands.Command;
-import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
-import dev.nextftc.core.commands.groups.SequentialGroup;
-import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.ftc.NextFTCOpMode;
 
-//Auton Naming Convention
-//total slots = 4: __ __ __ __
-//First slot = Name Type: Auton
-//2nd slot = Side type: Blue, Red
-//3rd slot = Classifier type (There can be multiple types on the same auto):
-//1. Leaving it blank
-//2. Wait (only for shooter type autons)
-//3. Far (only for shooter and backup type autons)
-//4. Close (only for shooter and backup type autons)
-//4th slot = Auton type: Motif, Backup, Shooter
-//Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
-//Main Autons should be: Auton__WaitFarShooter & Auton__Motif
-
-@Autonomous(name = "Auton Blue Close Backup", group = "Auton")
-public class AutonBlueCloseBackup extends NextFTCOpMode {
-    public AutonBlueCloseBackup() {
+@Autonomous(name = "Auton Translational Testing", group = "Auton")
+public class AutonTranslationalTesting extends NextFTCOpMode{
+    public AutonTranslationalTesting() {
         addComponents(
                 new PedroComponent(Constants::createFollower)
         );
@@ -47,8 +29,9 @@ public class AutonBlueCloseBackup extends NextFTCOpMode {
         pathState = pState;
         pathTimer.resetTimer();
     }
-    public static double DISTANCE = 20;
 
+    private static double DISTANCE = 40;
+    private boolean forward = true;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
@@ -76,43 +59,32 @@ public class AutonBlueCloseBackup extends NextFTCOpMode {
         robotPark.setLinearHeadingInterpolation(startPose.getHeading(), endPose.getHeading());
 
         repeatedSideSteps = new Path(new BezierLine(endPose, startPose));
-        robotPark.setLinearHeadingInterpolation(endPose.getHeading(), startPose.getHeading());
+        repeatedSideSteps.setLinearHeadingInterpolation(endPose.getHeading(), startPose.getHeading());
     }
 
-
-
-    /////////////////////
-    ////State Manager////
-    /////////////////////
-    // Controls which path the robot will take after finishing a specific path.
-    public void autonomousPathUpdate() {
-        switch (pathState) { //Although there may be no unique states useful for future Autons
-            case 0:
-                if (!follower().isBusy()) {
-                    new FollowPath(robotPark);
-                    setPathState(1); //Last Path
-                    break;
-                }
-            case 1:
-//                new FollowPath(repeatedSideSteps);
-                setPathState(-1);
-                break;
-        }
-    }
 
     /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
     @ Override
     public void runOpMode() {
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower.update();
-        autonomousPathUpdate();
-        // Feedback to Driver Hub for debugging
-        telemetry.addData("path state", pathState);
-        telemetry.addData("x", follower().getPose().getX());
-        telemetry.addData("y", follower().getPose().getY());
-        telemetry.addData("heading", follower().getPose().getHeading());
-        telemetry.update();
+        if (!follower().isBusy()) {
+            if (forward) {
+                forward = false;
+                new FollowPath(repeatedSideSteps);
+            } else {
+                forward = true;
+                new FollowPath(robotPark);
+            }
+            // Feedback to Driver Hub for debugging
+            telemetry.addData("path state", pathState);
+            telemetry.addData("x", follower().getPose().getX());
+            telemetry.addData("y", follower().getPose().getY());
+            telemetry.addData("heading", follower().getPose().getHeading());
+            telemetry.update();
+        }
     }
+
     /** This method is called once at the init of the OpMode. **/
     @Override
     public void onInit() {

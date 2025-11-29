@@ -437,7 +437,7 @@ class AutonRedMotif : NextFTCOpMode() {
             //GPP PATHS (START)
             AutonPath.GPPPathIntake1 -> if (!follower.isBusy) {
                 close.schedule()
-                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+//                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 FollowPath(motifGPPIntake1!!)
                 if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
                     setPathState(AutonPath.GPPPathIntake2)
@@ -452,7 +452,7 @@ class AutonRedMotif : NextFTCOpMode() {
                 }
                 if (follower.atPose(motifGPPIntake2Purp1Intaked, 5.0, 5.0)) {
                     close.schedule()
-                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+//                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 }
                 if (follower.atPose(motifGPPIntake2Intaked2, 1.0, 1.0)) {
                     setPathState(AutonPath.GPPPathLastShoot)
@@ -468,7 +468,7 @@ class AutonRedMotif : NextFTCOpMode() {
             //PGP PATHS (START)
             AutonPath.PGPPathStart -> if (!follower.isBusy) {
                 close.schedule()
-                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+//                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
 //                FollowPath(motifPGPIntake1!!)
                 setPathState(AutonPath.PGPPathIntake1)
 //                if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
@@ -489,7 +489,7 @@ class AutonRedMotif : NextFTCOpMode() {
                 open.schedule()
                 if (follower.atPose(motifPGPIntake2Prep, 5.0, 5.0)) {
                     close.schedule()
-                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+//                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 }
                 if (follower.atPose(motifsShooterEnd, 1.0, 1.0)) {
                     IntakeSubsystem.reverse.schedule() //(TURNS OFF INTAKE) temporary value
@@ -503,7 +503,7 @@ class AutonRedMotif : NextFTCOpMode() {
             //PPG PATHS (START)
             AutonPath.PPGPathIntakePrep1 -> if (!follower.isBusy) {
                 close.schedule()
-                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+//                IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 FollowPath(motifPPGIntake1Prep!!)
                 if (follower.atPose(endBeforeMotifStartPose, 1.0, 1.0)) {
                     setPathState(AutonPath.PPGPathIntake1)
@@ -524,7 +524,7 @@ class AutonRedMotif : NextFTCOpMode() {
                 open.schedule()
                 if (follower.atPose(motifPPGIntake2MidPos, 1.0, 1.0)) {
                     close.schedule()
-                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
+//                    IntakeSubsystem.forward.schedule() //(TURNS ON INTAKE) temporary value
                 }
                 FollowPath(motifPPGIntake2!!)
                 if (follower.atPose(motifPPGIntake2End, 1.0, 1.0)) {
@@ -562,11 +562,11 @@ class AutonRedMotif : NextFTCOpMode() {
         //        if (pathTimer.getElapsedTimeSeconds() > 1) {
 //            CommandManager.INSTANCE.scheduleCommand(TurretSubsystem.INSTANCE.autoAim(telemetry));
 //        }
-        TurretSubsystem.AutoAim(
-            { 0.0 },
-            { 0.0 },
-            { 0.0.rad }
-        ).schedule() // todo: wait for localization
+//        TurretSubsystem.AutoAim(
+//            { 0.0 },
+//            { 0.0 },
+//            { 0.0.rad }
+//        ).schedule() // todo: wait for localization
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState)
         telemetry.addData("x", follower.pose.x)
