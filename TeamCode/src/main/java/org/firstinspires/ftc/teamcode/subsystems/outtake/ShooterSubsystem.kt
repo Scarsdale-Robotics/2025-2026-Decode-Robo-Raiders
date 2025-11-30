@@ -80,7 +80,7 @@ object ShooterSubsystem : Subsystem {
     override fun periodic() {
         val power = controller.calculate(
             motor.state * -1.0
-        );
+        ).coerceIn(0.0, 1.0);
         SetPower(motor, power).setInterruptible(true)()
 
         val measuredVel = (motor.currentPosition - lastPos)/elapsedTime.time();
