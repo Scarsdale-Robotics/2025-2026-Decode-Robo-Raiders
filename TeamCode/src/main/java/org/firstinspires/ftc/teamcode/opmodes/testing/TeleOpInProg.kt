@@ -8,6 +8,7 @@ import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.ftc.Gamepads
@@ -99,7 +100,31 @@ class TeleOpInProg : NextFTCOpMode() {
         setGamepadColors(YELLOW)
     }
 
+    val x: Double
+        get() {
+            if (odom != null) {
+                return odom!!.rOx1 + ofsX;
+            }
+            return 0.0;
+        }
+    val y: Double
+        get() {
+            if (odom != null) {
+                return odom!!.rOy1 + ofsY;
+            }
+            return 0.0;
+        }
+    val h: Angle
+        get() {
+            if (odom != null) {
+                return odom!!.rOh.rad + ofsH.rad;
+            }
+            return 0.0.rad;
+        }
+
 //    var ballCnt = 0;
+    var aac = 0.0;
+    var speedFactor = 1.0;
     override fun onStartButtonPressed() {
 //        setGamepadColors(WHITE)
 
@@ -167,17 +192,32 @@ class TeleOpInProg : NextFTCOpMode() {
         Gamepads.gamepad2.cross whenBecomesTrue PusherServoSubsystem.`in`
         Gamepads.gamepad2.cross whenBecomesFalse PusherServoSubsystem.out
 
+        if (isBlue) {
+            Gamepads.gamepad2.dpadUp whenBecomesTrue { ofsX += 4.0; }
+            Gamepads.gamepad2.dpadRight whenBecomesTrue { ofsY -= 4.0; }
+            Gamepads.gamepad2.dpadLeft whenBecomesTrue { ofsY += 4.0; }
+            Gamepads.gamepad2.dpadDown whenBecomesTrue { ofsX -= 4.0; }
+        } else {
+            Gamepads.gamepad2.dpadUp whenBecomesTrue { ofsX -= 4.0; }
+            Gamepads.gamepad2.dpadRight whenBecomesTrue { ofsY += 4.0; }
+            Gamepads.gamepad2.dpadLeft whenBecomesTrue { ofsY -= 4.0; }
+            Gamepads.gamepad2.dpadDown whenBecomesTrue { ofsX += 4.0; }
+        }
+
+        Gamepads.gamepad2.rightBumper whenBecomesTrue { aac += 5.0; }
+        Gamepads.gamepad2.leftBumper whenBecomesTrue { aac -= 5.0; }
+
     // todo: auto aim with velo test
         val mecanum = MecanumDriverControlled(
             lfw,
             rfw,
             lbw,
             rbw,
-            -Gamepads.gamepad1.leftStickY,
-            Gamepads.gamepad1.leftStickX,
-            Gamepads.gamepad1.rightStickX,
+            -Gamepads.gamepad1.leftStickY.map { it*speedFactor },
+            Gamepads.gamepad1.leftStickX.map { it*speedFactor },
+            Gamepads.gamepad1.rightStickX.map { it*speedFactor },
 //            FieldCentric({
-//                if (isBlue) (odom!!.rOh - PI).rad else (odom!!.rOh).rad
+//                if (isBlue) (h - PI).rad else (h).rad
 //            })
         )
         mecanum();
@@ -187,8 +227,8 @@ class TeleOpInProg : NextFTCOpMode() {
         val thetaAim = TurretThetaSubsystem.AutoAim(
             {
                 hypot(
-                    goalX - odom!!.rOx1 + odom!!.vx * overaimSecs,
-                    goalY - odom!!.rOy1 + odom!!.vy * overaimSecs,
+                    goalX - x + odom!!.vx * overaimSecs,
+                    goalY - y + odom!!.vy * overaimSecs,
                 )
             },
             { (-0.053 * it + 63.0).coerceIn(55.0, 63.0).deg }
@@ -197,9 +237,9 @@ class TeleOpInProg : NextFTCOpMode() {
 
 
         val autoAimPhi = TurretPhiSubsystem.AutoAim(
-            { goalX - odom!!.rOx1 + odom!!.vx * overaimSecs },
-            { goalY - odom!!.rOy1 + odom!!.vy * overaimSecs },
-            { odom!!.rOh.rad + odom!!.omega.rad * overaimSecs }
+            { goalX - x + odom!!.vx * overaimSecs },
+            { goalY - y + odom!!.vy * overaimSecs },
+            { h + odom!!.omega.rad * overaimSecs }
         );
         autoAimPhi.schedule();
 
@@ -212,8 +252,8 @@ class TeleOpInProg : NextFTCOpMode() {
 //        )
 
         val shooterAutoAim = ShooterSubsystem.AutoAim(
-            { hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1) },
-            { (831 + 3.52*it - 0.00429*it*it).coerceIn(0.0, 1500.0) }
+            { hypot(goalX - x, goalY - y) },
+            { (aac + 831 + 67 + 3.52*it - 0.00429*it*it).coerceIn(0.0, 1500.0) }
         )
         shooterAutoAim.schedule();
 
@@ -243,25 +283,32 @@ class TeleOpInProg : NextFTCOpMode() {
             }
         }
 
+        speedFactor = 1.0 - gamepad1.left_trigger * 0.5;
+
 //        if (onCmd != null) CommandManager.cancelCommand(onCmd!!)
 //        val cmd = ShooterSubsystem.On(speed);
 //        cmd();
 //        onCmd = cmd;
 
-        PanelsTelemetry.telemetry.addData("ang degs", (atan2(goalY - odom!!.rOy1, goalX - odom!!.rOx1).rad - odom!!.rOh.rad).inDeg)
+        PanelsTelemetry.telemetry.addData("ang degs", (atan2(goalY - y, goalX - x).rad - h).inDeg)
 
-        PanelsTelemetry.telemetry.addData("x (inch)", odom!!.rOx1 + ofsX)
-        PanelsTelemetry.telemetry.addData("y (inch)", odom!!.rOy1 + ofsY)
-        PanelsTelemetry.telemetry.addData("h (degrees)", odom!!.rOh.rad.inDeg + ofsH.rad.inDeg)
+        PanelsTelemetry.telemetry.addData("x (inch)", x)
+        PanelsTelemetry.telemetry.addData("y (inch)", y)
+        PanelsTelemetry.telemetry.addData("h (degrees)", h)
 
         PanelsTelemetry.telemetry.addData("CM", CommandManager.snapshot.toString());
         PanelsTelemetry.telemetry.update();
 
-        telemetry.addData("X POS (inch)", odom!!.rOx1 + ofsX)
-        telemetry.addData("Y POS (inch)", odom!!.rOy1 + ofsY)
-        telemetry.addData("H (degrees)", odom!!.rOh.rad.inDeg + ofsH.rad.inDeg)
+        telemetry.addLine("LOCALIZATION")
+        telemetry.addData("X POS (inch)", x)
+        telemetry.addData("Y POS (inch)", y)
+        telemetry.addData("H (degrees)", h)
 
-        telemetry.addData("distance to goal (inches)", hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1))
+        telemetry.addData("distance to goal (inches)", hypot(goalX - x, goalY - y))
+
+        telemetry.addLine("\nINPUTS")
+        telemetry.addData("speed factor", speedFactor)
+        telemetry.addData("velocity auto aim correctional constant, aac (tps)", aac)
 
         telemetry.update()
     }
@@ -284,12 +331,29 @@ class TeleOpInProg : NextFTCOpMode() {
         val b: Double
 
         when (i) {
-            0 -> { r = v; g = t; b = p }
-            1 -> { r = q; g = v; b = p }
-            2 -> { r = p; g = v; b = t }
-            3 -> { r = p; g = q; b = v }
-            4 -> { r = t; g = p; b = v }
-            else -> { r = v; g = p; b = q } // Case 5 and any potential default
+            0 -> {
+                r = v; g = t; b = p
+            }
+
+            1 -> {
+                r = q; g = v; b = p
+            }
+
+            2 -> {
+                r = p; g = v; b = t
+            }
+
+            3 -> {
+                r = p; g = q; b = v
+            }
+
+            4 -> {
+                r = t; g = p; b = v
+            }
+
+            else -> {
+                r = v; g = p; b = q
+            } // Case 5 and any potential default
         }
 
         return Triple(r, g, b)

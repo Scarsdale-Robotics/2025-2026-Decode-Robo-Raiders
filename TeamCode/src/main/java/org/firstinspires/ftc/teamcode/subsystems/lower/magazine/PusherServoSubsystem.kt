@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.milliseconds
 object PusherServoSubsystem : Subsystem {
     @JvmField var OUT = 0.15;
     @JvmField var IN = 0.65;
-    @JvmField var DELAY_MS_PUSH: Double? = 300.0;  // todo: tune
+    @JvmField var DELAY_MS_PUSH: Double? = 1000.0;  // todo: tune
 
     private val servo = ServoEx("magpush");
 
