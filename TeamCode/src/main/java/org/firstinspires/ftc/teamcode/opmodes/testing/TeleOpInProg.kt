@@ -105,6 +105,8 @@ class TeleOpInProg : NextFTCOpMode() {
 
         var startX: Double = 72.0;
         var startY: Double = 72.0;
+    // todo: determine start positions by moving from 72.0, 72.0 to desired start pos
+
 //        if (isBlue) {
 //            if (startFar) {
 //                startX = 24.0*3.0-16;
@@ -158,14 +160,14 @@ class TeleOpInProg : NextFTCOpMode() {
         );
         magDrive!!.schedule();
 
-        // could do the if (dd) s below but lazy hehehehe
-        Gamepads.gamepad2.circle whenBecomesTrue MagblockServoSubsystem.open
-        Gamepads.gamepad2.circle whenBecomesFalse MagblockServoSubsystem.close
+        //// could do the if (dd) s below but lazy hehehehe
+        (Gamepads.gamepad1.circle or Gamepads.gamepad2.circle) whenBecomesTrue MagblockServoSubsystem.open
+        (Gamepads.gamepad1.circle or Gamepads.gamepad2.circle) whenBecomesFalse MagblockServoSubsystem.close
+        Gamepads.gamepad1.cross whenBecomesTrue PusherServoSubsystem.push
         Gamepads.gamepad2.cross whenBecomesTrue PusherServoSubsystem.`in`
         Gamepads.gamepad2.cross whenBecomesFalse PusherServoSubsystem.out
 
-
-    // todo: tune shooter pid, auto aim retune and test, auto aim with velo test
+    // todo: auto aim with velo test
         val mecanum = MecanumDriverControlled(
             lfw,
             rfw,
@@ -189,7 +191,7 @@ class TeleOpInProg : NextFTCOpMode() {
                     goalY - odom!!.rOy1 + odom!!.vy * overaimSecs,
                 )
             },
-            { (-0.058 * it + 63.0).coerceIn(55.0, 63.0).deg }
+            { (-0.053 * it + 63.0).coerceIn(55.0, 63.0).deg }
         )
         thetaAim();
 
@@ -209,11 +211,11 @@ class TeleOpInProg : NextFTCOpMode() {
 //            intakeDrive!!
 //        )
 
-//        val shooterAutoAim = ShooterSubsystem.AutoAim(
-//            { hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1) },
-//            { (400 + 13.3*it - 0.0427*it*it).coerceIn(0.0, 1500.0) }
-//        )
-//        shooterAutoAim.schedule();
+        val shooterAutoAim = ShooterSubsystem.AutoAim(
+            { hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1) },
+            { (831 + 3.52*it - 0.00429*it*it).coerceIn(0.0, 1500.0) }
+        )
+        shooterAutoAim.schedule();
 
 
         MagblockServoSubsystem.close()
