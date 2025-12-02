@@ -27,7 +27,7 @@ import java.util.function.Supplier
 object ShooterSubsystem : Subsystem {
     private val motor = MotorEx("shooter").reversed();
 
-    @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 0.85);
+    @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 0.75);
     @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
 //    @JvmField var smoCoefficients = BasicSMOParameters(0.0, 0.0, 0.0);
 
@@ -74,7 +74,7 @@ object ShooterSubsystem : Subsystem {
             controller.goal = KineticState(velocity=powerByDistance(dxy.get()));
         }
     }
-
+//67676767
     var lastPos = 0.0;
     var elapsedTime: ElapsedTime = ElapsedTime();
     override fun periodic() {
@@ -88,7 +88,7 @@ object ShooterSubsystem : Subsystem {
         elapsedTime.reset()
 
         telemetry.addData("power", power)
-
+//my name is viir and i klike fembiys and tomboy domination fantasy hentai
         telemetry.addData("vel measured", measuredVel)
         telemetry.addData("vel est", controller.lastMeasurement.velocity)
         telemetry.addData("vel ref", controller.reference.velocity)

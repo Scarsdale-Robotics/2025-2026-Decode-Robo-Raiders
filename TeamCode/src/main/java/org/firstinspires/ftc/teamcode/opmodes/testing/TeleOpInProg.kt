@@ -37,6 +37,7 @@ class TeleOpInProg : NextFTCOpMode() {
     companion object {
         var overaimSecs = 0.0;
         var speed = 1234.0;
+        var m: Double? = 0.200;
         var goalX = 12.0;
         var goalY = 144.0-12.0;
         var isBlue = true;
@@ -231,7 +232,7 @@ class TeleOpInProg : NextFTCOpMode() {
                     goalY - y + odom!!.vy * overaimSecs,
                 )
             },
-            { (-0.053 * it + 63.0).coerceIn(55.0, 63.0).deg }
+            { (-m!!*it+70.67).coerceIn(55.0, 63.0).deg }
         )
         thetaAim();
 
@@ -253,7 +254,7 @@ class TeleOpInProg : NextFTCOpMode() {
 
         val shooterAutoAim = ShooterSubsystem.AutoAim(
             { hypot(goalX - x, goalY - y) },
-            { (aac + 831 + 67 + 3.52*it - 0.00429*it*it).coerceIn(0.0, 1500.0) }
+            { (aac + 578 + 12.7*it + -0.0921*it*it + 0.000316*it*it*it).coerceIn(0.0, 1500.0) }
         )
         shooterAutoAim.schedule();
 
@@ -285,10 +286,10 @@ class TeleOpInProg : NextFTCOpMode() {
 
         speedFactor = 1.0 - gamepad1.left_trigger * 0.5;
 
-//        if (onCmd != null) CommandManager.cancelCommand(onCmd!!)
-//        val cmd = ShooterSubsystem.On(speed);
-//        cmd();
-//        onCmd = cmd;
+        if (onCmd != null) CommandManager.cancelCommand(onCmd!!)
+        val cmd = ShooterSubsystem.On(speed);
+        cmd();
+        onCmd = cmd;
 
         PanelsTelemetry.telemetry.addData("ang degs", (atan2(goalY - y, goalX - x).rad - h).inDeg)
 
