@@ -1,24 +1,18 @@
 package org.firstinspires.ftc.teamcode.Auton;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
-import dev.nextftc.core.components.BindingsComponent;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
+import java.io.FileWriter;
+import java.io.IOException;
+
 import dev.nextftc.ftc.NextFTCOpMode;
-import dev.nextftc.extensions.pedro.*;
-import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 import dev.nextftc.extensions.pedro.PedroComponent;
-import dev.nextftc.core.commands.Command;
-import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
-import dev.nextftc.core.commands.groups.SequentialGroup;
-import dev.nextftc.core.components.SubsystemComponent;
 
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
@@ -29,7 +23,7 @@ import dev.nextftc.core.components.SubsystemComponent;
 //2. Wait (only for shooter type autons)
 //3. Far (only for shooter and backup type autons)
 //4. Close (only for shooter and backup type autons)
-//4th slot = Auton type: Motif, Backup, Shooter
+//4th slot = Auton type: Motif, Backup, Shooter, Artifact (is just Motif but does not care about motifs)
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__WaitFarShooter & Auton__Motif
 
@@ -48,6 +42,7 @@ public class AutonBlueFarBackup extends NextFTCOpMode {
         pathTimer.resetTimer();
     }
 
+    private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
@@ -83,26 +78,37 @@ public class AutonBlueFarBackup extends NextFTCOpMode {
     public void autonomousPathUpdate() {
         switch (pathState) { //Although there may be no unique states useful for future Autons
             case 0:
-                new FollowPath(robotPark);
+                follower.followPath(robotPark);
+                String path = "TeamCode/src/main/java/org/firstinspires/ftc/teamcode/RobotAutonEndPos";
+                String content =
+                        endPose.getX() + "\n" +
+                                endPose.getY() + "\n" +
+                                endPose.getPose().getHeading();
+                try {
+                    FileWriter f2 = new FileWriter(path, false);
+                    f2.write(content);
+                    f2.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 setPathState(-1); //Last Path
                 break;
             case 1:
-                // shouldn't do stuff
                 break;
         }
     }
 
     /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
     @Override
-    public void runOpMode() {
+    public void onUpdate() {
         // These loop the movements of the robot, these must be called continuously in order to work
-//        follower.update();
+        follower.update();
         autonomousPathUpdate();
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState);
-        telemetry.addData("x", follower().getPose().getX());
-        telemetry.addData("y", follower().getPose().getY());
-        telemetry.addData("heading", follower().getPose().getHeading());
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.update();
     }
     /** This method is called once at the init of the OpMode. **/
@@ -111,9 +117,9 @@ public class AutonBlueFarBackup extends NextFTCOpMode {
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
-//        follower = Constants.createFollower(hardwareMap);
+        follower = Constants.createFollower(hardwareMap);
         buildPaths();
-//        follower.setStartingPose(startPose);
+        follower.setStartingPose(startPose);
     }
 
     /** This method is called continuously after Init while waiting for "play". **/

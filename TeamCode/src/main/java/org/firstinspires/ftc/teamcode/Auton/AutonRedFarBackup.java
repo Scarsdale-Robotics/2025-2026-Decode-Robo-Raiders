@@ -1,24 +1,20 @@
 package org.firstinspires.ftc.teamcode.Auton;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
-import dev.nextftc.core.components.BindingsComponent;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.extensions.pedro.*;
 import static dev.nextftc.extensions.pedro.PedroComponent.follower;
+
+import java.io.FileWriter;
+import java.io.IOException;
+
 import dev.nextftc.extensions.pedro.PedroComponent;
-import dev.nextftc.core.commands.Command;
-import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.ParallelGroup;
-import dev.nextftc.core.commands.groups.SequentialGroup;
-import dev.nextftc.core.components.SubsystemComponent;
 
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
@@ -84,6 +80,18 @@ public class AutonRedFarBackup extends NextFTCOpMode {
         switch (pathState) { //Although there may be no unique states useful for future Autons
             case 0:
                 new FollowPath(robotPark);
+                String path = "TeamCode/src/main/java/org/firstinspires/ftc/teamcode/RobotAutonEndPos";
+                String content =
+                        endPose.getX() + "\n" +
+                                endPose.getY() + "\n" +
+                                endPose.getPose().getHeading();
+                try {
+                    FileWriter f2 = new FileWriter(path, false);
+                    f2.write(content);
+                    f2.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 setPathState(-1); //Last Path
                 break;
             case 1:
@@ -94,7 +102,7 @@ public class AutonRedFarBackup extends NextFTCOpMode {
 
     /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
     @Override
-    public void runOpMode() {
+    public void onUpdate() {
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower.update();
         autonomousPathUpdate();

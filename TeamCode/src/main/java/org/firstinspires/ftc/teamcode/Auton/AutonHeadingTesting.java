@@ -1,26 +1,23 @@
 package org.firstinspires.ftc.teamcode.Auton;
 
-import static dev.nextftc.extensions.pedro.PedroComponent.follower;
-
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-import dev.nextftc.extensions.pedro.FollowPath;
-import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
 @Autonomous(name = "Auton Heading Testing", group = "Auton")
 public class AutonHeadingTesting extends NextFTCOpMode {
-    public AutonHeadingTesting() {
-        addComponents(
-                new PedroComponent(Constants::createFollower)
-        );
-    }
+//    public AutonHeadingTesting() {
+//        addComponents(
+//                new PedroComponent(Constants::createFollower)
+//        );
+//    }
     /**
      * These change the states of the paths and actions. It will also reset the timers of the individual switches
      **/
@@ -29,6 +26,7 @@ public class AutonHeadingTesting extends NextFTCOpMode {
         pathTimer.resetTimer();
     }
 
+    private Follower follower;
     private static double DISTANCE = 40;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
@@ -69,14 +67,14 @@ public class AutonHeadingTesting extends NextFTCOpMode {
     public void autonomousPathUpdate() {
         switch (pathState) { //Although there may be no unique states useful for future Autons
             case 0:
-                if (!follower().isBusy()) {
-                    new FollowPath(robotPark);
+                if (!follower.isBusy()) {
+                    follower.followPath(robotPark);
                     setPathState(1); //Last Path
                     break;
                 }
             case 1:
-                if (!follower().isBusy()) {
-                    new FollowPath(repeatedSideSteps);
+                if (!follower.isBusy()) {
+                    follower.followPath(repeatedSideSteps);
                     setPathState(0);
                     break;
                 }
@@ -85,15 +83,15 @@ public class AutonHeadingTesting extends NextFTCOpMode {
 
     /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
     @ Override
-    public void runOpMode() {
+    public void onUpdate() {
         // These loop the movements of the robot, these must be called continuously in order to work
-//        follower.update();
+        follower.update();
         autonomousPathUpdate();
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState);
-        telemetry.addData("x", follower().getPose().getX());
-        telemetry.addData("y", follower().getPose().getY());
-        telemetry.addData("heading", follower().getPose().getHeading());
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.update();
     }
     /** This method is called once at the init of the OpMode. **/
@@ -102,10 +100,10 @@ public class AutonHeadingTesting extends NextFTCOpMode {
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
-//        follower = Constants.createFollower(hardwareMap);
+        follower = Constants.createFollower(hardwareMap);
 
         buildPaths();
-//        follower.setStartingPose(startPose);
+        follower.setStartingPose(startPose);
     }
 
     /** This method is called continuously after Init while waiting for "play". **/

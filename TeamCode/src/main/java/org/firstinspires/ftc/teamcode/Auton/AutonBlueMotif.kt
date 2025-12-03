@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Auton
 
-import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
@@ -8,18 +7,28 @@ import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import org.firstinspires.ftc.teamcode.PedroPathing.Constants
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.open
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.close
-import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem
 
+//Auton Naming Convention
+//total slots = 4: __ __ __ __
+//First slot = Name Type: Auton
+//2nd slot = Side type: Blue, Red
+//3rd slot = Classifier type (There can be multiple types on the same auto):
+//1. Leaving it blank
+//2. Wait (only for shooter type autons)
+//3. Far (only for shooter and backup type autons)
+//4. Close (only for shooter and backup type autons)
+//4th slot = Auton type: Motif, Backup, Shooter, Artifact (is just Motif but does not care about motifs)
+//Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
+//Main Autons should be: Auton__WaitFarShooter & Auton__Motif
 class AutonBlueMotif : NextFTCOpMode() {
     private var pathTimer: Timer? = null
     val actionTimer: Timer? = null;
@@ -27,7 +36,10 @@ class AutonBlueMotif : NextFTCOpMode() {
 
     init {
         addComponents(
-            SubsystemComponent(LowerSubsystem, OuttakeSubsystem),
+            SubsystemComponent(
+                LowerSubsystem,
+                OuttakeSubsystem,
+                IntakeSubsystem),
             PedroComponent(Constants::createFollower)
         );
 

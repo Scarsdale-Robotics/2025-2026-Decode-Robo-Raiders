@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Auton
 
-import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
@@ -8,17 +7,15 @@ import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import org.firstinspires.ftc.teamcode.PedroPathing.Constants
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.open
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.close
-import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem
 
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
@@ -555,7 +552,7 @@ class AutonRedMotif : NextFTCOpMode() {
     }
 
     /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play".  */
-    override fun runOpMode() {
+    override fun onUpdate() {
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower.update();
         autonomousPathUpdate()

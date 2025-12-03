@@ -1,27 +1,23 @@
 package org.firstinspires.ftc.teamcode.Auton;
 
-import static dev.nextftc.extensions.pedro.PedroComponent.follower;
-
-import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-import dev.nextftc.extensions.pedro.FollowPath;
-import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
 @Autonomous(name = "Auton Translational Testing", group = "Auton")
 public class AutonTranslationalTesting extends NextFTCOpMode{
-    public AutonTranslationalTesting() {
-        addComponents(
-                new PedroComponent(Constants::createFollower)
-        );
-    }
+//    public AutonTranslationalTesting() {
+//        addComponents(
+//                new PedroComponent(Constants::createFollower)
+//        );
+//    }
     /**
      * These change the states of the paths and actions. It will also reset the timers of the individual switches
      **/
@@ -30,6 +26,7 @@ public class AutonTranslationalTesting extends NextFTCOpMode{
         pathTimer.resetTimer();
     }
 
+    private Follower follower;
     private static double DISTANCE = 40;
     private boolean forward = true;
     private Timer pathTimer, actionTimer, opmodeTimer;
@@ -65,22 +62,22 @@ public class AutonTranslationalTesting extends NextFTCOpMode{
 
     /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
     @ Override
-    public void runOpMode() {
+    public void onUpdate() {
         // These loop the movements of the robot, these must be called continuously in order to work
-//        follower.update();
-        if (!follower().isBusy()) {
+        follower.update();
+        if (!follower.isBusy()) {
             if (forward) {
                 forward = false;
-                new FollowPath(repeatedSideSteps);
+                follower.followPath(repeatedSideSteps);
             } else {
                 forward = true;
-                new FollowPath(robotPark);
+                follower.followPath(robotPark);
             }
             // Feedback to Driver Hub for debugging
             telemetry.addData("path state", pathState);
-            telemetry.addData("x", follower().getPose().getX());
-            telemetry.addData("y", follower().getPose().getY());
-            telemetry.addData("heading", follower().getPose().getHeading());
+            telemetry.addData("x", follower.getPose().getX());
+            telemetry.addData("y", follower.getPose().getY());
+            telemetry.addData("heading", follower.getPose().getHeading());
             telemetry.update();
         }
     }
@@ -91,10 +88,10 @@ public class AutonTranslationalTesting extends NextFTCOpMode{
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
-//        follower = Constants.createFollower(hardwareMap);
+        follower = Constants.createFollower(hardwareMap);
 
         buildPaths();
-//        follower.setStartingPose(startPose);
+        follower.setStartingPose(startPose);
     }
 
     /** This method is called continuously after Init while waiting for "play". **/
