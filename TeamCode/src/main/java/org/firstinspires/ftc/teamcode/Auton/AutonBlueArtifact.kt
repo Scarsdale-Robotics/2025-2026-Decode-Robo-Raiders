@@ -256,21 +256,19 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     intake.schedule()
                     close.schedule()
                     out.schedule()
-                    setPathState(AutonPath.RobotIntake1)
+                    setPathState(AutonPath.EndAuton)
                 }
             }
 
             AutonPath.RobotIntake1 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.65)
+                follower!!.setMaxPower(0.75)
                 follower!!.followPath(robotIntake1!!)
-                if (follower!!.atPose(intake1stLinePos, 0.15, 0.15)) {
-                    setPathState(AutonPath.RobotShoot2)
-                }
+                setPathState(AutonPath.RobotShoot2)
             }
 
             AutonPath.RobotShoot2 -> if (!follower!!.isBusy) {
-                var pathF1: Boolean = true
                 follower!!.setMaxPower(1.0)
+                var pathF1: Boolean = true
                 if (pathF1) {
                     follower!!.followPath(robotGoToShoot1!!)
                     pathF1 = false
@@ -285,21 +283,22 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     intake.schedule()
                     close.schedule()
                     out.schedule()
-                    setPathState(AutonPath.EndAuton)
+                    setPathState(AutonPath.RobotIntake2)
                 }
             }
 
             AutonPath.RobotIntake2 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.65)
+                follower!!.setMaxPower(0.95)
                 follower!!.followPath(robotIntake2!!)
                 setPathState(AutonPath.RobotShoot3)
             }
 
             AutonPath.RobotShoot3 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(1.0)
-                if (pathTimer!!.elapsedTimeSeconds < 0.01) {
+                var pathF1: Boolean = true
+                if (pathF1) {
                     follower!!.followPath(robotGoToShoot2!!)
-                    follower!!.setMaxPower(1.0)
+                    pathF1 = false
                 }
                 if (pathTimer!!.elapsedTimeSeconds > 0.5 && follower!!.atPose(shootingPose, 0.15, 0.15)) {
                     open.schedule()
@@ -322,9 +321,10 @@ class AutonBlueArtifact : NextFTCOpMode() {
 
             AutonPath.RobotShoot4 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(1.0)
-                if (pathTimer!!.elapsedTimeSeconds < 0.01) {
-                    follower!!.setMaxPower(1.0)
+                var pathF1: Boolean = true
+                if (pathF1) {
                     follower!!.followPath(robotGoToShoot3!!)
+                    pathF1 = false
                 }
                 if (pathTimer!!.elapsedTimeSeconds > 0.5 && follower!!.atPose(shootingPose, 0.15, 0.15)) {
                     open.schedule()
@@ -340,16 +340,17 @@ class AutonBlueArtifact : NextFTCOpMode() {
             }
 
             AutonPath.RobotIntake4 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.65)
+                follower!!.setMaxPower(0.35)
                 follower!!.followPath(robotIntake4!!)
                 setPathState(AutonPath.RobotShoot5)
             }
 
             AutonPath.RobotShoot5 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(1.0)
-                if (pathTimer!!.elapsedTimeSeconds < 0.01) {
-                    follower!!.setMaxPower(1.0)
+                var pathF1: Boolean = true
+                if (pathF1) {
                     follower!!.followPath(robotGoToShoot4!!)
+                    pathF1 = false
                 }
                 if (pathTimer!!.elapsedTimeSeconds > 0.5 && follower!!.atPose(shootingPose, 0.15, 0.15)) {
                     open.schedule()
