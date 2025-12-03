@@ -27,9 +27,11 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.floor
 import kotlin.math.hypot
+import kotlin.math.sign
 
 @TeleOp(name = "Tele Op In Prog")
 @Configurable
@@ -214,8 +216,8 @@ class TeleOpInProg : NextFTCOpMode() {
             rfw,
             lbw,
             rbw,
-            -Gamepads.gamepad1.leftStickY.map { it*speedFactor },
-            Gamepads.gamepad1.leftStickX.map { it*speedFactor },
+            -Gamepads.gamepad1.leftStickY.map { ( if (abs(it) > 0.7) { sign(it) } else { it } )*speedFactor },
+            Gamepads.gamepad1.leftStickX.map { ( if (abs(it) > 0.7) { sign(it) } else { it } )*speedFactor },
             Gamepads.gamepad1.rightStickX.map { it*speedFactor },
 //            FieldCentric({
 //                if (isBlue) (h - PI).rad else (h).rad
@@ -245,7 +247,7 @@ class TeleOpInProg : NextFTCOpMode() {
         autoAimPhi.schedule();
 
 
-
+        Gamepads.gamepad1.rightBumper whenBecomesTrue { speedFactor = 0.5; }
 //        Gamepads.gamepad1.square whenBecomesTrue SequentialGroup(
 //            LowerSubsystem.launchAll,
 //            magDrive!!,
@@ -283,8 +285,6 @@ class TeleOpInProg : NextFTCOpMode() {
                 ofsH += gamepad2.right_stick_x * ODOM_OFS_RPS * dt
             }
         }
-
-        speedFactor = 1.0 - gamepad1.left_trigger * 0.5;
 
         if (onCmd != null) CommandManager.cancelCommand(onCmd!!)
         val cmd = ShooterSubsystem.On(speed);

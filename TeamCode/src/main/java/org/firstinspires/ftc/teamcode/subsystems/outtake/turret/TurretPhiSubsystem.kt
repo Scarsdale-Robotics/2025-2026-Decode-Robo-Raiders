@@ -73,9 +73,9 @@ object TurretPhiSubsystem : Subsystem {
         val tolerance = PI / 6;
         var a = angle.inRad;
 
-        if (a < -2 * PI - tolerance) {
+        if (a < -2 * PI -1.0/12.0 - tolerance) {
             a += 2 * PI;
-        } else if (a > 0.0 + tolerance) {
+        } else if (a > -1.0/12.0 + tolerance) {
             a -= 2 * PI;
         }
         return a.rad
