@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime
 import dev.nextftc.control.ControlSystem
 import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
+import dev.nextftc.control.feedback.FeedbackType
 import dev.nextftc.control.feedback.PIDCoefficients
 import dev.nextftc.control.feedforward.BasicFeedforwardParameters
 import dev.nextftc.core.commands.Command
@@ -17,6 +18,8 @@ import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem.targetTheta
+import org.firstinspires.ftc.teamcode.utils.SMO.BasicSMOParameters
+import org.firstinspires.ftc.teamcode.utils.SMO.SMOFilter
 import java.util.function.Supplier
 
 
@@ -24,8 +27,9 @@ import java.util.function.Supplier
 object ShooterSubsystem : Subsystem {
     private val motor = MotorEx("shooter").reversed();
 
-    @JvmField var ffCoefficients = BasicFeedforwardParameters(0.03, 0.02, 0.01);
+    @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 0.75);
     @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
+//    @JvmField var smoCoefficients = BasicSMOParameters(0.0, 0.0, 0.0);
 
 //    @JvmField var MAX_VELOCITY = -1000.0;  // rotational velocity
 //    @JvmField var NO_VELOCITY = 0.0;
@@ -34,11 +38,15 @@ object ShooterSubsystem : Subsystem {
     private val controller: ControlSystem;
 
     init {
-//        val velSMO = SMOFilter(FeedbackType.VELOCITY, Ls, Lv, La)
+//        val velSMO = SMOFilter(
+//            FeedbackType.VELOCITY,
+//            smoCoefficients.Ls,
+//            smoCoefficients.Lv,
+//            smoCoefficients.La
+//        );
         controller = controlSystem {
 //            velFilter { filter -> filter.custom(velSMO).build() }
-//            basicFF(ffCoefficients)
-
+            basicFF(ffCoefficients)
             velPid(pidCoefficients)
         }
     }
@@ -66,13 +74,13 @@ object ShooterSubsystem : Subsystem {
             controller.goal = KineticState(velocity=powerByDistance(dxy.get()));
         }
     }
-
+//67676767
     var lastPos = 0.0;
     var elapsedTime: ElapsedTime = ElapsedTime();
     override fun periodic() {
         val power = controller.calculate(
             motor.state * -1.0
-        );
+        ).coerceIn(0.0, 1.0);
         SetPower(motor, power).setInterruptible(true)()
 
         val measuredVel = (motor.currentPosition - lastPos)/elapsedTime.time();
@@ -80,14 +88,14 @@ object ShooterSubsystem : Subsystem {
         elapsedTime.reset()
 
         telemetry.addData("power", power)
-
+//my name is viir and i klike fembiys and tomboy domination fantasy hentai
         telemetry.addData("vel measured", measuredVel)
         telemetry.addData("vel est", controller.lastMeasurement.velocity)
         telemetry.addData("vel ref", controller.reference.velocity)
         telemetry.addData("vel goal", controller.goal.velocity)
 
         telemetry.addData("pos measured", motor.currentPosition)
-        telemetry.addData("pos est", controller.lastMeasurement.position)
+        telemetry.addData("pos est", -controller.lastMeasurement.position)
         telemetry.addData("pos ref", controller.reference.position)
 
 

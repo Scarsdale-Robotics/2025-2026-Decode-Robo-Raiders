@@ -7,6 +7,12 @@ import kotlin.time.ComparableTimeMark
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
 
+data class BasicSMOParameters @JvmOverloads constructor(
+    @JvmField var Ls: Double = 0.0,
+    @JvmField var Lv: Double = 0.0,
+    @JvmField var La: Double = 0.0
+)
+
 class SMOFilter @JvmOverloads constructor(
     private val smoType: FeedbackType,
     private val Ls: Double,

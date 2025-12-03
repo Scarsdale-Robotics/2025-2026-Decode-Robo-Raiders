@@ -26,8 +26,8 @@ import kotlin.time.TimeSource
 object TurretThetaSubsystem : Subsystem {
     private val servo = ServoEx("turret_theta");
 
-    @JvmField var POS_63deg = 0.65;
-    @JvmField var POS_55deg = 0.4;
+    @JvmField var POS_63deg = 0.44;
+    @JvmField var POS_55deg = 0.18;
 
     val open = SetPosition(servo, 0.1).requires(this)
 
