@@ -22,22 +22,22 @@ public class Constants {
             .forwardZeroPowerAcceleration(-33.227913662037004)
             .lateralZeroPowerAcceleration(-74.01881888975592)
             .translationalPIDFCoefficients(new PIDFCoefficients(
-                    0.045,
+                    0.1,
                     0,
-                    0.0065,
-                    0.018
+                    0.01,
+                    0.02
             ))
             .translationalPIDFSwitch(4)
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(
-                    0.3,
+                    0.1,
                     0,
-                    0.005,
-                    0.0006
+                    0.003,
+                    0.01
             ))
             .headingPIDFCoefficients(new PIDFCoefficients(
-                    0.75,
+                    1.5,
                     0,
-                    0.005,
+                    0.1,
                     0.02
             ))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(
@@ -47,18 +47,18 @@ public class Constants {
                     0.0005
             ))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.055,
+                    0.01467,
                     0,
-                    0.00065, //0.00035
+                    0.0002, //0.00035
                     0, //0.6
-                    0.005 //0.015
+                    0.03 //0.015
             ))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.02,
+                    0.03,
                     0,
-                    0.000005,
-                    0.6,
-                    0.01
+                    0.00001,
+                    0.0,
+                    0.0
             ))
             .drivePIDFSwitch(15)
 

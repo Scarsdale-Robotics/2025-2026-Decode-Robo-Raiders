@@ -286,7 +286,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     close.schedule()
                     pathF1 = false
                 }
-                if (follower!!.atPose(shootingPose, 0.5, 0.5)) { //Shooting stuff
+                if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
                     if (pusherSetUp1) {
@@ -305,21 +305,21 @@ class AutonBlueArtifact : NextFTCOpMode() {
             }
 
             AutonPath.RobotIntake1 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(1.0)
+                follower!!.setMaxPower(0.67)
                 follower!!.followPath(robotIntake1!!)
                 setPathState(AutonPath.RobotShoot2)
             }
 
             AutonPath.RobotShoot2 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(1.0)
-                if (pathTimer!!.elapsedTimeSeconds > 3.33) { //hopefully 2 ball already in mag
+                if (pathTimer!!.elapsedTimeSeconds > 3.33) { //hopefully exactly 1 ball above magblock
                     close.schedule()
                 }
                 if (pathF2) {
                     follower!!.followPath(robotGoToShoot1!!)
                     pathF2 = false
                 }
-                if (follower!!.atPose(shootingPose, 0.8, 0.8)) { //Shooting stuff
+                if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
                     if (pusherSetUp2) {
@@ -338,21 +338,54 @@ class AutonBlueArtifact : NextFTCOpMode() {
             }
 
             AutonPath.RobotIntake2 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.95)
+                follower!!.setMaxPower(0.67)
                 follower!!.followPath(robotIntake2!!)
                 setPathState(AutonPath.RobotShoot3)
             }
 
             AutonPath.RobotShoot3 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(1.0)
-                if (pathTimer!!.elapsedTimeSeconds > 1) { //hopefully 1 ball already in mag
+                if (pathTimer!!.elapsedTimeSeconds > 2.5) { //hopefully 1 ball already in mag
                     close.schedule()
                 }
                 if (pathF3) {
                     follower!!.followPath(robotGoToShoot2!!)
                     pathF3 = false
                 }
-                if (follower!!.atPose(shootingPose, 0.2, 0.2)) { //Shooting stuff
+                if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
+                    open.schedule()
+                    intake.schedule()
+                    if (pusherSetUp3) {
+                        pusherSetUp3 = false
+                        actionTimer!!.resetTimer()
+                    }
+                    PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
+                    PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
+                        out.schedule()
+                        setPathState(AutonPath.RobotIntake3)
+                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
+                        `in`.schedule()
+                    }
+                }
+            }
+
+            AutonPath.RobotIntake3 -> if (!follower!!.isBusy) {
+                follower!!.setMaxPower(0.67)
+                follower!!.followPath(robotIntake3!!)
+                setPathState(AutonPath.RobotShoot4)
+            }
+
+            AutonPath.RobotShoot4 -> if (!follower!!.isBusy) {
+                follower!!.setMaxPower(1.0)
+                if (pathTimer!!.elapsedTimeSeconds > 4.5) { //hopefully 1 ball already in mag
+                    close.schedule()
+                }
+                if (pathF4) {
+                    follower!!.followPath(robotGoToShoot3!!)
+                    pathF4 = false
+                }
+                if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
                     if (pusherSetUp3) {
@@ -370,53 +403,35 @@ class AutonBlueArtifact : NextFTCOpMode() {
                 }
             }
 
-            AutonPath.RobotIntake3 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.5)
-                follower!!.followPath(robotIntake3!!)
-                setPathState(AutonPath.RobotShoot4)
-            }
-
-            AutonPath.RobotShoot4 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(1.0)
-                if (pathF4) {
-                    follower!!.followPath(robotGoToShoot3!!)
-                    pathF4 = false
-                }
-                if (pathTimer!!.elapsedTimeSeconds > 0.5 && follower!!.atPose(shootingPose, 0.15, 0.15)) {
-                    open.schedule()
-                    stop.schedule()
-                    `in`.schedule()
-                }
-                if (pathTimer!!.elapsedTimeSeconds > 3) {
-                    intake.schedule()
-                    close.schedule()
-                    out.schedule()
-                    setPathState(AutonPath.RobotIntake4)
-                }
-            }
-
             AutonPath.RobotIntake4 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.35)
+                follower!!.setMaxPower(0.67)
                 follower!!.followPath(robotIntake4!!)
                 setPathState(AutonPath.RobotShoot5)
             }
 
             AutonPath.RobotShoot5 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(1.0)
+                if (pathTimer!!.elapsedTimeSeconds > 4.5) { //hopefully 1 ball already in mag
+                    close.schedule()
+                }
                 if (pathF5) {
                     follower!!.followPath(robotGoToShoot4!!)
                     pathF5 = false
                 }
-                if (pathTimer!!.elapsedTimeSeconds > 0.5 && follower!!.atPose(shootingPose, 0.15, 0.15)) {
+                if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
                     open.schedule()
-                    stop.schedule()
-                    `in`.schedule()
-                }
-                if (pathTimer!!.elapsedTimeSeconds > 3) {
-                    setPathState(AutonPath.EndAuton)
-                    if (pathTimer!!.elapsedTimeSeconds > 1 && follower!!.atPose(shootingPose, 0.15, 0.15)) {
-                        close.schedule()
+                    intake.schedule()
+                    if (pusherSetUp3) {
+                        pusherSetUp3 = false
+                        actionTimer!!.resetTimer()
+                    }
+                    PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
+                    PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
                         out.schedule()
+                        setPathState(AutonPath.EndAuton)
+                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
+                        `in`.schedule()
                     }
                 }
             }

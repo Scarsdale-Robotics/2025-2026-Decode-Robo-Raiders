@@ -77,7 +77,7 @@ object TurretPhiSubsystem : Subsystem {
             a += 2 * PI;
         } else if (a > -1.0/12.0 + tolerance) {
             a -= 2 * PI;
-        }
+        } //i hate kotlin
         return a.rad
     }
 
