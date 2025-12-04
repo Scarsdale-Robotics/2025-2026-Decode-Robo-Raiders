@@ -126,14 +126,14 @@ class AutonBlueArtifact : NextFTCOpMode() {
     private val endPose = Pose(57.0, 84.0, Math.toRadians(0.0)) // End Pose of our robot
 
     companion object {
-        private val toleranceIntakeMagSeq = 5.0;
+        private val toleranceIntakeMagSeq = 5.0
 
-        private var magBallHitDelay = 1.0;  // pessimistic time to hit magblock
-        private var magBallEnterDelay = magBallHitDelay + 2.5;  // time to pass magblock
+        private var magBallHitDelay = 1.0  // pessimistic time to hit magblock
+        private var magBallEnterDelay = magBallHitDelay + 2.5  // time to pass magblock
 
-        private var intakeMaxPower = 0.67;
-        private var shootReturnPower = 0.8;
-        private var intakeWaitDelay = 1.0;
+        private var intakeMaxPower = 0.68
+        private var shootReturnPower = 0.8
+        private var delayAfterIntake = 1.0
     }
 
     /////////////
@@ -289,6 +289,16 @@ class AutonBlueArtifact : NextFTCOpMode() {
     var magSeqReady4: Boolean = true
     var magSeqReady5: Boolean = true
 
+    var intakeReached1: Boolean = true
+    var intakeReached2: Boolean = true
+    var intakeReached3: Boolean = true
+    var intakeReached4: Boolean = true
+
+    var intakeDone1: Boolean = true
+    var intakeDone2: Boolean = true
+    var intakeDone3: Boolean = true
+    var intakeDone4: Boolean = true
+
     /////////////////////
     ////State Manager////
     /////////////////////
@@ -323,8 +333,19 @@ class AutonBlueArtifact : NextFTCOpMode() {
 
             AutonPath.RobotIntake1 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(intakeMaxPower)
-                follower!!.followPath(robotIntake1!!)
-                setPathState(AutonPath.RobotShoot2)
+                if (intakeReached1) {
+                    follower!!.followPath(robotIntake1!!)
+                    intakeReached1 = false
+                }
+                if(follower!!.atPose(intake1stLinePos, 0.15, 0.15)) {
+                    if (intakeDone1) {
+                        actionTimer!!.resetTimer()
+                        intakeDone1 = false
+                    }
+                    if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
+                        setPathState(AutonPath.RobotShoot2)
+                    }
+                }
             }
 
             AutonPath.RobotShoot2 -> if (!follower!!.isBusy) {
@@ -366,8 +387,19 @@ class AutonBlueArtifact : NextFTCOpMode() {
 
             AutonPath.RobotIntake2 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(intakeMaxPower)
-                follower!!.followPath(robotIntake2!!)
-                setPathState(AutonPath.RobotShoot3)
+                if (intakeReached2) {
+                    follower!!.followPath(robotIntake2!!)
+                    intakeReached2 = false
+                }
+                if(follower!!.atPose(intake1stLinePos, 0.15, 0.15)) {
+                    if (intakeDone2) {
+                        actionTimer!!.resetTimer()
+                        intakeDone2 = false
+                    }
+                    if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
+                        setPathState(AutonPath.RobotShoot3)
+                    }
+                }
             }
 
             AutonPath.RobotShoot3 -> if (!follower!!.isBusy) {
@@ -412,11 +444,22 @@ class AutonBlueArtifact : NextFTCOpMode() {
 
             AutonPath.RobotIntake3 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(intakeMaxPower)
-                follower!!.followPath(robotIntake3!!)
-                setPathState(AutonPath.RobotShoot4)
+                if (intakeReached3) {
+                    follower!!.followPath(robotIntake3!!)
+                    intakeReached3 = false
+                }
+                if(follower!!.atPose(intake1stLinePos, 0.15, 0.15)) {
+                    if (intakeDone3) {
+                        actionTimer!!.resetTimer()
+                        intakeDone3 = false
+                    }
+                    if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
+                        setPathState(AutonPath.RobotShoot4)
+                    }
+                }
             }
 
-            AutonPath.RobotShoot4 -> if (!follower!!.isBusy) {
+            AutonPath.RobotShoot4 -> if (!follower!!.isBusy) { //MAY BE REACHED // WOULD MEAN 12 ARTIFACT AUTON //
                 follower!!.setMaxPower(shootReturnPower)
                 if (follower!!.atPose(intake3FirstBallPos, toleranceIntakeMagSeq, toleranceIntakeMagSeq)) {
                     if (magSeqReady3) {
@@ -456,11 +499,22 @@ class AutonBlueArtifact : NextFTCOpMode() {
 
             AutonPath.RobotIntake4 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(intakeMaxPower)
-                follower!!.followPath(robotIntake4!!)
-                setPathState(AutonPath.RobotShoot5)
+                if (intakeReached4) {
+                    follower!!.followPath(robotIntake4!!)
+                    intakeReached4 = false
+                }
+                if(follower!!.atPose(intake1stLinePos, 0.15, 0.15)) {
+                    if (intakeDone4) {
+                        actionTimer!!.resetTimer()
+                        intakeDone4 = false
+                    }
+                    if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
+                        setPathState(AutonPath.RobotShoot5)
+                    }
+                }
             }
 
-            AutonPath.RobotShoot5 -> if (!follower!!.isBusy) {
+            AutonPath.RobotShoot5 -> if (!follower!!.isBusy) { //CANNOT BE REACHED // WOULD MEAN 14 ARTIFACT AUTON //
                 follower!!.setMaxPower(shootReturnPower)
                 // BAD NEED SETUP
                 if (follower!!.atPose(intake4FirstBallPos, toleranceIntakeMagSeq, toleranceIntakeMagSeq)) {
