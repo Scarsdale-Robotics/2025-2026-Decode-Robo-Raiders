@@ -109,12 +109,12 @@ class AutonBlueArtifact : NextFTCOpMode() {
     // robot positions
     private val startPose = Pose(33.0, 136.0, Math.toRadians(180.0)) // Start Pose of our robot.
 
-    private val intake1stLinePos = Pose(11.5, 60.0)
+    private val intake1stLinePos = Pose(10.0, 60.0)
     private val intake1ControlPointPos = Pose(73.0, 52.0)
 
-    private val intake2ndLinePos = Pose(22.0, 84.0)
+    private val intake2ndLinePos = Pose(18.0, 85.0)
 
-    private val intake3rdLinePos = Pose(11.5, 36.0)
+    private val intake3rdLinePos = Pose(10.0, 36.0)
     private val intake3ControlPointPos = Pose(77.0, 33.0)
 
     private val intake4thLinePos = Pose(11.0, 11.0, Math.toRadians(200.0))
@@ -286,7 +286,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     close.schedule()
                     pathF1 = false
                 }
-                if (follower!!.atPose(shootingPose, 0.15, 0.15)) { //Shooting stuff
+                if (follower!!.atPose(shootingPose, 0.5, 0.5)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
                     if (pusherSetUp1) {
@@ -305,7 +305,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
             }
 
             AutonPath.RobotIntake1 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.65)
+                follower!!.setMaxPower(1.0)
                 follower!!.followPath(robotIntake1!!)
                 setPathState(AutonPath.RobotShoot2)
             }
@@ -319,7 +319,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     follower!!.followPath(robotGoToShoot1!!)
                     pathF2 = false
                 }
-                if (follower!!.atPose(shootingPose, 0.15, 0.15)) { //Shooting stuff
+                if (follower!!.atPose(shootingPose, 0.8, 0.8)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
                     if (pusherSetUp2) {
@@ -338,7 +338,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
             }
 
             AutonPath.RobotIntake2 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.75)
+                follower!!.setMaxPower(0.95)
                 follower!!.followPath(robotIntake2!!)
                 setPathState(AutonPath.RobotShoot3)
             }
@@ -463,7 +463,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
     override fun onStartButtonPressed() {
         ShooterSubsystem.off()
         MagblockServoSubsystem.close()
-        PusherServoSubsystem.out();
+        PusherServoSubsystem.out()
         MagazineServoSubsystem.stop()
         opmodeTimer!!.resetTimer()
         actionTimer!!.resetTimer()
