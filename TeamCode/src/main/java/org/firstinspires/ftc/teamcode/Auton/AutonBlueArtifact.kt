@@ -1,28 +1,25 @@
 package org.firstinspires.ftc.teamcode.Auton
+import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
-import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
-import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 //import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.goalX
 //import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.goalY
 import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.m
-import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.overaimSecs
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem.intake
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem.stop
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem.forward
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
@@ -35,7 +32,6 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 
-import java.io.File
 import kotlin.math.hypot
 
 //Auton Naming Convention
@@ -51,6 +47,7 @@ import kotlin.math.hypot
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__WaitFarShooter & Auton__Motif
 @Autonomous(name = "Auton Blue Artifact", group = "Auton")
+@Configurable
 class AutonBlueArtifact : NextFTCOpMode() {
     private var pathTimer: Timer? = null
     var actionTimer: Timer? = null;
@@ -109,21 +106,35 @@ class AutonBlueArtifact : NextFTCOpMode() {
     // robot positions
     private val startPose = Pose(33.0, 136.0, Math.toRadians(180.0)) // Start Pose of our robot.
 
-    private val intake1stLinePos = Pose(10.0, 60.0)
+    private val intake1stLinePos = Pose(10.0, 61.5)
+    private val intake1FirstBallPos = Pose(27.0, intake1stLinePos.y)
     private val intake1ControlPointPos = Pose(73.0, 52.0)
 
     private val intake2ndLinePos = Pose(18.0, 85.0)
+    private val intake2FirstBallPos = Pose(27.0, intake2ndLinePos.y)
 
     private val intake3rdLinePos = Pose(10.0, 36.0)
     private val intake3ControlPointPos = Pose(77.0, 33.0)
+    private val intake3FirstBallPos = Pose(27.0, intake3rdLinePos.y)
 
     private val intake4thLinePos = Pose(11.0, 11.0, Math.toRadians(200.0))
     private val intake4ControlPointPos = Pose(10.0, 67.0)
+    private val intake4FirstBallPos = Pose(27.0, intake4thLinePos.y)
 
     private val shootingPose =
         Pose(57.0, 84.0, Math.toRadians(180.0)) // The shooter position for everything
     private val endPose = Pose(57.0, 84.0, Math.toRadians(0.0)) // End Pose of our robot
 
+    companion object {
+        private val toleranceIntakeMagSeq = 5.0;
+
+        private var magBallHitDelay = 1.0;  // pessimistic time to hit magblock
+        private var magBallEnterDelay = magBallHitDelay + 2.5;  // time to pass magblock
+
+        private var intakeMaxPower = 0.67;
+        private var shootReturnPower = 0.8;
+        private var intakeWaitDelay = 1.0;
+    }
 
     /////////////
     ////Paths////
@@ -272,6 +283,12 @@ class AutonBlueArtifact : NextFTCOpMode() {
     var pusherSetUp4: Boolean = true
     var pusherSetUp5: Boolean = true
 
+    var magSeqReady1: Boolean = true
+    var magSeqReady2: Boolean = true
+    var magSeqReady3: Boolean = true
+    var magSeqReady4: Boolean = true
+    var magSeqReady5: Boolean = true
+
     /////////////////////
     ////State Manager////
     /////////////////////
@@ -305,15 +322,18 @@ class AutonBlueArtifact : NextFTCOpMode() {
             }
 
             AutonPath.RobotIntake1 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.67)
+                follower!!.setMaxPower(intakeMaxPower)
                 follower!!.followPath(robotIntake1!!)
                 setPathState(AutonPath.RobotShoot2)
             }
 
             AutonPath.RobotShoot2 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(1.0)
-                if (pathTimer!!.elapsedTimeSeconds > 3.33) { //hopefully exactly 1 ball above magblock
-                    close.schedule()
+                follower!!.setMaxPower(shootReturnPower)
+                if (follower!!.atPose(intake1FirstBallPos, toleranceIntakeMagSeq, toleranceIntakeMagSeq)) {
+                    if (magSeqReady1) {
+                        magSeqReady1 = false
+                        actionTimer!!.resetTimer()
+                    }
                 }
                 if (pathF2) {
                     follower!!.followPath(robotGoToShoot1!!)
@@ -330,28 +350,40 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
                     if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
                         out.schedule()
-                        setPathState(AutonPath.RobotIntake2)
+                        setPathState(AutonPath.EndAuton)
                     } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
                     }
+                } else if (magSeqReady1) {
+                    if (actionTimer!!.elapsedTimeSeconds >= magBallEnterDelay) {
+                        close.schedule()
+                    }
+//                    else if (actionTimer!!.elapsedTimeSeconds >= magBallHitDelay) {
+//                        open.schedule()
+//                    }
                 }
             }
 
             AutonPath.RobotIntake2 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.67)
+                follower!!.setMaxPower(intakeMaxPower)
                 follower!!.followPath(robotIntake2!!)
                 setPathState(AutonPath.RobotShoot3)
             }
 
             AutonPath.RobotShoot3 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(1.0)
-                if (pathTimer!!.elapsedTimeSeconds > 2.5) { //hopefully 1 ball already in mag
-                    close.schedule()
+                follower!!.setMaxPower(shootReturnPower)
+                if (follower!!.atPose(intake2FirstBallPos, toleranceIntakeMagSeq, toleranceIntakeMagSeq)) {
+                    if (magSeqReady2) {
+                        magSeqReady2 = false
+                        actionTimer!!.resetTimer()
+                    }
                 }
+
                 if (pathF3) {
                     follower!!.followPath(robotGoToShoot2!!)
                     pathF3 = false
                 }
+
                 if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
@@ -367,19 +399,30 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
                     }
+                } else if (magSeqReady2) {
+                    if (actionTimer!!.elapsedTimeSeconds >= magBallEnterDelay) {
+                        close.schedule()
+                    } else if (actionTimer!!.elapsedTimeSeconds >= magBallHitDelay) {
+                        open.schedule()
+                    } else {
+                        close.schedule()
+                    }
                 }
             }
 
             AutonPath.RobotIntake3 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.67)
+                follower!!.setMaxPower(intakeMaxPower)
                 follower!!.followPath(robotIntake3!!)
                 setPathState(AutonPath.RobotShoot4)
             }
 
             AutonPath.RobotShoot4 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(1.0)
-                if (pathTimer!!.elapsedTimeSeconds > 4.5) { //hopefully 1 ball already in mag
-                    close.schedule()
+                follower!!.setMaxPower(shootReturnPower)
+                if (follower!!.atPose(intake3FirstBallPos, toleranceIntakeMagSeq, toleranceIntakeMagSeq)) {
+                    if (magSeqReady3) {
+                        magSeqReady3 = false
+                        actionTimer!!.resetTimer()
+                    }
                 }
                 if (pathF4) {
                     follower!!.followPath(robotGoToShoot3!!)
@@ -400,19 +443,31 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
                     }
+                } else if (magSeqReady3) {
+                    if (actionTimer!!.elapsedTimeSeconds >= magBallEnterDelay) {
+                        close.schedule()
+                    } else if (actionTimer!!.elapsedTimeSeconds >= magBallHitDelay) {
+                        open.schedule()
+                    } else {
+                        close.schedule()
+                    }
                 }
             }
 
             AutonPath.RobotIntake4 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.67)
+                follower!!.setMaxPower(intakeMaxPower)
                 follower!!.followPath(robotIntake4!!)
                 setPathState(AutonPath.RobotShoot5)
             }
 
             AutonPath.RobotShoot5 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(1.0)
-                if (pathTimer!!.elapsedTimeSeconds > 4.5) { //hopefully 1 ball already in mag
-                    close.schedule()
+                follower!!.setMaxPower(shootReturnPower)
+                // BAD NEED SETUP
+                if (follower!!.atPose(intake4FirstBallPos, toleranceIntakeMagSeq, toleranceIntakeMagSeq)) {
+                    if (magSeqReady4) {
+                        magSeqReady4 = false
+                        actionTimer!!.resetTimer()
+                    }
                 }
                 if (pathF5) {
                     follower!!.followPath(robotGoToShoot4!!)
@@ -432,6 +487,14 @@ class AutonBlueArtifact : NextFTCOpMode() {
                         setPathState(AutonPath.EndAuton)
                     } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
+                    }
+                } else if (magSeqReady4) {
+                    if (actionTimer!!.elapsedTimeSeconds >= magBallEnterDelay) {
+                        close.schedule()
+                    } else if (actionTimer!!.elapsedTimeSeconds >= magBallHitDelay) {
+                        open.schedule()
+                    } else {
+                        close.schedule()
                     }
                 }
             }
@@ -477,7 +540,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
      * It runs all the setup actions, including building paths and starting the path system  */
     override fun onStartButtonPressed() {
         ShooterSubsystem.off()
-        MagblockServoSubsystem.close()
+        open.schedule()
         PusherServoSubsystem.out()
         MagazineServoSubsystem.stop()
         opmodeTimer!!.resetTimer()
