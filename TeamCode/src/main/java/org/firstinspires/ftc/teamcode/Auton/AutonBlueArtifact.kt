@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.Auton
+import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
@@ -8,19 +9,34 @@ import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.deg
+import dev.nextftc.core.units.rad
+import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
+//import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.goalX
+//import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.goalY
+import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.m
+import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.overaimSecs
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem.intake
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem.stop
+import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem.forward
+import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.close
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.open
+import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsystem.`in`
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsystem.out
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 
 import java.io.File
+import kotlin.math.hypot
 
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
@@ -37,18 +53,25 @@ import java.io.File
 @Autonomous(name = "Auton Blue Artifact", group = "Auton")
 class AutonBlueArtifact : NextFTCOpMode() {
     private var pathTimer: Timer? = null
-    val actionTimer: Timer? = null;
+    var actionTimer: Timer? = null;
     var opmodeTimer: Timer? = null;
+
+    val delay3rdBall: Double = 2.8
+    val afterPushDelay: Double = 0.5
+
+    val goalX = 12
+    val goalY = 136
 
     init {
         addComponents(
             SubsystemComponent(
                 LowerSubsystem,
-//                OuttakeSubsystem,
+                OuttakeSubsystem,
                 IntakeSubsystem
             )
         );
 
+        actionTimer = Timer()
         pathTimer = Timer()
         opmodeTimer = Timer()
         opmodeTimer!!.resetTimer()
@@ -86,12 +109,12 @@ class AutonBlueArtifact : NextFTCOpMode() {
     // robot positions
     private val startPose = Pose(33.0, 136.0, Math.toRadians(180.0)) // Start Pose of our robot.
 
-    private val intake1stLinePos = Pose(12.0, 60.0)
+    private val intake1stLinePos = Pose(11.5, 60.0)
     private val intake1ControlPointPos = Pose(73.0, 52.0)
 
     private val intake2ndLinePos = Pose(22.0, 84.0)
 
-    private val intake3rdLinePos = Pose(12.0, 36.0)
+    private val intake3rdLinePos = Pose(11.5, 36.0)
     private val intake3ControlPointPos = Pose(77.0, 33.0)
 
     private val intake4thLinePos = Pose(11.0, 11.0, Math.toRadians(200.0))
@@ -106,7 +129,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
     ////Paths////
     /////////////
     // The different paths the robot will take in during Auton
-    private var robotShootPreload: Path? = null
+    private var robotShootPreload: PathChain? = null
 
     private var robotIntake1: PathChain? = null
     private var robotGoToShoot1: PathChain? = null
@@ -130,12 +153,15 @@ class AutonBlueArtifact : NextFTCOpMode() {
     // Builds the aforementioned paths with the initialized positions
     fun buildPaths() {
         /* This is the path before all the motif stuff. */
-        robotShootPreload = Path(
+        robotShootPreload = follower!!.pathBuilder()
+            .addPath(
             BezierLine(
                 startPose,
                 shootingPose
+                )
             )
-        )
+            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .build()
 //        robotShootPreload!!.setLinearHeadingInterpolation(
 //            startPose.heading,
 //            shootingPose.heading
@@ -234,6 +260,17 @@ class AutonBlueArtifact : NextFTCOpMode() {
             )
             .build()
     }
+    var pathF1: Boolean = true
+    var pathF2: Boolean = true
+    var pathF3: Boolean = true
+    var pathF4: Boolean = true
+    var pathF5: Boolean = true
+
+    var pusherSetUp1: Boolean = true
+    var pusherSetUp2: Boolean = true
+    var pusherSetUp3: Boolean = true
+    var pusherSetUp4: Boolean = true
+    var pusherSetUp5: Boolean = true
 
     /////////////////////
     ////State Manager////
@@ -243,73 +280,93 @@ class AutonBlueArtifact : NextFTCOpMode() {
         when (pathState) {
             AutonPath.RobotShoot1 -> {
                 follower!!.setMaxPower(1.0)
-                close.schedule()
-                if (pathTimer!!.elapsedTimeSeconds < 0.01) {
+                forward.schedule()
+                if (pathF1) {
                     follower!!.followPath(robotShootPreload!!)
+                    close.schedule()
+                    pathF1 = false
                 }
                 if (follower!!.atPose(shootingPose, 0.15, 0.15)) { //Shooting stuff
                     open.schedule()
-                    stop.schedule()
-                    `in`.schedule()
-                }
-                if (pathTimer!!.elapsedTimeSeconds > 3) {
                     intake.schedule()
-                    close.schedule()
-                    out.schedule()
-                    setPathState(AutonPath.EndAuton)
+                    if (pusherSetUp1) {
+                        pusherSetUp1 = false
+                        actionTimer!!.resetTimer()
+                    }
+                    PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
+                    PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
+                        out.schedule()
+                        setPathState(AutonPath.RobotIntake1)
+                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
+                        `in`.schedule()
+                    }
                 }
             }
 
             AutonPath.RobotIntake1 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.75)
+                follower!!.setMaxPower(0.65)
                 follower!!.followPath(robotIntake1!!)
                 setPathState(AutonPath.RobotShoot2)
             }
 
             AutonPath.RobotShoot2 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(1.0)
-                var pathF1: Boolean = true
-                if (pathF1) {
-                    follower!!.followPath(robotGoToShoot1!!)
-                    pathF1 = false
-                }
-
-                if (pathTimer!!.elapsedTimeSeconds > 0.5 && follower!!.atPose(shootingPose, 0.15, 0.15)) {
-                    open.schedule()
-                    stop.schedule()
-                    `in`.schedule()
-                }
-                if (pathTimer!!.elapsedTimeSeconds > 3) {
-                    intake.schedule()
+                if (pathTimer!!.elapsedTimeSeconds > 3.33) { //hopefully 2 ball already in mag
                     close.schedule()
-                    out.schedule()
-                    setPathState(AutonPath.RobotIntake2)
+                }
+                if (pathF2) {
+                    follower!!.followPath(robotGoToShoot1!!)
+                    pathF2 = false
+                }
+                if (follower!!.atPose(shootingPose, 0.15, 0.15)) { //Shooting stuff
+                    open.schedule()
+                    intake.schedule()
+                    if (pusherSetUp2) {
+                        pusherSetUp2 = false
+                        actionTimer!!.resetTimer()
+                    }
+                    PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
+                    PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
+                        out.schedule()
+                        setPathState(AutonPath.RobotIntake2)
+                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
+                        `in`.schedule()
+                    }
                 }
             }
 
             AutonPath.RobotIntake2 -> if (!follower!!.isBusy) {
-                follower!!.setMaxPower(0.95)
+                follower!!.setMaxPower(0.75)
                 follower!!.followPath(robotIntake2!!)
                 setPathState(AutonPath.RobotShoot3)
             }
 
             AutonPath.RobotShoot3 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(1.0)
-                var pathF1: Boolean = true
-                if (pathF1) {
-                    follower!!.followPath(robotGoToShoot2!!)
-                    pathF1 = false
-                }
-                if (pathTimer!!.elapsedTimeSeconds > 0.5 && follower!!.atPose(shootingPose, 0.15, 0.15)) {
-                    open.schedule()
-                    stop.schedule()
-                    `in`.schedule()
-                }
-                if (pathTimer!!.elapsedTimeSeconds > 3) {
-                    intake.schedule()
+                if (pathTimer!!.elapsedTimeSeconds > 1) { //hopefully 1 ball already in mag
                     close.schedule()
-                    out.schedule()
-                    setPathState(AutonPath.RobotIntake3)
+                }
+                if (pathF3) {
+                    follower!!.followPath(robotGoToShoot2!!)
+                    pathF3 = false
+                }
+                if (follower!!.atPose(shootingPose, 0.2, 0.2)) { //Shooting stuff
+                    open.schedule()
+                    intake.schedule()
+                    if (pusherSetUp3) {
+                        pusherSetUp3 = false
+                        actionTimer!!.resetTimer()
+                    }
+                    PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
+                    PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
+                        out.schedule()
+                        setPathState(AutonPath.EndAuton)
+                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
+                        `in`.schedule()
+                    }
                 }
             }
 
@@ -321,10 +378,9 @@ class AutonBlueArtifact : NextFTCOpMode() {
 
             AutonPath.RobotShoot4 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(1.0)
-                var pathF1: Boolean = true
-                if (pathF1) {
+                if (pathF4) {
                     follower!!.followPath(robotGoToShoot3!!)
-                    pathF1 = false
+                    pathF4 = false
                 }
                 if (pathTimer!!.elapsedTimeSeconds > 0.5 && follower!!.atPose(shootingPose, 0.15, 0.15)) {
                     open.schedule()
@@ -347,10 +403,9 @@ class AutonBlueArtifact : NextFTCOpMode() {
 
             AutonPath.RobotShoot5 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(1.0)
-                var pathF1: Boolean = true
-                if (pathF1) {
+                if (pathF5) {
                     follower!!.followPath(robotGoToShoot4!!)
-                    pathF1 = false
+                    pathF5 = false
                 }
                 if (pathTimer!!.elapsedTimeSeconds > 0.5 && follower!!.atPose(shootingPose, 0.15, 0.15)) {
                     open.schedule()
@@ -375,26 +430,22 @@ class AutonBlueArtifact : NextFTCOpMode() {
             }
         }
     }
+
     /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play".  */
     override fun onUpdate() {
         // These loop the movements of the robot, these must be called continuously in order to work
         follower!!.update();
-        forward.schedule()
+//        forward.schedule()
+
         autonomousPathUpdate()
-        //        if (pathTimer.getElapsedTimeSeconds() > 1) {
-//            CommandManager.INSTANCE.scheduleCommand(TurretSubsystem.INSTANCE.autoAim(telemetry));
-//        }
-//        TurretSubsystem.AutoAim(
-//            { 0.0 },
-//            { 0.0 },
-//            { 0.0.rad }
-//        ).schedule() // todo: wait for localization
         // Feedback to Driver Hub for debugging
         telemetry.addData("path state", pathState)
         telemetry.addData("x", follower!!.pose.x)
         telemetry.addData("y", follower!!.pose.y)
         telemetry.addData("heading", follower!!.pose.heading)
         telemetry.update()
+
+        PanelsTelemetry.telemetry.update()
     }
 
     /** This method is called continuously after Init while waiting for "play". **/
@@ -410,8 +461,37 @@ class AutonBlueArtifact : NextFTCOpMode() {
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system  */
     override fun onStartButtonPressed() {
+        ShooterSubsystem.off()
+        MagblockServoSubsystem.close()
+        PusherServoSubsystem.out();
+        MagazineServoSubsystem.stop()
         opmodeTimer!!.resetTimer()
+        actionTimer!!.resetTimer()
         setPathState(AutonPath.RobotShoot1)
+
+        val thetaAim = TurretThetaSubsystem.AutoAim(
+            {
+                hypot(
+                    goalX - follower!!.pose.x,
+                    goalY - follower!!.pose.y,
+                )
+            },
+            { (-m!!*it+70.67).coerceIn(55.0, 63.0).deg }
+        )
+        thetaAim.schedule();
+
+        val autoAimPhi = TurretPhiSubsystem.AutoAim(
+            { goalX - follower!!.pose.x },
+            { goalY - follower!!.pose.y },
+            { follower!!.pose.heading.rad }
+        );
+        autoAimPhi.schedule();
+
+        val shooterAutoAim = ShooterSubsystem.AutoAim(
+            { hypot(goalX - follower!!.pose.x, goalY - follower!!.pose.y) },
+            { (578 + 12.7*it + -0.0921*it*it + 0.000316*it*it*it).coerceIn(0.0, 1500.0) }
+        )
+        shooterAutoAim.schedule()
     }
 
     /** We do not use this because everything should automatically disable  */

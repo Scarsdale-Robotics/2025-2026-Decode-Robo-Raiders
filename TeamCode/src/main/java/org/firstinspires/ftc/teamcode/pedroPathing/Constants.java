@@ -19,26 +19,26 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
         .mass(12.519) //in kg
-            .forwardZeroPowerAcceleration(-30.79510460049662)
-            .lateralZeroPowerAcceleration(-68.07407454775519)
+            .forwardZeroPowerAcceleration(-33.227913662037004)
+            .lateralZeroPowerAcceleration(-74.01881888975592)
             .translationalPIDFCoefficients(new PIDFCoefficients(
-                    0.05,
-                    0,
-                    0,
-                    0.015
+                    0.045,
+                    0.0001,
+                    0.0005,
+                    0.018
             ))
             .translationalPIDFSwitch(4)
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(
-                    0.4,
+                    0.5,
                     0,
                     0.005,
                     0.0006
             ))
             .headingPIDFCoefficients(new PIDFCoefficients(
-                    0.8,
+                    0.75,
                     0,
-                    0,
-                    0.01
+                    0.005,
+                    0.02
             ))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(
                     2.5,
@@ -47,11 +47,11 @@ public class Constants {
                     0.0005
             ))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.055,
-                    0,
-                    0.0032, //0.00035
+                    0.003,
+                    0.001,
+                    0.0015, //0.00035
                     0, //0.6
-                    0 //0.015
+                    0.005 //0.015
             ))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(
                     0.02,
@@ -61,14 +61,20 @@ public class Constants {
                     0.01
             ))
             .drivePIDFSwitch(15)
+
+            .useSecondaryDrivePIDF(false)
+            .useSecondaryHeadingPIDF(false)
+            .useSecondaryTranslationalPIDF(false)
+
             .centripetalScaling(0.00038);
+
 
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .xVelocity(77.88217571588953)
-            .yVelocity(59.51546015701895)
+            .xVelocity(78.18835881751353)
+            .yVelocity(57.887402151513285)
             .rightFrontMotorName("rfw")
             .rightRearMotorName("rbw")
             .leftRearMotorName("lbw")
@@ -87,7 +93,7 @@ public class Constants {
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 0.9, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 0.825, 1);
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pathConstraints(pathConstraints)
