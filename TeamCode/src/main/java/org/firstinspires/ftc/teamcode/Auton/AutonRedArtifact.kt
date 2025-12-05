@@ -45,19 +45,19 @@ import kotlin.math.hypot
 //4th slot = Auton type: Motif, Backup, Shooter, Artifact (is just Motif but does not care about motifs)
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__WaitFarShooter & Auton__Motif
-@Autonomous(name = "Auton Blue Artifact", group = "Auton")
+@Autonomous(name = "Auton Red Artifact", group = "Auton")
 @Configurable
-class AutonBlueArtifact : NextFTCOpMode() {
+class AutonRedArtifact : NextFTCOpMode() {
     private var pathTimer: Timer? = null
     var actionTimer: Timer? = null;
     var opmodeTimer: Timer? = null;
 
     val delay3rdBall: Double = 2.8
-    val afterPushDelay: Double = 0.25
+    val afterPushDelay: Double = 0.5
 
-    val distanceGoalX = 12
-    val distanceGoalY = 132
-    var directionGoalX = 4.0;
+    val distanceGoalX = 144.0-12.0
+    val distanceGoalY = 144.0-12.0
+    var directionGoalX = 144.0-4.0;
     var directionGoalY = 144.0-4.0;
 
     init {
@@ -73,6 +73,21 @@ class AutonBlueArtifact : NextFTCOpMode() {
         pathTimer = Timer()
         opmodeTimer = Timer()
         opmodeTimer!!.resetTimer()
+    }
+
+    fun blueRedConvertXPos (x : Double): Double {
+        return 144.0 - x
+    }
+    fun blueRedConvertAngle (x : Double): Double {
+        var newAngle = x
+        if (x > 90 && x < 270) {
+            newAngle = 180 - x
+        }
+        else {
+            newAngle = 0 - x
+            newAngle = 180 + newAngle
+        }
+        return newAngle;
     }
 
     enum class AutonPath {
@@ -105,26 +120,27 @@ class AutonBlueArtifact : NextFTCOpMode() {
     /////////////////
     // Positions the robot will be in during Auton
     // robot positions
-    private val startPose = Pose(33.0, 136.0, Math.toRadians(180.0)) // Start Pose of our robot.
+    private val startPose = Pose(blueRedConvertXPos(33.0), 136.0, Math.toRadians(0.0)) // Start Pose of our robot.
 
-    private val intake1stLinePos = Pose(8.0, 61.5)
-    private val intake1ControlPointPos = Pose(73.0, 52.0)
+    private val intake1stLinePos = Pose(blueRedConvertXPos(11.0), 61.5)
+    private val intake1FirstBallPos = Pose(blueRedConvertXPos(27.0), intake1stLinePos.y)
+    private val intake1ControlPointPos = Pose(blueRedConvertXPos(73.0), 52.0)
 
-    private val intake2ndLinePos = Pose(15.0, 85.5)
-    private val intake2ControlPointPos = Pose(45.0, 87.0)
-    private val intake2FirstBallPos = Pose(27.0, intake2ndLinePos.y)
+    private val intake2ndLinePos = Pose(blueRedConvertXPos(15.0), 85.5)
+    private val intake2ControlPointPos = Pose(blueRedConvertXPos(45.0), 87.0)
+    private val intake2FirstBallPos = Pose(blueRedConvertXPos(27.0), intake2ndLinePos.y)
 
-    private val intake3rdLinePos = Pose(8.0, 36.0)
-    private val intake3ControlPointPos = Pose(77.0, 33.0)
-    private val intake3FirstBallPos = Pose(27.0, intake3rdLinePos.y)
+    private val intake3rdLinePos = Pose(blueRedConvertXPos(11.0), 36.0)
+    private val intake3ControlPointPos = Pose(blueRedConvertXPos(77.0), 33.0)
+    private val intake3FirstBallPos = Pose(blueRedConvertXPos(27.0), intake3rdLinePos.y)
 
-    private val intake4thLinePos = Pose(11.0, 11.0, Math.toRadians(200.0))
-    private val intake4ControlPointPos = Pose(10.0, 67.0)
-    private val intake4FirstBallPos = Pose(27.0, intake4thLinePos.y)
+    private val intake4thLinePos = Pose(blueRedConvertXPos(11.0), 11.0, Math.toRadians(blueRedConvertAngle(200.0)))
+    private val intake4ControlPointPos = Pose(blueRedConvertXPos(10.0), 67.0)
+    private val intake4FirstBallPos = Pose(blueRedConvertXPos(27.0), intake4thLinePos.y)
 
     private val shootingPose =
-        Pose(58.0, 80.0, Math.toRadians(180.0)) // The shooter position for everything
-    private val endPose = Pose(45.0, 80.0) // End Pose of our robot
+        Pose(blueRedConvertXPos(58.0), 80.0, Math.toRadians(0.0)) // The shooter position for everything
+    private val endPose = Pose(blueRedConvertXPos(57.0), 84.0, Math.toRadians(0.0)) // End Pose of our robot
 
     companion object {
         private val toleranceIntakeMagSeq = 5.0
@@ -132,11 +148,11 @@ class AutonBlueArtifact : NextFTCOpMode() {
         private var magBallHitDelay = 1.0  // pessimistic time to hit magblock
         private var magBallEnterDelay = magBallHitDelay + 2.5  // time to pass magblock
 
-        private var intakeMaxPower = 1.0
+        private var intakeMaxPower = 0.88
         private var shootReturnPower = 1.0
-        private var delayAfterIntake = 0.4
+        private var delayAfterIntake = 0.5
 
-        private var intakeMagblockDelay = 0.3;
+        private var intakeMagblockDelay = 0.3
 
         private var intakeEndPosTolerance = 2.0;
         private var shootingPoseTolerance = 2.0;
@@ -172,12 +188,12 @@ class AutonBlueArtifact : NextFTCOpMode() {
         /* This is the path before all the motif stuff. */
         robotShootPreload = follower!!.pathBuilder()
             .addPath(
-            BezierLine(
-                startPose,
-                shootingPose
+                BezierLine(
+                    startPose,
+                    shootingPose
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
 //        robotShootPreload!!.setLinearHeadingInterpolation(
 //            startPose.heading,
@@ -193,7 +209,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     intake1stLinePos
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //1st Go Shoot
         robotGoToShoot1 = follower!!.pathBuilder()
@@ -203,7 +219,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     shootingPose
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
 
         // 2nd Intake
@@ -215,7 +231,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     intake2ndLinePos
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //2nd Go Shoot
         robotGoToShoot2 = follower!!.pathBuilder()
@@ -225,7 +241,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     shootingPose
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
 
         //3rd Intake
@@ -237,7 +253,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     intake3rdLinePos
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //3rd Go Shoot
         robotGoToShoot3 = follower!!.pathBuilder()
@@ -247,7 +263,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     shootingPose
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
 
         //4th Intake
@@ -272,11 +288,10 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     endPose
                 )
             )
-//            .setLinearHeadingInterpolation(
-//                intake4thLinePos.heading,
-//                endPose.heading
-//            )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setLinearHeadingInterpolation(
+                intake4thLinePos.heading,
+                endPose.heading
+            )
             .build()
     }
     var pathF1: Boolean = true
@@ -416,6 +431,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                         actionTimer!!.resetTimer()
                     }
                 }
+
                 if (pathF3) {
                     follower!!.followPath(robotGoToShoot2!!)
                     pathF3 = false
@@ -432,7 +448,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
                     if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
                         out.schedule()
-                        setPathState(AutonPath.RobotIntake3)
+                        setPathState(AutonPath.EndAuton)
                     } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
                     }
@@ -476,8 +492,8 @@ class AutonBlueArtifact : NextFTCOpMode() {
                 if (follower!!.atPose(shootingPose, shootingPoseTolerance, shootingPoseTolerance)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
-                    if (pusherSetUp4) {
-                        pusherSetUp4 = false
+                    if (pusherSetUp3) {
+                        pusherSetUp3 = false
                         actionTimer!!.resetTimer()
                     }
                     PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
@@ -488,10 +504,6 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
                     }
-                }
-                if (opmodeTimer!!.elapsedTimeSeconds >= 29.5) {
-                    out.schedule()
-                    setPathState(AutonPath.EndAuton)
                 }
             }
 
@@ -530,8 +542,8 @@ class AutonBlueArtifact : NextFTCOpMode() {
                 if (follower!!.atPose(shootingPose, shootingPoseTolerance, shootingPoseTolerance)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
-                    if (pusherSetUp5) {
-                        pusherSetUp5 = false
+                    if (pusherSetUp3) {
+                        pusherSetUp3 = false
                         actionTimer!!.resetTimer()
                     }
                     PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
@@ -545,8 +557,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                 }
             }
 
-            AutonPath.EndAuton -> if (!follower!!.isBusy) {
-                follower!!.followPath(robotGoToShoot4!!)
+            AutonPath.EndAuton -> {
 //                val file = File("TeamCode/src/main/java/org/firstinspires/ftc/teamcode/RobotAutonEndPos")
 //                file.writeText(
 //                    follower!!.pose.x.toString() + "\n" +
