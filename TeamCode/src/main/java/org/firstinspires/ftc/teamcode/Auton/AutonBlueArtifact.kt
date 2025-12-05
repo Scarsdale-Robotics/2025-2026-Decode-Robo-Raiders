@@ -22,7 +22,6 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem.intake
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem.forward
-import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.close
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.open
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsystem
@@ -56,8 +55,10 @@ class AutonBlueArtifact : NextFTCOpMode() {
     val delay3rdBall: Double = 2.8
     val afterPushDelay: Double = 0.5
 
-    val goalX = 12
-    val goalY = 136
+    val distanceGoalX = 12
+    val distanceGoalY = 136
+    var directionGoalX = 4.0;
+    var directionGoalY = 144.0-4.0;
 
     init {
         addComponents(
@@ -106,14 +107,15 @@ class AutonBlueArtifact : NextFTCOpMode() {
     // robot positions
     private val startPose = Pose(33.0, 136.0, Math.toRadians(180.0)) // Start Pose of our robot.
 
-    private val intake1stLinePos = Pose(10.0, 61.5)
+    private val intake1stLinePos = Pose(8.0, 61.5)
     private val intake1FirstBallPos = Pose(27.0, intake1stLinePos.y)
     private val intake1ControlPointPos = Pose(73.0, 52.0)
 
-    private val intake2ndLinePos = Pose(18.0, 85.0)
+    private val intake2ndLinePos = Pose(15.0, 85.5)
+    private val intake2ControlPointPos = Pose(45.0, 87.0)
     private val intake2FirstBallPos = Pose(27.0, intake2ndLinePos.y)
 
-    private val intake3rdLinePos = Pose(10.0, 36.0)
+    private val intake3rdLinePos = Pose(8.0, 36.0)
     private val intake3ControlPointPos = Pose(77.0, 33.0)
     private val intake3FirstBallPos = Pose(27.0, intake3rdLinePos.y)
 
@@ -122,7 +124,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
     private val intake4FirstBallPos = Pose(27.0, intake4thLinePos.y)
 
     private val shootingPose =
-        Pose(57.0, 84.0, Math.toRadians(180.0)) // The shooter position for everything
+        Pose(58.0, 80.0, Math.toRadians(180.0)) // The shooter position for everything
     private val endPose = Pose(57.0, 84.0, Math.toRadians(0.0)) // End Pose of our robot
 
     companion object {
@@ -131,9 +133,14 @@ class AutonBlueArtifact : NextFTCOpMode() {
         private var magBallHitDelay = 1.0  // pessimistic time to hit magblock
         private var magBallEnterDelay = magBallHitDelay + 2.5  // time to pass magblock
 
-        private var intakeMaxPower = 0.68
-        private var shootReturnPower = 0.8
-        private var delayAfterIntake = 1.0
+        private var intakeMaxPower = 0.88
+        private var shootReturnPower = 1.0
+        private var delayAfterIntake = 0.5
+
+        private var intakeMagblockDelay = 0.3;
+
+        private var intakeEndPosTolerance = 2.0;
+        private var shootingPoseTolerance = 2.0;
     }
 
     /////////////
@@ -203,8 +210,9 @@ class AutonBlueArtifact : NextFTCOpMode() {
         // 2nd Intake
         robotIntake2 = follower!!.pathBuilder()
             .addPath(
-                BezierLine(
+                BezierCurve(
                     shootingPose,
+                    intake2ControlPointPos,
                     intake2ndLinePos
                 )
             )
@@ -313,8 +321,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     close.schedule()
                     pathF1 = false
                 }
-                if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
-                    open.schedule()
+                if (follower!!.atPose(shootingPose, shootingPoseTolerance, shootingPoseTolerance)) { //Shooting stuff
                     intake.schedule()
                     if (pusherSetUp1) {
                         pusherSetUp1 = false
@@ -322,11 +329,13 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     }
                     PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
                     PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
-                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay + 0.5) {
                         out.schedule()
                         setPathState(AutonPath.RobotIntake1)
-                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
+                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + 0.5) {
                         `in`.schedule()
+                    } else if (actionTimer!!.elapsedTimeSeconds >= 1.0){
+                        open.schedule()
                     }
                 }
             }
@@ -337,30 +346,29 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     follower!!.followPath(robotIntake1!!)
                     intakeReached1 = false
                 }
-                if(follower!!.atPose(intake1stLinePos, 0.15, 0.15)) {
+                if(follower!!.atPose(intake1stLinePos, intakeEndPosTolerance, intakeEndPosTolerance)) {
                     if (intakeDone1) {
                         actionTimer!!.resetTimer()
                         intakeDone1 = false
+                        close.schedule()
                     }
+                }
+                if (!intakeDone1) {
                     if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
                         setPathState(AutonPath.RobotShoot2)
+                    } else if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
+                        close.schedule()
                     }
                 }
             }
 
             AutonPath.RobotShoot2 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(shootReturnPower)
-                if (follower!!.atPose(intake1FirstBallPos, toleranceIntakeMagSeq, toleranceIntakeMagSeq)) {
-                    if (magSeqReady1) {
-                        magSeqReady1 = false
-                        actionTimer!!.resetTimer()
-                    }
-                }
                 if (pathF2) {
                     follower!!.followPath(robotGoToShoot1!!)
                     pathF2 = false
                 }
-                if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
+                if (follower!!.atPose(shootingPose, shootingPoseTolerance, shootingPoseTolerance)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
                     if (pusherSetUp2) {
@@ -371,17 +379,10 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
                     if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
                         out.schedule()
-                        setPathState(AutonPath.EndAuton)
+                        setPathState(AutonPath.RobotIntake2)
                     } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
                     }
-                } else if (magSeqReady1) {
-                    if (actionTimer!!.elapsedTimeSeconds >= magBallEnterDelay) {
-                        close.schedule()
-                    }
-//                    else if (actionTimer!!.elapsedTimeSeconds >= magBallHitDelay) {
-//                        open.schedule()
-//                    }
                 }
             }
 
@@ -391,13 +392,18 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     follower!!.followPath(robotIntake2!!)
                     intakeReached2 = false
                 }
-                if(follower!!.atPose(intake1stLinePos, 0.15, 0.15)) {
+                if(follower!!.atPose(intake2ndLinePos, intakeEndPosTolerance, intakeEndPosTolerance)) {
                     if (intakeDone2) {
                         actionTimer!!.resetTimer()
                         intakeDone2 = false
+                        close.schedule()
                     }
+                }
+                if (!intakeDone2) {
                     if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
                         setPathState(AutonPath.RobotShoot3)
+                    } else if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
+                        close.schedule()
                     }
                 }
             }
@@ -416,7 +422,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     pathF3 = false
                 }
 
-                if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
+                if (follower!!.atPose(shootingPose, shootingPoseTolerance, shootingPoseTolerance)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
                     if (pusherSetUp3) {
@@ -427,17 +433,9 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
                     if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
                         out.schedule()
-                        setPathState(AutonPath.RobotIntake3)
+                        setPathState(AutonPath.EndAuton)
                     } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
-                    }
-                } else if (magSeqReady2) {
-                    if (actionTimer!!.elapsedTimeSeconds >= magBallEnterDelay) {
-                        close.schedule()
-                    } else if (actionTimer!!.elapsedTimeSeconds >= magBallHitDelay) {
-                        open.schedule()
-                    } else {
-                        close.schedule()
                     }
                 }
             }
@@ -448,13 +446,18 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     follower!!.followPath(robotIntake3!!)
                     intakeReached3 = false
                 }
-                if(follower!!.atPose(intake1stLinePos, 0.15, 0.15)) {
+                if(follower!!.atPose(intake3rdLinePos, intakeEndPosTolerance, intakeEndPosTolerance)) {
                     if (intakeDone3) {
                         actionTimer!!.resetTimer()
                         intakeDone3 = false
+                        close.schedule()
                     }
+                }
+                if (!intakeDone3) {
                     if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
                         setPathState(AutonPath.RobotShoot4)
+                    } else if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
+                        close.schedule()
                     }
                 }
             }
@@ -471,7 +474,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     follower!!.followPath(robotGoToShoot3!!)
                     pathF4 = false
                 }
-                if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
+                if (follower!!.atPose(shootingPose, shootingPoseTolerance, shootingPoseTolerance)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
                     if (pusherSetUp3) {
@@ -486,14 +489,6 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
                     }
-                } else if (magSeqReady3) {
-                    if (actionTimer!!.elapsedTimeSeconds >= magBallEnterDelay) {
-                        close.schedule()
-                    } else if (actionTimer!!.elapsedTimeSeconds >= magBallHitDelay) {
-                        open.schedule()
-                    } else {
-                        close.schedule()
-                    }
                 }
             }
 
@@ -503,13 +498,15 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     follower!!.followPath(robotIntake4!!)
                     intakeReached4 = false
                 }
-                if(follower!!.atPose(intake1stLinePos, 0.15, 0.15)) {
+                if(follower!!.atPose(intake4thLinePos, 0.15, 0.15)) {
                     if (intakeDone4) {
                         actionTimer!!.resetTimer()
                         intakeDone4 = false
                     }
                     if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
                         setPathState(AutonPath.RobotShoot5)
+                    } else if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
+                        close.schedule()
                     }
                 }
             }
@@ -527,7 +524,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
                     follower!!.followPath(robotGoToShoot4!!)
                     pathF5 = false
                 }
-                if (follower!!.atPose(shootingPose, 2.0, 2.0)) { //Shooting stuff
+                if (follower!!.atPose(shootingPose, shootingPoseTolerance, shootingPoseTolerance)) { //Shooting stuff
                     open.schedule()
                     intake.schedule()
                     if (pusherSetUp3) {
@@ -541,14 +538,6 @@ class AutonBlueArtifact : NextFTCOpMode() {
                         setPathState(AutonPath.EndAuton)
                     } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
-                    }
-                } else if (magSeqReady4) {
-                    if (actionTimer!!.elapsedTimeSeconds >= magBallEnterDelay) {
-                        close.schedule()
-                    } else if (actionTimer!!.elapsedTimeSeconds >= magBallHitDelay) {
-                        open.schedule()
-                    } else {
-                        close.schedule()
                     }
                 }
             }
@@ -604,8 +593,8 @@ class AutonBlueArtifact : NextFTCOpMode() {
         val thetaAim = TurretThetaSubsystem.AutoAim(
             {
                 hypot(
-                    goalX - follower!!.pose.x,
-                    goalY - follower!!.pose.y,
+                    distanceGoalX - follower!!.pose.x,
+                    distanceGoalY - follower!!.pose.y,
                 )
             },
             { (-m!!*it+70.67).coerceIn(55.0, 63.0).deg }
@@ -613,14 +602,14 @@ class AutonBlueArtifact : NextFTCOpMode() {
         thetaAim.schedule();
 
         val autoAimPhi = TurretPhiSubsystem.AutoAim(
-            { goalX - follower!!.pose.x },
-            { goalY - follower!!.pose.y },
+            { directionGoalX - follower!!.pose.x },
+            { directionGoalY - follower!!.pose.y },
             { follower!!.pose.heading.rad }
         );
         autoAimPhi.schedule();
 
         val shooterAutoAim = ShooterSubsystem.AutoAim(
-            { hypot(goalX - follower!!.pose.x, goalY - follower!!.pose.y) },
+            { hypot(distanceGoalX - follower!!.pose.x, distanceGoalY - follower!!.pose.y) },
             { (578 + 12.7*it + -0.0921*it*it + 0.000316*it*it*it).coerceIn(0.0, 1500.0) }
         )
         shooterAutoAim.schedule()

@@ -1,31 +1,16 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing
 
-import com.acmerobotics.dashboard.FtcDashboard
-import com.acmerobotics.dashboard.config.Config
 import com.bylazar.configurables.annotations.Configurable
-import com.bylazar.telemetry.PanelsTelemetry
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.commands.CommandManager
-import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.Angle
-import dev.nextftc.core.units.deg
-import dev.nextftc.core.units.rad
-import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import dev.nextftc.hardware.impl.ServoEx
-import dev.nextftc.hardware.positionable.SetPosition
-import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.goalX
-import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.goalY
-import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.overaimSecs
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
+import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.distanceGoalX
+import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.distanceGoalY
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem.open
 import kotlin.math.hypot
 
 @TeleOp(name = "Auto Aim Test 2")
@@ -82,7 +67,7 @@ class AutoAimTest2 : NextFTCOpMode() {
 //        );
 //        autoAimPhi.schedule();
         val shooterAutoAim = ShooterSubsystem.AutoAim(
-            { hypot(goalX - odom!!.rOx1, goalY - odom!!.rOy1) },
+            { hypot(distanceGoalX - odom!!.rOx1, distanceGoalY - odom!!.rOy1) },
             { (831 + 67 + 3.52*it - 0.00429*it*it).coerceIn(0.0, 1500.0) }
         )
         shooterAutoAim.schedule();

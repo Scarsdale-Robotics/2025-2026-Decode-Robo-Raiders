@@ -27,11 +27,9 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.floor
 import kotlin.math.hypot
-import kotlin.math.sign
 
 @TeleOp(name = "Tele Op In Prog")
 @Configurable
@@ -40,8 +38,10 @@ class TeleOpInProg : NextFTCOpMode() {
         var overaimSecs = 0.0;
         var speed = 1234.0;
         var m: Double? = 0.200;
-        var goalX = 12.0;
-        var goalY = 144.0-12.0;
+        var distanceGoalX = 12.0;
+        var distanceGoalY = 144.0-12.0;
+        var directionGoalX = 4.0;
+        var directionGoalY = 144.0-4.0;
         var isBlue = true;
         var startFar = true;
         var ODOM_SHIFT_SPEED = 0.1;
@@ -191,9 +191,11 @@ class TeleOpInProg : NextFTCOpMode() {
         //// could do the if (dd) s below but lazy hehehehe
         (Gamepads.gamepad1.circle or Gamepads.gamepad2.circle) whenBecomesTrue MagblockServoSubsystem.open
         (Gamepads.gamepad1.circle or Gamepads.gamepad2.circle) whenBecomesFalse MagblockServoSubsystem.close
-        Gamepads.gamepad1.cross whenBecomesTrue PusherServoSubsystem.push
-        Gamepads.gamepad2.cross whenBecomesTrue PusherServoSubsystem.`in`
-        Gamepads.gamepad2.cross whenBecomesFalse PusherServoSubsystem.out
+//        Gamepads.gamepad1.cross whenBecomesTrue { gamepad2.rumble(500) }
+//        Gamepads.gamepad2.cross whenBecomesTrue PusherServoSubsystem.`in`
+//        Gamepads.gamepad2.cross whenBecomesFalse PusherServoSubsystem.out
+        Gamepads.gamepad1.cross whenBecomesTrue PusherServoSubsystem.`in`
+        Gamepads.gamepad1.cross whenBecomesFalse PusherServoSubsystem.out
 
         if (isBlue) {
             Gamepads.gamepad2.dpadUp whenBecomesTrue { ofsX += 4.0; }
@@ -216,12 +218,12 @@ class TeleOpInProg : NextFTCOpMode() {
             rfw,
             lbw,
             rbw,
-            -Gamepads.gamepad1.leftStickY.map { ( if (abs(it) > 0.7) { sign(it) } else { it } )*speedFactor },
-            Gamepads.gamepad1.leftStickX.map { ( if (abs(it) > 0.7) { sign(it) } else { it } )*speedFactor },
+            -Gamepads.gamepad1.leftStickY.map { it*speedFactor },
+            Gamepads.gamepad1.leftStickX.map { it*speedFactor },
             Gamepads.gamepad1.rightStickX.map { it*speedFactor },
-//            FieldCentric({
-//                if (isBlue) (h - PI).rad else (h).rad
-//            })
+            FieldCentric({
+                if (isBlue) (h.inRad - PI).rad else h
+            })
         )
         mecanum();
 
@@ -230,8 +232,8 @@ class TeleOpInProg : NextFTCOpMode() {
         val thetaAim = TurretThetaSubsystem.AutoAim(
             {
                 hypot(
-                    goalX - x + odom!!.vx * overaimSecs,
-                    goalY - y + odom!!.vy * overaimSecs,
+                    distanceGoalX - x + odom!!.vx * overaimSecs,
+                    distanceGoalY - y + odom!!.vy * overaimSecs,
                 )
             },
             { (-m!!*it+70.67).coerceIn(55.0, 63.0).deg }
@@ -240,14 +242,15 @@ class TeleOpInProg : NextFTCOpMode() {
 
 
         val autoAimPhi = TurretPhiSubsystem.AutoAim(
-            { goalX - x + odom!!.vx * overaimSecs },
-            { goalY - y + odom!!.vy * overaimSecs },
+            { directionGoalX - x + odom!!.vx * overaimSecs },
+            { directionGoalY - y + odom!!.vy * overaimSecs },
             { h + odom!!.omega.rad * overaimSecs }
         );
         autoAimPhi.schedule();
 
 
         Gamepads.gamepad1.rightBumper whenBecomesTrue { speedFactor = 0.5; }
+        Gamepads.gamepad1.rightBumper whenBecomesFalse { speedFactor = 1.0; }
 //        Gamepads.gamepad1.square whenBecomesTrue SequentialGroup(
 //            LowerSubsystem.launchAll,
 //            magDrive!!,
@@ -255,7 +258,7 @@ class TeleOpInProg : NextFTCOpMode() {
 //        )
 
         val shooterAutoAim = ShooterSubsystem.AutoAim(
-            { hypot(goalX - x, goalY - y) },
+            { hypot(distanceGoalX - x, distanceGoalY - y) },
             { (aac + 578 + 12.7*it + -0.0921*it*it + 0.000316*it*it*it).coerceIn(0.0, 1500.0) }
         )
         shooterAutoAim.schedule();
@@ -291,7 +294,7 @@ class TeleOpInProg : NextFTCOpMode() {
         cmd();
         onCmd = cmd;
 
-        PanelsTelemetry.telemetry.addData("ang degs", (atan2(goalY - y, goalX - x).rad - h).inDeg)
+        PanelsTelemetry.telemetry.addData("ang degs", (atan2(distanceGoalY - y, distanceGoalX - x).rad - h).inDeg)
 
         PanelsTelemetry.telemetry.addData("x (inch)", x)
         PanelsTelemetry.telemetry.addData("y (inch)", y)
@@ -305,7 +308,7 @@ class TeleOpInProg : NextFTCOpMode() {
         telemetry.addData("Y POS (inch)", y)
         telemetry.addData("H (degrees)", h)
 
-        telemetry.addData("distance to goal (inches)", hypot(goalX - x, goalY - y))
+        telemetry.addData("distance to goal (inches)", hypot(distanceGoalX - x, distanceGoalY - y))
 
         telemetry.addLine("\nINPUTS")
         telemetry.addData("speed factor", speedFactor)
