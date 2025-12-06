@@ -52,10 +52,6 @@ object ShooterSubsystem : Subsystem {
     }
 
     override fun initialize() {
-        motor.zero()
-        controller.reset()
-        controller.goal = KineticState()
-        motor.power = 0.0
     }
 
 //    @JvmField var FAR_SPEED = 1488.0;

@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem.open
 
-@TeleOp(name = "Auto Aim Test")
+@TeleOp(name = "Auto Aim Test", group = "Testing")
 @Configurable
 class AutoAimTest : NextFTCOpMode() {
     companion object {

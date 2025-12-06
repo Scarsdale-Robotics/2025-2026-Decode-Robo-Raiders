@@ -26,12 +26,13 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsy
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import java.io.File
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.floor
 import kotlin.math.hypot
 
-@TeleOp(name = "Tele Op In Prog")
+@TeleOp(name = "Tele Op In Prog", group = "Testing")
 @Configurable
 class TeleOpInProg : NextFTCOpMode() {
     companion object {
@@ -97,8 +98,21 @@ class TeleOpInProg : NextFTCOpMode() {
         setGamepadColors(rgb.first, rgb.second, rgb.third);
     }
 
+    var startX: Double = 72.0;
+    var startY: Double = 72.0;
+    var startH: Double = -PI / 2.0;
     override fun onInit() {
 //        odom = LocalizationSubsystem(0.0, 0.0, 0.0, isBlue, hardwareMap)
+        val file = File("RobotAutonEndPos.txt")
+        val content = file.readText().split("\n")
+        startX = content[0].toDouble()
+        startY = content[1].toDouble()
+        startH = content[2].toDouble()
+//        file.writeText(
+//            follower!!.pose.x.toString() + "\n" +
+//                    follower!!.pose.y.toString() + "\n" +
+//                    follower!!.pose.heading.toString())
+
         odom = OdometrySubsystem(0.0, 0.0, 0.0, hardwareMap)
         setGamepadColors(YELLOW)
     }
@@ -131,8 +145,6 @@ class TeleOpInProg : NextFTCOpMode() {
     override fun onStartButtonPressed() {
 //        setGamepadColors(WHITE)
 
-        var startX: Double = 72.0;
-        var startY: Double = 72.0;
     // todo: determine start positions by moving from 72.0, 72.0 to desired start pos
 
 //        if (isBlue) {
@@ -154,7 +166,7 @@ class TeleOpInProg : NextFTCOpMode() {
 //        }
 
         // Initialize the device
-        odom!!.setPinpoint(startX, startY, -Math.PI / 2.0);
+        odom!!.setPinpoint(startX, startY, startH);
 
 //        var xs = 0.0;
 //        var ys = 0.0;

@@ -16,6 +16,7 @@ import dev.nextftc.hardware.controllable.RunToState
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
+import org.opencv.video.BackgroundSubtractor
 import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -52,10 +53,12 @@ object TurretPhiSubsystem : Subsystem {
     }
 
     override fun initialize() {
-        motor.zero()
-        controller.reset()
-        controller.goal = KineticState()
-        motor.power = 0.0
+    }
+
+    fun reset() {
+        var d = ENCODERS_FORWARD - ENCODERS_BACKWARD
+        ENCODERS_FORWARD = motor.currentPosition
+        ENCODERS_BACKWARD = ENCODERS_FORWARD - d
     }
 
     // 0.0 --> robot forward
@@ -81,11 +84,12 @@ object TurretPhiSubsystem : Subsystem {
         return a.rad
     }
 
-    open class SetTargetPhi(val angle: Angle) : RunToState(
+    open class SetTargetPhi(val angle: Angle, ofsTurret: Double = 0.0) : RunToState(
         controller,
         KineticState(
             norm(angle) / PI.rad *
             (ENCODERS_FORWARD - ENCODERS_BACKWARD) + ENCODERS_FORWARD
+            + ofsTurret
         )
     )
 
@@ -93,6 +97,7 @@ object TurretPhiSubsystem : Subsystem {
         private val dx: Supplier<Double>,
         private val dy: Supplier<Double>,
         private val rh: Supplier<Angle>,
+        private val ofsTurret: Supplier<Double> = Supplier({ 0.0 })
     ) : Command() {
         override val isDone = false;
 
@@ -106,7 +111,7 @@ object TurretPhiSubsystem : Subsystem {
             if (lastCommand != null) {
                 CommandManager.cancelCommand(lastCommand!!)
             }
-            val currCommand = SetTargetPhi(atan2(dy.get(), dx.get()).rad - rh.get());
+            val currCommand = SetTargetPhi(atan2(dy.get(), dx.get()).rad - rh.get(), ofsTurret.get());
             currCommand();
             lastCommand = currCommand;
         }

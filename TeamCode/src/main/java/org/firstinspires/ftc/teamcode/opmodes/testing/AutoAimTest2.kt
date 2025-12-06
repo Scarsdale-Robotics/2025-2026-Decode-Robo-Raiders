@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import kotlin.math.hypot
 
-@TeleOp(name = "Auto Aim Test 2")
+@TeleOp(name = "Auto Aim Test 2", group = "Testing")
 @Configurable
 class AutoAimTest2 : NextFTCOpMode() {
     init {

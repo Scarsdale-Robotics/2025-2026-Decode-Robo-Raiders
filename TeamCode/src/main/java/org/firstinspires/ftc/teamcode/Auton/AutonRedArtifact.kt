@@ -30,6 +30,8 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsy
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.utils.Lefile.filePath
+import java.io.File
 
 import kotlin.math.hypot
 
@@ -52,20 +54,19 @@ class AutonRedArtifact : NextFTCOpMode() {
     var actionTimer: Timer? = null;
     var opmodeTimer: Timer? = null;
 
-    val delay3rdBall: Double = 2.8
-    val afterPushDelay: Double = 0.25
+    val delay3rdBall: Double = 2.5
+    val afterPushDelay: Double = 0.2
 
-    val distanceGoalX = 12
+    val distanceGoalX = 132
     val distanceGoalY = 132
-    var directionGoalX = 4.0;
+    var directionGoalX = 144.0-4.0;
     var directionGoalY = 144.0-4.0;
 
     init {
         addComponents(
             SubsystemComponent(
                 LowerSubsystem,
-                OuttakeSubsystem,
-                IntakeSubsystem
+                OuttakeSubsystem
             )
         );
 
@@ -105,16 +106,16 @@ class AutonRedArtifact : NextFTCOpMode() {
     /////////////////
     // Positions the robot will be in during Auton
     // robot positions
-    private val startPose = Pose(144.0-33.0, 136.0, Math.toRadians(0.0)) // Start Pose of our robot.
+    private val startPose = Pose(144.0-32.0, 137.0, Math.toRadians(0.0)) // Start Pose of our robot.
 
-    private val intake1stLinePos = Pose(144.0-8.0, 61.5)
+    private val intake1stLinePos = Pose(144.0-11.0, 61.5)
     private val intake1ControlPointPos = Pose(144.0-73.0, 52.0)
 
-    private val intake2ndLinePos = Pose(144.0-15.0, 85.5)
+    private val intake2ndLinePos = Pose(144.0-18.0, 85.5)
     private val intake2ControlPointPos = Pose(144.0-45.0, 87.0)
     private val intake2FirstBallPos = Pose(144.0-27.0, intake2ndLinePos.y)
 
-    private val intake3rdLinePos = Pose(144.0-8.0, 36.0)
+    private val intake3rdLinePos = Pose(144.0-11.0, 36.0)
     private val intake3ControlPointPos = Pose(144.0-77.0, 33.0)
     private val intake3FirstBallPos = Pose(144.0-27.0, intake3rdLinePos.y)
 
@@ -134,12 +135,14 @@ class AutonRedArtifact : NextFTCOpMode() {
 
         private var intakeMaxPower = 1.0
         private var shootReturnPower = 1.0
-        private var delayAfterIntake = 0.4
+        private var delayAfterIntake = 0.42
 
-        private var intakeMagblockDelay = 0.3;
+        private var delayOut = 0.5;
+
+        private var intakeMagblockDelay = 0.2;
 
         private var intakeEndPosTolerance = 2.0;
-        private var shootingPoseTolerance = 2.0;
+        private var shootingPoseTolerance = 3.0;
     }
 
     /////////////
@@ -329,19 +332,23 @@ class AutonRedArtifact : NextFTCOpMode() {
                     }
                     PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
                     PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
-                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay + 0.5) {
-                        out.schedule()
-                        setPathState(AutonPath.RobotIntake1)
-                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + 0.5) {
-                        `in`.schedule()
-                    } else if (actionTimer!!.elapsedTimeSeconds >= 1.0){
+                    if (actionTimer!!.elapsedTimeSeconds >= 1.0){
                         open.schedule()
+                    }
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + 1.0) {
+                        `in`.schedule()
+                    }
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay + 1.0) {
+                        setPathState(AutonPath.RobotIntake1)
                     }
                 }
             }
 
             AutonPath.RobotIntake1 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(intakeMaxPower)
+                if (pathTimer!!.elapsedTimeSeconds > delayOut) {
+                    out.schedule()
+                }
                 if (intakeReached1) {
                     follower!!.followPath(robotIntake1!!)
                     intakeReached1 = false
@@ -350,14 +357,14 @@ class AutonRedArtifact : NextFTCOpMode() {
                     if (intakeDone1) {
                         actionTimer!!.resetTimer()
                         intakeDone1 = false
-                        close.schedule()
                     }
                 }
                 if (!intakeDone1) {
-                    if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
-                        setPathState(AutonPath.RobotShoot2)
-                    } else if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
+                    if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
                         close.schedule()
+                    }
+                    if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake + 0.1) {
+                        setPathState(AutonPath.RobotShoot2)
                     }
                 }
             }
@@ -377,17 +384,20 @@ class AutonRedArtifact : NextFTCOpMode() {
                     }
                     PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
                     PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
-                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
-                        out.schedule()
-                        setPathState(AutonPath.RobotIntake2)
-                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
+                    }
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
+                        setPathState(AutonPath.RobotIntake2)
                     }
                 }
             }
 
             AutonPath.RobotIntake2 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(intakeMaxPower)
+                if (pathTimer!!.elapsedTimeSeconds > delayOut) {
+                    out.schedule()
+                }
                 if (intakeReached2) {
                     follower!!.followPath(robotIntake2!!)
                     intakeReached2 = false
@@ -396,14 +406,14 @@ class AutonRedArtifact : NextFTCOpMode() {
                     if (intakeDone2) {
                         actionTimer!!.resetTimer()
                         intakeDone2 = false
-                        close.schedule()
                     }
                 }
                 if (!intakeDone2) {
+                    if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
+                        close.schedule()
+                    }
                     if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
                         setPathState(AutonPath.RobotShoot3)
-                    } else if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
-                        close.schedule()
                     }
                 }
             }
@@ -430,17 +440,20 @@ class AutonRedArtifact : NextFTCOpMode() {
                     }
                     PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
                     PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
-                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
-                        out.schedule()
-                        setPathState(AutonPath.RobotIntake3)
-                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
+                    }
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
+                        setPathState(AutonPath.RobotIntake3)
                     }
                 }
             }
 
             AutonPath.RobotIntake3 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(intakeMaxPower)
+                if (pathTimer!!.elapsedTimeSeconds > delayOut) {
+                    out.schedule()
+                }
                 if (intakeReached3) {
                     follower!!.followPath(robotIntake3!!)
                     intakeReached3 = false
@@ -449,14 +462,14 @@ class AutonRedArtifact : NextFTCOpMode() {
                     if (intakeDone3) {
                         actionTimer!!.resetTimer()
                         intakeDone3 = false
-                        close.schedule()
                     }
                 }
                 if (!intakeDone3) {
+                    if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
+                        close.schedule()
+                    }
                     if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
                         setPathState(AutonPath.RobotShoot4)
-                    } else if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
-                        close.schedule()
                     }
                 }
             }
@@ -482,14 +495,14 @@ class AutonRedArtifact : NextFTCOpMode() {
                     }
                     PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
                     PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
-                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
-                        out.schedule()
-                        setPathState(AutonPath.EndAuton)
-                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
                     }
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
+                        setPathState(AutonPath.EndAuton)
+                    }
                 }
-                if (opmodeTimer!!.elapsedTimeSeconds >= 29.5) {
+                if (opmodeTimer!!.elapsedTimeSeconds >= 28.0) {
                     out.schedule()
                     setPathState(AutonPath.EndAuton)
                 }
@@ -497,6 +510,9 @@ class AutonRedArtifact : NextFTCOpMode() {
 
             AutonPath.RobotIntake4 -> if (!follower!!.isBusy) {
                 follower!!.setMaxPower(intakeMaxPower)
+                if (pathTimer!!.elapsedTimeSeconds > delayOut) {
+                    out.schedule()
+                }
                 if (intakeReached4) {
                     follower!!.followPath(robotIntake4!!)
                     intakeReached4 = false
@@ -506,10 +522,11 @@ class AutonRedArtifact : NextFTCOpMode() {
                         actionTimer!!.resetTimer()
                         intakeDone4 = false
                     }
+                    if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
+                        close.schedule()
+                    }
                     if (actionTimer!!.elapsedTimeSeconds >= delayAfterIntake) {
                         setPathState(AutonPath.RobotShoot5)
-                    } else if (actionTimer!!.elapsedTimeSeconds >= intakeMagblockDelay) {
-                        close.schedule()
                     }
                 }
             }
@@ -536,22 +553,25 @@ class AutonRedArtifact : NextFTCOpMode() {
                     }
                     PanelsTelemetry.telemetry.addData("actionTimer", actionTimer!!.elapsedTimeSeconds)
                     PanelsTelemetry.telemetry.addData("pathTimer", pathTimer!!.elapsedTimeSeconds)
-                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
-                        out.schedule()
-                        setPathState(AutonPath.EndAuton)
-                    } else if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall) {
                         `in`.schedule()
                     }
+                    if (actionTimer!!.elapsedTimeSeconds >= delay3rdBall + afterPushDelay) {
+                        setPathState(AutonPath.EndAuton)
+                    }
+                }
+                if (opmodeTimer!!.elapsedTimeSeconds >= 27.0) {
+                    setPathState(AutonPath.EndAuton)
                 }
             }
 
             AutonPath.EndAuton -> if (!follower!!.isBusy) {
                 follower!!.followPath(robotGoToShoot4!!)
-//                val file = File("TeamCode/src/main/java/org/firstinspires/ftc/teamcode/RobotAutonEndPos")
-//                file.writeText(
-//                    follower!!.pose.x.toString() + "\n" +
-//                            follower!!.pose.y.toString() + "\n" +
-//                            follower!!.pose.heading.toString())
+                if (follower!!.atPose(endPose, 1.25, 1.25)) {
+                    follower!!.pausePathFollowing()
+                    follower!!.breakFollowing()
+                    follower!!.setMaxPower(0.0)
+                }
             }
         }
     }
@@ -620,5 +640,12 @@ class AutonRedArtifact : NextFTCOpMode() {
     }
 
     /** We do not use this because everything should automatically disable  */
-    override fun onStop() {}  // todo: log to file
+    override fun onStop() {
+        val file = File(filePath)
+        file.writeText(
+            follower!!.pose.x.toString() + "\n" +
+                    follower!!.pose.y.toString() + "\n" +
+                    follower!!.pose.heading.toString() + "\n"
+        )
+    }
 }

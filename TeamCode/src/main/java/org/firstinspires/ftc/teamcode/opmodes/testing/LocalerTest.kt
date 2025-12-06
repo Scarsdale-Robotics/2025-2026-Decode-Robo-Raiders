@@ -9,7 +9,7 @@ import dev.nextftc.ftc.components.BulkReadComponent
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
 
-@TeleOp(name = "LocalerTest")
+@TeleOp(name = "LocalerTest", group = "Testing")
 class LocalerTest : NextFTCOpMode() {
 
 
