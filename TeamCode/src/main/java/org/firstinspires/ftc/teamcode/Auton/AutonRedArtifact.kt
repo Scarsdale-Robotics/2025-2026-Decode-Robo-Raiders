@@ -108,14 +108,14 @@ class AutonRedArtifact : NextFTCOpMode() {
     // robot positions
     private val startPose = Pose(144.0-32.0, 137.0, Math.toRadians(0.0)) // Start Pose of our robot.
 
-    private val intake1stLinePos = Pose(144.0-11.0, 61.5)
+    private val intake1stLinePos = Pose(144.0-8.0, 61.5)
     private val intake1ControlPointPos = Pose(144.0-73.0, 52.0)
 
-    private val intake2ndLinePos = Pose(144.0-18.0, 85.5)
+    private val intake2ndLinePos = Pose(144.0-16.5, 85.5)
     private val intake2ControlPointPos = Pose(144.0-45.0, 87.0)
     private val intake2FirstBallPos = Pose(144.0-27.0, intake2ndLinePos.y)
 
-    private val intake3rdLinePos = Pose(144.0-11.0, 36.0)
+    private val intake3rdLinePos = Pose(144.0-8.0, 36.0)
     private val intake3ControlPointPos = Pose(144.0-77.0, 33.0)
     private val intake3FirstBallPos = Pose(144.0-27.0, intake3rdLinePos.y)
 
@@ -137,7 +137,7 @@ class AutonRedArtifact : NextFTCOpMode() {
         private var shootReturnPower = 1.0
         private var delayAfterIntake = 0.42
 
-        private var delayOut = 0.5;
+        private var delayOut = 0.0;
 
         private var intakeMagblockDelay = 0.2;
 
