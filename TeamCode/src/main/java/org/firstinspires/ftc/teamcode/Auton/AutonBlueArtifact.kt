@@ -109,14 +109,14 @@ class AutonBlueArtifact : NextFTCOpMode() {
     // robot positions
     private val startPose = Pose(32.0, 137.0, Math.toRadians(180.0)) // Start Pose of our robot.
 
-    private val intake1stLinePos = Pose(8.0, 61.5)
+    private val intake1stLinePos = Pose(11.0, 61.5)
     private val intake1ControlPointPos = Pose(73.0, 52.0)
 
     private val intake2ndLinePos = Pose(16.5, 85.5)
     private val intake2ControlPointPos = Pose(45.0, 87.0)
     private val intake2FirstBallPos = Pose(27.0, intake2ndLinePos.y)
 
-    private val intake3rdLinePos = Pose(8.0, 36.0)
+    private val intake3rdLinePos = Pose(11.0, 36.0)
     private val intake3ControlPointPos = Pose(77.0, 33.0)
     private val intake3FirstBallPos = Pose(27.0, intake3rdLinePos.y)
 
@@ -126,7 +126,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
 
     private val shootingPose =
         Pose(58.0, 80.0, Math.toRadians(180.0)) // The shooter position for everything
-    private val endPose = Pose(45.0, 80.0) // End Pose of our robot
+    private val endPose = Pose(48.0, 80.0) // End Pose of our robot
 
     companion object {
         private val toleranceIntakeMagSeq = 5.0

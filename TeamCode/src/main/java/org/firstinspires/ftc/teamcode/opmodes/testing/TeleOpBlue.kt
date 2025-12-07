@@ -387,4 +387,12 @@ class TeleOpBlue : NextFTCOpMode() {
 
         return Triple(r, g, b)
     }
+    override fun onStop() {
+        val file = File(filePath)
+        file.writeText(
+            x.toString() + "\n" +
+                    y.toString() + "\n" +
+                    h.inRad.toString() + "\n"
+        )
+    }
 }
