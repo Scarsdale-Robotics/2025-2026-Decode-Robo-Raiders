@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.localization;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import androidx.annotation.Nullable;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -34,10 +36,14 @@ public class CVSubsystem_VisionPortal {
     private motif currentMotif;
     private AprilTagDetection lastDetection;
 
+    public HardwareMap hm1;
+
     public CVSubsystem_VisionPortal(double x1, double y1, double h, boolean side, HardwareMap hm) {
 
+        hm1 = hm;
+
         // Initialize IMU
-        imu = hm.get(IMU.class, "imu");
+        imu = hm1.get(IMU.class, "imu");
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
@@ -58,10 +64,17 @@ public class CVSubsystem_VisionPortal {
         WebcamName webcamName = hm.get(WebcamName.class, "Cam");  ///has to be called Cam
         visionPortal = new VisionPortal.Builder()
                 .setCamera(webcamName)
+                .enableLiveView(true)
                 .addProcessor(aprilTagProcessor)
                 .setCameraResolution(new android.util.Size(640, 480))
-                .setCamera(BuiltinCameraDirection.BACK) // fallback if internal
+                .setCamera(BuiltinCameraDirection.BACK)// fallback if internal
+                .setAutoStartStreamOnBuild(true)
+                .setLiveViewContainerId(hm1.appContext.getResources().getIdentifier(
+                        "cameraMonitorViewId", "id", hm1.appContext.getPackageName()
+                ))
                 .build();
+
+
 
         this.RCx1 = x1;
         this.RCy1 = y1;
