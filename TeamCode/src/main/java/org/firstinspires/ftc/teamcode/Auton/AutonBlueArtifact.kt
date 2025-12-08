@@ -54,29 +54,48 @@ class AutonBlueArtifact : NextFTCOpMode() {
     private var pathTimer: Timer? = null
     var actionTimer: Timer? = null;
     var opmodeTimer: Timer? = null;
-
-    val delay3rdBall: Double = 2.5
-    val afterPushDelay: Double = 0.2
-
-    val distanceGoalX = 12
-    val distanceGoalY = 132
-    var directionGoalX = 4.0;
-    var directionGoalY = 144.0-4.0;
-
-    init {
-        addComponents(
+    init { addComponents(
             SubsystemComponent(
                 LowerSubsystem,
-                OuttakeSubsystem
-            )
-        );
-
+                OuttakeSubsystem));
         actionTimer = Timer()
         pathTimer = Timer()
         opmodeTimer = Timer()
         opmodeTimer!!.resetTimer()
     }
 
+    /////////////////
+    ////Constants////
+    /////////////////
+    companion object {
+        val delay3rdBall: Double = 2.5
+        val afterPushDelay: Double = 0.2
+
+        val distanceGoalX = 12
+        val distanceGoalY = 132
+        var directionGoalX = 4.0;
+        var directionGoalY = 144.0-4.0;
+
+        private val toleranceIntakeMagSeq = 5.0
+
+        private var magBallHitDelay = 1.0  // pessimistic time to hit magblock
+        private var magBallEnterDelay = magBallHitDelay + 2.5  // time to pass magblock
+
+        private var intakeMaxPower = 1.0
+        private var shootReturnPower = 1.0
+        private var delayAfterIntake = 0.42
+
+        private var delayOut = 0.0;
+
+        private var intakeMagblockDelay = 0.2;
+
+        private var intakeEndPosTolerance = 2.0;
+        private var shootingPoseTolerance = 3.0;
+    }
+
+    /////////////////
+    /////PathIDs/////
+    /////////////////
     enum class AutonPath {
         RobotShoot1, //the starting path of the robot
         RobotIntake1,
@@ -91,6 +110,7 @@ class AutonBlueArtifact : NextFTCOpMode() {
     }
 
     private var pathState: AutonPath = AutonPath.RobotShoot1
+    var follower: Follower? = null
 
     /**
      * These change the states of the paths and actions. It will also reset the timers of the individual switches
@@ -99,8 +119,6 @@ class AutonBlueArtifact : NextFTCOpMode() {
         pathState = pState
         pathTimer?.resetTimer()
     }
-
-    var follower: Follower? = null
 
     /////////////////
     ////Positions////
@@ -127,24 +145,6 @@ class AutonBlueArtifact : NextFTCOpMode() {
     private val shootingPose =
         Pose(58.0, 80.0, Math.toRadians(180.0)) // The shooter position for everything
     private val endPose = Pose(48.0, 80.0) // End Pose of our robot
-
-    companion object {
-        private val toleranceIntakeMagSeq = 5.0
-
-        private var magBallHitDelay = 1.0  // pessimistic time to hit magblock
-        private var magBallEnterDelay = magBallHitDelay + 2.5  // time to pass magblock
-
-        private var intakeMaxPower = 1.0
-        private var shootReturnPower = 1.0
-        private var delayAfterIntake = 0.42
-
-        private var delayOut = 0.0;
-
-        private var intakeMagblockDelay = 0.2;
-
-        private var intakeEndPosTolerance = 2.0;
-        private var shootingPoseTolerance = 3.0;
-    }
 
     /////////////
     ////Paths////
