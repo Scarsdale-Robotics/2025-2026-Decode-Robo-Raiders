@@ -14,15 +14,7 @@ object MagblockServoSubsystem : Subsystem {
 
     private val servo = ServoEx("magblock");
 
-    var isOpen = false;
-
     // using functions instead of fields makes the opmodes much cleaner: you don't need new each time, but the parentheses are still there to give meathod-vibes
-    val open = {
-        SetPosition(servo, OPEN!!)
-        isOpen = true
-    };
-    val close = {
-        SetPosition(servo, CLOSED!!)
-        isOpen = false
-    };
+    val open = SetPosition(servo, OPEN!!)
+    val close = SetPosition(servo, CLOSED!!)
 }

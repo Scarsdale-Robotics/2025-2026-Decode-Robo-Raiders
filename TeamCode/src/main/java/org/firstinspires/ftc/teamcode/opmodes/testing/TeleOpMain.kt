@@ -1,12 +1,20 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing
 
 import com.bylazar.configurables.annotations.Configurable
-import dev.nextftc.core.commands.Command
+import com.bylazar.telemetry.PanelsTelemetry
+import com.bylazar.telemetry.TelemetryManager
+import com.pedropathing.follower.Follower
+import com.pedropathing.geometry.BezierLine
+import com.pedropathing.geometry.Pose
+import com.pedropathing.paths.Path
+import com.pedropathing.paths.PathChain
+import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.rad
+import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
@@ -14,10 +22,9 @@ import dev.nextftc.hardware.driving.FieldCentric
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.isBlue
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.intake.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.intake.IntakeServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineMotorSubsystem
@@ -28,19 +35,28 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsyst
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.utils.Lefile.filePath
 import java.io.File
+import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.hypot
+
 
 @Configurable
 open class TeleOpMain(
     private val isRed: Boolean,
     private val goalX: Double,
     private val goalY: Double,
+    private val invertDriveControls: Boolean,
     private val distanceToVelocity: (Double) -> Double,
-    private val distanceToTheta: (Double) -> Angle
+    private val distanceToTheta: (Double) -> Angle,
+    private val boxBoxPose: Pose,
+    private val hammerTimePose: Pose,
+    private val closeShootPose: Pose,
+    private val farShootPose: Pose
 ) : NextFTCOpMode() {
 
-    private var odom: OdometrySubsystem? = null;
+    private val follower: Follower
+
+//    private var odom: OdometrySubsystem? = null;
 
     private val lfw = MotorEx("lfw").reversed();
     private val lbw = MotorEx("lbw").reversed();
@@ -53,27 +69,69 @@ open class TeleOpMain(
 
     val x: Double
         get() {
-            if (odom != null) {
-                return odom!!.rOx1 + ofsX;
-            }
-            return 0.0;
+            return follower.pose.x + ofsX;
         }
     val y: Double
         get() {
-            if (odom != null) {
-                return odom!!.rOy1 + ofsY;
-            }
-            return 0.0;
+            return follower.pose.y + ofsY;
         }
     val h: Angle
         get() {
-            if (odom != null) {
-                return odom!!.rOh.rad + ofsH.rad;
-            }
-            return 0.0.rad;
+            return follower.pose.heading.rad + ofsH.rad;
         }
 
-    var speedFactor = 1.0;
+    private var speedFactor = 1.0;
+
+    private val telemetryM: TelemetryManager
+
+    private val boxBoxPath: Supplier<PathChain>
+    private val hammerTimePath: Supplier<PathChain>
+    private val farShootPath: Supplier<PathChain>
+    private val closeShootPath: Supplier<PathChain>
+
+    init {
+        val file = File("RobotAutonEndPos.txt")
+        val content = file.readText().split("\n")
+        val startX = content[0].toDouble()
+        val startY = content[1].toDouble()
+        val startH = content[2].toDouble()
+
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(Pose(startX, startY, startH))
+        follower.update();
+
+        telemetryM = PanelsTelemetry.telemetry;
+
+        // pedro paths
+        boxBoxPath = Supplier {
+            follower.pathBuilder()
+                .addPath(Path(BezierLine(
+                    follower::getPose, boxBoxPose
+                )))
+                .build()
+        }
+        hammerTimePath = Supplier {
+            follower.pathBuilder()
+                .addPath(Path(BezierLine(
+                    follower::getPose, hammerTimePose
+                )))
+                .build()
+        }
+        farShootPath = Supplier {
+            follower.pathBuilder()
+                .addPath(Path(BezierLine(
+                    follower::getPose, farShootPose
+                )))
+                .build()
+        }
+        closeShootPath = Supplier {
+            follower.pathBuilder()
+                .addPath(Path(BezierLine(
+                    follower::getPose, closeShootPose
+                )))
+                .build()
+        }
+    }
 
     override fun onInit() {
         addComponents(
@@ -88,39 +146,50 @@ open class TeleOpMain(
         ShooterSubsystem.off()
         MagazineMotorSubsystem.off()
         IntakeMotorSubsystem.off()
-
-        odom = OdometrySubsystem(0.0, 0.0, 0.0, hardwareMap)
     }
 
     override fun onStartButtonPressed() {
         IntakeServoSubsystem.up()
         PusherServoSubsystem.out()
         MagblockServoSubsystem.close()
+        MagazineMotorSubsystem.slow()
 
         // DRIVER CONTROLS
         // Drivetrain
-        val mecanum = MecanumDriverControlled(
-            lfw,
-            rfw,
-            lbw,
-            rbw,
-            -Gamepads.gamepad1.leftStickY.map { it*speedFactor },
-            Gamepads.gamepad1.leftStickX.map { it*speedFactor },
-            Gamepads.gamepad1.rightStickX.map { it*speedFactor },
-            FieldCentric({
-                if (isBlue) (h.inRad - PI).rad else h
-            })
+        val driveCommand = PedroDriverControlled(
+            Gamepads.gamepad1.leftStickY.map { it * speedFactor * (if (invertDriveControls) -1.0 else 1.0) },
+            Gamepads.gamepad1.leftStickX.map { it * speedFactor * (if (invertDriveControls) 1.0 else -1.0) },
+            Gamepads.gamepad1.rightStickX.map { it * speedFactor },
+            false
         )
-        mecanum();
         Gamepads.gamepad1.rightBumper whenBecomesTrue { speedFactor = 0.5; }
         Gamepads.gamepad1.rightBumper whenBecomesFalse { speedFactor = 1.0; }
 
+        Gamepads.gamepad1.dpadUp whenBecomesTrue { follower.followPath(hammerTimePath.get()) }
+        Gamepads.gamepad1.dpadDown whenBecomesTrue { follower.followPath(boxBoxPath.get()) }
+        (if (invertDriveControls) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft) whenBecomesTrue { follower.followPath(closeShootPath.get()) }
+        (if (invertDriveControls) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight) whenBecomesTrue { follower.followPath(farShootPath.get()) }
+
         // Scoring
+        // g1circle -> open shoot
         Gamepads.gamepad1.circle whenBecomesTrue SequentialGroup(
             MagblockServoSubsystem.open,
-            MagazineMotorSubsystem.On(FAST_SPEED)
+            MagazineMotorSubsystem.fast  // also enters with gradually faster speed helps counter flywheel speed loss
+        ) whenBecomesFalse SequentialGroup(
+            MagazineMotorSubsystem.slow,
+            MagblockServoSubsystem.close
         )
 
+        // Intake
+        Gamepads.gamepad2.triangle whenBecomesTrue ParallelGroup(
+            IntakeServoSubsystem.down,
+            IntakeMotorSubsystem.intake
+        ) whenBecomesFalse ParallelGroup(
+            IntakeServoSubsystem.up,
+            IntakeMotorSubsystem.off
+        )
+
+        //
 
         // AUTO AIM
         ShooterSubsystem.AutoAim(
@@ -140,7 +209,8 @@ open class TeleOpMain(
     }
 
     override fun onUpdate() {
-        odom!!.updateOdom()
+        follower.update()
+        telemetryM.update()
     }
 
     override fun onStop() {
