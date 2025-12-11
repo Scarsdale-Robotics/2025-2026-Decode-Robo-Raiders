@@ -1,6 +1,5 @@
-package org.firstinspires.ftc.teamcode.subsystems.lower.Intake
+package org.firstinspires.ftc.teamcode.subsystems.lower.intake
 
-import com.acmerobotics.dashboard.config.Config
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
@@ -12,13 +11,14 @@ import java.util.function.Supplier
 
 object IntakeMotorSubsystem : Subsystem {
 
-  private val motor = MotorEx("intake");
+  private val motor = MotorEx("im");
 
 
   val OUT = -1.0;
   val IN = 1.0;
 
-  class Power(power: Double) : InstantCommand({ motor.power = power })
+  class On(power: Double) : InstantCommand({ motor.power = power })
+  val off = InstantCommand({ motor.power = 0.0 })
 
   val intake = SetPower(motor, IN);
   val reverse = SetPower(motor, OUT);

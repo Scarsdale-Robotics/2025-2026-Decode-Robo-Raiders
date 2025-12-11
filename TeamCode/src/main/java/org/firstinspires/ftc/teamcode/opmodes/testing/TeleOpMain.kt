@@ -1,160 +1,155 @@
 package org.firstinspires.ftc.teamcode.opmodes.testing
 
-import com.qualcomm.robotcore.hardware.Gamepad
-import com.qualcomm.robotcore.hardware.HardwareMap
+import com.bylazar.configurables.annotations.Configurable
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.groups.SequentialGroup
+import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.deg
+import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.rad
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
+import dev.nextftc.ftc.components.BulkReadComponent
+import dev.nextftc.hardware.driving.FieldCentric
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
-import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem
+import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.isBlue
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.intake.IntakeMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.intake.IntakeServoSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.utils.Lefile.filePath
+import java.io.File
+import kotlin.math.PI
+import kotlin.math.hypot
 
-class TeleOpMain: NextFTCOpMode() {
-    private val intakeMotor = MotorEx("intake");
+@Configurable
+open class TeleOpMain(
+    private val isRed: Boolean,
+    private val goalX: Double,
+    private val goalY: Double,
+    private val distanceToVelocity: (Double) -> Double,
+    private val distanceToTheta: (Double) -> Angle
+) : NextFTCOpMode() {
 
-    private val frontLeftMotor = MotorEx("frontLeft");
-    private val frontRightMotor = MotorEx("frontRight");
-    private val backLeftMotor = MotorEx("backLeft");
-    private val backRightMotor = MotorEx("backRight");
+    private var odom: OdometrySubsystem? = null;
 
-    private var autoAimEnabled = true;
+    private val lfw = MotorEx("lfw").reversed();
+    private val lbw = MotorEx("lbw").reversed();
+    private val rfw = MotorEx("rfw");
+    private val rbw = MotorEx("rbw");
 
-    private var autoAimCommand: Command;
-    private val manualAimCommand: Command;
+    private var ofsX = 0.0;
+    private var ofsY = 0.0;
+    private var ofsH = 0.0;
 
-    var LocalizationSubsystem: LocalizationSubsystem;
-
-
-    init {
-        addComponents(
-            SubsystemComponent(
-                OuttakeSubsystem,
-                LowerSubsystem
-            )  // todo: consider add localization subsystem
-        )
-        LocalizationSubsystem = LocalizationSubsystem(1.0,1.0,1.0,true, hardwareMap);
-
-
-        autoAimCommand = TurretSubsystem.AutoAim(
-            { 0.0 }, { 0.0 }, {0.0.rad}, {0.0.rad}
-        );  // todo: connect with localization
-        manualAimCommand = TurretSubsystem.DriverCommand(
-            Gamepads.gamepad2.triangle,
-            Gamepads.gamepad2.cross,
-            Gamepads.gamepad2.dpadUp,
-            Gamepads.gamepad2.dpadDown,
-            Gamepads.gamepad2.dpadLeft,
-            Gamepads.gamepad2.dpadRight,
-            Gamepads.gamepad2.circle,
-            49.0.deg,
-            58.0.deg,
-            30.0.deg,
-            45.0.deg,
-        );
-    }
-
-    override fun onStartButtonPressed(): Unit {
-        IntakeSubsystem.DriverCommandDefaultOn(
-            Gamepads.gamepad1.leftTrigger,
-        ).schedule();
-
-        MecanumDriverControlled(
-            frontLeftMotor,
-            frontRightMotor,
-            backLeftMotor,
-            backRightMotor,
-            Gamepads.gamepad1.leftStickY,
-            Gamepads.gamepad1.leftStickX,
-            Gamepads.gamepad1.rightStickX,
-        ).schedule();
-
-        // auto-aim
-        autoAimCommand.schedule();
-
-        // circle --> shoot
-        Gamepads.gamepad1.circle whenBecomesTrue MagblockServoSubsystem.open;
-        Gamepads.gamepad1.circle whenBecomesFalse MagblockServoSubsystem.close;
-
-        // g2 both bumpers --> toggle autoAim
-        Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.rightBumper whenBecomesTrue {
-            if (autoAimEnabled) {
-                autoAimCommand.cancel();
-                manualAimCommand.schedule();
-            } else {
-                autoAimCommand.schedule();
-                manualAimCommand.cancel();
+    val x: Double
+        get() {
+            if (odom != null) {
+                return odom!!.rOx1 + ofsX;
             }
-            autoAimEnabled = !autoAimEnabled;
-            gamepad1.rumble(0.5, 0.5, 200);
-            gamepad2.rumble(0.5, 0.5, 200);
+            return 0.0;
+        }
+    val y: Double
+        get() {
+            if (odom != null) {
+                return odom!!.rOy1 + ofsY;
+            }
+            return 0.0;
+        }
+    val h: Angle
+        get() {
+            if (odom != null) {
+                return odom!!.rOh.rad + ofsH.rad;
+            }
+            return 0.0.rad;
         }
 
-        // g2 square --> try to clear balls, fix jam
-//        Gamepads.gamepad2.square whenBecomesTrue LowerSubsystem.fixJam;
+    var speedFactor = 1.0;
 
-        // todo: localization reset
-        // todo: auto aim test teleop
+    override fun onInit() {
+        addComponents(
+            SubsystemComponent(
+                LowerSubsystem,
+                OuttakeSubsystem
+            ),
+            BindingsComponent,
+            BulkReadComponent
+        )
+
+        ShooterSubsystem.off()
+        MagazineMotorSubsystem.off()
+        IntakeMotorSubsystem.off()
+
+        odom = OdometrySubsystem(0.0, 0.0, 0.0, hardwareMap)
+    }
+
+    override fun onStartButtonPressed() {
+        IntakeServoSubsystem.up()
+        PusherServoSubsystem.out()
+        MagblockServoSubsystem.close()
+
+        // DRIVER CONTROLS
+        // Drivetrain
+        val mecanum = MecanumDriverControlled(
+            lfw,
+            rfw,
+            lbw,
+            rbw,
+            -Gamepads.gamepad1.leftStickY.map { it*speedFactor },
+            Gamepads.gamepad1.leftStickX.map { it*speedFactor },
+            Gamepads.gamepad1.rightStickX.map { it*speedFactor },
+            FieldCentric({
+                if (isBlue) (h.inRad - PI).rad else h
+            })
+        )
+        mecanum();
+        Gamepads.gamepad1.rightBumper whenBecomesTrue { speedFactor = 0.5; }
+        Gamepads.gamepad1.rightBumper whenBecomesFalse { speedFactor = 1.0; }
+
+        // Scoring
+        Gamepads.gamepad1.circle whenBecomesTrue SequentialGroup(
+            MagblockServoSubsystem.open,
+            MagazineMotorSubsystem.On(FAST_SPEED)
+        )
+
+
+        // AUTO AIM
+        ShooterSubsystem.AutoAim(
+            { hypot(goalX - x, goalY - y) },
+            distanceToVelocity
+        )
+        TurretPhiSubsystem.AutoAim(
+            { goalX - x },
+            { goalY - y },
+            { h }
+        )
+        TurretThetaSubsystem.AutoAim(
+            { hypot(goalX - x, goalY - y) },
+            distanceToTheta
+        )
+
     }
 
     override fun onUpdate() {
-        // indicators
-        if (!autoAimEnabled) {
-            gamepad2.setLedColor(
-                255.0, 0.0, 0.0, Gamepad.LED_DURATION_CONTINUOUS);
-        } else {
-            gamepad2.setLedColor(
-                255.0, 255.0, 255.0, Gamepad.LED_DURATION_CONTINUOUS);
-        }
-
+        odom!!.updateOdom()
     }
 
-    fun telemetry() {
-
-      //That's a lot of data
-
-
-      /** postion (inch)/// */
-        telemetry.addData("x (inch): ", LocalizationSubsystem.getX())
-        telemetry.addData("y (inch): ", LocalizationSubsystem.getY())
-        telemetry.addData("h (radians): ", LocalizationSubsystem.getH())
-
-        /** velocities (inch/ms)/// */
-        telemetry.addData("Vx (inch/ms): ", LocalizationSubsystem.getVX())
-        telemetry.addData("Vy (inch/ms): ", LocalizationSubsystem.getVY())
-        telemetry.addData("Vh (rad/ms): ", LocalizationSubsystem.getVH())
-
-        /** accelerations (inch/ms^2) /// */
-        telemetry.addData("Ax (inch/ms^2): ", LocalizationSubsystem.getAX())
-        telemetry.addData("Ay (inch/ms^2): ", LocalizationSubsystem.getAY())
-        telemetry.addData("Ah (rad/ms^2): ", LocalizationSubsystem.getAH())
-
-        /** Time info /// */
-        telemetry.addData(
-            "Time since last update (ms): ",
-            LocalizationSubsystem.getTimeSinceLastUpdate()
+    override fun onStop() {
+        val file = File(filePath)
+        file.writeText(
+            x.toString() + "\n" +
+                    y.toString() + "\n" +
+                    h.inRad.toString() + "\n"
         )
-        telemetry.addData("Clock (ms): ", LocalizationSubsystem.getClock())
-        telemetry.addData("Clock (s): ", LocalizationSubsystem.getTimeS())
-        telemetry.addData("Last update time (ms): ", LocalizationSubsystem.getLastUpdateTime())
-
-        /** Kalman /// */
-        telemetry.addData("Kalman Gain X: ", LocalizationSubsystem.getKalmangainX())
-        telemetry.addData("Kalman Gain Y: ", LocalizationSubsystem.getKalmangainY())
-
-        /** motif /// */
-        telemetry.addData("Detected Motif: ", LocalizationSubsystem.getMotif().toString())
-
-        // scarsdale robotics if we dont get 300 lines of telemetry: (explodes)
-
-        telemetry.update()
     }
 
 }
