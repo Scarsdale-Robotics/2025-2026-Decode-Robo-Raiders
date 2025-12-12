@@ -45,6 +45,7 @@ open class TeleOpMain(
     private val isRed: Boolean,
     private val goalX: Double,
     private val goalY: Double,
+    private val distanceToFlightTimeSecs: (Double) -> Double,
     private val invertDriveControls: Boolean,
     private val distanceToVelocity: (Double) -> Double,
     private val distanceToTheta: (Double) -> Angle,
@@ -192,17 +193,36 @@ open class TeleOpMain(
         //
 
         // AUTO AIM
+        val dx = Supplier { goalX - x }
+        val dy = Supplier { goalY - y }
+        val dxy = Supplier { hypot(dx.get(), dy.get()) }
+        val dxya = Supplier {
+            var dxa_tmp = dx.get() + distanceToFlightTimeSecs(dxy.get()) * follower.velocity.xComponent
+            var dya_tmp = dy.get() + distanceToFlightTimeSecs(dxy.get()) * follower.velocity.yComponent
+            for (i in 0..100) {
+                dxa_tmp = dx.get() + distanceToFlightTimeSecs(hypot(dxa_tmp, dya_tmp)) * follower.velocity.xComponent
+                dya_tmp = dy.get() + distanceToFlightTimeSecs(hypot(dxa_tmp, dya_tmp)) * follower.velocity.yComponent
+            }
+            return@Supplier hypot(dxa_tmp, dya_tmp)
+        }
+        val dxa = Supplier {
+            dx.get() + distanceToFlightTimeSecs(dxya.get()) * follower.velocity.xComponent
+        } // todo: check units? seconds? milliseconds?; todo: check work lol probably not
+        val dya = Supplier {
+            dy.get() + distanceToFlightTimeSecs(dxya.get()) * follower.velocity.yComponent
+        }
+        val dha = Supplier {
+            (h.inRad + distanceToFlightTimeSecs(dxya.get()) * follower.velocity.theta).rad
+        }
         ShooterSubsystem.AutoAim(
-            { hypot(goalX - x, goalY - y) },
+            dxya,
             distanceToVelocity
         )
         TurretPhiSubsystem.AutoAim(
-            { goalX - x },
-            { goalY - y },
-            { h }
+            dxa, dya, dha
         )
         TurretThetaSubsystem.AutoAim(
-            { hypot(goalX - x, goalY - y) },
+            dxya,
             distanceToTheta
         )
 
