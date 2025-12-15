@@ -29,13 +29,6 @@ class AutoAimTest : NextFTCOpMode() {
     }
 
 
-
-
-
-
-
-
-
     init {
         addComponents(
             SubsystemComponent(
