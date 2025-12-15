@@ -30,12 +30,12 @@ class MagazineColorSensors(val sensorFront: ColorSensor, val sensorBack: ColorSe
     val hsv = FloatArray(3)
     Color.colorToHSV(color,hsv)
     if(GreenHue[0]<hsv[0] && GreenHue[1]>hsv[0] && GreenSat < hsv[1] && GreenVal < hsv[2]) {
-      return GREEN
+      return BallColor.GREEN
     }
     if(PurpleHue[0]<hsv[0] && PurpleHue[1]>hsv[0] && PurpleSat < hsv[1] && PurpleVal < hsv[2]) {
-      return PURPLE
+      return BallColor.PURPLE
     }
-    return NONE
+    return BallColor.NONE
     //// I hate not having pointers
     //val front = IntArray(4){ i->(color.toLong() shr (i*8)).toByte().toInt()}
   }
