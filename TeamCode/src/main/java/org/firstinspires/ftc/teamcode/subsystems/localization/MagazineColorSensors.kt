@@ -1,13 +1,15 @@
 package org.firstinspires.ftc.teamcode.subsystems.localization
 
+import com.acmerobotics.dashboard.config.Config
 import android.graphics.Color
 import com.qualcomm.robotcore.hardware.ColorSensor
 
-enum class BallColor{
+enum class BallColor {
   NONE,
   GREEN,
   PURPLE
 }
+@Config
 class MagazineColorSensors(val sensorFront: ColorSensor, val sensorBack: ColorSensor) {
   //tune
   private val GreenHue = arrayOf(70, 170)
