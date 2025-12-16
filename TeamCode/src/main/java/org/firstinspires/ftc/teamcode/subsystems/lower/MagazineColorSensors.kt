@@ -1,19 +1,23 @@
 package org.firstinspires.ftc.teamcode.subsystems.lower
 
-import com.acmerobotics.dashboard.config.Config
 import android.graphics.Color
+import com.acmerobotics.dashboard.config.Config
 import com.qualcomm.robotcore.hardware.ColorSensor
 import com.qualcomm.robotcore.hardware.HardwareMap
 
-enum class BallColor {
-  NONE,
-  GREEN,
-  PURPLE
+enum class BallColor(val number: Int) {
+  NONE(0),
+  GREEN(1),
+  PURPLE(2);
+
+  fun getNum(): Int {
+    return number
+  }
 }
+
+
 @Config
 class MagazineColorSensors(val hardwareMap: HardwareMap) {
-
-
 
 
   //tune
@@ -26,11 +30,8 @@ class MagazineColorSensors(val hardwareMap: HardwareMap) {
 
   private val sensorFront: ColorSensor =
     hardwareMap.get(ColorSensor::class.java, "sensorFront")
-  private val sensorBront:
-          ColorSensor =
+  private val sensorBack: ColorSensor =
     hardwareMap.get(ColorSensor::class.java, "sensorBack")
-
-
 
 
   fun BallOrder() : Array<BallColor>{
@@ -40,7 +41,7 @@ class MagazineColorSensors(val hardwareMap: HardwareMap) {
     return detections
   }
 
-  private fun detect( color: Int): BallColor{
+  private fun detect(color: Int): BallColor{
     val hsv = FloatArray(3)
     Color.colorToHSV(color,hsv)
     if(greenHue[0]<hsv[0] && greenHue[1]>hsv[0] && greenSat < hsv[1] && greenVal < hsv[2]) {
