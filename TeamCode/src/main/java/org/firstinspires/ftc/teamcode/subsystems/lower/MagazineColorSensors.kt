@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.lower
 import com.acmerobotics.dashboard.config.Config
 import android.graphics.Color
 import com.qualcomm.robotcore.hardware.ColorSensor
+import com.qualcomm.robotcore.hardware.HardwareMap
 
 enum class BallColor {
   NONE,
@@ -10,7 +11,11 @@ enum class BallColor {
   PURPLE
 }
 @Config
-class MagazineColorSensors(val sensorFront: ColorSensor, val sensorBack: ColorSensor) {
+class MagazineColorSensors(val hardwareMap: HardwareMap) {
+
+
+
+
   //tune
   private val greenHue = arrayOf(70, 170)
   private val greenSat = 40
@@ -19,10 +24,19 @@ class MagazineColorSensors(val sensorFront: ColorSensor, val sensorBack: ColorSe
   private val purpleSat =40
   private val purpleVal=50
 
+  private val sensorFront: ColorSensor =
+    hardwareMap.get(ColorSensor::class.java, "sensorFront")
+  private val sensorBront:
+          ColorSensor =
+    hardwareMap.get(ColorSensor::class.java, "sensorBack")
+
+
+
+
   fun BallOrder() : Array<BallColor>{
     val front32 = sensorFront.argb()
     val back32  = sensorBack.argb()
-    val detections =arrayOf(detect(front32), detect(back32))
+    val detections = arrayOf(detect(front32), detect(back32))
     return detections
   }
 
