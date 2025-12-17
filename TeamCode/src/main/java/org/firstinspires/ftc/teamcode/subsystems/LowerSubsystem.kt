@@ -43,20 +43,20 @@ object LowerSubsystem : SubsystemGroup(
         MagblockServoSubsystem.close
     )
 
-    val launchOne = SequentialGroup(
-        MagazineServoSubsystem.forward,
-        Delay(TOP_RISE_DELAY_MS.milliseconds),
-        PusherServoSubsystem.pushMult,
-        MagblockServoSubsystem.open,
-        Delay(BALL_UP_DELAY_MS.milliseconds),
-        MagblockServoSubsystem.close,
-        IntakeSubsystem.intake,
-//        Delay(EXTRA_DELAY_BETWEEN_LAUNCHES_MS.milliseconds),
-//        MagazineServoSubsystem.stop,
-//        IntakeSubsystem.stop,
-    ).setInterruptible(false).requires(
-        PusherServoSubsystem,
-        MagazineServoSubsystem,
-        IntakeSubsystem
-    );
+//    val launchOne = SequentialGroup(
+//        MagazineServoSubsystem.forward,
+//        Delay(TOP_RISE_DELAY_MS.milliseconds),
+//        PusherServoSubsystem.pushMult,
+//        MagblockServoSubsystem.open,
+//        Delay(BALL_UP_DELAY_MS.milliseconds),
+//        MagblockServoSubsystem.close,
+//        IntakeSubsystem.intake,
+////        Delay(EXTRA_DELAY_BETWEEN_LAUNCHES_MS.milliseconds),
+////        MagazineServoSubsystem.stop,
+////        IntakeSubsystem.stop,
+//    ).setInterruptible(false).requires(
+//        PusherServoSubsystem,
+//        MagazineServoSubsystem,
+//        IntakeSubsystem
+//    );
 }
