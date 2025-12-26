@@ -21,6 +21,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 ///re written with Vision Portal supposedly the exact same thing
+/// scrcpy --no-audio --record=file.mkv
 public class CVSubsystem_VisionPortal {
     private final VisionPortal visionPortal;
     private final AprilTagProcessor aprilTagProcessor;
