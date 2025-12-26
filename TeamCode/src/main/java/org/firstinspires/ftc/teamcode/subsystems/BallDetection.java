@@ -9,7 +9,7 @@ import java.util.List;
 
 public class BallDetection extends OpenCvPipeline {
 
-
+    ///hsv -> erode/dilate (open) -> GaussianBlur -> HoughCircles (testing)
     private Mat hsv = new Mat();
     private Mat mask = new Mat();
     private Mat blurred = new Mat();
