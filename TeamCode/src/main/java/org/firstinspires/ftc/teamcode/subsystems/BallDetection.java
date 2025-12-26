@@ -92,7 +92,6 @@ public class BallDetection extends OpenCvPipeline {
                 ballCenter = new Point(cx, cy);
                 ballRadius = radius;
 
-                // Draw detected circle
                 Imgproc.circle(
                         input,
                         ballCenter,
