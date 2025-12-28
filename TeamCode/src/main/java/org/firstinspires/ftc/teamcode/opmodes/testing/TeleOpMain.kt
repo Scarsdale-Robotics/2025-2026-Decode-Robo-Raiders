@@ -55,6 +55,10 @@ open class TeleOpMain(
     private val farShootPose: Pose
 ) : NextFTCOpMode() {
 
+    companion object {
+        var dtCalcIterations = 100;
+    }
+
     private val follower: Follower
 
 //    private var odom: OdometrySubsystem? = null;
@@ -79,6 +83,18 @@ open class TeleOpMain(
     val h: Angle
         get() {
             return follower.pose.heading.rad + ofsH.rad;
+        }
+    val vx: Double
+        get() {
+            return follower.velocity.xComponent;
+        }
+    val vy: Double
+        get() {
+            return follower.velocity.yComponent;
+        }
+    val vh: Angle
+        get() {
+            return follower.velocity.theta.rad;
         }
 
     private var speedFactor = 1.0;
@@ -196,33 +212,36 @@ open class TeleOpMain(
         val dx = Supplier { goalX - x }
         val dy = Supplier { goalY - y }
         val dxy = Supplier { hypot(dx.get(), dy.get()) }
-        val dxya = Supplier {
-            var dxa_tmp = dx.get() + distanceToFlightTimeSecs(dxy.get()) * follower.velocity.xComponent
-            var dya_tmp = dy.get() + distanceToFlightTimeSecs(dxy.get()) * follower.velocity.yComponent
-            for (i in 0..100) {
-                dxa_tmp = dx.get() + distanceToFlightTimeSecs(hypot(dxa_tmp, dya_tmp)) * follower.velocity.xComponent
-                dya_tmp = dy.get() + distanceToFlightTimeSecs(hypot(dxa_tmp, dya_tmp)) * follower.velocity.yComponent
+        val dt = Supplier {
+            var dtLastIter = distanceToFlightTimeSecs(dxy.get())
+            for (i in 1..dtCalcIterations) {
+                val estgRprime = distanceToFlightTimeSecs(
+                    hypot(
+                        x + vx*dtLastIter - goalX,
+                        y + vy*dtLastIter - goalY
+                    )
+                )
+                val xIter = (goalX - x) / (vx - ((goalX - x - vx * dtLastIter) / estgRprime))
+                val yIter = (goalY - y) / (vy - ((goalY - y - vy * dtLastIter) / estgRprime))
+                dtLastIter = hypot(xIter, yIter)
             }
-            return@Supplier hypot(dxa_tmp, dya_tmp)
+            return@Supplier dtLastIter
         }
-        val dxa = Supplier {
-            dx.get() + distanceToFlightTimeSecs(dxya.get()) * follower.velocity.xComponent
-        } // todo: check units? seconds? milliseconds?; todo: check work lol probably not
-        val dya = Supplier {
-            dy.get() + distanceToFlightTimeSecs(dxya.get()) * follower.velocity.yComponent
-        }
-        val dha = Supplier {
-            (h.inRad + distanceToFlightTimeSecs(dxya.get()) * follower.velocity.theta).rad
-        }
+        val xp = Supplier { x + vx * dt.get() }
+        val yp = Supplier { y + vy * dt.get() }
+        val hp = Supplier { (h.inRad + vh.inRad * dt.get()).rad }
+        val dxyp = Supplier { hypot(xp.get(), yp.get()) }
+        val dxp = Supplier { goalX - xp.get() }
+        val dyp = Supplier { goalY - yp.get() }
         ShooterSubsystem.AutoAim(
-            dxya,
+            dxyp,
             distanceToVelocity
         )
         TurretPhiSubsystem.AutoAim(
-            dxa, dya, dha
+            dxp, dyp, hp
         )
         TurretThetaSubsystem.AutoAim(
-            dxya,
+            dxyp,
             distanceToTheta
         )
 
