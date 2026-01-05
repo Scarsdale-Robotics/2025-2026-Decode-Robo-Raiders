@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.testing
+package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
@@ -18,10 +18,7 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import dev.nextftc.hardware.driving.FieldCentric
-import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
-import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.isBlue
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
@@ -36,7 +33,6 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 import org.firstinspires.ftc.teamcode.utils.Lefile.filePath
 import java.io.File
 import java.util.function.Supplier
-import kotlin.math.PI
 import kotlin.math.hypot
 
 
@@ -203,10 +199,8 @@ open class TeleOpMain(
             IntakeMotorSubsystem.intake
         ) whenBecomesFalse ParallelGroup(
             IntakeServoSubsystem.up,
-            IntakeMotorSubsystem.off
+            IntakeMotorSubsystem.slow
         )
-
-        //
 
         // AUTO AIM
         val dx = Supplier { goalX - x }
