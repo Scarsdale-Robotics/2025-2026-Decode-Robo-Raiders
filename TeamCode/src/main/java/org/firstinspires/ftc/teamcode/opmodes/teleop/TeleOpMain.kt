@@ -22,11 +22,10 @@ import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.intake.IntakeMotorSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.intake.IntakeServoSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineMotorSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsystem
+//import org.firstinspires.ftc.teamcode.subsystems.lower.intake.IntakeMotorSubsystem
+//import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineMotorSubsystem
+//import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
+//import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem

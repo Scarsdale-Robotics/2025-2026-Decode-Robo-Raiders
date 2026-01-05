@@ -1,8 +1,6 @@
-package org.firstinspires.ftc.teamcode.subsystems.lower.magazine
+package org.firstinspires.ftc.teamcode.subsystems.lower
 
-import com.acmerobotics.dashboard.config.Config
 import com.bylazar.configurables.annotations.Configurable
-import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.ServoEx
 import dev.nextftc.hardware.positionable.SetPosition

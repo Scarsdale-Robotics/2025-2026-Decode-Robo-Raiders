@@ -16,6 +16,7 @@ import dev.nextftc.hardware.controllable.RunToState
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem.setMotorPowers
 import org.opencv.video.BackgroundSubtractor
 import java.util.function.Supplier
 import kotlin.math.PI
@@ -80,7 +81,7 @@ object TurretPhiSubsystem : Subsystem {
             a += 2 * PI;
         } else if (a > -1.0/12.0 + tolerance) {
             a -= 2 * PI;
-        } //i hate kotlin
+        }
         return a.rad
     }
 
@@ -117,66 +118,19 @@ object TurretPhiSubsystem : Subsystem {
         }
     }
 
-    @JvmField var manualAimPhiChangeDegsPerSecond = 3;
-
-    class DriverCommand(
-        private val farModeButton: Button,
-        private val nearModeButton: Button,
-        private val shiftLeftButton: Button,
-        private val shiftRightButton: Button,
-        private val setButton: Button,
-        initialFarModePhi: Angle,
-        initialNearModePhi: Angle,
-        private val timeSource: TimeSource.WithComparableMarks = TimeSource.Monotonic,
+    @JvmField var thing = 3.0;
+    class Manual(
+        private val goalChange: Supplier<Double>
     ) : Command() {
-        enum class DistanceMode {
-            FAR,
-            CLOSE
-        }
-
         override val isDone = false;
 
-        var mode = DistanceMode.FAR;
-
-        var farModePhi = initialFarModePhi;
-        var nearModePhi = initialNearModePhi;
-
-        var lastTimestamp: ComparableTimeMark? = null;
-
         override fun update() {
-            val timestamp = timeSource.markNow();
-            val dt = (timestamp - (lastTimestamp?:timestamp)).toDouble(DurationUnit.SECONDS);
-            lastTimestamp = timestamp;
-
-            // manual move
-            shiftLeftButton whenBecomesTrue {
-                targetPhi -= manualAimPhiChangeDegsPerSecond.deg * dt;
-            }
-            shiftRightButton whenBecomesTrue {
-                targetPhi += manualAimPhiChangeDegsPerSecond.deg * dt;
-            }
-
-            // move to template locations
-            farModeButton whenBecomesTrue {
-                mode = DistanceMode.FAR;
-                targetPhi = farModePhi;
-            }
-            nearModeButton whenBecomesTrue {
-                mode = DistanceMode.CLOSE;
-                targetPhi = nearModePhi;
-            }
-
-            // set template locations
-            setButton whenBecomesTrue {
-                when (mode) {
-                    DistanceMode.FAR -> farModePhi = targetPhi;
-                    DistanceMode.CLOSE -> nearModePhi = targetPhi;
-                }
-            }
-        }
-
-        override fun stop(interrupted: Boolean) {
-            lastTimestamp = null;
+            RunToState(
+                controller,
+                KineticState(
+                    controller.goal.position + goalChange.get() * thing
+                )
+            )
         }
     }
 

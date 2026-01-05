@@ -25,4 +25,14 @@ object OuttakeSubsystem : SubsystemGroup(
         TurretThetaSubsystem.AutoAim({ hypot(dx.get(), dy.get()) }, angleByDistance),
         ShooterSubsystem.AutoAim({ hypot(dx.get(), dy.get()) }, powerByDistance),
     )
+
+    class Manual(
+        goalChangePhi: Supplier<Double>,
+        goalChangeTheta: Supplier<Double>,
+        shooterPower: Supplier<Double>
+    ) : ParallelGroup(
+        TurretThetaSubsystem.Manual(goalChangeTheta),
+        TurretPhiSubsystem.Manual(goalChangePhi),
+        ShooterSubsystem.Manual(shooterPower)
+    )
 }

@@ -16,11 +16,7 @@ import dev.nextftc.ftc.NextFTCOpMode
 //import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.goalY
 import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.m
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
-import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem.intake
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem.stop
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem.forward
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.close

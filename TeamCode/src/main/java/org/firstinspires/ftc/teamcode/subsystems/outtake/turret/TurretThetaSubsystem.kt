@@ -3,14 +3,17 @@ package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import dev.nextftc.bindings.Button
+import dev.nextftc.control.KineticState
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
+import dev.nextftc.hardware.controllable.RunToState
 import dev.nextftc.hardware.impl.ServoEx
 import dev.nextftc.hardware.positionable.SetPosition
 import dev.nextftc.hardware.positionable.SetPositions
+//import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem.controller
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem.targetPhi
 import java.util.function.Supplier
 import kotlin.math.atan2
@@ -70,67 +73,14 @@ object TurretThetaSubsystem : Subsystem {
         }
     }
 
-    @JvmField var manualAimThetaChangeDegsPerSecond = 0.5;
-
-    class DriverCommand(
-        private val farModeButton: Button,
-        private val nearModeButton: Button,
-        private val shiftUpButton: Button,
-        private val shiftDownButton: Button,
-        private val setButton: Button,
-        initialFarModeTheta: Angle,
-        initialNearModeTheta: Angle,
-        private val timeSource: TimeSource.WithComparableMarks = TimeSource.Monotonic,
+    @JvmField var thing = 0.005;
+    class Manual(
+        private val goalChange: Supplier<Double>
     ) : Command() {
-        enum class DistanceMode {
-            FAR,
-            CLOSE
-        }
-
         override val isDone = false;
 
-        var mode = DistanceMode.FAR;
-
-        var farModeTheta = initialFarModeTheta;
-        var nearModeTheta = initialNearModeTheta;
-
-        var lastTimestamp: ComparableTimeMark? = null;
-
         override fun update() {
-            val timestamp = timeSource.markNow();
-            val dt = (timestamp - (lastTimestamp?:timestamp))
-                .toDouble(DurationUnit.SECONDS);
-            lastTimestamp = timestamp;
-
-            // manual move
-            shiftUpButton whenBecomesTrue {
-                targetTheta += manualAimThetaChangeDegsPerSecond.deg * dt;
-            }
-            shiftDownButton whenBecomesTrue {
-                targetTheta -= manualAimThetaChangeDegsPerSecond.deg * dt;
-            }
-
-            // move to template locations
-            farModeButton whenBecomesTrue {
-                mode = DistanceMode.FAR;
-                targetTheta = farModeTheta;
-            }
-            nearModeButton whenBecomesTrue {
-                mode = DistanceMode.CLOSE;
-                targetTheta = nearModeTheta;
-            }
-
-            // set template locations
-            setButton whenBecomesTrue {
-                when (mode) {
-                    DistanceMode.FAR -> farModeTheta = targetPhi;
-                    DistanceMode.CLOSE -> nearModeTheta = targetPhi;
-                }
-            }
-        }
-
-        override fun stop(interrupted: Boolean) {
-            lastTimestamp = null;
+            servo.position += goalChange.get() * thing;
         }
     }
 }
