@@ -54,6 +54,7 @@ object ShooterSubsystem : Subsystem {
         override val isDone = false;
 
         override fun update() {
+
             setMotorPowers(shooterPower.get())
         }
     }
@@ -64,30 +65,32 @@ object ShooterSubsystem : Subsystem {
     ) : Command() {
         override val isDone = false;
 
-        var lastPos = 0.0;
-        var elapsedTime: ElapsedTime = ElapsedTime();
         override fun update() {
             controller.goal = KineticState(velocity=powerByDistance(dxy.get()));
-
-            val power = controller.calculate(
-                motor1.state * -1.0
-            ).coerceIn(0.0, 1.0);
-            setMotorPowers(power);
-
-            val measuredVel = (motor1.currentPosition - lastPos)/elapsedTime.time();
-            lastPos = motor1.currentPosition;
-            elapsedTime.reset()
-
-            telemetry.addData("power", power)
-
-            telemetry.addData("vel measured", measuredVel)
-            telemetry.addData("vel est", controller.lastMeasurement.velocity)
-            telemetry.addData("vel ref", controller.reference.velocity)
-            telemetry.addData("vel goal", controller.goal.velocity)
-
-            telemetry.addData("pos measured", motor1.currentPosition)
-            telemetry.addData("pos est", -controller.lastMeasurement.position)
-            telemetry.addData("pos ref", controller.reference.position)
         }
+    }
+
+    var lastPos = 0.0;
+    var elapsedTime: ElapsedTime = ElapsedTime();
+    override fun periodic() {
+        val power = controller.calculate(
+            motor1.state * -1.0
+        ).coerceIn(0.0, 1.0);
+        setMotorPowers(power);
+
+        val measuredVel = (motor1.currentPosition - lastPos)/elapsedTime.time();
+        lastPos = motor1.currentPosition;
+        elapsedTime.reset()
+
+        telemetry.addData("power", power)
+
+        telemetry.addData("vel measured", measuredVel)
+        telemetry.addData("vel est", controller.lastMeasurement.velocity)
+        telemetry.addData("vel ref", controller.reference.velocity)
+        telemetry.addData("vel goal", controller.goal.velocity)
+
+        telemetry.addData("pos measured", motor1.currentPosition)
+        telemetry.addData("pos est", -controller.lastMeasurement.position)
+        telemetry.addData("pos ref", controller.reference.position)
     }
 }

@@ -22,6 +22,9 @@ import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.intake.IntakeMotorSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineMotorSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
@@ -58,10 +61,10 @@ open class TeleOpMain(
 
 //    private var odom: OdometrySubsystem? = null;
 
-    private val lfw = MotorEx("lfw").reversed();
-    private val lbw = MotorEx("lbw").reversed();
-    private val rfw = MotorEx("rfw");
-    private val rbw = MotorEx("rbw");
+//    private val lfw = MotorEx("lfw").reversed();
+//    private val lbw = MotorEx("lbw").reversed();
+//    private val rfw = MotorEx("rfw");
+//    private val rbw = MotorEx("rbw");
 
     private var ofsX = 0.0;
     private var ofsY = 0.0;
@@ -100,6 +103,8 @@ open class TeleOpMain(
     private val hammerTimePath: Supplier<PathChain>
     private val farShootPath: Supplier<PathChain>
     private val closeShootPath: Supplier<PathChain>
+
+    private var autoAimEnabled = true;
 
     init {
         val file = File("RobotAutonEndPos.txt")
@@ -156,15 +161,13 @@ open class TeleOpMain(
         )
 
         ShooterSubsystem.off()
-        MagazineMotorSubsystem.off()
-        IntakeMotorSubsystem.off()
+        LowerMotorSubsystem.off()
     }
 
     override fun onStartButtonPressed() {
         IntakeServoSubsystem.up()
-        PusherServoSubsystem.out()
-        MagblockServoSubsystem.close()
-        MagazineMotorSubsystem.slow()
+        MagblockServoSubsystem.unblock()
+        IntakeServoSubsystem.up()
 
         // DRIVER CONTROLS
         // Drivetrain
@@ -182,24 +185,21 @@ open class TeleOpMain(
         (if (invertDriveControls) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft) whenBecomesTrue { follower.followPath(closeShootPath.get()) }
         (if (invertDriveControls) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight) whenBecomesTrue { follower.followPath(farShootPath.get()) }
 
-        // Scoring
-        // g1circle -> open shoot
-        Gamepads.gamepad1.circle whenBecomesTrue SequentialGroup(
-            MagblockServoSubsystem.open,
-            MagazineMotorSubsystem.fast  // also enters with gradually faster speed helps counter flywheel speed loss
-        ) whenBecomesFalse SequentialGroup(
-            MagazineMotorSubsystem.slow,
-            MagblockServoSubsystem.close
-        )
+        driveCommand();
 
-        // Intake
-        Gamepads.gamepad2.triangle whenBecomesTrue ParallelGroup(
-            IntakeServoSubsystem.down,
-            IntakeMotorSubsystem.intake
-        ) whenBecomesFalse ParallelGroup(
-            IntakeServoSubsystem.up,
-            IntakeMotorSubsystem.slow
-        )
+        // Scoring
+        Gamepads.gamepad1.circle
+            .whenTrue { MagblockServoSubsystem.unblock }
+            .whenBecomesFalse { MagblockServoSubsystem.block }
+        // Lower
+        val lowerMotorDrive = LowerMotorSubsystem.DriverCommandDefaultOn(
+            Gamepads.gamepad2.leftTrigger
+        );
+        lowerMotorDrive();
+        // Intake Servo
+        Gamepads.gamepad2.triangle
+            .whenTrue { IntakeServoSubsystem.down }
+            .whenFalse { IntakeServoSubsystem.up }
 
         // AUTO AIM
         val dx = Supplier { goalX - x }
@@ -226,17 +226,23 @@ open class TeleOpMain(
         val dxyp = Supplier { hypot(xp.get(), yp.get()) }
         val dxp = Supplier { goalX - xp.get() }
         val dyp = Supplier { goalY - yp.get() }
-        ShooterSubsystem.AutoAim(
-            dxyp,
-            distanceToVelocity
-        )
-        TurretPhiSubsystem.AutoAim(
-            dxp, dyp, hp
-        )
-        TurretThetaSubsystem.AutoAim(
-            dxyp,
-            distanceToTheta
-        )
+        if (autoAimEnabled) {
+            ShooterSubsystem.AutoAim(
+                dxyp,
+                distanceToVelocity
+            )
+            TurretPhiSubsystem.AutoAim(
+                dxp, dyp, hp
+            )
+            TurretThetaSubsystem.AutoAim(
+                dxyp,
+                distanceToTheta
+            )
+        } else {
+            ShooterSubsystem.Manual(
+
+            )
+        }
 
     }
 
