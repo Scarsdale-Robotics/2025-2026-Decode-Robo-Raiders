@@ -1,18 +1,17 @@
-package org.firstinspires.ftc.teamcode.opmodes.testing
+package org.firstinspires.ftc.teamcode.opmodes.testing.archive
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.commands.CommandManager
-import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
 
-@TeleOp(name = "Motor Power Test", group = "Config")
+@TeleOp(name = "Shooter Test", group = "Config")
 @Configurable
-class MotorTest : NextFTCOpMode() {
-    val motor = MotorEx("turret_phi");
+class ShooterTest : NextFTCOpMode() {
+    val motor = MotorEx("shooter");
 
     companion object {
         var power = 0.5;

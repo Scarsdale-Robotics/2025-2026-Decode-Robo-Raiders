@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.testing
+package org.firstinspires.ftc.teamcode.opmodes.testing.archive
 
 import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -7,8 +7,6 @@ import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.distanceGoalX
-import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.distanceGoalY
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import kotlin.math.hypot
@@ -67,7 +65,7 @@ class AutoAimTest2 : NextFTCOpMode() {
 //        );
 //        autoAimPhi.schedule();
         val shooterAutoAim = ShooterSubsystem.AutoAim(
-            { hypot(distanceGoalX - odom!!.rOx1, distanceGoalY - odom!!.rOy1) },
+            { hypot(TeleOpInProg.Companion.distanceGoalX - odom!!.rOx1, TeleOpInProg.Companion.distanceGoalY - odom!!.rOy1) },
             { (831 + 67 + 3.52*it - 0.00429*it*it).coerceIn(0.0, 1500.0) }
         )
         shooterAutoAim.schedule();

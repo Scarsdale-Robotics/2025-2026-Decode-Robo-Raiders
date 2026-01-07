@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode.Auton
-import android.os.Environment
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.follower.Follower
@@ -13,9 +12,9 @@ import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.ftc.NextFTCOpMode
-//import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.goalX
-//import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.goalY
-import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.m
+//import org.firstinspires.ftc.teamcode.opmodes.testing.archive.TeleOpInProg.Companion.goalX
+//import org.firstinspires.ftc.teamcode.opmodes.testing.archive.TeleOpInProg.Companion.goalY
+import org.firstinspires.ftc.teamcode.opmodes.testing.archive.TeleOpInProg.Companion.m
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem

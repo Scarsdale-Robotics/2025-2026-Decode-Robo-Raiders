@@ -46,7 +46,8 @@ object ShooterSubsystem : Subsystem {
         motor2.power = power;
     }
 
-    @JvmField var off = RunToVelocity(controller, 0.0).requires(this).named("FlywheelOff").setInterruptible(true);
+    class On(speed: Double) : RunToState(controller, KineticState(velocity=speed));
+    var off = RunToVelocity(controller, 0.0).requires(this).named("FlywheelOff").setInterruptible(true);
 
     class Manual(
         private val shooterPower: Supplier<Double>
@@ -54,7 +55,6 @@ object ShooterSubsystem : Subsystem {
         override val isDone = false;
 
         override fun update() {
-
             setMotorPowers(shooterPower.get())
         }
     }

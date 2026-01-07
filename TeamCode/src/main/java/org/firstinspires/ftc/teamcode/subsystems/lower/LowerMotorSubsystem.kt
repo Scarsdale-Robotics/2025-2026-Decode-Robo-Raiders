@@ -7,6 +7,7 @@ import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.control.feedback.PIDCoefficients
 import dev.nextftc.control.feedforward.BasicFeedforwardParameters
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.controllable.RunToState
 import dev.nextftc.hardware.controllable.RunToVelocity
@@ -18,9 +19,10 @@ import java.util.function.Supplier
 object LowerMotorSubsystem : Subsystem {
     private val motor = MotorEx("lower_motor")
 
-    @JvmField var intake = SetPower(motor, 1.0);
-    @JvmField var reverse = SetPower(motor, -1.0);
-    @JvmField var off = SetPower(motor, 0.0);
+    class On(power: Double) : InstantCommand({ motor.power = power })
+    var intake = SetPower(motor, 1.0);
+    var reverse = SetPower(motor, -1.0);
+    var off = SetPower(motor, 0.0);
 
     class DriverCommandDefaultOn(
         private val outPower: Supplier<Double>,
