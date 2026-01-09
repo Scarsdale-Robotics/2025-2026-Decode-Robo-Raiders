@@ -54,11 +54,18 @@ public class LocalizationSubsystem {
     lastUpdateTime = clock;
     cv.updateCV();
     odom.updateOdom();
-    kalmanX.updateKF(odom.getROx1(), cv.getRCx1());
-    kalmanY.updateKF(odom.getROy1(), cv.getRCy1());
-    Rx = kalmanX.getEstimate();
-    Ry = kalmanY.getEstimate();
-    Rh = odom.getROh();
+    if(cv.getCam()){
+        kalmanX.updateKF(odom.getROx1(), cv.getRCx1());
+        kalmanY.updateKF(odom.getROy1(), cv.getRCy1());
+        Rx = kalmanX.getEstimate();
+        Ry = kalmanY.getEstimate();
+        Rh = odom.getROh();
+    }else{
+        Rx = odom.getROx1();
+        Ry = odom.getROy1();
+        Rh = odom.getROh();
+    }
+
     updateHistory();
     Vx = computeFirstDerivative(xHistory, tHistory);
     Vy = computeFirstDerivative(yHistory, tHistory);
