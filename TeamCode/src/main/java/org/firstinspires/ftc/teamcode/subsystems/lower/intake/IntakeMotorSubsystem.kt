@@ -13,15 +13,12 @@ object IntakeMotorSubsystem : Subsystem {
 
   private val motor = MotorEx("im");
 
+//  class On(power: Double) : InstantCommand({ motor.power = power })
+////  val off = InstantCommand({ motor.power = 0.0 })
 
-  val OUT = -1.0;
-  val IN = 1.0;
-
-  class On(power: Double) : InstantCommand({ motor.power = power })
-  val off = InstantCommand({ motor.power = 0.0 })
-
-  val intake = SetPower(motor, IN);
-  val reverse = SetPower(motor, OUT);
+  val intake = SetPower(motor, 1.0);
+  val slow = SetPower(motor, 0.5);
+  val reverse = SetPower(motor, -1.0);
   val stop = SetPower(motor, 0.0);
 
   override fun initialize() {
