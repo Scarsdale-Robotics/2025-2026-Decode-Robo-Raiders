@@ -239,9 +239,9 @@ open class TeleOpMain(
                 distanceToTheta
             )
         } else {
-            ShooterSubsystem.Manual(
+            //ShooterSubsystem.Manual(
 
-            )
+            //)
         }
 
     }
