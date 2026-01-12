@@ -25,8 +25,8 @@ class MagazineColorSensors(val hardwareMap: HardwareMap) {
   private val greenSat = 40
   private val greenVal = 35
   private val purpleHue = arrayOf(250, 300)
-  private val purpleSat =40
-  private val purpleVal=50
+  private val purpleSat = 40
+  private val purpleVal = 50
 
   private val sensorFront: ColorSensor =
     hardwareMap.get(ColorSensor::class.java, "sensorFront")

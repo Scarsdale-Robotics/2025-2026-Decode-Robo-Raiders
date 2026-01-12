@@ -21,10 +21,13 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 ///re written with Vision Portal supposedly the exact same thing
+/// scrcpy --no-audio --record=file.mkv
 public class CVSubsystem_VisionPortal {
     private final VisionPortal visionPortal;
     private final AprilTagProcessor aprilTagProcessor;
     private final IMU imu;
+
+    private boolean Cam;
 
     // Robot’s current pose (in inches)
     private double RCx1;
@@ -41,6 +44,7 @@ public class CVSubsystem_VisionPortal {
     public CVSubsystem_VisionPortal(double x1, double y1, double h, boolean side, HardwareMap hm) {
 
         hm1 = hm;
+
 
         // Initialize IMU
         imu = hm1.get(IMU.class, "imu");
@@ -114,8 +118,10 @@ public class CVSubsystem_VisionPortal {
     /** Updates the robot's camera-based pose */
     public void updateCV() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+        Cam = true ? aprilTagProcessor.getDetections() != null : false;
 
-        if (detections == null || detections.isEmpty()) return;
+        if (Cam){return;}
+
 
         AprilTagDetection tag = detections.get(0);
         lastDetection = tag;
@@ -168,6 +174,8 @@ public class CVSubsystem_VisionPortal {
     public double getTurretAngleToTag() {
         return wrapAngleRad(getCameraOffset());
     }
+
+    public boolean getCam(){return Cam;}
 
     /** Motif enum, same as before */
     public enum motif {
