@@ -11,9 +11,7 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
-import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.open
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.close
 

@@ -1,26 +1,19 @@
-package org.firstinspires.ftc.teamcode.opmodes.testing
+package org.firstinspires.ftc.teamcode.opmodes.testing.multiSubsystem
 
-import com.acmerobotics.dashboard.FtcDashboard
-import com.acmerobotics.dashboard.config.Config
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.commands.CommandManager
-import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
-import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import dev.nextftc.hardware.impl.ServoEx
-import dev.nextftc.hardware.positionable.SetPosition
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem.open
 
-@TeleOp(name = "Auto Aim Test", group = "Testing")
+
+@TeleOp(name = "Auto Aim Test", group = "Multi Subsystem Tests")
 @Configurable
 class AutoAimTest : NextFTCOpMode() {
     companion object {

@@ -1,11 +1,8 @@
-package org.firstinspires.ftc.teamcode.subsystems;
+package org.firstinspires.ftc.teamcode.subsystems.cv;
 
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BallDetection extends OpenCvPipeline {
 

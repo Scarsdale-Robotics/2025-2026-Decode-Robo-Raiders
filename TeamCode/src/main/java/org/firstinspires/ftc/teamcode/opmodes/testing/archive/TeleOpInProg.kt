@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.testing
+package org.firstinspires.ftc.teamcode.opmodes.testing.archive
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
@@ -17,9 +17,7 @@ import dev.nextftc.ftc.components.BulkReadComponent
 import dev.nextftc.hardware.driving.FieldCentric
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
-import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.PusherServoSubsystem

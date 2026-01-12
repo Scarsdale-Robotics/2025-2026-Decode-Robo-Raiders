@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.testing
+package org.firstinspires.ftc.teamcode.opmodes.testing.archive
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
@@ -7,7 +7,6 @@ import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.deg
-import dev.nextftc.core.units.rad
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem

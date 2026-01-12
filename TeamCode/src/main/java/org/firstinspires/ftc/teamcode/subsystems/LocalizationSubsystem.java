@@ -55,15 +55,15 @@ public class LocalizationSubsystem {
     cv.updateCV();
     odom.updateOdom();
     if(cv.getCam()){
-        kalmanX.updateKF(odom.getROx1(), cv.getRCx1());
-        kalmanY.updateKF(odom.getROy1(), cv.getRCy1());
-        Rx = kalmanX.getEstimate();
-        Ry = kalmanY.getEstimate();
-        Rh = odom.getROh();
+      kalmanX.updateKF(odom.getROx1(), cv.getRCx1());
+      kalmanY.updateKF(odom.getROy1(), cv.getRCy1());
+      Rx = kalmanX.getEstimate();
+      Ry = kalmanY.getEstimate();
+      Rh = odom.getROh();
     }else{
-        Rx = odom.getROx1();
-        Ry = odom.getROy1();
-        Rh = odom.getROh();
+      Rx = odom.getROx1();
+      Ry = odom.getROy1();
+      Rh = odom.getROh();
     }
 
     updateHistory();
@@ -151,3 +151,4 @@ public class LocalizationSubsystem {
   public double getCameraOffset(){return cv.getCameraOffset();}
   public double getTurretAngleToTag(){return cv.getTurretAngleToTag();}
 }
+
