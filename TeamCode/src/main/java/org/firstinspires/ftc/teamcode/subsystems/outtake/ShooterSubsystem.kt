@@ -26,8 +26,8 @@ import java.util.function.Supplier
 
 @Configurable
 object ShooterSubsystem : Subsystem {
-    private val motor1 = MotorEx("shooter1").reversed();
-    private val motor2 = MotorEx("shooter2");
+    private val motor1 = MotorEx("shooter1");
+    private val motor2 = MotorEx("shooter2").reversed();
 
     @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 0.75);
     @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
@@ -74,7 +74,7 @@ object ShooterSubsystem : Subsystem {
     var elapsedTime: ElapsedTime = ElapsedTime();
     override fun periodic() {
         val power = controller.calculate(
-            motor1.state * -1.0
+            motor1.state
         ).coerceIn(0.0, 1.0);
         setMotorPowers(power);
 
