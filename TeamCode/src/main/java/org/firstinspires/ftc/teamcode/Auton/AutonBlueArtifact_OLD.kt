@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode.Auton
-import android.os.Environment
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.follower.Follower
@@ -19,8 +18,7 @@ import org.firstinspires.ftc.teamcode.opmodes.testing.TeleOpInProg.Companion.m
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeSubsystem.intake
+import org.firstinspires.ftc.teamcode.subsystems.lower.intake.IntakeMotorSubsystem.intake
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineServoSubsystem.forward
 import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagblockServoSubsystem.close
@@ -48,9 +46,9 @@ import kotlin.math.hypot
 //4th slot = Auton type: Motif, Backup, Shooter, Artifact (is just Motif but does not care about motifs)
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__WaitFarShooter & Auton__Motif
-@Autonomous(name = "Auton Blue Artifact", group = "Auton")
+@Autonomous(name = "Auton Blue Artifact(OLD)", group = "Auton")
 @Configurable
-class AutonBlueArtifact : NextFTCOpMode() {
+class AutonBlueArtifact_OLD : NextFTCOpMode() {
     private var pathTimer: Timer? = null
     var actionTimer: Timer? = null;
     var opmodeTimer: Timer? = null;
