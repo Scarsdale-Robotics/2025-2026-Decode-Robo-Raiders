@@ -72,7 +72,6 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
     companion object {
         val delayStartShoot: Double = 0.01
         val delayAfterEachShoot: Double = 2.0 //currently at a really high #
-        val DelayFromRampIntake: Double = 2.0
 
         val distanceGoalX = 12
         val distanceGoalY = 132
@@ -105,10 +104,6 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
 
     private val intake2Pos = Pose(25.0, 60.0) // Intake Pos2
     private val intake2ControlPos = Pose(58.9, 51.3)
-
-
-
-
 
     /////////////
     ////Paths////
@@ -340,7 +335,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
 
     override fun onUpdate() {
         // These loop the movements of the robot, these must be called continuously in order to work
-        follower!!.update();
+//        follower!!.update();
 //        forward.schedule()
 
         autonomousRoutine()
@@ -356,9 +351,9 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
 
     /** This method is called continuously after Init while waiting for "play". **/
     override fun onInit() {
-        follower = Constants.createFollower(hardwareMap)
+//        follower = Constants.createFollower(hardwareMap)
         buildPaths()
-        follower!!.setStartingPose(startPose)
+//        follower!!.setStartingPose(startPose)
     }
 
     /** This method is called continuously after Init while waiting for "play".  */

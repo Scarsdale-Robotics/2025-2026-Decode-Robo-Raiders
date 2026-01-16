@@ -73,6 +73,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
         val delayStartShoot: Double = 0.01
         val delayAfterEachShoot: Double = 2.0 //currently at a really high #
         val DelayFromRampIntake: Double = 2.0
+        val DelayAtLever: Double = 0.1
 
         val distanceGoalX = 12
         val distanceGoalY = 132
@@ -93,6 +94,8 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
         Pose(55.4, 18.5, Math.toRadians(180.0)) // Far Shoot Pose of our robot.
     private val gateOpenPose =
         Pose(11.5, 60.48, Math.toRadians(145.0)) // Gate Open Pose of our robot.
+    private val gateAfterOpenPose = //F FTC MADE OUR MAIN STRATEGY ILLEGAL
+        Pose(11.5, 56.48, Math.toRadians(145.0)) // Gate Open Pose of our robot.
 
     private val commonIntakePos = Pose(10.92, 10.5, Math.toRadians(180.0))
     private val commonIntakeControlPos = Pose(54.8, 36.7)
@@ -125,6 +128,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
     private var robotOpenLeverFromFar: PathChain? = null
     private var robotOpenLeverFromClose: PathChain? = null
+    private var robotBackupFromRamp: PathChain? = null
     private var LeverGoShoot: PathChain? = null
 
     private var robotIntake3: PathChain? = null
@@ -192,11 +196,21 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             )
             .setConstantHeadingInterpolation(gateOpenPose.heading)
             .build()
+        //backs up from lever to stay legal
+        robotBackupFromRamp = follower!!.pathBuilder()
+            .addPath(
+                BezierLine(
+                    gateOpenPose,
+                    gateAfterOpenPose
+                )
+            )
+            .setConstantHeadingInterpolation(gateOpenPose.heading)
+            .build()
         //Lever Go Shoot
         LeverGoShoot = follower!!.pathBuilder()
             .addPath(
                 BezierLine(
-                    gateOpenPose,
+                    gateAfterOpenPose,
                     shootPoseClose
                 )
             )
@@ -320,6 +334,8 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             ),
 
             SequentialGroup( //Intakes from RAMP and then moves to CLOSE Shoot Position
+                Delay(DelayAtLever),
+                FollowPath(robotBackupFromRamp!!),
                 Delay(DelayFromRampIntake),
                 ParallelGroup(
                     LowerMotorSubsystem.off, //kebab stop spinny
@@ -357,6 +373,8 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             ),
 
             SequentialGroup( //Intakes from RAMP and then moves to CLOSE Shoot Position
+                Delay(DelayAtLever),
+                FollowPath(robotBackupFromRamp!!),
                 Delay(DelayFromRampIntake),
                 ParallelGroup(
                     LowerMotorSubsystem.off, //kebab stop spinny
@@ -396,7 +414,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
     override fun onUpdate() {
         // These loop the movements of the robot, these must be called continuously in order to work
-        follower!!.update();
+//        follower!!.update();
 //        forward.schedule()
 
         autonomousRoutine()
@@ -412,9 +430,9 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
     /** This method is called continuously after Init while waiting for "play". **/
     override fun onInit() {
-        follower = Constants.createFollower(hardwareMap)
+//        follower = Constants.createFollower(hardwareMap)
         buildPaths()
-        follower!!.setStartingPose(startPose)
+//        follower!!.setStartingPose(startPose)
     }
 
     /** This method is called continuously after Init while waiting for "play".  */
