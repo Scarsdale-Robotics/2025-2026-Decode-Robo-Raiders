@@ -14,7 +14,7 @@ import dev.nextftc.hardware.powerable.SetPower
 @Configurable
 class MagblockTest : NextFTCOpMode() {
     companion object {
-        @JvmField var servoPos = 0.0;
+        @JvmField var servoPos = 0.02;
     }
 
 

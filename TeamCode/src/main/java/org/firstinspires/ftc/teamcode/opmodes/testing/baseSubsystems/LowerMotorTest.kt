@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.testing.baseSubsystems
 
 import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.ftc.Gamepads
@@ -25,7 +26,8 @@ class LowerMotorTest : NextFTCOpMode() {
         )
     }
 
-    override fun onStartButtonPressed() {
+    override fun onUpdate() {
+        CommandManager.cancelAll()
         LowerMotorSubsystem.On(power)();
 //        val lowerMotorDrive = LowerMotorSubsystem.DriverCommandDefaultOn(
 //            Gamepads.gamepad2.leftTrigger
