@@ -1,24 +1,29 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.pedropathing.follower.Follower
+import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.deg
 import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.opmodes.testing.baseSubsystems.ShooterFTest.Companion.speed
+import org.firstinspires.ftc.teamcode.opmodes.testing.multiSubsystem.AutoAimTest.Companion.shootAngleDegrees
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 
 class BasicTeleOp(): NextFTCOpMode() {
 
     companion object {
         @JvmField var speed1 = 0.0;
+        @JvmField var shootAngleDegrees = 60;
     }
 
     override fun onInit() {
@@ -57,13 +62,16 @@ class BasicTeleOp(): NextFTCOpMode() {
         )
         magDrive();
 
-        ShooterSubsystem.On(speed1)();
-
         MagblockServoSubsystem.unblock()
         Gamepads.gamepad1.circle
             .whenTrue { MagblockServoSubsystem.unblock }
             .whenBecomesFalse { MagblockServoSubsystem.block }
 
+    }
+
+    override fun onUpdate() {
+        TurretThetaSubsystem.SetTargetTheta(shootAngleDegrees.deg)()
+        ShooterSubsystem.On(speed1)();
     }
 
 }

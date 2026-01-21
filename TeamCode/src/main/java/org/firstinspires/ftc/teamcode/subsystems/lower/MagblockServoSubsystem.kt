@@ -4,11 +4,11 @@ import com.bylazar.configurables.annotations.Configurable
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.ServoEx
 import dev.nextftc.hardware.positionable.SetPosition
-
+///0.15 (Highest Angle) 0.75 (Shallow Angle)///
 @Configurable
 object MagblockServoSubsystem : Subsystem {
-    @JvmField var UNBLOCK: Double? = 0.3;  // todo: tune
-    @JvmField var BLOCK: Double? = 0.0;
+    @JvmField var UNBLOCK: Double? = 0.02;
+    @JvmField var BLOCK: Double? = 0.17;
 
     private val servo = ServoEx("magblock");
 

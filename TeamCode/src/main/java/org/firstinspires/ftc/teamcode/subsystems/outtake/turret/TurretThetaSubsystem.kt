@@ -29,8 +29,15 @@ import kotlin.time.TimeSource
 object TurretThetaSubsystem : Subsystem {
     private val servo = ServoEx("turret_theta");
 
-    @JvmField var POS_63deg = 0.94;
-    @JvmField var POS_55deg = 0.2;
+    ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
+    ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
+    ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
+    ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
+    ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
+
+
+    @JvmField var POS_63deg = 0.15;
+    @JvmField var POS_55deg = 0.75;
 
     val open = SetPosition(servo, 0.1).requires(this)
 
