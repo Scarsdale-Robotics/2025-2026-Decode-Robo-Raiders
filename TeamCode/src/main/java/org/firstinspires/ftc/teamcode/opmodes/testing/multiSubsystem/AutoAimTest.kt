@@ -20,7 +20,8 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 @Configurable
 class AutoAimTest : NextFTCOpMode() {
     companion object {
-        @JvmField var servoPos = 0.0;
+        //@JvmField var servoPos = 0.0;
+        @JvmField var shootAngleDegrees = 60;
         @JvmField var speed = 1423.0;
     }
 
@@ -47,11 +48,13 @@ class AutoAimTest : NextFTCOpMode() {
 //        val dashboard = FtcDashboard.getInstance()
 //        val dashboardTelemetry = dashboard.telemetry
 //        CommandManager.run()
+        //
 //        SequentialGroup(open).schedule()
         CommandManager.cancelAll()
-        ShooterSubsystem.On(-speed).setInterruptible(true)()
-        SetPosition(servo, servoPos)()
-//        TurretThetaSubsystem.SetTargetTheta(shootAngleDegrees.deg)()
+        ShooterSubsystem.On(speed).setInterruptible(true)
+        //(SetPosition(servo, servoPos)()
+        ///0.2-0.93///
+        TurretThetaSubsystem.SetTargetTheta(shootAngleDegrees.deg)()
 
 //        telemetry.addData("AAA", "AAA");
 //        telemetry.addData("sdas", ServoEx("turret_theta").servo.portNumber);

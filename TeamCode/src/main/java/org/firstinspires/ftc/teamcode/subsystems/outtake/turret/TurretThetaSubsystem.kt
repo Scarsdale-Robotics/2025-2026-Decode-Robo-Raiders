@@ -29,8 +29,8 @@ import kotlin.time.TimeSource
 object TurretThetaSubsystem : Subsystem {
     private val servo = ServoEx("turret_theta");
 
-    @JvmField var POS_63deg = 0.48;
-    @JvmField var POS_55deg = 0.22;
+    @JvmField var POS_63deg = 0.94;
+    @JvmField var POS_55deg = 0.2;
 
     val open = SetPosition(servo, 0.1).requires(this)
 
@@ -50,6 +50,8 @@ object TurretThetaSubsystem : Subsystem {
 
     class SetTargetTheta(val angle: Angle) : SetPositions(
         servo to ((norm(angle) - 55.0.deg) / 8.0.deg * (POS_63deg - POS_55deg) + POS_55deg)
+        //im not sure if this work
+        //servo to (angle*0.09625 - 5.09375)
     )
 
     class AutoAim(
