@@ -95,7 +95,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is in
     private val gateOpenPose =
         Pose(11.5, 60.48, Math.toRadians(145.0)) // Gate Open Pose of our robot.
     private val gateAfterOpenPose = //F FTC MADE OUR MAIN STRATEGY ILLEGAL
-        Pose(11.5, 56.48, Math.toRadians(145.0)) // Gate Open Pose of our robot.
+        Pose(11.5, 57.48, Math.toRadians(145.0)) // Gate Open Pose of our robot.
 
     private val commonIntakePos = Pose(10.92, 10.5, Math.toRadians(180.0))
     private val commonIntakeControlPos = Pose(54.8, 36.7)
