@@ -289,9 +289,10 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             SequentialGroup( //Shoots PRELOAD
                 Delay(delayStartShoot),
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntake1!!) //robot goes to intake
@@ -307,9 +308,10 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
             SequentialGroup( //Shoots FIRST Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntake2!!) //robot goes to intake
@@ -325,9 +327,10 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
             SequentialGroup( //Shoots SECOND Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotOpenLeverFromFar!!), //robot goes to the RAMP LEVER
@@ -346,9 +349,10 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
             SequentialGroup( //Shoots THIRD Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntake3!!), //robot goes to intake
@@ -364,9 +368,10 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
             SequentialGroup( //Shoots FOURTH Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotOpenLeverFromClose!!), //robot goes to intake
@@ -385,9 +390,10 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
             SequentialGroup( //Shoots FIFTH Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntake4!!), //robot goes to intake
@@ -403,9 +409,10 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
             SequentialGroup( //Shoots SIXTH Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotPark!!), //robot goes to PARK
@@ -416,8 +423,6 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower!!.update();
 //        forward.schedule()
-
-        autonomousRoutine()
         // Feedback to Driver Hub for debugging
 //        telemetry.addData("path state", pathState)
         telemetry.addData("x", follower!!.pose.x)
@@ -441,6 +446,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system  */
     override fun onStartButtonPressed() {
+        autonomousRoutine()
         ShooterSubsystem.off()
         IntakeServoSubsystem.down.schedule() //puts kebab into default position, down.
         LowerMotorSubsystem.off.schedule() //sets kebab into its default spin rate, off.

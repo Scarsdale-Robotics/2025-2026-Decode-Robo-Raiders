@@ -221,9 +221,10 @@ class AutonBlueCloseCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is in
             SequentialGroup( //Shoots PRELOAD
                 Delay(delayStartShoot),
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntake1!!) //robot goes to intake
@@ -239,16 +240,17 @@ class AutonBlueCloseCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is in
 
             SequentialGroup( //Shoots FIRST Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotOpenLeverFromClose!!) //robot goes to intake
             ),
 
             SequentialGroup( //Intakes from RAMP and then moves to CLOSE Shoot Position
-                Delay(AutonBlueFarArtifact.Companion.DelayAtLever),
+                Delay(DelayAtLever),
                 FollowPath(robotBackupFromRamp!!),
                 Delay(DelayFromRampIntake),
                 ParallelGroup(
@@ -260,9 +262,10 @@ class AutonBlueCloseCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is in
 
             SequentialGroup( //Shoots SECOND Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
-                Delay(AutonBlueFarArtifact.Companion.delayAfterEachShoot),
+                LowerMotorSubsystem.intake, //kebab spinny
+                Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntake2!!), //robot goes to intake
@@ -277,7 +280,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is in
             ),
             //////////////////////REPEATABLE SECTION//////////////////////
             SequentialGroup( //Intakes from RAMP and then moves to CLOSE Shoot Position
-                Delay(AutonBlueFarArtifact.Companion.DelayAtLever),
+                Delay(DelayAtLever),
                 FollowPath(robotBackupFromRamp!!),
                 Delay(DelayFromRampIntake),
                 ParallelGroup(
@@ -289,9 +292,10 @@ class AutonBlueCloseCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is in
 
             SequentialGroup( //Shoots Common Intake #1
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(LeverGoShoot!!) //robot goes to intake
@@ -310,9 +314,10 @@ class AutonBlueCloseCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is in
 
             SequentialGroup( //Shoots the COMMON Intake #1
                 MagblockServoSubsystem.unblock, //blocker unblock
+                LowerMotorSubsystem.intake, //kebab spinny
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
-                    LowerMotorSubsystem.intake, //kebab spinny
+//                    LowerMotorSubsystem.intake, //kebab spinny
                     IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotOpenLeverFromClose!!) //robot goes to intake
@@ -327,8 +332,6 @@ class AutonBlueCloseCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is in
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower!!.update();
 //        forward.schedule()
-
-        autonomousRoutine()
         // Feedback to Driver Hub for debugging
 //        telemetry.addData("path state", pathState)
         telemetry.addData("x", follower!!.pose.x)
@@ -352,6 +355,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is in
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system  */
     override fun onStartButtonPressed() {
+        autonomousRoutine()
         ShooterSubsystem.off()
         IntakeServoSubsystem.down.schedule() //puts kebab into default position, down.
         LowerMotorSubsystem.off.schedule() //sets kebab into its default spin rate, off.
