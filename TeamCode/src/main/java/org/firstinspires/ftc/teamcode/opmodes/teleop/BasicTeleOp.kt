@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 
 class BasicTeleOp(): NextFTCOpMode() {
@@ -36,6 +37,8 @@ class BasicTeleOp(): NextFTCOpMode() {
     }
 
     override fun onStartButtonPressed() {
+
+
         val driveCommand = PedroDriverControlled(
             Gamepads.gamepad1.leftStickY.map {it},
             Gamepads.gamepad1.leftStickX.map {it},
@@ -55,6 +58,11 @@ class BasicTeleOp(): NextFTCOpMode() {
         magDrive();
 
         ShooterSubsystem.On(speed1)();
+
+        MagblockServoSubsystem.unblock()
+        Gamepads.gamepad1.circle
+            .whenTrue { MagblockServoSubsystem.unblock }
+            .whenBecomesFalse { MagblockServoSubsystem.block }
 
     }
 
