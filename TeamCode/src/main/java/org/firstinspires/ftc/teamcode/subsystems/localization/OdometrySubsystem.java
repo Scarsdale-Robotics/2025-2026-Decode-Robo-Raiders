@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.localization;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.MM;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -48,7 +49,7 @@ public class OdometrySubsystem {
     Pose2D initPose = new Pose2D(INCH, x1, y1, AngleUnit.RADIANS, h);
 
     // Configure sensors and set initial position
-    pinpoint.setOffsets(-5.0, -3.1496, INCH);
+    pinpoint.setOffsets(-96, -25, MM);
     pinpoint.setEncoderDirections(
             GoBildaPinpointDriver.EncoderDirection.FORWARD,
             GoBildaPinpointDriver.EncoderDirection.FORWARD

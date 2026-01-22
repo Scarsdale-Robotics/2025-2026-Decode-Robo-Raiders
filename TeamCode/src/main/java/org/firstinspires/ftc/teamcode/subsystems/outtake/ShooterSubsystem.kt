@@ -26,7 +26,7 @@ import java.util.function.Supplier
 
 @Configurable
 object ShooterSubsystem : Subsystem {
-//    private val motor1 = MotorEx("shooter1");
+    private val motor1 = MotorEx("shooter1");
     private val motor2 = MotorEx("shooter2").reversed();
 
     @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 0.75);
@@ -42,7 +42,7 @@ object ShooterSubsystem : Subsystem {
     }
 
     fun setMotorPowers(power: Double) {
-//        motor1.power = power;
+        motor1.power = power;
         motor2.power = power;
     }
 
