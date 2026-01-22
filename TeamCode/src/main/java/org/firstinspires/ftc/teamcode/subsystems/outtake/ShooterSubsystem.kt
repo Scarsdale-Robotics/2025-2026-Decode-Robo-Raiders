@@ -26,7 +26,7 @@ import java.util.function.Supplier
 
 @Configurable
 object ShooterSubsystem : Subsystem {
-    private val motor1 = MotorEx("shooter1");
+//    private val motor1 = MotorEx("shooter1");
     private val motor2 = MotorEx("shooter2").reversed();
 
     @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 0.75);
@@ -42,7 +42,7 @@ object ShooterSubsystem : Subsystem {
     }
 
     fun setMotorPowers(power: Double) {
-        motor1.power = power;
+//        motor1.power = power;
         motor2.power = power;
     }
 
@@ -74,12 +74,12 @@ object ShooterSubsystem : Subsystem {
     var elapsedTime: ElapsedTime = ElapsedTime();
     override fun periodic() {
         val power = controller.calculate(
-            motor1.state
+            motor2.state.times(-1.0)
         ).coerceIn(0.0, 1.0);
         setMotorPowers(power);
 
-        val measuredVel = (motor1.currentPosition - lastPos)/elapsedTime.time();
-        lastPos = motor1.currentPosition;
+        val measuredVel = (motor2.currentPosition - lastPos)/elapsedTime.time();
+        lastPos = motor2.currentPosition;
         elapsedTime.reset()
 
         telemetry.addData("power", power)
@@ -89,7 +89,8 @@ object ShooterSubsystem : Subsystem {
         telemetry.addData("vel ref", controller.reference.velocity)
         telemetry.addData("vel goal", controller.goal.velocity)
 
-        telemetry.addData("pos measured", motor1.currentPosition)
+//        telemetry.addData("pos measured 1", motor1.currentPosition)
+        telemetry.addData("pos measured 2", motor2.currentPosition)
         telemetry.addData("pos est", -controller.lastMeasurement.position)
         telemetry.addData("pos ref", controller.reference.position)
     }
