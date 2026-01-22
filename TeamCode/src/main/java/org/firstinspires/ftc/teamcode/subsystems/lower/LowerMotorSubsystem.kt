@@ -17,7 +17,7 @@ import java.util.function.Supplier
 
 @Configurable
 object LowerMotorSubsystem : Subsystem {
-    private val motor = MotorEx("lower_motor")
+    private val motor = MotorEx("lower_motor").reversed()
 
     class On(power: Double) : InstantCommand({ motor.power = power })
     var intake = SetPower(motor, 1.0);
