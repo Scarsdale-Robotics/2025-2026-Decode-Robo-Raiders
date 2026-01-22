@@ -65,7 +65,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
         opmodeTimer = Timer()
         opmodeTimer!!.resetTimer()
     }
-    var follower : Follower? = null
+//    var follower : Follower? = null
     /////////////////
     ////Constants////
     /////////////////
@@ -145,7 +145,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
     ////////////////////
     fun buildPaths() {
         //1st Intake
-        robotIntake1 = follower!!.pathBuilder()
+        robotIntake1 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
                     startPose,
@@ -156,7 +156,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
         //1st Go Shoot
-        robotGoToShoot1 = follower!!.pathBuilder()
+        robotGoToShoot1 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     intake1Pos,
@@ -166,7 +166,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
         //2nd Intake
-        robotIntake2 = follower!!.pathBuilder()
+        robotIntake2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
                     shootPoseFar,
@@ -177,7 +177,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
         //2nd Go Shoot
-        robotGoToShoot2 = follower!!.pathBuilder()
+        robotGoToShoot2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     intake2Pos,
@@ -187,7 +187,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
         //1st Go to Gate
-        robotOpenLeverFromFar = follower!!.pathBuilder()
+        robotOpenLeverFromFar = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     shootPoseFar,
@@ -197,7 +197,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(gateOpenPose.heading)
             .build()
         //backs up from lever to stay legal
-        robotBackupFromRamp = follower!!.pathBuilder()
+        robotBackupFromRamp = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     gateOpenPose,
@@ -207,7 +207,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(gateOpenPose.heading)
             .build()
         //Lever Go Shoot
-        LeverGoShoot = follower!!.pathBuilder()
+        LeverGoShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     gateAfterOpenPose,
@@ -217,7 +217,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
         //3rd Intake
-        robotIntake3 = follower!!.pathBuilder()
+        robotIntake3 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     shootPoseClose,
@@ -227,7 +227,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
         //3rd Go Shoot
-        robotGoToShoot3 = follower!!.pathBuilder()
+        robotGoToShoot3 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     intake3Pos,
@@ -237,7 +237,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
         //2nd Go to Gate
-        robotOpenLeverFromClose = follower!!.pathBuilder()
+        robotOpenLeverFromClose = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     shootPoseClose,
@@ -247,7 +247,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(gateOpenPose.heading)
             .build()
         //4th Intake
-        robotIntake4 = follower!!.pathBuilder()
+        robotIntake4 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
                     shootPoseClose,
@@ -258,7 +258,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
         //4th Go Shoot
-        robotGoToShoot4 = follower!!.pathBuilder()
+        robotGoToShoot4 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     commonIntakePos,
@@ -268,7 +268,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
         //Go Park
-        robotPark = follower!!.pathBuilder()
+        robotPark = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     shootPoseFar,
@@ -425,9 +425,9 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 //        forward.schedule()
         // Feedback to Driver Hub for debugging
 //        telemetry.addData("path state", pathState)
-        telemetry.addData("x", follower!!.pose.x)
-        telemetry.addData("y", follower!!.pose.y)
-        telemetry.addData("heading", follower!!.pose.heading)
+        telemetry.addData("x", PedroComponent.follower.pose.x)
+        telemetry.addData("y", PedroComponent.follower.pose.y)
+        telemetry.addData("heading", PedroComponent.follower.pose.heading)
         telemetry.update()
 
         PanelsTelemetry.telemetry.update()
@@ -459,8 +459,8 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
         val thetaAim = TurretThetaSubsystem.AutoAim(
             {
                 hypot(
-                    distanceGoalX - follower!!.pose.x,
-                    distanceGoalY - follower!!.pose.y,
+                    distanceGoalX - PedroComponent.follower.pose.x,
+                    distanceGoalY - PedroComponent.follower.pose.y,
                 )
             },
             { (/*-m!!**/it+70.67).coerceIn(55.0, 63.0).deg }
@@ -468,14 +468,14 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
         thetaAim.schedule();
 
         val autoAimPhi = TurretPhiSubsystem.AutoAim(
-            { directionGoalX - follower!!.pose.x },
-            { directionGoalY - follower!!.pose.y },
-            { follower!!.pose.heading.rad }
+            { directionGoalX - PedroComponent.follower.pose.x },
+            { directionGoalY - PedroComponent.follower.pose.y },
+            { PedroComponent.follower.pose.heading.rad }
         );
         autoAimPhi.schedule();
 
         val shooterAutoAim = ShooterSubsystem.AutoAim(
-            { hypot(distanceGoalX - follower!!.pose.x, distanceGoalY - follower!!.pose.y) },
+            { hypot(distanceGoalX - PedroComponent.follower.pose.x, distanceGoalY - PedroComponent.follower.pose.y) },
             { (578 + 12.7*it + -0.0921*it*it + 0.000316*it*it*it).coerceIn(0.0, 1500.0) }
         )
         shooterAutoAim.schedule()
@@ -485,9 +485,9 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
     override fun onStop() {
         val file = File(Lefile.filePath)
         file.writeText(
-            follower!!.pose.x.toString() + "\n" +
-                    follower!!.pose.y.toString() + "\n" +
-                    follower!!.pose.heading.toString() + "\n"
+            PedroComponent.follower.pose.x.toString() + "\n" +
+                    PedroComponent.follower.pose.y.toString() + "\n" +
+                    PedroComponent.follower.pose.heading.toString() + "\n"
         )
     }
 }

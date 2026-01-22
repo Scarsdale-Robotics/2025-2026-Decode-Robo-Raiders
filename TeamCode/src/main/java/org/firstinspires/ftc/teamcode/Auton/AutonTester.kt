@@ -18,6 +18,7 @@ import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
+//import dev.nextftc.extensions.pedro.PedroComponent.follower
 import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
@@ -65,7 +66,7 @@ class AutonTester: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to
         opmodeTimer = Timer()
         opmodeTimer!!.resetTimer()
     }
-    var follower : Follower? = null
+//    var follower : Follower? = null
     /////////////////
     ////Constants////
     /////////////////
@@ -103,7 +104,7 @@ class AutonTester: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to
     ////////////////////
     fun buildPaths() {
         //1st Go Shoot
-        robotGoToShoot1 = follower!!.pathBuilder()
+        robotGoToShoot1 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     startPose,
@@ -129,9 +130,9 @@ class AutonTester: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to
 
         // Feedback to Driver Hub for debugging
 //        telemetry.addData("path state", pathState)
-        telemetry.addData("x", follower!!.pose.x)
-        telemetry.addData("y", follower!!.pose.y)
-        telemetry.addData("heading", follower!!.pose.heading)
+        telemetry.addData("x", PedroComponent.follower.pose.x)
+        telemetry.addData("y", PedroComponent.follower.pose.y)
+        telemetry.addData("heading", PedroComponent.follower.pose.heading)
         telemetry.update()
 
         PanelsTelemetry.telemetry.update()
@@ -141,7 +142,7 @@ class AutonTester: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to
     override fun onInit() {
 //        follower = Constants.createFollower(hardwareMap)
         buildPaths()
-//        follower!!.setStartingPose(startPose)
+        PedroComponent.follower.setStartingPose(startPose)
     }
 
     /** This method is called continuously after Init while waiting for "play".  */
@@ -164,8 +165,8 @@ class AutonTester: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to
         val thetaAim = TurretThetaSubsystem.AutoAim(
             {
                 hypot(
-                    distanceGoalX - follower!!.pose.x,
-                    distanceGoalY - follower!!.pose.y,
+                    distanceGoalX - PedroComponent.follower.pose.x,
+                    distanceGoalY - PedroComponent.follower.pose.y,
                 )
             },
             { (/*-m!!**/it+70.67).coerceIn(55.0, 63.0).deg }
@@ -173,14 +174,14 @@ class AutonTester: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to
         thetaAim.schedule();
 
         val autoAimPhi = TurretPhiSubsystem.AutoAim(
-            { directionGoalX - follower!!.pose.x },
-            { directionGoalY - follower!!.pose.y },
-            { follower!!.pose.heading.rad }
+            { directionGoalX - PedroComponent.follower.pose.x },
+            { directionGoalY - PedroComponent.follower.pose.y },
+            { PedroComponent.follower.pose.heading.rad }
         );
         autoAimPhi.schedule();
 
         val shooterAutoAim = ShooterSubsystem.AutoAim(
-            { hypot(distanceGoalX - follower!!.pose.x, distanceGoalY - follower!!.pose.y) },
+            { hypot(distanceGoalX - PedroComponent.follower.pose.x, distanceGoalY - PedroComponent.follower.pose.y) },
             { (578 + 12.7*it + -0.0921*it*it + 0.000316*it*it*it).coerceIn(0.0, 1500.0) }
         )
         shooterAutoAim.schedule()
@@ -190,9 +191,9 @@ class AutonTester: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to
     override fun onStop() {
         val file = File(Lefile.filePath)
         file.writeText(
-            follower!!.pose.x.toString() + "\n" +
-                    follower!!.pose.y.toString() + "\n" +
-                    follower!!.pose.heading.toString() + "\n"
+            PedroComponent.follower.pose.x.toString() + "\n" +
+                    PedroComponent.follower.pose.y.toString() + "\n" +
+                    PedroComponent.follower.pose.heading.toString() + "\n"
         )
     }
 }
