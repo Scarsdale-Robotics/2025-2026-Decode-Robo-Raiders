@@ -32,7 +32,7 @@ import kotlin.time.TimeSource
 object TurretPhiSubsystem : Subsystem {
     private val motor = MotorEx("turret_phi");
 
-    @JvmField var ENCODERS_FORWARD = -1367.0;
+    @JvmField var ENCODERS_FORWARD = 1367.0;
     @JvmField var ENCODERS_BACKWARD = 0.0;  // todo: TUNE
 
     private val controller: ControlSystem;

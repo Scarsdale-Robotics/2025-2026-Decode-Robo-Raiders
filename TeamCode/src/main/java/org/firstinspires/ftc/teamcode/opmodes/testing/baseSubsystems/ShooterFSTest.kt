@@ -2,14 +2,8 @@ package org.firstinspires.ftc.teamcode.opmodes.testing.baseSubsystems
 
 import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import dev.nextftc.core.components.BindingsComponent
-import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import dev.nextftc.ftc.components.BulkReadComponent
 import dev.nextftc.hardware.impl.MotorEx
-import org.firstinspires.ftc.teamcode.opmodes.testing.baseSubsystems.LowerMotorTest.Companion.power
-import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 
 @Configurable
 @TeleOp(name = "Shooter FS Test", group = "Base Subsystem Tests")

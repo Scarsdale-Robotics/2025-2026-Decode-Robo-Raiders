@@ -5,11 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 
 @Configurable
 @TeleOp(name = "Lower Motor Test", group = "Base Subsystem Tests")
@@ -20,7 +18,7 @@ class LowerMotorTest : NextFTCOpMode() {
 
     init {
         addComponents(
-            SubsystemComponent(LowerMotorSubsystem),
+            SubsystemComponent(MagMotorSubsystem),
             BulkReadComponent,
             BindingsComponent
         )
@@ -28,7 +26,7 @@ class LowerMotorTest : NextFTCOpMode() {
 
     override fun onUpdate() {
         CommandManager.cancelAll()
-        LowerMotorSubsystem.On(power)();
+        MagMotorSubsystem.On(power)();
 //        val lowerMotorDrive = LowerMotorSubsystem.DriverCommandDefaultOn(
 //            Gamepads.gamepad2.leftTrigger
 //        );

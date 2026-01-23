@@ -2,16 +2,12 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.pedropathing.follower.Follower
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
-import dev.nextftc.extensions.pedro.PedroComponent
-import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
@@ -21,11 +17,13 @@ import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.hypot
 
@@ -42,6 +40,9 @@ class BasicTeleOp(): NextFTCOpMode() {
         @JvmField var speed1 = 0.0;
         @JvmField var shootAngleDegrees = 60;
         @JvmField var isBlue = true;
+
+        @JvmField var goalX = 3.0;
+        @JvmField var goalY = 144.0 - 3.0;
     }
 
     val x: Double
@@ -74,14 +75,15 @@ class BasicTeleOp(): NextFTCOpMode() {
                 OuttakeSubsystem,
                 MagServoSubsystem,
                 MagblockServoSubsystem,
-                TurretThetaSubsystem
+                TurretThetaSubsystem,
+                TurretPhiSubsystem
             ),
             BindingsComponent,
             BulkReadComponent
         )
 
         ShooterSubsystem.off()
-        LowerMotorSubsystem.off()
+        MagMotorSubsystem.off()
         MagServoSubsystem.stop()
         odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
     }
@@ -117,7 +119,7 @@ class BasicTeleOp(): NextFTCOpMode() {
 //        )
 //        driveCommand();
 
-        val lowerMotorDrive = LowerMotorSubsystem.DriverCommandDefaultOn(
+        val lowerMotorDrive = MagMotorSubsystem.DriverCommandDefaultOn(
             Gamepads.gamepad1.leftTrigger
         );
         lowerMotorDrive();
@@ -131,6 +133,14 @@ class BasicTeleOp(): NextFTCOpMode() {
             .whenTrue(MagblockServoSubsystem.unblock)
             .whenBecomesFalse(MagblockServoSubsystem.block)
 
+
+        val dx = Supplier { goalX - x }
+        val dy = Supplier { goalY - y }
+        val dxy = Supplier { hypot(dx.get(), dy.get()) }
+
+        TurretPhiSubsystem.AutoAim(
+            dx, dy, { h }
+        )()
     }
 
     override fun onUpdate() {

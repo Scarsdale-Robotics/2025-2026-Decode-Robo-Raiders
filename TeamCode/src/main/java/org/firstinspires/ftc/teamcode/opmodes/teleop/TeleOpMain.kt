@@ -8,8 +8,6 @@ import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
-import dev.nextftc.core.commands.groups.ParallelGroup
-import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
@@ -18,12 +16,11 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.intake.IntakeMotorSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.magazine.MagazineMotorSubsystem
@@ -161,7 +158,7 @@ open class TeleOpMain(
         )
 
         ShooterSubsystem.off()
-        LowerMotorSubsystem.off()
+        MagMotorSubsystem.off()
     }
 
     override fun onStartButtonPressed() {
@@ -192,7 +189,7 @@ open class TeleOpMain(
             .whenTrue { MagblockServoSubsystem.unblock }
             .whenBecomesFalse { MagblockServoSubsystem.block }
         // Lower
-        val lowerMotorDrive = LowerMotorSubsystem.DriverCommandDefaultOn(
+        val lowerMotorDrive = MagMotorSubsystem.DriverCommandDefaultOn(
             Gamepads.gamepad2.leftTrigger
         );
         lowerMotorDrive();

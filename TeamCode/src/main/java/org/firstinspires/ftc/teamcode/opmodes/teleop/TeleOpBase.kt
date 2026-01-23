@@ -13,25 +13,24 @@ import dev.nextftc.ftc.components.BulkReadComponent
 import dev.nextftc.hardware.driving.FieldCentric
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
-import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.isBlue
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.speed1
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
-import java.io.File
 import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.hypot
 
 @Configurable
-class TeleOpBase(
+open class TeleOpBase(
     private val isBlue: Boolean,
     private val goalX: Double,
     private val goalY: Double,
@@ -88,10 +87,10 @@ class TeleOpBase(
         )
 
         ShooterSubsystem.off()
-        LowerMotorSubsystem.off()
+        MagMotorSubsystem.off()
         MagServoSubsystem.stop()
 
-        odom = OdometrySubsystem(72.0, 72.0, PI / 2, hardwareMap)
+        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
     }
 
     private var autoAimEnabled = true;
@@ -104,7 +103,7 @@ class TeleOpBase(
 //        val startH = content[2].toDouble()
 //
 //        odom!!.setPinpoint(startX, startY, startH)
-        odom!!.setPinpoint(72.0, 72.0, PI / 2)
+        odom!!.setPinpoint(72.0, 72.0, -PI / 2)
 
         MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
@@ -126,15 +125,21 @@ class TeleOpBase(
         Gamepads.gamepad1.rightBumper whenBecomesTrue { speedFactor = 0.5; }
         Gamepads.gamepad1.rightBumper whenBecomesFalse { speedFactor = 1.0; }
 
-        val lowerMotorDrive = LowerMotorSubsystem.DriverCommandDefaultOn(
+        val magMotorDrive = MagMotorSubsystem.DriverCommandDefaultOn(
             Gamepads.gamepad1.leftTrigger
         );
-        lowerMotorDrive();
+        magMotorDrive();
 
-        val magDrive = MagServoSubsystem.DriverCommandDefaultOn(
+        val intakeMotorDrive = IntakeMotorSubsystem.DriverCommand(
+            Gamepads.gamepad2.rightTrigger,
+            Gamepads.gamepad1.leftTrigger
+        )
+        intakeMotorDrive()
+
+        val magServoDrive = MagServoSubsystem.DriverCommandDefaultOn(
             Gamepads.gamepad1.leftTrigger.greaterThan(0.0)
         )
-        magDrive();
+        magServoDrive();
 
         Gamepads.gamepad1.circle
             .whenTrue(MagblockServoSubsystem.unblock)
@@ -154,14 +159,14 @@ class TeleOpBase(
             ShooterSubsystem.AutoAim(
                 dxy,
                 distanceToVelocity
-            )
+            )()
             TurretPhiSubsystem.AutoAim(
                 dx, dy, { h }
-            )
+            )()
             TurretThetaSubsystem.AutoAim(
                 dxy,
                 distanceToTheta
-            )
+            )()
         } else {
             //ShooterSubsystem.Manual(
 

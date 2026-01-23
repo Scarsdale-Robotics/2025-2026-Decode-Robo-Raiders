@@ -10,7 +10,7 @@ import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 
@@ -33,12 +33,12 @@ class LowerAndShooter(): NextFTCOpMode() {
         )
 
         ShooterSubsystem.off()
-        LowerMotorSubsystem.off()
+        MagMotorSubsystem.off()
     }
 
     override fun onStartButtonPressed() {
 
-        val lowerMotorDrive = LowerMotorSubsystem.DriverCommandDefaultOn(
+        val lowerMotorDrive = MagMotorSubsystem.DriverCommandDefaultOn(
             Gamepads.gamepad1.leftTrigger
         );
         lowerMotorDrive();
