@@ -85,12 +85,12 @@ class BasicTeleOp(): NextFTCOpMode() {
         ShooterSubsystem.off()
         LowerMotorSubsystem.off()
         MagServoSubsystem.stop()
-        odom = OdometrySubsystem(72.0, 72.0, PI / 2, hardwareMap)
+        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
     }
 
     var speedFactor = 1.0;
     override fun onStartButtonPressed() {
-        odom!!.setPinpoint(72.0, 72.0, PI / 2)
+        odom!!.setPinpoint(72.0, 72.0, -PI / 2)
         MagblockServoSubsystem.block()
 
         val mecanum = MecanumDriverControlled(
