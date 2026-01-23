@@ -39,4 +39,21 @@ object LowerMotorSubsystem : Subsystem {
             motor.power = 1.0 - 2.0 * outPower.get();
         }
     }
+
+    class DriverCommand(
+        private val inPower: Supplier<Double>,
+        private val outPower: Supplier<Double>
+    ) : Command() {
+        override val isDone = false;
+
+        init {
+            setInterruptible(true);
+            setRequirements(LowerMotorSubsystem);
+            setName("Lower Drive")
+        }
+
+        override fun update() {
+            motor.power = inPower.get() - outPower.get();
+        }
+    }
 }

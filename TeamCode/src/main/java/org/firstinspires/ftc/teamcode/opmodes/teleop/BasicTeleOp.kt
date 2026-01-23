@@ -2,24 +2,18 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.pedropathing.follower.Follower
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
-import dev.nextftc.extensions.pedro.PedroComponent
-import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import dev.nextftc.hardware.driving.FieldCentric
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
-import org.firstinspires.ftc.teamcode.opmodes.testing.baseSubsystems.ShooterFTest.Companion.speed
-import org.firstinspires.ftc.teamcode.opmodes.testing.multiSubsystem.AutoAimTest.Companion.shootAngleDegrees
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
@@ -91,6 +85,7 @@ class BasicTeleOp(): NextFTCOpMode() {
     var speedFactor = 1.0;
     override fun onStartButtonPressed() {
         odom!!.setPinpoint(72.0, 72.0, PI / 2)
+        MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
 
         val mecanum = MecanumDriverControlled(
@@ -123,7 +118,7 @@ class BasicTeleOp(): NextFTCOpMode() {
         );
         lowerMotorDrive();
 
-        val magDrive = MagServoSubsystem.DriverCommand(
+        val magDrive = MagServoSubsystem.DriverCommandDefaultOn(
             Gamepads.gamepad1.leftTrigger.greaterThan(0.0)
         )
         magDrive();

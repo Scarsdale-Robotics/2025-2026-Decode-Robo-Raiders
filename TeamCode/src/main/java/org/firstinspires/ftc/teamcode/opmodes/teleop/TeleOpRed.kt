@@ -3,4 +3,10 @@
 //import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 //
 //@TeleOp(name = "[RED] Tele Op")
-//class TeleOpRed : TeleOpMain(isRed = true)
+//class TeleOpRed : TeleOpBase(
+//    isBlue = false,
+//    goalX = 3.0,
+//    goalY = 144.0 - 3.0,
+//    distanceToVelocity = {  },
+//    distanceToTheta = {  }
+//)
