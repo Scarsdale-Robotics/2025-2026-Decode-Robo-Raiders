@@ -29,11 +29,14 @@ import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.hypot
 
+data class ResetModeParams(val x: Double, val y: Double, val h: Angle)
+
 @Configurable
 open class TeleOpBase(
     private val isBlue: Boolean,
     private val goalX: Double,
     private val goalY: Double,
+    private val resetModeParams: ResetModeParams,
 //    private val distanceToFlightTimeSecs: (Double) -> Double,
 //    private val invertDriveControls: Boolean,
     private val distanceToVelocity: (Double) -> Double,
@@ -94,8 +97,14 @@ open class TeleOpBase(
     }
 
     private var autoAimEnabled = true;
+    private var resetMode = false;
+    private var resetModePhiAngle = 180.0.deg;
+    private var phiTrim = 0.0.deg;
     var speedFactor = 1.0;
     override fun onStartButtonPressed() {
+        gamepad1.setLedColor(0.0, 0.0, 0.0, -1)
+        gamepad2.setLedColor(0.0, 0.0, 0.0, -1)
+
 //        val file = File("RobotAutonEndPos.txt")
 //        val content = file.readText().split("\n")
 //        val startX = content[0].toDouble()
@@ -145,23 +154,54 @@ open class TeleOpBase(
             .whenTrue(MagblockServoSubsystem.unblock)
             .whenBecomesFalse(MagblockServoSubsystem.block)
 
-        Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.rightBumper whenBecomesTrue {
+        // manual mode toggle
+        Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.triangle whenBecomesTrue {
             autoAimEnabled = !autoAimEnabled;
             gamepad1.rumble(450);
             gamepad2.rumble(450);
         }
 
-        val dx = Supplier { goalX - x }
-        val dy = Supplier { goalY - y }
-        val dxy = Supplier { hypot(dx.get(), dy.get()) }
+        // reset mode toggle
+        Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.rightBumper whenBecomesTrue {
+            resetMode = !resetMode;
+            if (resetMode) {
+                // I think 180.0.deg corresponds to turret facing backwards
+                // todo: confirm this
+                resetModePhiAngle = 180.0.deg
+                gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
+            } else {
+                // reset position
+                ofsX = resetModeParams.x - x
+                ofsY = resetModeParams.y - y
+                ofsH = resetModeParams.h.inRad - h.inRad
+                gamepad2.setLedColor(0.0, 0.0, 0.0, -1)
+            }
+        }
+        // I think l/r only makes sense when robot facing away (approx same direction person is facing)
+        Gamepads.gamepad2.dpadRight whenBecomesTrue {
+            phiTrim -= 1.0.deg
+        }
+        Gamepads.gamepad2.dpadLeft whenBecomesTrue {
+            phiTrim += 1.0.deg
+        }
+    }
 
-        if (autoAimEnabled) {
+    override fun onUpdate() {
+        odom!!.updateOdom()
+
+        val dx = goalX - x
+        val dy = goalY - y
+        val dxy = hypot(dx, dy)
+
+        if (resetMode) {
+            TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle).requires(TurretPhiSubsystem)()
+        } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
                 dxy,
                 distanceToVelocity
             )()
             TurretPhiSubsystem.AutoAim(
-                dx, dy, { h }
+                dx, dy, h
             )()
             TurretThetaSubsystem.AutoAim(
                 dxy,
@@ -172,10 +212,6 @@ open class TeleOpBase(
 
             //)
         }
-    }
-
-    override fun onUpdate() {
-        odom!!.updateOdom()
 
         telemetry.addData("x (inch)", odom!!.rOx1);
         telemetry.addData("y (inch)", odom!!.rOy1);

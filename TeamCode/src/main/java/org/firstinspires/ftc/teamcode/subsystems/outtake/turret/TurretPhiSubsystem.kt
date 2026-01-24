@@ -94,25 +94,25 @@ object TurretPhiSubsystem : Subsystem {
         )
     )
 
+    var lastCommand: Command? = null;
+
     class AutoAim(
-        private val dx: Supplier<Double>,
-        private val dy: Supplier<Double>,
-        private val rh: Supplier<Angle>,
-        private val ofsTurret: Supplier<Double> = Supplier({ 0.0 })
+        private val dx: Double,
+        private val dy: Double,
+        private val rh: Angle,
+        private val ofsTurret: Double = 0.0
     ) : Command() {
-        override val isDone = false;
+        override val isDone = true;
 
         init {
             setName("Auto Aim Phi")
         }
 
-        var lastCommand: Command? = null;
-
         override fun update() {
             if (lastCommand != null) {
                 CommandManager.cancelCommand(lastCommand!!)
             }
-            val currCommand = SetTargetPhi(atan2(dy.get(), dx.get()).rad - rh.get(), ofsTurret.get());
+            val currCommand = SetTargetPhi(atan2(dy, dx).rad - rh, ofsTurret);
             currCommand();
             lastCommand = currCommand;
         }

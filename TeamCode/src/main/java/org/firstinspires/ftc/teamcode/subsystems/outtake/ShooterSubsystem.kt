@@ -60,13 +60,17 @@ object ShooterSubsystem : Subsystem {
     }
 
     class AutoAim(
-        private val dxy: Supplier<Double>,
+        private val dxy: Double,
         private val powerByDistance: (Double) -> Double,  // get by running curve of best fit on collected data
     ) : Command() {
-        override val isDone = false;
+        override val isDone = true;
+
+        init {
+            requires(ShooterSubsystem)
+        }
 
         override fun update() {
-            controller.goal = KineticState(velocity=powerByDistance(dxy.get()));
+            controller.goal = KineticState(velocity=powerByDistance(dxy));
         }
     }
 

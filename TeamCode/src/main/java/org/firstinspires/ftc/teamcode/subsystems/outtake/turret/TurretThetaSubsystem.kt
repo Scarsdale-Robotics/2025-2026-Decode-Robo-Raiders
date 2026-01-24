@@ -62,10 +62,10 @@ object TurretThetaSubsystem : Subsystem {
     )
 
     class AutoAim(
-        private val dxy: Supplier<Double>,
+        private val dxy: Double,
         private val angleByDistance: (Double) -> Angle,  // get by running curve of best fit on collected data
     ) : Command() {
-        override val isDone = false;
+        override val isDone = true;
 
         init {
             setName("Auto Aim Theta")
@@ -76,9 +76,9 @@ object TurretThetaSubsystem : Subsystem {
         }
         
         override fun update() {
-            SetTargetTheta(angleByDistance(dxy.get()))();
-            PanelsTelemetry.telemetry.addData("s", dxy.get())
-            PanelsTelemetry.telemetry.addData("theta goal", angleByDistance(dxy.get()))
+            SetTargetTheta(angleByDistance(dxy))();
+            PanelsTelemetry.telemetry.addData("s", dxy)
+            PanelsTelemetry.telemetry.addData("theta goal", angleByDistance(dxy))
         }
     }
 
