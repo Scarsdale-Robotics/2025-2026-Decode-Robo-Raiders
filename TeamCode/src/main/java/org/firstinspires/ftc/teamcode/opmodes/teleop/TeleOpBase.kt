@@ -40,7 +40,8 @@ open class TeleOpBase(
 //    private val distanceToFlightTimeSecs: (Double) -> Double,
 //    private val invertDriveControls: Boolean,
     private val distanceToVelocity: (Double) -> Double,
-    private val distanceToTheta: (Double) -> Angle
+    private val distanceToTheta: (Double) -> Angle,
+    private val distanceToTime: (Double) -> Double
 ): NextFTCOpMode() {
 
     private val lfw = MotorEx("lfw").reversed();
@@ -72,6 +73,27 @@ open class TeleOpBase(
         get() {
             if (odom != null) {
                 return odom!!.rOh.rad + ofsH.rad;
+            }
+            return 0.0.rad;
+        }
+    val vx: Double
+        get() {
+            if (odom != null) {
+                return odom!!.vx;
+            }
+            return 0.0;
+        }
+    val vy: Double
+        get() {
+            if (odom != null) {
+                return odom!!.vy;
+            }
+            return 0.0;
+        }
+    val vh: Angle
+        get() {
+            if (odom != null) {
+                return odom!!.omega.rad;
             }
             return 0.0.rad;
         }
@@ -186,25 +208,33 @@ open class TeleOpBase(
         }
     }
 
+    var lastRuntime = 0.0
     override fun onUpdate() {
+        telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
+        lastRuntime = runtime;
+
         odom!!.updateOdom()
 
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
+        val dxp = dx + vx * distanceToTime(dxy)
+        val dyp = dy + vy * distanceToTime(dxy)
+        val dxyp = hypot(dxp, dyp)
+        val hp = h + vh * distanceToTime(dxyp)
 
         if (resetMode) {
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
-                dxy,
+                dxyp,
                 distanceToVelocity
             )()
             TurretPhiSubsystem.AutoAim(
-                dx, dy, h
+                dxp, dyp, hp
             )()
             TurretThetaSubsystem.AutoAim(
-                dxy,
+                dxyp,
                 distanceToTheta
             )()
         } else {
@@ -223,6 +253,9 @@ open class TeleOpBase(
         telemetry.addData("ShooterSpeed", speed1);
         telemetry.addData("Angle", shootAngleDegrees.deg);
         telemetry.update()
+
+        PanelsTelemetry.telemetry.addData("Vx (in/s)", vx)
+        PanelsTelemetry.telemetry.addData("Vy (in/s)", vy)
         PanelsTelemetry.telemetry.update()
     }
 }

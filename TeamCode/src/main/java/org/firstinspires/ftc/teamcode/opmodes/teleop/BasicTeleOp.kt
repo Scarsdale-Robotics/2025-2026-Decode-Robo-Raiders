@@ -138,9 +138,9 @@ class BasicTeleOp(): NextFTCOpMode() {
         val dy = Supplier { goalY - y }
         val dxy = Supplier { hypot(dx.get(), dy.get()) }
 
-        TurretPhiSubsystem.AutoAim(
-            dx, dy, { h }
-        )()
+//        TurretPhiSubsystem.AutoAim(
+//            dx, dy, { h }
+//        )()
     }
 
     override fun onUpdate() {
