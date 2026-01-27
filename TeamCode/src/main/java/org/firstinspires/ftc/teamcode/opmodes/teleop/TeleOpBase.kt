@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
+import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
@@ -98,22 +99,27 @@ open class TeleOpBase(
             return 0.0.rad;
         }
 
-    override fun onInit() {
+    init {
         addComponents(
             SubsystemComponent(
-                LowerSubsystem,
-                OuttakeSubsystem,
-                MagServoSubsystem,
+                IntakeMotorSubsystem,
+                MagMotorSubsystem,
                 MagblockServoSubsystem,
+                MagServoSubsystem,
+                ShooterSubsystem,
+                TurretPhiSubsystem,
                 TurretThetaSubsystem
             ),
-            BindingsComponent,
-            BulkReadComponent
+            BulkReadComponent,
+            BindingsComponent
         )
+    }
 
+    override fun onInit() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
         MagServoSubsystem.stop()
+        MagblockServoSubsystem.block()
 
         odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
     }
@@ -124,8 +130,8 @@ open class TeleOpBase(
     private var phiTrim = 0.0.deg;
     var speedFactor = 1.0;
     override fun onStartButtonPressed() {
-        gamepad1.setLedColor(0.0, 0.0, 0.0, -1)
-        gamepad2.setLedColor(0.0, 0.0, 0.0, -1)
+        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
+        gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
 
 //        val file = File("RobotAutonEndPos.txt")
 //        val content = file.readText().split("\n")
@@ -135,9 +141,6 @@ open class TeleOpBase(
 //
 //        odom!!.setPinpoint(startX, startY, startH)
         odom!!.setPinpoint(72.0, 72.0, -PI / 2)
-
-        MagblockServoSubsystem.unblock()
-        MagblockServoSubsystem.block()
 
         val mecanum = MecanumDriverControlled(
             lfw,
@@ -156,13 +159,13 @@ open class TeleOpBase(
         Gamepads.gamepad1.rightBumper whenBecomesTrue { speedFactor = 0.5; }
         Gamepads.gamepad1.rightBumper whenBecomesFalse { speedFactor = 1.0; }
 
-        val magMotorDrive = MagMotorSubsystem.DriverCommandDefaultOn(
+        val lowerMotorDrive = MagMotorSubsystem.DriverCommandDefaultOn(
             Gamepads.gamepad1.leftTrigger
         );
-        magMotorDrive();
+        lowerMotorDrive();
 
         val intakeMotorDrive = IntakeMotorSubsystem.DriverCommand(
-            Gamepads.gamepad2.rightTrigger,
+            Gamepads.gamepad1.rightTrigger,
             Gamepads.gamepad1.leftTrigger
         )
         intakeMotorDrive()
@@ -172,9 +175,10 @@ open class TeleOpBase(
         )
         magServoDrive();
 
-        Gamepads.gamepad1.circle
-            .whenTrue(MagblockServoSubsystem.unblock)
-            .whenBecomesFalse(MagblockServoSubsystem.block)
+        Gamepads.gamepad1.circle whenBecomesTrue {
+            telemetry.addData("unblock", "active")
+            MagblockServoSubsystem.unblock()
+        } whenBecomesFalse MagblockServoSubsystem.block
 
         // manual mode toggle
         Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.triangle whenBecomesTrue {
@@ -190,13 +194,13 @@ open class TeleOpBase(
                 // I think 180.0.deg corresponds to turret facing backwards
                 // todo: confirm this
                 resetModePhiAngle = 180.0.deg
-                gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
+                gamepad2.setLedColor(100.0, 0.0, 0.0, -1)
             } else {
                 // reset position
                 ofsX = resetModeParams.x - x
                 ofsY = resetModeParams.y - y
                 ofsH = resetModeParams.h.inRad - h.inRad
-                gamepad2.setLedColor(0.0, 0.0, 0.0, -1)
+                gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
             }
         }
         // I think l/r only makes sense when robot facing away (approx same direction person is facing)
@@ -254,8 +258,9 @@ open class TeleOpBase(
         telemetry.addData("Angle", shootAngleDegrees.deg);
         telemetry.update()
 
-        PanelsTelemetry.telemetry.addData("Vx (in/s)", vx)
-        PanelsTelemetry.telemetry.addData("Vy (in/s)", vy)
+//        PanelsTelemetry.telemetry.addData("Vx (in/s)", vx)
+//        PanelsTelemetry.telemetry.addData("Vy (in/s)", vy)
+        PanelsTelemetry.telemetry.addData("CMD", CommandManager.snapshot)
         PanelsTelemetry.telemetry.update()
     }
 }

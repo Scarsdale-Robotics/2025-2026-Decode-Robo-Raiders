@@ -108,7 +108,7 @@ object TurretPhiSubsystem : Subsystem {
             setName("Auto Aim Phi")
         }
 
-        override fun update() {
+        override fun start() {
             if (lastCommand != null) {
                 CommandManager.cancelCommand(lastCommand!!)
             }

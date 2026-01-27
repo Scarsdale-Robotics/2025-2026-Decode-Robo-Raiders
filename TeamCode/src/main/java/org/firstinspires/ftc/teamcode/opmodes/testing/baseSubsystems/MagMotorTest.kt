@@ -10,8 +10,8 @@ import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 
 @Configurable
-@TeleOp(name = "Lower Motor Test", group = "Base Subsystem Tests")
-class LowerMotorTest : NextFTCOpMode() {
+@TeleOp(name = "Mag Motor Test", group = "Base Subsystem Tests")
+class MagMotorTest : NextFTCOpMode() {
     companion object {
         @JvmField var power = 0.0;
     }

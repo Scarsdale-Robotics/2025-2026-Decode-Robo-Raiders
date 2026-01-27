@@ -19,6 +19,7 @@ object MagServoSubsystem: Subsystem {
 
         init {
             setRequirements(MagServoSubsystem)
+            servo.power = 0.0;
         }
 
         override fun update() {

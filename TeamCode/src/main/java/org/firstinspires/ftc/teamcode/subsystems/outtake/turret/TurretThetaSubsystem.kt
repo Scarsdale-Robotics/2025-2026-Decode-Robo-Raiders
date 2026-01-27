@@ -70,12 +70,8 @@ object TurretThetaSubsystem : Subsystem {
         init {
             setName("Auto Aim Theta")
         }
-
-        override fun start() {
-            SetTargetTheta(55.0.deg);
-        }
         
-        override fun update() {
+        override fun start() {
             SetTargetTheta(angleByDistance(dxy))();
             PanelsTelemetry.telemetry.addData("s", dxy)
             PanelsTelemetry.telemetry.addData("theta goal", angleByDistance(dxy))

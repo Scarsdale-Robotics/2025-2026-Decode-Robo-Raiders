@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.lower
 
 import com.bylazar.configurables.annotations.Configurable
+import com.bylazar.telemetry.PanelsTelemetry
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
@@ -41,8 +42,11 @@ object IntakeMotorSubsystem : Subsystem {
 
         init {
             setInterruptible(true);
-            setRequirements(MagMotorSubsystem);
             setName("Intake Drive")
+        }
+
+        override fun start() {
+            motor.power = 0.0;
         }
 
         override fun update() {

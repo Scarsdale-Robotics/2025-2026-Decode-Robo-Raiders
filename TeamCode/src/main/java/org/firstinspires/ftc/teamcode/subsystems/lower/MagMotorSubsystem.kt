@@ -24,8 +24,12 @@ object MagMotorSubsystem : Subsystem {
 
         init {
             setInterruptible(true);
-            setRequirements(MagMotorSubsystem);
+//            setRequirements(MagMotorSubsystem);
             setName("Magazine Drive")
+        }
+
+        override fun start() {
+            motor.power = 0.0;
         }
 
         override fun update() {
@@ -41,7 +45,6 @@ object MagMotorSubsystem : Subsystem {
 
         init {
             setInterruptible(true);
-            setRequirements(MagMotorSubsystem);
             setName("Magazine Drive")
         }
 

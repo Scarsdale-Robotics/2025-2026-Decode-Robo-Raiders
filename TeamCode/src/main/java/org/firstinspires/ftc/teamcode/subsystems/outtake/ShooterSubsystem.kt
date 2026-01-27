@@ -69,7 +69,7 @@ object ShooterSubsystem : Subsystem {
             requires(ShooterSubsystem)
         }
 
-        override fun update() {
+        override fun start() {
             controller.goal = KineticState(velocity=powerByDistance(dxy));
         }
     }
