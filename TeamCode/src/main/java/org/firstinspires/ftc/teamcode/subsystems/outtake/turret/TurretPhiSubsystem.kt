@@ -22,6 +22,8 @@ import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 import kotlin.time.ComparableTimeMark
 import kotlin.time.DurationUnit
@@ -82,15 +84,14 @@ object TurretPhiSubsystem : Subsystem {
         } else if (a > -1.0/12.0 + tolerance) {
             a -= 2 * PI;
         }
-        return a.rad
+        return max(min(a, PI / 4.0), -7.0 * PI / 4.0).rad
     }
 
-    open class SetTargetPhi(val angle: Angle, ofsTurret: Double = 0.0) : RunToState(
+    open class SetTargetPhi(val angle: Angle, ofsTurret: Angle = 0.0.rad) : RunToState(
         controller,
         KineticState(
-            norm(angle) / PI.rad *
+            (norm(angle) + ofsTurret) / PI.rad *
             (ENCODERS_FORWARD - ENCODERS_BACKWARD) + ENCODERS_FORWARD
-            + ofsTurret
         )
     )
 
@@ -100,7 +101,7 @@ object TurretPhiSubsystem : Subsystem {
         private val dx: Double,
         private val dy: Double,
         private val rh: Angle,
-        private val ofsTurret: Double = 0.0
+        private val ofsTurret: Angle = 0.0.rad
     ) : Command() {
         override val isDone = true;
 

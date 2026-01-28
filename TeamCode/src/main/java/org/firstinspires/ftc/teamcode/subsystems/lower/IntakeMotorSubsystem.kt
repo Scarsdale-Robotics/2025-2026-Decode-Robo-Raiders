@@ -29,6 +29,10 @@ object IntakeMotorSubsystem : Subsystem {
             setName("Intake Drive")
         }
 
+        override fun start() {
+            motor.power = 0.0;
+        }
+
         override fun update() {
             motor.power = 1.0 - 2.0 * outPower.get();
         }
