@@ -18,9 +18,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Configurable
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-        .mass(12.519) //in kg
-            .forwardZeroPowerAcceleration(-33.227913662037004)
-            .lateralZeroPowerAcceleration(-74.01881888975592)
+        .mass(25.2) //in kg
+            .forwardZeroPowerAcceleration(-36.251943126849014)
+            .lateralZeroPowerAcceleration(-69.11570394121402)
             .translationalPIDFCoefficients(new PIDFCoefficients(
                     0.1,
                     0,
@@ -62,9 +62,9 @@ public class Constants {
             ))
             .drivePIDFSwitch(15)
 
-            .useSecondaryDrivePIDF(true)
+            .useSecondaryDrivePIDF(false)
             .useSecondaryHeadingPIDF(false)
-            .useSecondaryTranslationalPIDF(true)
+            .useSecondaryTranslationalPIDF(false)
 
             .centripetalScaling(0.00038);
 
@@ -73,8 +73,8 @@ public class Constants {
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .xVelocity(78.18835881751353)
-            .yVelocity(57.887402151513285)
+            .xVelocity(65.31741164800691)
+            .yVelocity(58.67722927303764)
             .rightFrontMotorName("rfw")
             .rightRearMotorName("rbw")
             .leftRearMotorName("lbw")
@@ -85,9 +85,9 @@ public class Constants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-5)
-            .strafePodX(3.1496)
-            .distanceUnit(DistanceUnit.INCH)
+            .forwardPodY(-96)
+            .strafePodX(-25)
+            .distanceUnit(DistanceUnit.MM)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
