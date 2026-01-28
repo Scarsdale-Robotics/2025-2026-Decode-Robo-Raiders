@@ -14,25 +14,25 @@ object OuttakeSubsystem : SubsystemGroup(
     ShooterSubsystem,
     TurretSubsystem,
 ) {
-    class AutoAim(
-        private val dx: Supplier<Double>,  // distance from turret to goal in x axis; positive means goal is right of turret
-        private val dy: Supplier<Double>,
-        rh: Supplier<Angle>,
-        angleByDistance: (Double) -> Angle,
-        powerByDistance: (Double) -> Double,
-    ) : ParallelGroup(
-        TurretPhiSubsystem.AutoAim(dx, dy, rh),
-        TurretThetaSubsystem.AutoAim({ hypot(dx.get(), dy.get()) }, angleByDistance),
-        ShooterSubsystem.AutoAim({ hypot(dx.get(), dy.get()) }, powerByDistance),
-    )
-
-    class Manual(
-        goalChangePhi: Supplier<Double>,
-        goalChangeTheta: Supplier<Double>,
-        shooterPower: Supplier<Double>
-    ) : ParallelGroup(
-        TurretThetaSubsystem.Manual(goalChangeTheta),
-        TurretPhiSubsystem.Manual(goalChangePhi),
-        ShooterSubsystem.Manual(shooterPower)
-    )
+//    class AutoAim(
+//        private val dx: Supplier<Double>,  // distance from turret to goal in x axis; positive means goal is right of turret
+//        private val dy: Supplier<Double>,
+//        rh: Supplier<Angle>,
+//        angleByDistance: (Double) -> Angle,
+//        powerByDistance: (Double) -> Double,
+//    ) : ParallelGroup(
+//        TurretPhiSubsystem.AutoAim(dx, dy, rh),
+//        TurretThetaSubsystem.AutoAim({ hypot(dx.get(), dy.get()) }, angleByDistance),
+//        ShooterSubsystem.AutoAim({ hypot(dx.get(), dy.get()) }, powerByDistance),
+//    )
+//
+//    class Manual(
+//        goalChangePhi: Supplier<Double>,
+//        goalChangeTheta: Supplier<Double>,
+//        shooterPower: Supplier<Double>
+//    ) : ParallelGroup(
+//        TurretThetaSubsystem.Manual(goalChangeTheta),
+//        TurretPhiSubsystem.Manual(goalChangePhi),
+//        ShooterSubsystem.Manual(shooterPower)
+//    )
 }

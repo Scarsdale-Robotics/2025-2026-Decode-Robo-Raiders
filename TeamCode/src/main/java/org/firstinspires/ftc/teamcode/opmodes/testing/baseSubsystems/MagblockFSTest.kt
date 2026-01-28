@@ -10,9 +10,9 @@ import dev.nextftc.hardware.impl.ServoEx
 import dev.nextftc.hardware.positionable.SetPosition
 import dev.nextftc.hardware.powerable.SetPower
 
-@TeleOp(name = "Magblock Test", group = "Base Subsystem Tests")
+@TeleOp(name = "Magblock FS Test", group = "Base Subsystem Tests")
 @Configurable
-class MagblockTest : NextFTCOpMode() {
+class MagblockFSTest : NextFTCOpMode() {
     companion object {
         @JvmField var servoPos = 0.02;
     }

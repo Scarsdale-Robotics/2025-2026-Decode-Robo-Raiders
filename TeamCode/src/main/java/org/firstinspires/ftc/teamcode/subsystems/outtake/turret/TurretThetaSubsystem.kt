@@ -29,8 +29,15 @@ import kotlin.time.TimeSource
 object TurretThetaSubsystem : Subsystem {
     private val servo = ServoEx("turret_theta");
 
-    @JvmField var POS_63deg = 0.48;
-    @JvmField var POS_55deg = 0.22;
+    ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
+    ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
+    ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
+    ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
+    ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
+
+
+    @JvmField var POS_63deg = 0.97;
+    @JvmField var POS_55deg = 0.3;
 
     val open = SetPosition(servo, 0.1).requires(this)
 
@@ -50,26 +57,24 @@ object TurretThetaSubsystem : Subsystem {
 
     class SetTargetTheta(val angle: Angle) : SetPositions(
         servo to ((norm(angle) - 55.0.deg) / 8.0.deg * (POS_63deg - POS_55deg) + POS_55deg)
+        //im not sure if this work
+        //servo to (angle*0.09625 - 5.09375)
     )
 
     class AutoAim(
-        private val dxy: Supplier<Double>,
+        private val dxy: Double,
         private val angleByDistance: (Double) -> Angle,  // get by running curve of best fit on collected data
     ) : Command() {
-        override val isDone = false;
+        override val isDone = true;
 
         init {
             setName("Auto Aim Theta")
         }
-
-        override fun start() {
-            SetTargetTheta(55.0.deg);
-        }
         
-        override fun update() {
-            SetTargetTheta(angleByDistance(dxy.get()))();
-            PanelsTelemetry.telemetry.addData("s", dxy.get())
-            PanelsTelemetry.telemetry.addData("theta goal", angleByDistance(dxy.get()))
+        override fun start() {
+            SetTargetTheta(angleByDistance(dxy))();
+            PanelsTelemetry.telemetry.addData("s", dxy)
+            PanelsTelemetry.telemetry.addData("theta goal", angleByDistance(dxy))
         }
     }
 

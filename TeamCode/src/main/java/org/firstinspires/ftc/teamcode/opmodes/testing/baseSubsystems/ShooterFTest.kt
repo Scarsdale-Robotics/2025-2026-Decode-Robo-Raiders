@@ -8,8 +8,6 @@ import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import org.firstinspires.ftc.teamcode.opmodes.testing.baseSubsystems.LowerMotorTest.Companion.power
-import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 
 @Configurable
