@@ -12,7 +12,7 @@ class TeleOpRed : TeleOpBase(
     isBlue = false,
     goalX = 144.0 - 3.0,
     goalY = 144.0 - 3.0,
-    resetModeParams = ResetModeParams(144.0 - 8.127, 5.0, (PI / 2.0).rad),
+    resetModeParams = ResetModeParams(8.127, 5.0, (PI / 2.0).rad),
     distanceToVelocity = { 0.0127 * it * it + 1.81 * it + 937.0 },
     distanceToTheta = { max(min(-0.224*it+74, 63.0), 55.0).deg },
     distanceToTime = { 0.0 }  // todo: tune  // is over seconds, not milliseconds
