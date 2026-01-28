@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.testing.archive
+package org.firstinspires.ftc.teamcode.opmodes.testing.baseSubsystems
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
@@ -11,29 +11,26 @@ import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 
-@TeleOp(name = "Turret Phi Test", group = "Config")
+@TeleOp(name = "Turret Phi FS Test", group = "Base Subsystem Tests")
 @Configurable
-class TurretPhiTest : NextFTCOpMode() {
+class TurretPhiFSTest : NextFTCOpMode() {
+
     companion object {
-        var angle = 45.0;
+        var degrees = 0.0;
     }
-    init {
+
+    override fun onInit() {
         addComponents(
-            SubsystemComponent(
-                TurretPhiSubsystem
-            ),
-            BindingsComponent,
+            SubsystemComponent(TurretPhiSubsystem),
             BulkReadComponent,
+            BindingsComponent
         )
-    }
-
-    override fun onStartButtonPressed() {
-
     }
 
     override fun onUpdate() {
         CommandManager.cancelAll()
-        TurretPhiSubsystem.SetTargetPhi(angle.deg)()
+        TurretPhiSubsystem.SetTargetPhi(degrees.deg)();
         PanelsTelemetry.telemetry.update()
     }
+
 }

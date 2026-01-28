@@ -15,6 +15,7 @@ public class Kalman {
     }
 
     public double updateKF(double predection, double measurement) {
+        //arjan are we serious u cant even spell prediction what is predection bro
         x += predection;
         p += q;
         k = p / (p + r);
