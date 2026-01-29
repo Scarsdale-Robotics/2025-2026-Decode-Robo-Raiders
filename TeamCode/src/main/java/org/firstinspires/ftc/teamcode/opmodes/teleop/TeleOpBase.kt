@@ -28,6 +28,8 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.utils.Lefile
+import java.io.File
 import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.hypot
@@ -271,5 +273,14 @@ open class TeleOpBase(
 //        PanelsTelemetry.telemetry.addData("Vy (in/s)", vy)
         PanelsTelemetry.telemetry.addData("CMD", CommandManager.snapshot)
         PanelsTelemetry.telemetry.update()
+    }
+
+    override fun onStop() {
+        val file = File(Lefile.filePath)
+        file.writeText(
+            x.toString() + "\n" +
+                    y.toString() + "\n" +
+                    h.inRad.toString() + "\n"
+        )
     }
 }
