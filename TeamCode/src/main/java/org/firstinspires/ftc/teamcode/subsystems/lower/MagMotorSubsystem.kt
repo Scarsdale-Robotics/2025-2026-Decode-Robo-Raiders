@@ -48,6 +48,10 @@ object MagMotorSubsystem : Subsystem {
             setName("Magazine Drive")
         }
 
+        override fun start() {
+            motor.power = 0.0;
+        }
+
         override fun update() {
             motor.power = inPower.get() - outPower.get();
         }

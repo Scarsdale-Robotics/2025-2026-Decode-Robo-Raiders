@@ -11,6 +11,7 @@ object MagServoSubsystem: Subsystem {
 
     val run = SetPower(servo, -1.0)
     val stop = SetPower(servo, 0.0)
+    val reverse = SetPower(servo, 1.0)
 
     class DriverCommandDefaultOn(
         private val reverse: Button
