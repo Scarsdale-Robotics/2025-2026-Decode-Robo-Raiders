@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import dev.nextftc.core.commands.CommandManager
+import dev.nextftc.core.commands.groups.ParallelGroup
+import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
@@ -150,16 +152,20 @@ open class TeleOpBase(
             -Gamepads.gamepad1.leftStickY.map { it*speedFactor },
             Gamepads.gamepad1.leftStickX.map { it*speedFactor },
             Gamepads.gamepad1.rightStickX.map { it*speedFactor },
-            FieldCentric({
+            FieldCentric {
                 if (isBlue) (h.inRad - PI).rad else h
-            })
+            }
         )
         mecanum();
 
-        Gamepads.gamepad1.rightBumper whenBecomesTrue { speedFactor = 0.5; }
-        Gamepads.gamepad1.rightBumper whenBecomesFalse { speedFactor = 1.0; }
+        Gamepads.gamepad1.rightBumper whenBecomesTrue {
+            speedFactor = 0.5;
+        } whenBecomesFalse {
+            speedFactor = 1.0;
+        }
 
-        val lowerMotorDrive = MagMotorSubsystem.DriverCommandDefaultOn(
+        val lowerMotorDrive = MagMotorSubsystem.DriverCommand(
+            Gamepads.gamepad1.rightTrigger,
             Gamepads.gamepad1.leftTrigger
         );
         lowerMotorDrive();
@@ -170,15 +176,19 @@ open class TeleOpBase(
         )
         intakeMotorDrive()
 
-        val magServoDrive = MagServoSubsystem.DriverCommandDefaultOn(
-            Gamepads.gamepad1.leftTrigger.greaterThan(0.0)
-        )
-        magServoDrive();
+//        val magServoDrive = MagServoSubsystem.DriverCommandDefaultOn(
+//            Gamepads.gamepad1.leftTrigger.greaterThan(0.0)
+//        )
+//        magServoDrive();
+        Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
 
-        Gamepads.gamepad1.circle whenBecomesTrue {
-            telemetry.addData("unblock", "active")
-            MagblockServoSubsystem.unblock()
-        } whenBecomesFalse MagblockServoSubsystem.block
+        Gamepads.gamepad1.circle whenBecomesTrue ParallelGroup(
+            MagServoSubsystem.run,
+            MagblockServoSubsystem.unblock
+        ) whenBecomesFalse ParallelGroup(
+            MagServoSubsystem.stop,
+            MagblockServoSubsystem.block
+        )
 
         // manual mode toggle
         Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.triangle whenBecomesTrue {
@@ -191,8 +201,7 @@ open class TeleOpBase(
         Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.rightBumper whenBecomesTrue {
             resetMode = !resetMode;
             if (resetMode) {
-                // I think 180.0.deg corresponds to turret facing backwards
-                // todo: confirm this
+                // 180.0.deg corresponds to turret facing backwards
                 resetModePhiAngle = 180.0.deg
                 gamepad2.setLedColor(100.0, 0.0, 0.0, -1)
             } else {
