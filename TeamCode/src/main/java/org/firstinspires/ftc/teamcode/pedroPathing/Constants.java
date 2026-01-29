@@ -21,52 +21,52 @@ public class Constants {
         .mass(25.2) //in kg
             .forwardZeroPowerAcceleration(-36.251943126849014)
             .lateralZeroPowerAcceleration(-69.11570394121402)
-            .translationalPIDFCoefficients(new PIDFCoefficients(
+            .translationalPIDFCoefficients(new PIDFCoefficients( //fine
                     0.1,
                     0,
                     0.01,
                     0.02
             ))
             .translationalPIDFSwitch(4)
-            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(
+            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients( //fine
                     0.1,
                     0,
-                    0.003,
-                    0.01
+                    0.007,
+                    0.009
             ))
-            .headingPIDFCoefficients(new PIDFCoefficients(
-                    1.5,
+            .headingPIDFCoefficients(new PIDFCoefficients( //fine
+                    1.2,
                     0,
                     0.1,
                     0.02
             ))
-            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(
-                    2.5,
+            .secondaryHeadingPIDFCoefficients(new PIDFCoefficients( //fine
+                    1.5,
                     0,
-                    0.1,
-                    0.0005
+                    0.12,
+                    0.001
             ))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.01467,
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients( //fine
+                    0.01460,
                     0,
-                    0.0002, //0.00035
+                    0.00012, //0.00035
                     0, //0.6
-                    0.03 //0.015
+                    0.02 //0.015
             ))
-            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.03,
+            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients( //fine ig
+                    0.032,
                     0,
-                    0.00001,
+                    0.00004,
                     0.0,
                     0.0
             ))
             .drivePIDFSwitch(15)
 
-            .useSecondaryDrivePIDF(false)
-            .useSecondaryHeadingPIDF(false)
-            .useSecondaryTranslationalPIDF(false)
+            .useSecondaryDrivePIDF(true)
+            .useSecondaryHeadingPIDF(true)
+            .useSecondaryTranslationalPIDF(true)
 
-            .centripetalScaling(0.00038);
+            .centripetalScaling(0.0002);
 
 
 
@@ -93,7 +93,8 @@ public class Constants {
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 0.5, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1
+            , 1);
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pathConstraints(pathConstraints)

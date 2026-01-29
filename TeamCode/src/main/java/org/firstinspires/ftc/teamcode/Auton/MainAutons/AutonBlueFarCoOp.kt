@@ -22,9 +22,12 @@ import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
+
+import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem //spins the Intake
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem //continuous back spinner
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem //transfer motor
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem //MAG BLOCK
+
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
@@ -233,108 +236,108 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             SequentialGroup( //Shoots PRELOAD
                 Delay(delayStartShoot),
                 MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                IntakeMotorSubsystem.intake, //kebab spinny
+                MagMotorSubsystem.intake, // starts mag
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
 //                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntake1!!) //robot goes to intake
             ),
 
             SequentialGroup( //Robot goes back to FAR Shoot Position
                 ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
+                    IntakeMotorSubsystem.off, //kebab stop spinny
+                    MagMotorSubsystem.off, // turns off mag
                 ),
                 FollowPath(robotGoToShoot1!!)
             ),
 
             SequentialGroup( //Shoots FIRST Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                IntakeMotorSubsystem.intake, //kebab spinny
+                MagMotorSubsystem.intake, // starts mag
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
 //                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntake2!!) //robot goes to intake
             ),
 
             SequentialGroup( //Robot goes back to FAR Shoot Position
                 ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
+                    IntakeMotorSubsystem.off, //kebab stop spinny
+                    MagMotorSubsystem.off, // turns off mag
                 ),
                 FollowPath(robotGoToShoot2!!)
             ),
 
             SequentialGroup( //Shoots the SECOND Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                IntakeMotorSubsystem.intake, //kebab spinny
+                MagMotorSubsystem.intake, // starts mag
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
 //                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntakeCommon!!) //robot goes to intake
             ),
 
             SequentialGroup( //Robot goes back to FAR Shoot Position
                 ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
+                    IntakeMotorSubsystem.off, //kebab stop spinny
+                    MagMotorSubsystem.off, // turns off mag
                 ),
                 FollowPath(robotGoToShootCommon!!)
             ),
             //////////////////////REPEATABLE SECTION//////////////////////
             SequentialGroup( //Shoots the COMMON Intake #1
                 MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                IntakeMotorSubsystem.intake, //kebab spinny
+                MagMotorSubsystem.intake, // starts mag
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
 //                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntakeCommon!!) //robot goes to intake
             ),
 
             SequentialGroup( //Robot goes back to FAR Shoot Position
                 ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
+                    IntakeMotorSubsystem.off, //kebab stop spinny
+                    MagMotorSubsystem.off, // turns off mag
                 ),
                 FollowPath(robotGoToShootCommon!!)
             ),
             //////////////////////REPEATABLE SECTION//////////////////////
             SequentialGroup( //Shoots the COMMON Intake #2
                 MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                IntakeMotorSubsystem.intake, //kebab spinny
+                MagMotorSubsystem.intake, // starts mag
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
 //                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
                 ),
                 FollowPath(robotIntakeCommon!!) //robot goes to intake
             ),
 
             SequentialGroup( //Robot goes back to FAR Shoot Position
                 ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
+                    IntakeMotorSubsystem.off, //kebab stop spinny
+                    MagMotorSubsystem.off, // turns off mag
                 ),
                 FollowPath(robotGoToShootCommon!!)
             ),
             //////////////////////REPEATABLE SECTION//////////////////////
             SequentialGroup( //Shoots SIXTH Intake
                 MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                IntakeMotorSubsystem.intake, //kebab spinny
+                MagMotorSubsystem.intake, // starts mag
                 Delay(delayAfterEachShoot),
                 ParallelGroup(
 //                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
                 ),
-                LowerMotorSubsystem.off, //kebab stop spinny
+                IntakeMotorSubsystem.off, //kebab stop spinny
                 FollowPath(robotPark!!), //robot goes to PARK
             )
 
@@ -368,37 +371,14 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
      * It runs all the setup actions, including building paths and starting the path system  */
     override fun onStartButtonPressed() {
         ShooterSubsystem.off()
-        IntakeServoSubsystem.down.schedule() //puts kebab into default position, down.
-        LowerMotorSubsystem.off.schedule() //sets kebab into its default spin rate, off.
-        MagblockServoSubsystem.block.schedule() // puts up magBlocker.
+        IntakeMotorSubsystem.off() //sets kebab into its default spin rate, off.
+        MagServoSubsystem.run() //sets magSpinner at back into its default spin rate, off.
+        MagMotorSubsystem.off() //sets mag into its default spin rate, off.
+        MagblockServoSubsystem.block() // puts up magBlocker.
 
         opmodeTimer!!.resetTimer()
         actionTimer!!.resetTimer()
 //        setPathState(AutonPath.RobotShoot1)
-
-        val thetaAim = TurretThetaSubsystem.AutoAim(
-            {
-                hypot(
-                    distanceGoalX - PedroComponent.follower.pose.x,
-                    distanceGoalY - PedroComponent.follower.pose.y,
-                )
-            },
-            { (/*-m!!**/it+70.67).coerceIn(55.0, 63.0).deg }
-        )
-        thetaAim.schedule();
-
-        val autoAimPhi = TurretPhiSubsystem.AutoAim(
-            { directionGoalX - PedroComponent.follower.pose.x },
-            { directionGoalY - PedroComponent.follower.pose.y },
-            { PedroComponent.follower.pose.heading.rad }
-        );
-        autoAimPhi.schedule();
-
-        val shooterAutoAim = ShooterSubsystem.AutoAim(
-            { hypot(distanceGoalX - PedroComponent.follower.pose.x, distanceGoalY - PedroComponent.follower.pose.y) },
-            { (578 + 12.7*it + -0.0921*it*it + 0.000316*it*it*it).coerceIn(0.0, 1500.0) }
-        )
-        shooterAutoAim.schedule()
     }
 
     /** We do not use this because everything should automatically disable  */
