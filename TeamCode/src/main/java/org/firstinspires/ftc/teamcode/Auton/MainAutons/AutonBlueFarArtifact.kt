@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Auton.MainAutons
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
@@ -14,6 +13,7 @@ import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.SubsystemComponent
+import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
@@ -22,8 +22,11 @@ import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
+//import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
@@ -31,6 +34,8 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.hypot
+import kotlin.math.max
+import kotlin.math.min
 
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
@@ -75,10 +80,10 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
         val DelayFromRampIntake: Double = 2.0
         val DelayAtLever: Double = 0.1
 
-        val distanceGoalX = 12
-        val distanceGoalY = 132
-        var directionGoalX = 4.0;
-        var directionGoalY = 144.0-4.0;
+        val goalX = 3.0
+        val goalY = 144.0 - 3.0
+//        var directionGoalX = 4.0;
+//        var directionGoalY = 144.0-4.0;
 
     }
 
@@ -279,6 +284,28 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             .build()
     }
 
+    val IntakeCommand: Command
+        get() = ParallelGroup(
+            IntakeMotorSubsystem.intake,
+            MagMotorSubsystem.intake,
+            MagServoSubsystem.run,
+            MagblockServoSubsystem.block
+        )
+    val TravelCommand: Command
+        get() = ParallelGroup(
+            IntakeMotorSubsystem.off,
+            MagMotorSubsystem.off,
+            MagServoSubsystem.stop,
+            MagblockServoSubsystem.block
+        )
+    val ShootCommand: Command
+        get() = ParallelGroup(
+            MagblockServoSubsystem.unblock,
+            MagMotorSubsystem.intake,
+            IntakeMotorSubsystem.intake,
+            MagServoSubsystem.run
+        )
+
     /////////////////////////
     ////Autonomous Runner////
     /////////////////////////
@@ -288,138 +315,113 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
             SequentialGroup( //Shoots PRELOAD
                 Delay(delayStartShoot),
-                MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                ShootCommand,
                 Delay(delayAfterEachShoot),
-                ParallelGroup(
-//                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
-                ),
+                IntakeCommand,
                 FollowPath(robotIntake1!!) //robot goes to intake
             ),
 
             SequentialGroup( //Robot goes back to FAR Shoot Position
-                ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
-                ),
+                TravelCommand,
                 FollowPath(robotGoToShoot1!!)
             ),
 
             SequentialGroup( //Shoots FIRST Intake
-                MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                ShootCommand,
                 Delay(delayAfterEachShoot),
-                ParallelGroup(
-//                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
-                ),
+                IntakeCommand,
                 FollowPath(robotIntake2!!) //robot goes to intake
             ),
 
             SequentialGroup( //Robot goes back to FAR Shoot Position
-                ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
-                ),
+                TravelCommand,
                 FollowPath(robotGoToShoot2!!)
             ),
 
             SequentialGroup( //Shoots SECOND Intake
-                MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                ShootCommand,
                 Delay(delayAfterEachShoot),
-                ParallelGroup(
-//                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
-                ),
+                TravelCommand,
                 FollowPath(robotOpenLeverFromFar!!), //robot goes to the RAMP LEVER
             ),
 
             SequentialGroup( //Intakes from RAMP and then moves to CLOSE Shoot Position
                 Delay(DelayAtLever),
+                IntakeCommand,
                 FollowPath(robotBackupFromRamp!!),
                 Delay(DelayFromRampIntake),
-                ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
-                ),
+                TravelCommand,
                 FollowPath(LeverGoShoot!!), //robot goes to level
             ),
 
             SequentialGroup( //Shoots THIRD Intake
-                MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                ShootCommand,
                 Delay(delayAfterEachShoot),
-                ParallelGroup(
-//                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
-                ),
+                IntakeCommand,
                 FollowPath(robotIntake3!!), //robot goes to intake
             ),
 
             SequentialGroup( //Robot goes back to CLOSE Shoot Position
-                ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
-                ),
+                TravelCommand,
                 FollowPath(robotGoToShoot3!!)
             ),
 
             SequentialGroup( //Shoots FOURTH Intake
-                MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                ShootCommand,
                 Delay(delayAfterEachShoot),
-                ParallelGroup(
-//                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
-                ),
+                TravelCommand,
                 FollowPath(robotOpenLeverFromClose!!), //robot goes to intake
             ),
 
             SequentialGroup( //Intakes from RAMP and then moves to CLOSE Shoot Position
                 Delay(DelayAtLever),
+                IntakeCommand,
                 FollowPath(robotBackupFromRamp!!),
                 Delay(DelayFromRampIntake),
-                ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
-                ),
+                TravelCommand,
                 FollowPath(LeverGoShoot!!), //robot goes to level
             ),
 
             SequentialGroup( //Shoots FIFTH Intake
-                MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                ShootCommand,
                 Delay(delayAfterEachShoot),
-                ParallelGroup(
-//                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
-                ),
+                IntakeCommand,
                 FollowPath(robotIntake4!!), //robot goes to intake
             ),
 
             SequentialGroup( //Robot goes back to CLOSE Shoot Position
-                ParallelGroup(
-                    LowerMotorSubsystem.off, //kebab stop spinny
-                    IntakeServoSubsystem.down //kebab down
-                ),
+                TravelCommand,
                 FollowPath(robotGoToShoot4!!)
             ),
 
             SequentialGroup( //Shoots SIXTH Intake
-                MagblockServoSubsystem.unblock, //blocker unblock
-                LowerMotorSubsystem.intake, //kebab spinny
+                ShootCommand,
                 Delay(delayAfterEachShoot),
-                ParallelGroup(
-//                    LowerMotorSubsystem.intake, //kebab spinny
-                    IntakeServoSubsystem.up //kebab up
-                ),
+                TravelCommand,
                 FollowPath(robotPark!!), //robot goes to PARK
             ),
         )
 
     override fun onUpdate() {
+        val dx = goalX - PedroComponent.follower.pose.x
+        val dy = goalY - PedroComponent.follower.pose.y
+        val dxy = hypot(dx, dy)
+        val dxp = dx + PedroComponent.follower.velocity.xComponent * distanceToTime(dxy)
+        val dyp = dy + PedroComponent.follower.velocity.yComponent * distanceToTime(dxy)
+        val dxyp = hypot(dxp, dyp)
+        val hp = PedroComponent.follower.pose.heading + PedroComponent.follower.velocity.theta * distanceToTime(dxyp)
+        ShooterSubsystem.AutoAim(
+            dxy,
+            { distanceToVelocity(it) }
+        )()
+        TurretPhiSubsystem.AutoAim(
+            dx, dy, hp.rad
+        )()
+        TurretThetaSubsystem.AutoAim(
+            dxyp,
+            { distanceToTheta(it) }
+        )()
+
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower!!.update();
 //        forward.schedule()
@@ -437,48 +439,36 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
     override fun onInit() {
 //        follower = Constants.createFollower(hardwareMap)
         buildPaths()
+        ShooterSubsystem.off()
+        IntakeMotorSubsystem.off()
+        MagMotorSubsystem.off()
+        MagServoSubsystem.stop()
+        MagblockServoSubsystem.block()
+
 //        follower!!.setStartingPose(startPose)
     }
 
     /** This method is called continuously after Init while waiting for "play".  */
     override fun onWaitForStart() {}
 
+    fun distanceToTime(it: Double): Double {
+        return it * 0.0;
+    }
+    fun distanceToVelocity(it: Double): Double {
+        return 0.0127 * it * it + 1.81 * it + 937.0;
+    }
+    fun distanceToTheta(it: Double): Angle {
+        return max(min(-0.224*it+74, 63.0), 55.0).deg;
+    }
+
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system  */
     override fun onStartButtonPressed() {
         autonomousRoutine()
-        ShooterSubsystem.off()
-        IntakeServoSubsystem.down.schedule() //puts kebab into default position, down.
-        LowerMotorSubsystem.off.schedule() //sets kebab into its default spin rate, off.
-        MagblockServoSubsystem.block.schedule() // puts up magBlocker.
 
         opmodeTimer!!.resetTimer()
         actionTimer!!.resetTimer()
 //        setPathState(AutonPath.RobotShoot1)
-
-        val thetaAim = TurretThetaSubsystem.AutoAim(
-            {
-                hypot(
-                    distanceGoalX - PedroComponent.follower.pose.x,
-                    distanceGoalY - PedroComponent.follower.pose.y,
-                )
-            },
-            { (/*-m!!**/it+70.67).coerceIn(55.0, 63.0).deg }
-        )
-        thetaAim.schedule();
-
-        val autoAimPhi = TurretPhiSubsystem.AutoAim(
-            { directionGoalX - PedroComponent.follower.pose.x },
-            { directionGoalY - PedroComponent.follower.pose.y },
-            { PedroComponent.follower.pose.heading.rad }
-        );
-        autoAimPhi.schedule();
-
-        val shooterAutoAim = ShooterSubsystem.AutoAim(
-            { hypot(distanceGoalX - PedroComponent.follower.pose.x, distanceGoalY - PedroComponent.follower.pose.y) },
-            { (578 + 12.7*it + -0.0921*it*it + 0.000316*it*it*it).coerceIn(0.0, 1500.0) }
-        )
-        shooterAutoAim.schedule()
     }
 
     /** We do not use this because everything should automatically disable  */
