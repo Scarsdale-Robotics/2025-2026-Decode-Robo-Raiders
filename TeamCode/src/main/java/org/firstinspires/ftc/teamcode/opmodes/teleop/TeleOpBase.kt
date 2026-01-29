@@ -244,7 +244,7 @@ open class TeleOpBase(
                 distanceToVelocity
             )()
             TurretPhiSubsystem.AutoAim(
-                dxp, dyp, hp
+                dxp, dyp, hp, phiTrim
             )()
             TurretThetaSubsystem.AutoAim(
                 dxyp,
