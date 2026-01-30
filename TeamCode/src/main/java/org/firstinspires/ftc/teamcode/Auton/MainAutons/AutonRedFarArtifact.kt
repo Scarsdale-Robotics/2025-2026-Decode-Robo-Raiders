@@ -34,6 +34,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsyst
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
+import kotlin.math.PI
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
@@ -129,7 +130,7 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
     private val intake1ControlPos = Pose(144-48.4, 32.0)
 
     private val intake2Pos = Pose(144-20.0, 60.0) // Intake Pos2
-    private val intake2ControlPos = Pose(144-58.9, 53.3)
+    private val intake2ControlPos = Pose(144-58.9, 63.3)
 
     private val intake3Pos = Pose(144-20.0, 84.0) // Intake Pos3
 
@@ -318,7 +319,7 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
     val ShootCommand: Command
         get() = ParallelGroup(
             MagblockServoSubsystem.unblock,
-            MagMotorSubsystem.intake,
+            MagMotorSubsystem.On(0.8),
             IntakeMotorSubsystem.intake,
             MagServoSubsystem.run
         )
@@ -331,8 +332,10 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
             //Main Group
 
             SequentialGroup( //Shoots PRELOAD
-                TurretPhiSubsystem.SetTargetPhi(-5.075.rad),
-                Delay(delayStartShoot),
+                ParallelGroup(
+                    TurretPhiSubsystem.SetTargetPhi(-5.075.rad),
+                    Delay(delayStartShoot),
+                ),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
                 IntakeCommand,
@@ -341,6 +344,7 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
             ),
 
             ParallelGroup( //Robot goes back to FAR Shoot Position
+                TurretPhiSubsystem.SetTargetPhi((-5.075 + 2.0 * PI - PI / 3.0 - PI / 32.0).rad),
                 SequentialGroup(
                     Delay(DelayInIntake),
                     TravelCommand,
@@ -368,7 +372,6 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
-                TurretPhiSubsystem.SetTargetPhi(-0.0.rad),
                 IntakeCommand,
                 FollowPath(robotIntake3!!), //robot goes to the RAMP LEVER
             ),
@@ -392,6 +395,7 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
 //            ),
 
             ParallelGroup( //Robot goes back to CLOSE Shoot Position
+                TurretPhiSubsystem.SetTargetPhi((-0.0 - PI / 16.0).rad),
                 SequentialGroup(
                     Delay(DelayInIntake),
                     TravelCommand,
@@ -426,7 +430,7 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
 //            ),
 
             ParallelGroup( //Robot goes back to CLOSE Shoot Position
-                TurretPhiSubsystem.SetTargetPhi(-5.075.rad),
+                TurretPhiSubsystem.SetTargetPhi((-5.075 + 2.0 * PI - PI / 3.0 - PI / 32.0).rad),
                 SequentialGroup(
                     Delay(DelayInIntake),
                     TravelCommand,

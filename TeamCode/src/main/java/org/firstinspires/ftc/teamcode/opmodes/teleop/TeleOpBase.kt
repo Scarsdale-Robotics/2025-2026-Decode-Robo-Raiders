@@ -137,14 +137,14 @@ open class TeleOpBase(
         gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
         gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
 
-//        val file = File("RobotAutonEndPos.txt")
-//        val content = file.readText().split("\n")
-//        val startX = content[0].toDouble()
-//        val startY = content[1].toDouble()
-//        val startH = content[2].toDouble()
-//
-//        odom!!.setPinpoint(startX, startY, startH)
-        odom!!.setPinpoint(72.0, 72.0, -PI / 2)
+        val file = File(Lefile.filePath)
+        val content = file.readText().split("\n")
+        val startX = content[0].toDouble()
+        val startY = content[1].toDouble()
+        val startH = content[2].toDouble()
+
+        odom!!.setPinpoint(startX, startY, startH)
+//        odom!!.setPinpoint(72.0, 72.0, -PI / 2)
 
         val mecanum = MecanumDriverControlled(
             lfw,
@@ -167,14 +167,14 @@ open class TeleOpBase(
         }
 
         val lowerMotorDrive = MagMotorSubsystem.DriverCommand(
-            Gamepads.gamepad1.rightTrigger,
-            Gamepads.gamepad1.leftTrigger
+            Gamepads.gamepad2.rightTrigger,
+            Gamepads.gamepad2.leftTrigger
         );
         lowerMotorDrive();
 
         val intakeMotorDrive = IntakeMotorSubsystem.DriverCommand(
-            Gamepads.gamepad1.rightTrigger,
-            Gamepads.gamepad1.leftTrigger
+            Gamepads.gamepad2.rightTrigger,
+            Gamepads.gamepad2.leftTrigger
         )
         intakeMotorDrive()
 
@@ -206,12 +206,14 @@ open class TeleOpBase(
             if (resetMode) {
                 // 180.0.deg corresponds to turret facing backwards
                 resetModePhiAngle = 180.0.deg
+                gamepad2.rumble(200)
                 gamepad2.setLedColor(100.0, 0.0, 0.0, -1)
             } else {
                 // reset position
                 ofsX = resetModeParams.x - x
                 ofsY = resetModeParams.y - y
                 ofsH = resetModeParams.h.inRad - h.inRad
+                gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
             }
         }

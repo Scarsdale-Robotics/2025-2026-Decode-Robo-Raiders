@@ -34,6 +34,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsyst
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
+import kotlin.math.PI
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
@@ -305,7 +306,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
     val ShootCommand: Command
         get() = ParallelGroup(
             MagblockServoSubsystem.unblock,
-            MagMotorSubsystem.intake,
+            MagMotorSubsystem.On(0.8),
             IntakeMotorSubsystem.intake,
             MagServoSubsystem.run
         )
@@ -324,7 +325,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
                 IntakeCommand,
                 FollowPath(robotIntake1!!), //robot goes to intake
                 Delay(DelayAfterIntake),
-          ),
+            ),
 
             ParallelGroup( //Robot goes back to FAR Shoot Position
                 SequentialGroup(
@@ -377,6 +378,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 //            ),
 
             ParallelGroup( //Robot goes back to CLOSE Shoot Position
+                TurretPhiSubsystem.SetTargetPhi((-2 * PI - (-0.0 - PI / 16.0)).rad),
                 SequentialGroup(
                     Delay(DelayInIntake),
                     TravelCommand,
@@ -411,6 +413,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 //            ),
 
             ParallelGroup( //Robot goes back to CLOSE Shoot Position
+                TurretPhiSubsystem.SetTargetPhi((-2 * PI - (-5.075 + 2.0 * PI - PI / 3.0 - PI / 32.0)).rad),
                 SequentialGroup(
                     Delay(DelayInIntake),
                     TravelCommand,
@@ -439,9 +442,9 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             dxy,
             { distanceToVelocity(it) }
         )()
-        TurretPhiSubsystem.AutoAim(
-            dx, dy, hp.rad
-        )()
+//        TurretPhiSubsystem.AutoAim(
+//            dx, dy, hp.rad
+//        )()
         TurretThetaSubsystem.AutoAim(
             dxyp,
             { distanceToTheta(it) }
