@@ -183,6 +183,7 @@ open class TeleOpBase(
 //        )
 //        magServoDrive();
         Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
+        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
         Gamepads.gamepad1.circle whenBecomesTrue ParallelGroup(
             MagServoSubsystem.run,
