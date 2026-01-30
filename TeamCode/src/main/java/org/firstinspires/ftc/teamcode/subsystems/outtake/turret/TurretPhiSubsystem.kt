@@ -34,12 +34,12 @@ import kotlin.time.TimeSource
 object TurretPhiSubsystem : Subsystem {
     private val motor = MotorEx("turret_phi");
 
-    @JvmField var ENCODERS_FORWARD = 1367.0;
+    @JvmField var ENCODERS_FORWARD = 1425.0;
     @JvmField var ENCODERS_BACKWARD = 0.0;  // todo: TUNE
 
     private val controller: ControlSystem;
 
-    @JvmField var squidCoefficients = PIDCoefficients(0.001, 0.0, 0.0);
+    @JvmField var squidCoefficients = PIDCoefficients(0.004, 0.0, 0.0);
 
 //    @JvmField var Ls = 0.0;
 //    @JvmField var Lv = 0.0;
@@ -79,9 +79,9 @@ object TurretPhiSubsystem : Subsystem {
         val tolerance = PI / 6;
         var a = angle.inRad;
 
-        if (a < -2 * PI -1.0/12.0 - tolerance) {
+        if (a < 0.3 - 2 * PI - tolerance) {
             a += 2 * PI;
-        } else if (a > -1.0/12.0 + tolerance) {
+        } else if (a > 0.3 + tolerance) {
             a -= 2 * PI;
         }
         return a.rad;
