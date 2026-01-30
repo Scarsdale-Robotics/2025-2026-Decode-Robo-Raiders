@@ -79,9 +79,10 @@ object TurretPhiSubsystem : Subsystem {
         val tolerance = PI / 6;
         var a = angle.inRad;
 
-        if (a < 0.3 - 2 * PI - tolerance) {
+        while (a < 0.3 - 2 * PI - tolerance) {
             a += 2 * PI;
-        } else if (a > 0.3 + tolerance) {
+        }
+        while (a > 0.3 + tolerance) {
             a -= 2 * PI;
         }
         return a.rad;
@@ -91,7 +92,7 @@ object TurretPhiSubsystem : Subsystem {
     open class SetTargetPhi(val angle: Angle, ofsTurret: Angle = 0.0.rad) : RunToState(
         controller,
         KineticState(
-            (norm(angle) + ofsTurret) / PI.rad *
+            (norm(angle + ofsTurret)) / PI.rad *
             (ENCODERS_FORWARD - ENCODERS_BACKWARD) + ENCODERS_FORWARD
         )
     )
