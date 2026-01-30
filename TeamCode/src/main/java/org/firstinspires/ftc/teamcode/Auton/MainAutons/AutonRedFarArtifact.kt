@@ -97,7 +97,7 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
         val DelayAfterIntake: Double = 0.3
         val DelayAtLever: Double = 0.05
 
-        val goalX = 3.0
+        val goalX = 144.0 - 3.0
         val goalY = 144.0 - 3.0
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
