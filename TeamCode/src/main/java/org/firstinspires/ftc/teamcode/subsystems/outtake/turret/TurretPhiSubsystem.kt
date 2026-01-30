@@ -84,7 +84,8 @@ object TurretPhiSubsystem : Subsystem {
         } else if (a > -1.0/12.0 + tolerance) {
             a -= 2 * PI;
         }
-        return max(min(a, PI / 4.0), -7.0 * PI / 4.0).rad
+        return a.rad;
+//        return max(min(a, PI / 4.0), -7.0 * PI / 4.0).rad
     }
 
     open class SetTargetPhi(val angle: Angle, ofsTurret: Angle = 0.0.rad) : RunToState(
