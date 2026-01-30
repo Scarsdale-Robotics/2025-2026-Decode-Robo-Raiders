@@ -43,16 +43,16 @@ import kotlin.math.min
 //First slot = Name Type: Auton
 //2nd slot = Side type: Blue, Red
 //3rd slot = Classifier type (There can be multiple types on the same auto):
-    //1. Leaving it blank
-    //2. Wait (only for shooter type autons)
-    //3. Far (only for shooter and backup type autons)
-    //4. Close (only for shooter and backup type autons)
+//1. Leaving it blank
+//2. Wait (only for shooter type autons)
+//3. Far (only for shooter and backup type autons)
+//4. Close (only for shooter and backup type autons)
 //4th slot = Auton type: Motif, Backup, Shooter, Artifact, CoOp
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__ __Artifact & Auton__ __ CoOp
-@Autonomous(name = "Auton Blue Far Artifact", group = "Auton")
+@Autonomous(name = "Auton Red Far Artifact", group = "Auton")
 @Configurable
-class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
+class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
     //////////////////////
     ////Base Variables////
     //////////////////////
@@ -71,7 +71,20 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
         opmodeTimer = Timer()
         opmodeTimer!!.resetTimer()
     }
-//    var follower : Follower? = null
+    //    var follower : Follower? = null
+
+    fun blueRedConvertAngle (x : Double): Double {
+        var newAngle = x
+        if (x > 90 && x < 270) {
+            newAngle = 180 - x
+        }
+        else {
+            newAngle = 0 - x
+            newAngle = 180 + newAngle
+        }
+        return newAngle;
+    }
+
     /////////////////
     ////Constants////
     /////////////////
@@ -84,7 +97,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
         val DelayAfterIntake: Double = 0.3
         val DelayAtLever: Double = 0.05
 
-        val goalX = 3.0
+        val goalX = 144.0 - 3.0
         val goalY = 144.0 - 3.0
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
@@ -96,29 +109,29 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
     ////Positions////
     /////////////////
     //Constant positions
-    private val startPose = Pose(56.43, 8.503, Math.toRadians(180.0)) // Start Pose of our robot.
+    private val startPose = Pose(144-56.43, 8.503, Math.toRadians(0.0)) // Start Pose of our robot.
     private val shootPoseClose =
-        Pose(57.0, 76.6, Math.toRadians(128.0)) // Close Shoot Pose of our robot.
+        Pose(144-57.0, 76.6, Math.toRadians(blueRedConvertAngle(128.0))) // Close Shoot Pose of our robot.
     private val shootPoseFar =
-        Pose(57.0, 13.5, Math.toRadians(120.0)) // Far Shoot Pose of our robot.
+        Pose(144-57.0, 13.5, Math.toRadians(blueRedConvertAngle(120.0))) // Far Shoot Pose of our robot.
     private val gateOpenPose =
-        Pose(14.0, 60.0, Math.toRadians(145.0)) // Gate Open Pose of our robot.
+        Pose(144-14.0, 60.0, Math.toRadians(blueRedConvertAngle(145.0))) // Gate Open Pose of our robot.
     private val gateAfterOpenPose = //F FTC MADE OUR MAIN STRATEGY ILLEGAL
-        Pose(14.0, 53.0, Math.toRadians(145.0)) // Gate Open Pose of our robot.
+        Pose(144-14.0, 53.0, Math.toRadians(blueRedConvertAngle(145.0))) // Gate Open Pose of our robot.
 
-    private val commonIntakePos = Pose(12.5, 10.9, Math.toRadians(180.0))
-    private val commonIntakeControlPos = Pose(54.8, 36.7)
+    private val commonIntakePos = Pose(144-12.5, 10.9, Math.toRadians(0.0))
+    private val commonIntakeControlPos = Pose(144-54.8, 36.7)
 
-    private val parkPose = Pose(35.5, 18.5, Math.toRadians(180.0))
+    private val parkPose = Pose(144-35.5, 18.5, Math.toRadians(0.0))
 
     // Non-constant positions
-    private val intake1Pos = Pose(20.0, 40.0) // Intake Pos1
-    private val intake1ControlPos = Pose(48.4, 32.0)
+    private val intake1Pos = Pose(144-20.0, 40.0) // Intake Pos1
+    private val intake1ControlPos = Pose(144-48.4, 32.0)
 
-    private val intake2Pos = Pose(20.0, 60.0) // Intake Pos2
-    private val intake2ControlPos = Pose(58.9, 53.3)
+    private val intake2Pos = Pose(144-20.0, 60.0) // Intake Pos2
+    private val intake2ControlPos = Pose(144-58.9, 53.3)
 
-    private val intake3Pos = Pose(20.0, 84.0) // Intake Pos3
+    private val intake3Pos = Pose(144-20.0, 84.0) // Intake Pos3
 
 
 
@@ -162,7 +175,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
                     intake1Pos
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //1st Go Shoot
         robotGoToShoot1 = PedroComponent.follower.pathBuilder()
@@ -183,7 +196,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
                     intake2Pos
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //2nd Go Shoot
         robotGoToShoot2 = PedroComponent.follower.pathBuilder()
@@ -233,7 +246,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
                     intake3Pos
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //3rd Go Shoot
         robotGoToShoot3 = PedroComponent.follower.pathBuilder()
@@ -264,7 +277,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
                     commonIntakePos
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //4th Go Shoot
         robotGoToShoot4 = PedroComponent.follower.pathBuilder()
@@ -284,7 +297,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
                     parkPose
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
     }
 
@@ -324,7 +337,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
                 IntakeCommand,
                 FollowPath(robotIntake1!!), //robot goes to intake
                 Delay(DelayAfterIntake),
-          ),
+            ),
 
             ParallelGroup( //Robot goes back to FAR Shoot Position
                 SequentialGroup(
