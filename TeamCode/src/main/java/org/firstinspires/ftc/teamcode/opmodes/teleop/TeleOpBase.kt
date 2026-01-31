@@ -244,6 +244,14 @@ open class TeleOpBase(
 
         if (resetMode) {
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
+            ShooterSubsystem.AutoAim(
+                dxyp,
+                distanceToVelocity
+            )()
+            TurretThetaSubsystem.AutoAim(
+                dxyp,
+                distanceToTheta
+            )()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
                 dxyp,
