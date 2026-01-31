@@ -320,7 +320,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 
             SequentialGroup( //Shoots PRELOAD
                 ParallelGroup(
-                    TurretPhiSubsystem.SetTargetPhi(-5.075.rad),
+                    TurretPhiSubsystem.SetTargetPhi(5.075.rad),
                     Delay(delayStartShoot),
                 ),
                 ShootCommand,
@@ -331,7 +331,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             ),
 
             ParallelGroup( //Robot goes back to FAR Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((2 * PI - (-5.075 + 2.0 * PI - PI / 3.0 - PI / 32.0)).rad),
+                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 32.0)).rad),
                 SequentialGroup(
                     Delay(DelayInIntake),
                     TravelCommand,
@@ -382,7 +382,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 //            ),
 
             ParallelGroup( //Robot goes back to CLOSE Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((-2 * PI - (-0.0 - PI / 16.0)).rad),
+                TurretPhiSubsystem.SetTargetPhi((- (-0.0 - PI / 16.0)).rad),
                 SequentialGroup(
                     Delay(DelayInIntake),
                     TravelCommand,
@@ -447,9 +447,9 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
             dxy,
             { distanceToVelocity(it) }
         )()
-        TurretPhiSubsystem.AutoAim(
-            dx, dy, hp.rad
-        )()
+//        TurretPhiSubsystem.AutoAim(
+//            dx, dy, hp.rad
+//        )()
         TurretThetaSubsystem.AutoAim(
             dxyp,
             { distanceToTheta(it) }

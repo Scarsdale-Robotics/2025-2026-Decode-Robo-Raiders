@@ -201,6 +201,19 @@ open class TeleOpBase(
             gamepad2.rumble(450);
         }
 
+        Gamepads.gamepad2.circle whenBecomesTrue {
+            val dx = goalX - x
+            val dy = goalY - y
+            val dxy = hypot(dx, dy)
+            val dxp = dx + vx * distanceToTime(dxy)
+            val dyp = dy + vy * distanceToTime(dxy)
+            val dxyp = hypot(dxp, dyp)
+            val hp = h + vh * distanceToTime(dxyp)
+            TurretPhiSubsystem.AutoAim(
+                dxp, dyp, hp, phiTrim
+            )
+        }
+
         // not trimming in reset mode
         // reset mode toggle
         Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.rightBumper whenBecomesTrue {
@@ -257,9 +270,9 @@ open class TeleOpBase(
                 dxyp,
                 distanceToVelocity
             )()
-            TurretPhiSubsystem.AutoAim(
-                dxp, dyp, hp, phiTrim
-            )()
+//            TurretPhiSubsystem.AutoAim(
+//                dxp, dyp, hp, phiTrim
+//            )()
             TurretThetaSubsystem.AutoAim(
                 dxyp,
                 distanceToTheta
