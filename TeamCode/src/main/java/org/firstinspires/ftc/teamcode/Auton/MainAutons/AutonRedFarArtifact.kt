@@ -123,7 +123,7 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
     private val commonIntakePos = Pose(144-12.5, 10.9, Math.toRadians(0.0))
     private val commonIntakeControlPos = Pose(144-54.8, 36.7)
 
-    private val parkPose = Pose(144-35.5, 18.5, Math.toRadians(0.0))
+    private val parkPose = Pose(144-35.5, 25.5, Math.toRadians(0.0))
 
     // Non-constant positions
     private val intake1Pos = Pose(144-20.0, 40.0) // Intake Pos1
@@ -407,9 +407,10 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntake4!!), //robot goes to intake
-                Delay(DelayAfterIntake),
+//                IntakeCommand,
+                TravelCommand,
+                FollowPath(robotPark!!), //robot goes to intake
+//                Delay(DelayAfterIntake),
             ),
 
 //            SequentialGroup( //Intakes from RAMP and then moves to CLOSE Shoot Position
@@ -432,10 +433,10 @@ class AutonRedFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is i
             ParallelGroup( //Robot goes back to CLOSE Shoot Position
                 TurretPhiSubsystem.SetTargetPhi((-5.075 + 2.0 * PI - PI / 3.0 - PI / 32.0).rad),
                 SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
+//                    Delay(DelayInIntake),
+//                    TravelCommand,
                 ),
-                FollowPath(robotPark!!)
+//                FollowPath(robotPark!!)
             ),
 
 //            SequentialGroup( //Shoots SIXTH Intake

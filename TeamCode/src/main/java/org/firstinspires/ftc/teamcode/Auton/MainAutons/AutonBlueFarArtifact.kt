@@ -110,7 +110,7 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
     private val commonIntakePos = Pose(12.5, 10.9, Math.toRadians(180.0))
     private val commonIntakeControlPos = Pose(54.8, 36.7)
 
-    private val parkPose = Pose(35.5, 18.5, Math.toRadians(180.0))
+    private val parkPose = Pose(35.5, 25.5, Math.toRadians(180.0))
 
     // Non-constant positions
     private val intake1Pos = Pose(20.0, 40.0) // Intake Pos1
@@ -390,9 +390,10 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntake4!!), //robot goes to intake
-                Delay(DelayAfterIntake),
+//                IntakeCommand,
+                TravelCommand,
+                FollowPath(robotPark!!), //robot goes to intake
+//                Delay(DelayAfterIntake),
             ),
 
 //            SequentialGroup( //Intakes from RAMP and then moves to CLOSE Shoot Position
@@ -412,14 +413,14 @@ class AutonBlueFarArtifact: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is 
 //                FollowPath(robotIntake4!!), //robot goes to intake
 //            ),
 
-            ParallelGroup( //Robot goes back to CLOSE Shoot Position
-//                TurretPhiSubsystem.SetTargetPhi((-2 * PI - (-5.075 + 2.0 * PI - PI / 3.0 - PI / 32.0)).rad),
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotPark!!)
-            ),
+//            ParallelGroup( //Robot goes back to CLOSE Shoot Position
+////                TurretPhiSubsystem.SetTargetPhi((-2 * PI - (-5.075 + 2.0 * PI - PI / 3.0 - PI / 32.0)).rad),
+//                SequentialGroup(
+//                    Delay(DelayInIntake),
+//                    TravelCommand,
+//                ),
+//                FollowPath(robotPark!!)
+//            ),
 
 //            SequentialGroup( //Shoots SIXTH Intake
 //                Delay(DelayBeforeShoot),
