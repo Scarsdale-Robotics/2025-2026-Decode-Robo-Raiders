@@ -42,6 +42,7 @@ open class TeleOpBase(
     private val goalX: Double,
     private val goalY: Double,
     private val resetModeParams: ResetModeParams,
+    private val resetModePhiAngle: Angle,
 //    private val distanceToFlightTimeSecs: (Double) -> Double,
 //    private val invertDriveControls: Boolean,
     private val distanceToVelocity: (Double) -> Double,
@@ -130,7 +131,7 @@ open class TeleOpBase(
 
     private var autoAimEnabled = true;
     private var resetMode = false;
-    private var resetModePhiAngle = 180.0.deg;
+//    private var resetModePhiAngle = 180.0.deg;
     private var phiTrim = 0.0.deg;
     var speedFactor = 1.0;
     override fun onStartButtonPressed() {
@@ -200,12 +201,12 @@ open class TeleOpBase(
             gamepad2.rumble(450);
         }
 
+        // not trimming in reset mode
         // reset mode toggle
         Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.rightBumper whenBecomesTrue {
             resetMode = !resetMode;
             if (resetMode) {
                 // 180.0.deg corresponds to turret facing backwards
-                resetModePhiAngle = 180.0.deg
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(100.0, 0.0, 0.0, -1)
             } else {
@@ -242,7 +243,7 @@ open class TeleOpBase(
         val hp = h + vh * distanceToTime(dxyp)
 
         if (resetMode) {
-            TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle).requires(TurretPhiSubsystem)()
+            TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
                 dxyp,
