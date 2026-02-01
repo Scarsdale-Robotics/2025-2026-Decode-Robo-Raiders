@@ -211,7 +211,7 @@ open class TeleOpBase(
             val hp = h + vh * distanceToTime(dxyp)
             TurretPhiSubsystem.AutoAim(
                 dxp, dyp, hp, phiTrim
-            )
+            )()
         }
 
         // not trimming in reset mode
@@ -221,7 +221,7 @@ open class TeleOpBase(
             if (resetMode) {
                 // 180.0.deg corresponds to turret facing backwards
                 gamepad2.rumble(200)
-                gamepad2.setLedColor(100.0, 0.0, 0.0, -1)
+                gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
             } else {
                 // reset position
                 ofsX = resetModeParams.x - x
@@ -233,10 +233,10 @@ open class TeleOpBase(
         }
         // I think l/r only makes sense when robot facing away (approx same direction person is facing)
         Gamepads.gamepad2.dpadRight whenBecomesTrue {
-            phiTrim -= 1.0.deg
+            phiTrim -= 2.0.deg
         }
         Gamepads.gamepad2.dpadLeft whenBecomesTrue {
-            phiTrim += 1.0.deg
+            phiTrim += 2.0.deg
         }
     }
 

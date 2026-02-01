@@ -7,8 +7,8 @@ import dev.nextftc.hardware.positionable.SetPosition
 ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
 @Configurable
 object MagblockServoSubsystem : Subsystem {
-    @JvmField var UNBLOCK: Double? = 0.00;
-    @JvmField var BLOCK: Double? = 0.17;
+    @JvmField var UNBLOCK: Double? = 0.00
+    @JvmField var BLOCK: Double? = 0.13;
 
     private val servo = ServoEx("magblock");
 

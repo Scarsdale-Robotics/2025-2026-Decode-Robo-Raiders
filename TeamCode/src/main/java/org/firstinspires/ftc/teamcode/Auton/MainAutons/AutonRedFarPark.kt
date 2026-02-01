@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Auton.MainAutons
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
@@ -12,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
+import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
@@ -20,8 +20,6 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueFarArtifact.Companion.goalX
-import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueFarArtifact.Companion.goalY
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
@@ -55,9 +53,9 @@ import kotlin.math.min
 //4th slot = Auton type: Motif, Backup, Shooter, Artifact, CoOp
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__ __Artifact & Auton__ __ CoOp
-@Autonomous(name = "Auton Blue Far CoOp", group = "Auton")
+@Autonomous(name = "Auton Red Far Park", group = "Auton")
 @Configurable
-class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
+class AutonRedFarPark: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
     //////////////////////
     ////Base Variables////
     //////////////////////
@@ -76,7 +74,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         opmodeTimer = Timer()
         opmodeTimer!!.resetTimer()
     }
-//    var follower : Follower? = null
+    //    var follower : Follower? = null
     /////////////////
     ////Constants////
     /////////////////
@@ -84,15 +82,13 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         val delayStartShoot: Double = 3.5
         val DelayBeforeShoot: Double = 0.4
         val delayAfterEachShoot: Double = 2.0 //currently at a really high #
-        val DelayFromRampIntake: Double = 1.8
-        val DelayInIntake: Double = 1.1
-        val DelayAfterIntake: Double = 0.4
-        val DelayAtLever: Double = 0.05
 
-        val distanceGoalX = 12
-        val distanceGoalY = 132
-        var directionGoalX = 4.0;
-        var directionGoalY = 144.0-4.0;
+        val delayForPark: Double = 20.0 // wow
+
+        val goalX = 144.0 - 3.0
+        val goalY = 144.0 - 3.0
+//        var directionGoalX = 4.0;
+//        var directionGoalY = 144.0-4.0;
 
     }
 
@@ -101,25 +97,29 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
     ////Positions////
     /////////////////
     //Constant positions
-    private val startPose = Pose(56.43, 8.503, Math.toRadians(180.0)) // Start Pose of our robot.
+    private val startPose = Pose(144-56.43, 8.503, Math.toRadians(180.0)) // Start Pose of our robot.
     private val shootPoseClose =
-        Pose(57.0, 76.6, Math.toRadians(180.0)) // Close Shoot Pose of our robot.
+        Pose(144-57.0, 76.6, Math.toRadians(128.0)) // Close Shoot Pose of our robot.
     private val shootPoseFar =
-        Pose(57.0, 13.5, Math.toRadians(120.0)) // Far Shoot Pose of our robot.
+        Pose(144-57.0, 13.5, Math.toRadians(120.0)) // Far Shoot Pose of our robot.
     private val gateOpenPose =
-        Pose(11.5, 60.48, Math.toRadians(145.0)) // Gate Open Pose of our robot.
+        Pose(144-14.0, 60.0, Math.toRadians(145.0)) // Gate Open Pose of our robot.
+    private val gateAfterOpenPose = //F FTC MADE OUR MAIN STRATEGY ILLEGAL
+        Pose(144-14.0, 53.0, Math.toRadians(145.0)) // Gate Open Pose of our robot.
 
-    private val commonIntakePos = Pose(13.0, 9.7, Math.toRadians(180.0))
-    private val commonIntakeControlPos = Pose(54.8, 36.7)
+    private val commonIntakePos = Pose(144-12.5, 10.9, Math.toRadians(180.0))
+    private val commonIntakeControlPos = Pose(144-54.8, 36.7)
 
-    private val parkPose = Pose(35.5, 25.5, Math.toRadians(180.0))
+    private val parkPose = Pose(144-35.5, 12.5, Math.toRadians(180.0))
 
     // Non-constant positions
-    private val intake1Pos = Pose(19.0, 40.0) // Intake Pos1
-    private val intake1ControlPos = Pose(48.4, 32.0)
+    private val intake1Pos = Pose(144-25.0, 36.0) // Intake Pos1
+    private val intake1ControlPos = Pose(144-48.4, 32.0)
 
-    private val intake2Pos = Pose(17.0, 60.0) // Intake Pos2
-    private val intake2ControlPos = Pose(58.9, 51.3)
+    private val intake2Pos = Pose(144-25.0, 60.0) // Intake Pos2
+    private val intake2ControlPos = Pose(144-58.9, 53.3)
+
+    private val intake3Pos = Pose(144-20.0, 84.0) // Intake Pos3
 
     /////////////
     ////Paths////
@@ -134,11 +134,18 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
     private var robotGoToShoot2: PathChain? = null
 
     private var robotOpenLeverFromFar: PathChain? = null
+    private var robotOpenLeverFromClose: PathChain? = null
+    private var robotBackupFromRamp: PathChain? = null
     private var LeverGoShoot: PathChain? = null
 
-    private var robotIntakeCommon: PathChain? = null
-    private var robotGoToShootCommon: PathChain? = null
+    private var robotIntake3: PathChain? = null
+    private var robotGoToShoot3: PathChain? = null
+
+    private var robotIntake4: PathChain? = null
+    private var robotGoToShoot4: PathChain? = null
+
     private var robotPark: PathChain? = null
+
 
     ////////////////////
     ////Path Builder////
@@ -196,29 +203,69 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             )
             .setConstantHeadingInterpolation(gateOpenPose.heading)
             .build()
+        //backs up from lever to stay legal
+        robotBackupFromRamp = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    gateOpenPose,
+                    gateAfterOpenPose
+                )
+            )
+            .setConstantHeadingInterpolation(gateOpenPose.heading)
+            .build()
         //Lever Go Shoot
         LeverGoShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    gateOpenPose,
+                    gateAfterOpenPose,
                     shootPoseClose
+                )
+            )
+            .setConstantHeadingInterpolation(shootPoseClose.heading)
+            .build()
+        //3rd Intake
+        robotIntake3 = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    shootPoseClose,
+                    intake3Pos
                 )
             )
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
-        //Common Intake
-        robotIntakeCommon = PedroComponent.follower.pathBuilder()
+        //3rd Go Shoot
+        robotGoToShoot3 = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    intake3Pos,
+                    shootPoseClose
+                )
+            )
+            .setConstantHeadingInterpolation(shootPoseClose.heading)
+            .build()
+        //2nd Go to Gate
+        robotOpenLeverFromClose = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    shootPoseClose,
+                    gateOpenPose
+                )
+            )
+            .setConstantHeadingInterpolation(gateOpenPose.heading)
+            .build()
+        //4th Intake
+        robotIntake4 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    shootPoseFar,
+                    shootPoseClose,
                     commonIntakeControlPos,
                     commonIntakePos
                 )
             )
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
             .build()
-        //Common Go Shoot
-        robotGoToShootCommon = PedroComponent.follower.pathBuilder()
+        //4th Go Shoot
+        robotGoToShoot4 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
                     commonIntakePos,
@@ -267,82 +314,17 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
     private val autonomousRoutine: Command
         get() = SequentialGroup(
             //Main Group
-            SequentialGroup( //Shoots PRELOA+D
+            SequentialGroup( //Shoots PRELOAD
                 ParallelGroup(
-                    TurretPhiSubsystem.SetTargetPhi(5.075.rad),
-                    Delay(AutonBlueFarArtifact.Companion.delayStartShoot),
+                    TurretPhiSubsystem.SetTargetPhi(-5.075.rad),
+                    Delay(delayStartShoot),
                 ),
                 ShootCommand,
-                Delay(AutonBlueFarArtifact.Companion.delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntake1!!), //robot goes to intake
-                Delay(AutonBlueFarArtifact.Companion.DelayAfterIntake),
+                Delay(delayAfterEachShoot),
+                TravelCommand,
+                Delay(delayForPark),
+                FollowPath(robotPark!!), //robot goes to intake
             ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 48.0)).rad),
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShoot1!!)
-            ),
-
-            SequentialGroup( //Shoots FIRST Intake
-                Delay(AutonBlueFarArtifact.Companion.DelayBeforeShoot),
-                ShootCommand,
-                Delay(AutonBlueFarArtifact.Companion.delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntakeCommon!!), //robot goes to intake
-                Delay(AutonBlueFarArtifact.Companion.DelayAfterIntake),
-            ),
-
-            //////////////////////REPEATABLE SECTION//////////////////////
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 48.0)).rad),
-                SequentialGroup(
-                    Delay(AutonBlueFarArtifact.Companion.DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShootCommon!!)
-            ),
-
-            SequentialGroup( //Shoots COMMON Intake
-                Delay(AutonBlueFarArtifact.Companion.DelayBeforeShoot),
-                ShootCommand,
-                Delay(AutonBlueFarArtifact.Companion.delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntakeCommon!!), //robot goes to intake
-                Delay(AutonBlueFarArtifact.Companion.DelayAfterIntake),
-            ),
-            //////////////////////REPEATABLE SECTION//////////////////////
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 48.0)).rad),
-                SequentialGroup(
-                    Delay(AutonBlueFarArtifact.Companion.DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShootCommon!!)
-            ),
-
-            SequentialGroup( //Shoots COMMON Intake
-                Delay(AutonBlueFarArtifact.Companion.DelayBeforeShoot),
-                ShootCommand,
-                Delay(AutonBlueFarArtifact.Companion.delayAfterEachShoot),
-//                IntakeCommand,
-//                FollowPath(robotIntakeCommon!!), //robot goes to intake
-//                Delay(AutonBlueFarArtifact.Companion.DelayAfterIntake),
-            ),
-            //////////////////////REPEATABLE SECTION//////////////////////
-            SequentialGroup( //Robot goes to PARK
-//                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 32.0)).rad),
-                SequentialGroup(
-//                    Delay(AutonBlueFarArtifact.Companion.DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotPark!!)
-            ),
-
         )
 
     override fun onUpdate() {
@@ -398,7 +380,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         return it * 0.0;
     }
     fun distanceToVelocity(it: Double): Double {
-        return 0.98 * (0.0127 * it * it + 1.81 * it + 937.0);
+        return 0.0127 * it * it + 1.81 * it + 937.0;
     }
     fun distanceToTheta(it: Double): Angle {
         return max(min(-0.224*it+74, 63.0), 55.0).deg;

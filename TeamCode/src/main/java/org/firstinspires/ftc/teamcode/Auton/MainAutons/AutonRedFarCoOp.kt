@@ -55,9 +55,9 @@ import kotlin.math.min
 //4th slot = Auton type: Motif, Backup, Shooter, Artifact, CoOp
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__ __Artifact & Auton__ __ CoOp
-@Autonomous(name = "Auton Blue Far CoOp", group = "Auton")
+@Autonomous(name = "Auton Red Far CoOp", group = "Auton")
 @Configurable
-class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
+class AutonRedFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
     //////////////////////
     ////Base Variables////
     //////////////////////
@@ -76,7 +76,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         opmodeTimer = Timer()
         opmodeTimer!!.resetTimer()
     }
-//    var follower : Follower? = null
+    //    var follower : Follower? = null
     /////////////////
     ////Constants////
     /////////////////
@@ -96,27 +96,39 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
 
     }
 
+    fun blueRedConvertAngle (x : Double): Double {
+        var newAngle = x
+        if (x > 90 && x < 270) {
+            newAngle = 180 - x
+        }
+        else {
+            newAngle = 0 - x
+            newAngle = 180 + newAngle
+        }
+        return newAngle;
+    }
+
 
     /////////////////
     ////Positions////
     /////////////////
     //Constant positions
-    private val startPose = Pose(56.43, 8.503, Math.toRadians(180.0)) // Start Pose of our robot.
+    private val startPose = Pose(144-56.43, 8.503, Math.toRadians(0.0)) // Start Pose of our robot.
     private val shootPoseClose =
-        Pose(57.0, 76.6, Math.toRadians(180.0)) // Close Shoot Pose of our robot.
+        Pose(57.0, 76.6, Math.toRadians(0.0)) // Close Shoot Pose of our robot.
     private val shootPoseFar =
-        Pose(57.0, 13.5, Math.toRadians(120.0)) // Far Shoot Pose of our robot.
+        Pose(144-57.0, 13.5, Math.toRadians(blueRedConvertAngle(120.0))) // Far Shoot Pose of our robot.
     private val gateOpenPose =
         Pose(11.5, 60.48, Math.toRadians(145.0)) // Gate Open Pose of our robot.
 
-    private val commonIntakePos = Pose(13.0, 9.7, Math.toRadians(180.0))
-    private val commonIntakeControlPos = Pose(54.8, 36.7)
+    private val commonIntakePos = Pose(144-13.0, 9.7, Math.toRadians(0.0))
+    private val commonIntakeControlPos = Pose(144-54.8, 36.7)
 
-    private val parkPose = Pose(35.5, 25.5, Math.toRadians(180.0))
+    private val parkPose = Pose(144-35.5, 25.5, Math.toRadians(0.0))
 
     // Non-constant positions
-    private val intake1Pos = Pose(19.0, 40.0) // Intake Pos1
-    private val intake1ControlPos = Pose(48.4, 32.0)
+    private val intake1Pos = Pose(144-19.0, 40.0) // Intake Pos1
+    private val intake1ControlPos = Pose(144-48.4, 32.0)
 
     private val intake2Pos = Pose(17.0, 60.0) // Intake Pos2
     private val intake2ControlPos = Pose(58.9, 51.3)
@@ -153,7 +165,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     intake1Pos
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //1st Go Shoot
         robotGoToShoot1 = PedroComponent.follower.pathBuilder()
@@ -174,7 +186,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     intake2Pos
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //2nd Go Shoot
         robotGoToShoot2 = PedroComponent.follower.pathBuilder()
@@ -204,7 +216,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     shootPoseClose
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //Common Intake
         robotIntakeCommon = PedroComponent.follower.pathBuilder()
@@ -215,7 +227,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     commonIntakePos
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         //Common Go Shoot
         robotGoToShootCommon = PedroComponent.follower.pathBuilder()
@@ -235,7 +247,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     parkPose
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
     }
 
@@ -269,7 +281,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             //Main Group
             SequentialGroup( //Shoots PRELOA+D
                 ParallelGroup(
-                    TurretPhiSubsystem.SetTargetPhi(5.075.rad),
+                    TurretPhiSubsystem.SetTargetPhi(-5.075.rad),
                     Delay(AutonBlueFarArtifact.Companion.delayStartShoot),
                 ),
                 ShootCommand,
@@ -280,12 +292,12 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             ),
 
             ParallelGroup( //Robot goes back to FAR Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 48.0)).rad),
+                TurretPhiSubsystem.SetTargetPhi((-5.075 + 2.0 * PI - PI / 3.0 + PI / 48.0 /*- PI / 98.0*/).rad),
                 SequentialGroup(
                     Delay(DelayInIntake),
                     TravelCommand,
                 ),
-                FollowPath(robotGoToShoot1!!)
+                FollowPath(robotGoToShoot1!!),
             ),
 
             SequentialGroup( //Shoots FIRST Intake
@@ -299,9 +311,9 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
 
             //////////////////////REPEATABLE SECTION//////////////////////
             ParallelGroup( //Robot goes back to FAR Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 48.0)).rad),
+                TurretPhiSubsystem.SetTargetPhi((-5.075 + 2.0 * PI - PI / 3.0 + PI / 48.0 /*- PI / 98.0*/).rad),
                 SequentialGroup(
-                    Delay(AutonBlueFarArtifact.Companion.DelayInIntake),
+                    Delay(DelayInIntake),
                     TravelCommand,
                 ),
                 FollowPath(robotGoToShootCommon!!)
@@ -317,9 +329,9 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             ),
             //////////////////////REPEATABLE SECTION//////////////////////
             ParallelGroup( //Robot goes back to FAR Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 48.0)).rad),
+                TurretPhiSubsystem.SetTargetPhi((-5.075 + 2.0 * PI - PI / 3.0 + PI / 48.0 /*- PI / 98.0*/).rad),
                 SequentialGroup(
-                    Delay(AutonBlueFarArtifact.Companion.DelayInIntake),
+                    Delay(DelayInIntake),
                     TravelCommand,
                 ),
                 FollowPath(robotGoToShootCommon!!)
@@ -343,7 +355,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                 FollowPath(robotPark!!)
             ),
 
-        )
+            )
 
     override fun onUpdate() {
         val dx = goalX - PedroComponent.follower.pose.x
@@ -398,7 +410,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         return it * 0.0;
     }
     fun distanceToVelocity(it: Double): Double {
-        return 0.98 * (0.0127 * it * it + 1.81 * it + 937.0);
+        return 0.95 * (0.0127 * it * it + 1.81 * it + 937.0);
     }
     fun distanceToTheta(it: Double): Angle {
         return max(min(-0.224*it+74, 63.0), 55.0).deg;
