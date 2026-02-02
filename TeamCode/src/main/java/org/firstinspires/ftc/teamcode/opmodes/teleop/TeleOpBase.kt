@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
+import com.pedropathing.geometry.BezierLine
+import com.pedropathing.geometry.Pose
+import com.pedropathing.paths.HeadingInterpolator
+import com.pedropathing.paths.PathChain
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
@@ -10,17 +14,17 @@ import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
+import dev.nextftc.extensions.pedro.FollowPath
+import dev.nextftc.extensions.pedro.PedroComponent
+import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import dev.nextftc.hardware.driving.FieldCentric
-import dev.nextftc.hardware.driving.MecanumDriverControlled
-import dev.nextftc.hardware.impl.MotorEx
+import org.firstinspires.ftc.teamcode.Auton.AutonPositions
+import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.speed1
-import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
@@ -30,9 +34,8 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsyst
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
-import java.util.function.Supplier
-import kotlin.math.PI
 import kotlin.math.hypot
+
 
 data class ResetModeParams(val x: Double, val y: Double, val h: Angle)
 
@@ -43,19 +46,17 @@ open class TeleOpBase(
     private val goalY: Double,
     private val resetModeParams: ResetModeParams,
     private val resetModePhiAngle: Angle,
-//    private val distanceToFlightTimeSecs: (Double) -> Double,
-//    private val invertDriveControls: Boolean,
     private val distanceToVelocity: (Double) -> Double,
     private val distanceToTheta: (Double) -> Angle,
     private val distanceToTime: (Double) -> Double
 ): NextFTCOpMode() {
 
-    private val lfw = MotorEx("lfw").reversed();
-    private val lbw = MotorEx("lbw").reversed();
-    private val rfw = MotorEx("rfw");
-    private val rbw = MotorEx("rbw");
+//    private val lfw = MotorEx("lfw").reversed();
+//    private val lbw = MotorEx("lbw").reversed();
+//    private val rfw = MotorEx("rfw");
+//    private val rbw = MotorEx("rbw");
 
-    private var odom: OdometrySubsystem? = null;
+//    private var odom: OdometrySubsystem? = null;
 
     private var ofsX = 0.0;
     private var ofsY = 0.0;
@@ -63,45 +64,27 @@ open class TeleOpBase(
 
     val x: Double
         get() {
-            if (odom != null) {
-                return odom!!.rOx1 + ofsX;
-            }
-            return 0.0;
+            return PedroComponent.follower.pose.x + ofsX;
         }
     val y: Double
         get() {
-            if (odom != null) {
-                return odom!!.rOy1 + ofsY;
-            }
-            return 0.0;
+            return PedroComponent.follower.pose.y + ofsY;
         }
     val h: Angle
         get() {
-            if (odom != null) {
-                return odom!!.rOh.rad + ofsH.rad;
-            }
-            return 0.0.rad;
+            return (PedroComponent.follower.pose.heading + ofsH).rad;
         }
     val vx: Double
         get() {
-            if (odom != null) {
-                return odom!!.vx;
-            }
-            return 0.0;
+            return PedroComponent.follower.velocity.xComponent;
         }
     val vy: Double
         get() {
-            if (odom != null) {
-                return odom!!.vy;
-            }
-            return 0.0;
+            return PedroComponent.follower.velocity.yComponent;
         }
     val vh: Angle
         get() {
-            if (odom != null) {
-                return odom!!.omega.rad;
-            }
-            return 0.0.rad;
+            return PedroComponent.follower.velocity.theta.rad;
         }
 
     init {
@@ -115,26 +98,81 @@ open class TeleOpBase(
                 TurretPhiSubsystem,
                 TurretThetaSubsystem
             ),
+            PedroComponent(Constants::createFollower),
             BulkReadComponent,
             BindingsComponent
         )
     }
 
+    var gateIntakeChain: PathChain? = null;
+    var farShootChain: PathChain? = null;
+    var closeShootChain: PathChain? = null;
+    var closeIntakeChain: PathChain? = null;
+
     override fun onInit() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
         MagServoSubsystem.stop()
-        MagblockServoSubsystem.block()
 
-        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
+//        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
+
+        gateIntakeChain = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    PedroComponent.follower::getPose,
+                    Pos(AutonPositions.gateOpenPose, isBlue)
+                )
+            )
+            .setHeadingInterpolation(
+                HeadingInterpolator.linearFromPoint(
+                    PedroComponent.follower::getHeading,
+                    Pos(AutonPositions.gateOpenPose, isBlue).heading,
+                    0.75
+                )
+            )
+            .addPath(
+                BezierLine(
+                    Pos(AutonPositions.gateOpenPose, isBlue),
+                    Pos(AutonPositions.gateAfterOpenPose, isBlue)
+                )
+            )
+            .setLinearHeadingInterpolation(
+                Pos(AutonPositions.gateOpenPose, isBlue).heading,
+                Pos(AutonPositions.gateAfterOpenPose, isBlue).heading,
+                0.8
+            )
+            .build()
+
+        farShootChain = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    PedroComponent.follower::getPose,
+                    Pos(AutonPositions.shootPoseFar, isBlue)
+                )
+            )
+            .setTangentHeadingInterpolation()
+            .build()
+
+        closeShootChain = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    PedroComponent.follower::getPose,
+                    Pos(AutonPositions.shootPoseClose, isBlue)
+                )
+            )
+            .setTangentHeadingInterpolation()
+            .build()
     }
 
     private var autoAimEnabled = true;
     private var resetMode = false;
 //    private var resetModePhiAngle = 180.0.deg;
     private var phiTrim = 0.0.deg;
+    private var automatedDrive = false;
     var speedFactor = 1.0;
     override fun onStartButtonPressed() {
+        MagblockServoSubsystem.block()
+
         gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
         gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
 
@@ -144,22 +182,58 @@ open class TeleOpBase(
         val startY = content[1].toDouble()
         val startH = content[2].toDouble()
 
-        odom!!.setPinpoint(startX, startY, startH)
+        PedroComponent.follower.pose = Pose(startX, startY, startH)
+//        odom!!.setPinpoint(startX, startY, startH)
 //        odom!!.setPinpoint(72.0, 72.0, -PI / 2)
 
-        val mecanum = MecanumDriverControlled(
-            lfw,
-            rfw,
-            lbw,
-            rbw,
-            -Gamepads.gamepad1.leftStickY.map { it*speedFactor },
-            Gamepads.gamepad1.leftStickX.map { it*speedFactor },
-            Gamepads.gamepad1.rightStickX.map { it*speedFactor },
-            FieldCentric {
-                if (isBlue) (h.inRad - PI).rad else h
-            }
+        // if doesn't work after macro, might have to add thing that causes
+        val driverControlled = PedroDriverControlled(
+            Gamepads.gamepad1.leftStickY.map { if (isBlue) -it else it },
+            Gamepads.gamepad1.leftStickX.map { if (isBlue) -it else it },
+            Gamepads.gamepad1.rightStickX,
+            false
         )
-        mecanum();
+        driverControlled()
+
+        Gamepads.gamepad1.leftStickX.inRange(-0.01, 0.01).not()
+            .or(Gamepads.gamepad1.leftStickY.inRange(-0.01, 0.01).not())
+            .or(Gamepads.gamepad1.rightStickX.inRange(-0.01, 0.01).not())
+            .whenBecomesTrue {
+                if (automatedDrive) {
+                    automatedDrive = false
+                    driverControlled()
+                }
+            }
+
+        Gamepads.gamepad1.dpadUp whenBecomesTrue {
+            FollowPath(gateIntakeChain!!)()
+            automatedDrive = true
+        }
+        (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
+            .whenBecomesTrue {
+                ParallelGroup(
+                    TurretPhiSubsystem.AutoAim(
+                        goalX - Pos(AutonPositions.shootPoseFar, isBlue).x,
+                        goalY - Pos(AutonPositions.shootPoseFar, isBlue).y,
+                        farShootChain!!.getPose(PathChain.PathT(0, 1.0)).heading.rad  // t=1.0 is end
+                    ),
+                    FollowPath(farShootChain!!)
+                )()
+                automatedDrive = true;
+            }
+        (if (isBlue) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft)
+            .whenBecomesTrue {
+                ParallelGroup(
+                    TurretPhiSubsystem.AutoAim(
+                        goalX - Pos(AutonPositions.shootPoseClose, isBlue).x,
+                        goalY - Pos(AutonPositions.shootPoseClose, isBlue).y,
+                        closeShootChain!!.getPose(PathChain.PathT(0, 1.0)).heading.rad  // t=1.0 is end
+                    ),
+                    FollowPath(closeShootChain!!)
+                )()
+                automatedDrive = true
+            }
+        //todo: handle automatedDrive = false
 
         Gamepads.gamepad1.rightBumper whenBecomesTrue {
             speedFactor = 0.5;
@@ -245,7 +319,7 @@ open class TeleOpBase(
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
 
-        odom!!.updateOdom()
+        PedroComponent.follower.update()
 
         val dx = goalX - x
         val dy = goalY - y
@@ -283,12 +357,12 @@ open class TeleOpBase(
             //)
         }
 
-        telemetry.addData("x (inch)", odom!!.rOx1);
-        telemetry.addData("y (inch)", odom!!.rOy1);
-        telemetry.addData("h (radians)", odom!!.rOh);
+        telemetry.addData("x (inch)", x);
+        telemetry.addData("y (inch)", y);
+        telemetry.addData("h (radians)", h);
         telemetry.addData(
             "distanceToGoal",
-            hypot((3 - odom!!.rOx1), (141 - odom!!.rOy1))
+            hypot((goalX - x), (goalY - y))
         );
         telemetry.addData("ShooterSpeed", speed1);
         telemetry.addData("Angle", shootAngleDegrees.deg);

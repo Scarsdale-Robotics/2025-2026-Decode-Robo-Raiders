@@ -34,6 +34,9 @@ object AutonPositions {
     fun Red(bluePose: Pose): Pose {
         return Pose(144.0 - bluePose.x, bluePose.y, Math.toRadians(blueRedConvertAngle(bluePose.heading)))
     }
+    fun Pos(bluePose: Pose, isBlue: Boolean): Pose {
+        return if (isBlue) Blue(bluePose) else Red(bluePose);
+    }
 
 
     fun blueRedConvertAngle (x : Double): Double {
