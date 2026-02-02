@@ -51,41 +51,18 @@ open class TeleOpBase(
     private val distanceToTime: (Double) -> Double
 ): NextFTCOpMode() {
 
-//    private val lfw = MotorEx("lfw").reversed();
-//    private val lbw = MotorEx("lbw").reversed();
-//    private val rfw = MotorEx("rfw");
-//    private val rbw = MotorEx("rbw");
-
-//    private var odom: OdometrySubsystem? = null;
+//
 
     private var ofsX = 0.0;
     private var ofsY = 0.0;
     private var ofsH = 0.0;
 
-    val x: Double
-        get() {
-            return PedroComponent.follower.pose.x + ofsX;
-        }
-    val y: Double
-        get() {
-            return PedroComponent.follower.pose.y + ofsY;
-        }
-    val h: Angle
-        get() {
-            return (PedroComponent.follower.pose.heading + ofsH).rad;
-        }
-    val vx: Double
-        get() {
-            return PedroComponent.follower.velocity.xComponent;
-        }
-    val vy: Double
-        get() {
-            return PedroComponent.follower.velocity.yComponent;
-        }
-    val vh: Angle
-        get() {
-            return PedroComponent.follower.velocity.theta.rad;
-        }
+    val x:  Double get() { return (PedroComponent.follower.pose.x + ofsX);}
+    val y:  Double get() { return (PedroComponent.follower.pose.y + ofsY);}
+    val h:  Angle  get() { return (PedroComponent.follower.pose.heading + ofsH).rad;}
+    val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
+    val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
+    val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
 
     init {
         addComponents(
@@ -150,7 +127,13 @@ open class TeleOpBase(
                     Pos(AutonPositions.shootPoseFar, isBlue)
                 )
             )
-            .setTangentHeadingInterpolation()
+            .setHeadingInterpolation(
+                HeadingInterpolator.linearFromPoint(
+                    PedroComponent.follower::getHeading,
+                    Pos(AutonPositions.shootPoseFar, isBlue).heading,
+                    0.9
+                )
+            )
             .build()
 
         closeShootChain = PedroComponent.follower.pathBuilder()
@@ -160,7 +143,13 @@ open class TeleOpBase(
                     Pos(AutonPositions.shootPoseClose, isBlue)
                 )
             )
-            .setTangentHeadingInterpolation()
+            .setHeadingInterpolation(
+                HeadingInterpolator.linearFromPoint(
+                    PedroComponent.follower::getHeading,
+                    Pos(AutonPositions.shootPoseClose, isBlue).heading,
+                    0.9
+                )
+            )
             .build()
     }
 
@@ -188,17 +177,17 @@ open class TeleOpBase(
 
         // if doesn't work after macro, might have to add thing that causes
         val driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.map { if (isBlue) -it else it },
-            Gamepads.gamepad1.leftStickX.map { if (isBlue) -it else it },
-            Gamepads.gamepad1.rightStickX,
+            Gamepads.gamepad1.leftStickY.map { if (isBlue) it else -it },
+            Gamepads.gamepad1.leftStickX.map { if (isBlue) it else -it },
+            -Gamepads.gamepad1.rightStickX,
             false
         )
         driverControlled()
 
-        Gamepads.gamepad1.leftStickX.inRange(-0.01, 0.01).not()
-            .or(Gamepads.gamepad1.leftStickY.inRange(-0.01, 0.01).not())
-            .or(Gamepads.gamepad1.rightStickX.inRange(-0.01, 0.01).not())
-            .whenBecomesTrue {
+        Gamepads.gamepad1.leftStickX.inRange(-0.05, 0.05)
+            .and(Gamepads.gamepad1.leftStickY.inRange(-0.05, 0.05))
+            .and(Gamepads.gamepad1.rightStickX.inRange(-0.05, 0.05))
+            .whenBecomesFalse {
                 if (automatedDrive) {
                     automatedDrive = false
                     driverControlled()
@@ -215,7 +204,7 @@ open class TeleOpBase(
                     TurretPhiSubsystem.AutoAim(
                         goalX - Pos(AutonPositions.shootPoseFar, isBlue).x,
                         goalY - Pos(AutonPositions.shootPoseFar, isBlue).y,
-                        farShootChain!!.getPose(PathChain.PathT(0, 1.0)).heading.rad  // t=1.0 is end
+                        Pos(AutonPositions.shootPoseFar, isBlue).heading.rad
                     ),
                     FollowPath(farShootChain!!)
                 )()
@@ -227,13 +216,12 @@ open class TeleOpBase(
                     TurretPhiSubsystem.AutoAim(
                         goalX - Pos(AutonPositions.shootPoseClose, isBlue).x,
                         goalY - Pos(AutonPositions.shootPoseClose, isBlue).y,
-                        closeShootChain!!.getPose(PathChain.PathT(0, 1.0)).heading.rad  // t=1.0 is end
+                        Pos(AutonPositions.shootPoseClose, isBlue).heading.rad
                     ),
                     FollowPath(closeShootChain!!)
                 )()
                 automatedDrive = true
             }
-        //todo: handle automatedDrive = false
 
         Gamepads.gamepad1.rightBumper whenBecomesTrue {
             speedFactor = 0.5;
@@ -362,7 +350,7 @@ open class TeleOpBase(
         telemetry.addData("h (radians)", h);
         telemetry.addData(
             "distanceToGoal",
-            hypot((goalX - x), (goalY - y))
+            Math.hypot((goalX - x), (goalY - y))
         );
         telemetry.addData("ShooterSpeed", speed1);
         telemetry.addData("Angle", shootAngleDegrees.deg);
