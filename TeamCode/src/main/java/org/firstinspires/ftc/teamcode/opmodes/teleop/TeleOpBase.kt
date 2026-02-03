@@ -249,7 +249,7 @@ open class TeleOpBase(
             gamepad2.rumble(450);
         }
 
-        Gamepads.gamepad2.circle whenBecomesTrue {
+        Gamepads.gamepad2.circle whenTrue {
             val dx = goalX - x
             val dy = goalY - y
             val dxy = hypot(dx, dy)
