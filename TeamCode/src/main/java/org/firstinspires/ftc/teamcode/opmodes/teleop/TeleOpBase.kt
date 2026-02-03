@@ -178,13 +178,13 @@ open class TeleOpBase(
         driverControlled()
 
         Gamepads.gamepad1.dpadUp whenBecomesTrue {
-            val path = FollowPath(gateIntakeChain!!)
+            val path = FollowPath(gateIntakeChain)
             path()
             activeDriveMacros.add(path)
         }
         (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
             .whenBecomesTrue {
-                val path = FollowPath(farShootChain!!)
+                val path = FollowPath(farShootChain)
                 ParallelGroup(
                     TurretPhiSubsystem.AutoAim(
                         goalX - Pos(AutonPositions.shootPoseFar, isBlue).x,
@@ -197,7 +197,7 @@ open class TeleOpBase(
             }
         (if (isBlue) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft)
             .whenBecomesTrue {
-                val path = FollowPath(closeShootChain!!)
+                val path = FollowPath(closeShootChain)
                 ParallelGroup(
                     TurretPhiSubsystem.AutoAim(
                         goalX - Pos(AutonPositions.shootPoseClose, isBlue).x,
@@ -234,13 +234,19 @@ open class TeleOpBase(
         Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
         Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
-        Gamepads.gamepad1.circle whenBecomesTrue ParallelGroup(
-            MagServoSubsystem.run,
-            MagblockServoSubsystem.unblock
-        ) whenBecomesFalse ParallelGroup(
-            MagServoSubsystem.stop,
-            MagblockServoSubsystem.block
-        )
+        Gamepads.gamepad1.circle whenBecomesTrue {
+            ParallelGroup(
+                MagServoSubsystem.run,
+                MagblockServoSubsystem.unblock
+            )()
+            ShooterSubsystem.isShooting = true  // todo: tell aaron to set this
+        } whenBecomesFalse {
+            ParallelGroup(
+                MagServoSubsystem.stop,
+                MagblockServoSubsystem.block
+            )()
+            ShooterSubsystem.isShooting = false
+        }
 
         // manual mode toggle
         Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.triangle whenBecomesTrue {
@@ -341,7 +347,7 @@ open class TeleOpBase(
         telemetry.addData("h (radians)", h);
         telemetry.addData(
             "distanceToGoal",
-            Math.hypot((goalX - x), (goalY - y))
+            hypot((goalX - x), (goalY - y))
         );
         telemetry.addData("ShooterSpeed", speed1);
         telemetry.addData("Angle", shootAngleDegrees.deg);
