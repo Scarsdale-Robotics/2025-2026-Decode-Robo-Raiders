@@ -6,6 +6,7 @@ import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.HeadingInterpolator
 import com.pedropathing.paths.PathChain
+import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
@@ -50,19 +51,18 @@ open class TeleOpBase(
     private val distanceToTheta: (Double) -> Angle,
     private val distanceToTime: (Double) -> Double
 ): NextFTCOpMode() {
-
-//
-
-    private var ofsX = 0.0;
-    private var ofsY = 0.0;
-    private var ofsH = 0.0;
-
-    val x:  Double get() { return (PedroComponent.follower.pose.x + ofsX);}
-    val y:  Double get() { return (PedroComponent.follower.pose.y + ofsY);}
-    val h:  Angle  get() { return (PedroComponent.follower.pose.heading + ofsH).rad;}
+    val x:  Double get() { return (PedroComponent.follower.pose.x);}
+    val y:  Double get() { return (PedroComponent.follower.pose.y);}
+    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
     val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
     val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
+
+    var gateIntakeChain: PathChain;
+    var farShootChain: PathChain;
+    var closeShootChain: PathChain;
+//    var closeIntakeChain: PathChain;
+    var driverControlled: PedroDriverControlled;
 
     init {
         addComponents(
@@ -79,19 +79,6 @@ open class TeleOpBase(
             BulkReadComponent,
             BindingsComponent
         )
-    }
-
-    var gateIntakeChain: PathChain? = null;
-    var farShootChain: PathChain? = null;
-    var closeShootChain: PathChain? = null;
-    var closeIntakeChain: PathChain? = null;
-
-    override fun onInit() {
-        ShooterSubsystem.off()
-        MagMotorSubsystem.off()
-        MagServoSubsystem.stop()
-
-//        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
 
         gateIntakeChain = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -151,19 +138,13 @@ open class TeleOpBase(
                 )
             )
             .build()
-    }
 
-    private var autoAimEnabled = true;
-    private var resetMode = false;
-//    private var resetModePhiAngle = 180.0.deg;
-    private var phiTrim = 0.0.deg;
-    private var automatedDrive = false;
-    var speedFactor = 1.0;
-    override fun onStartButtonPressed() {
-        MagblockServoSubsystem.block()
-
-        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
-        gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
+        driverControlled = PedroDriverControlled(
+            Gamepads.gamepad1.leftStickY.map { if (isBlue) it else -it },
+            Gamepads.gamepad1.leftStickX.map { if (isBlue) it else -it },
+            -Gamepads.gamepad1.rightStickX,
+            false
+        )
 
         val file = File(Lefile.filePath)
         val content = file.readText().split("\n")
@@ -172,55 +153,60 @@ open class TeleOpBase(
         val startH = content[2].toDouble()
 
         PedroComponent.follower.pose = Pose(startX, startY, startH)
-//        odom!!.setPinpoint(startX, startY, startH)
-//        odom!!.setPinpoint(72.0, 72.0, -PI / 2)
+    }
 
-        // if doesn't work after macro, might have to add thing that causes
-        val driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.map { if (isBlue) it else -it },
-            Gamepads.gamepad1.leftStickX.map { if (isBlue) it else -it },
-            -Gamepads.gamepad1.rightStickX,
-            false
-        )
+    override fun onInit() {
+        ShooterSubsystem.off()
+        MagMotorSubsystem.off()
+        MagServoSubsystem.stop()
+    }
+
+    private var autoAimEnabled = true;
+    private var resetMode = false;
+
+    var activeDriveMacros = mutableListOf<Command>()
+
+    private var phiTrim = 0.0.deg;
+    var speedFactor = 1.0;
+
+    override fun onStartButtonPressed() {
+        MagblockServoSubsystem.block()
+
+        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
+        gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
+
         driverControlled()
 
-        Gamepads.gamepad1.leftStickX.inRange(-0.05, 0.05)
-            .and(Gamepads.gamepad1.leftStickY.inRange(-0.05, 0.05))
-            .and(Gamepads.gamepad1.rightStickX.inRange(-0.05, 0.05))
-            .whenBecomesFalse {
-                if (automatedDrive) {
-                    automatedDrive = false
-                    driverControlled()
-                }
-            }
-
         Gamepads.gamepad1.dpadUp whenBecomesTrue {
-            FollowPath(gateIntakeChain!!)()
-            automatedDrive = true
+            val path = FollowPath(gateIntakeChain!!)
+            path()
+            activeDriveMacros.add(path)
         }
         (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
             .whenBecomesTrue {
+                val path = FollowPath(farShootChain!!)
                 ParallelGroup(
                     TurretPhiSubsystem.AutoAim(
                         goalX - Pos(AutonPositions.shootPoseFar, isBlue).x,
                         goalY - Pos(AutonPositions.shootPoseFar, isBlue).y,
                         Pos(AutonPositions.shootPoseFar, isBlue).heading.rad
                     ),
-                    FollowPath(farShootChain!!)
+                    path
                 )()
-                automatedDrive = true;
+                activeDriveMacros.add(path)
             }
         (if (isBlue) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft)
             .whenBecomesTrue {
+                val path = FollowPath(closeShootChain!!)
                 ParallelGroup(
                     TurretPhiSubsystem.AutoAim(
                         goalX - Pos(AutonPositions.shootPoseClose, isBlue).x,
                         goalY - Pos(AutonPositions.shootPoseClose, isBlue).y,
                         Pos(AutonPositions.shootPoseClose, isBlue).heading.rad
                     ),
-                    FollowPath(closeShootChain!!)
+                    path
                 )()
-                automatedDrive = true
+                activeDriveMacros.add(path)
             }
 
         Gamepads.gamepad1.rightBumper whenBecomesTrue {
@@ -286,9 +272,7 @@ open class TeleOpBase(
                 gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
             } else {
                 // reset position
-                ofsX = resetModeParams.x - x
-                ofsY = resetModeParams.y - y
-                ofsH = resetModeParams.h.inRad - h.inRad
+                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
             }
@@ -308,6 +292,13 @@ open class TeleOpBase(
         lastRuntime = runtime;
 
         PedroComponent.follower.update()
+
+        if (activeDriveMacros.isNotEmpty()) {
+            // untrigger macro
+            activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
+            activeDriveMacros.clear()
+            driverControlled()
+        }
 
         val dx = goalX - x
         val dy = goalY - y
