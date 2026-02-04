@@ -35,6 +35,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsyst
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
+import kotlin.math.abs
 import kotlin.math.hypot
 
 
@@ -58,12 +59,13 @@ open class TeleOpBase(
     val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
 
-    var gateIntakeChain: PathChain;
-    var farShootChain: PathChain;
-    var closeShootChain: PathChain;
+    var gateIntakeChain: PathChain? = null;
+    var farShootChain: PathChain? = null;
+    var closeShootChain: PathChain? = null;
 //    var closeIntakeChain: PathChain;
-    var driverControlled: PedroDriverControlled;
-    var parkChain: PathChain;
+    var driverControlled: PedroDriverControlled? = null;
+//    var driverControlled: PedroDriverControlled;
+    var parkChain: PathChain? = null;
 
     init {
         addComponents(
@@ -79,6 +81,19 @@ open class TeleOpBase(
             PedroComponent(Constants::createFollower),
             BulkReadComponent,
             BindingsComponent
+        )
+    }
+
+    override fun onInit() {
+        ShooterSubsystem.off()
+        MagMotorSubsystem.off()
+        MagServoSubsystem.stop()
+
+        driverControlled = PedroDriverControlled(
+            Gamepads.gamepad1.leftStickY.map { if (isBlue) it else -it },
+            Gamepads.gamepad1.leftStickX.map { if (isBlue) it else -it },
+            -Gamepads.gamepad1.rightStickX,
+            false
         )
 
         gateIntakeChain = PedroComponent.follower.pathBuilder()
@@ -156,13 +171,6 @@ open class TeleOpBase(
             )
             .build()
 
-        driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.map { if (isBlue) it else -it },
-            Gamepads.gamepad1.leftStickX.map { if (isBlue) it else -it },
-            -Gamepads.gamepad1.rightStickX,
-            false
-        )
-
         val file = File(Lefile.filePath)
         val content = file.readText().split("\n")
         val startX = content[0].toDouble()
@@ -170,12 +178,6 @@ open class TeleOpBase(
         val startH = content[2].toDouble()
 
         PedroComponent.follower.pose = Pose(startX, startY, startH)
-    }
-
-    override fun onInit() {
-        ShooterSubsystem.off()
-        MagMotorSubsystem.off()
-        MagServoSubsystem.stop()
     }
 
     private var autoAimEnabled = true;
@@ -192,16 +194,16 @@ open class TeleOpBase(
         gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
         gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
 
-        driverControlled()
+        driverControlled!!()
 
         Gamepads.gamepad1.dpadUp whenBecomesTrue {
-            val path = FollowPath(gateIntakeChain)
+            val path = FollowPath(gateIntakeChain!!)
             path()
             activeDriveMacros.add(path)
         }
         (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
             .whenBecomesTrue {
-                val path = FollowPath(farShootChain)
+                val path = FollowPath(farShootChain!!)
                 ParallelGroup(
                     TurretPhiSubsystem.AutoAim(
                         goalX - Pos(AutonPositions.shootPoseFar, isBlue).x,
@@ -214,7 +216,7 @@ open class TeleOpBase(
             }
         (if (isBlue) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft)
             .whenBecomesTrue {
-                val path = FollowPath(closeShootChain)
+                val path = FollowPath(closeShootChain!!)
                 ParallelGroup(
                     TurretPhiSubsystem.AutoAim(
                         goalX - Pos(AutonPositions.shootPoseClose, isBlue).x,
@@ -226,7 +228,7 @@ open class TeleOpBase(
                 activeDriveMacros.add(path)
             }
         Gamepads.gamepad1.leftBumper whenBecomesTrue {
-            val path = FollowPath(parkChain)
+            val path = FollowPath(parkChain!!)
             path()
             activeDriveMacros.add(path)
         }
@@ -321,11 +323,18 @@ open class TeleOpBase(
 
         PedroComponent.follower.update()
 
-        if (activeDriveMacros.isNotEmpty()) {
+        if (
+            activeDriveMacros.isNotEmpty() &&
+            (
+                    abs(gamepad1.left_stick_x) > 0.0 ||
+                    abs(gamepad1.left_stick_y) > 0.0 ||
+                    abs(gamepad1.right_stick_x) > 0.0
+            )
+        ) {
             // untrigger macro
             activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
             activeDriveMacros.clear()
-            driverControlled()
+            PedroComponent.follower.startTeleopDrive()
         }
 
         val dx = goalX - x
