@@ -16,6 +16,8 @@ object AutonPositions {
     val gateAfterOpenPose = //F FTC MADE OUR MAIN STRATEGY ILLEGAL
         Pose(14.0, 53.0, Math.toRadians(145.0)) // Gate Open Pose of our robot.
 
+    val parkPoseFull = Pose(37.5, 31.0, Math.toRadians(270.0))
+
     val commonIntakePos = Pose(12.5, 10.9, Math.toRadians(180.0))
     val commonIntakeControlPos = Pose(54.8, 36.7)
 

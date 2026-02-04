@@ -63,6 +63,7 @@ open class TeleOpBase(
     var closeShootChain: PathChain;
 //    var closeIntakeChain: PathChain;
     var driverControlled: PedroDriverControlled;
+    var parkChain: PathChain;
 
     init {
         addComponents(
@@ -139,6 +140,22 @@ open class TeleOpBase(
             )
             .build()
 
+        parkChain = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    PedroComponent.follower::getPose,
+                    Pos(AutonPositions.parkPoseFull, isBlue)
+                )
+            )
+            .setHeadingInterpolation(
+                HeadingInterpolator.linearFromPoint(
+                    PedroComponent.follower::getHeading,
+                    Pos(AutonPositions.parkPoseFull, isBlue).heading,
+                    1.0
+                )
+            )
+            .build()
+
         driverControlled = PedroDriverControlled(
             Gamepads.gamepad1.leftStickY.map { if (isBlue) it else -it },
             Gamepads.gamepad1.leftStickX.map { if (isBlue) it else -it },
@@ -208,6 +225,11 @@ open class TeleOpBase(
                 )()
                 activeDriveMacros.add(path)
             }
+        Gamepads.gamepad1.leftBumper whenBecomesTrue {
+            val path = FollowPath(parkChain)
+            path()
+            activeDriveMacros.add(path)
+        }
 
         Gamepads.gamepad1.rightBumper whenBecomesTrue {
             speedFactor = 0.5;
