@@ -263,13 +263,13 @@ open class TeleOpBase(
                 MagServoSubsystem.run,
                 MagblockServoSubsystem.unblock
             )()
-            ShooterSubsystem.isShooting = true  // todo: tell aaron to set this
+//            ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
         } whenBecomesFalse {
             ParallelGroup(
                 MagServoSubsystem.stop,
                 MagblockServoSubsystem.block
             )()
-            ShooterSubsystem.isShooting = false
+//            ShooterSubsystem.isShooting = false
         }
 
         // manual mode toggle
