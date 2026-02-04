@@ -34,21 +34,19 @@ public class CVSubsystem_VisionPortal {
     private double RCy1;
     private double RCh; // heading in radians
 
-    private boolean side; // True = blue, False = red
-
-    private motif currentMotif;
+//    private motif currentMotif;
     private AprilTagDetection lastDetection;
 
     public HardwareMap hm1;
 
-    public CVSubsystem_VisionPortal(double x1, double y1, double h, boolean side, HardwareMap hm) {
+    public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
         hm1 = hm;
 
 
         // Initialize IMU
         imu = hm1.get(IMU.class, "imu");
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot( ///tune
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
         );
@@ -83,7 +81,6 @@ public class CVSubsystem_VisionPortal {
         this.RCx1 = x1;
         this.RCy1 = y1;
         this.RCh = h;
-        this.side = side;
 
         init();
     }
@@ -100,41 +97,45 @@ public class CVSubsystem_VisionPortal {
         imu.resetYaw();
     }
 
-    /** Reads latest AprilTag and sets the motif if any valid detection */
-    public motif getMotifc() {
-        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
 
-        if (detections != null && !detections.isEmpty()) {
-            AprilTagDetection tag = detections.get(0);
-            int id = tag.id;
-            currentMotif = motif.FD(id);
-            lastDetection = tag;
-            return currentMotif;
-        }
 
-        return motif.Na;
-    }
-
-    /** Updates the robot's camera-based pose */
     public void updateCV() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
-        Cam = true ? aprilTagProcessor.getDetections() != null : false;
-
-        if (Cam){return;}
-
+        if (detections == null || detections.isEmpty()) return;
 
         AprilTagDetection tag = detections.get(0);
+        if (tag.robotPose == null) return;
+
         lastDetection = tag;
 
+        Pose3D pose = tag.robotPose;
+        RCx1 = pose.getPosition().x * 39.37;
+        RCy1 = pose.getPosition().y * 39.37;
+        RCh  = pose.getOrientation().getYaw(AngleUnit.RADIANS);
+
         // Use team-specific tags
-        if ((tag.id == 20 && side) || (tag.id == 24 && !side)) {
-            Pose3D pose = tag.robotPose;
-            if (pose != null) {
-                RCx1 = pose.getPosition().x * 39.37;
-                RCy1 = pose.getPosition().y * 39.37;
-                RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
-            }
-        }
+//       if ((tag.id == 20 && side) || (tag.id == 24 && !side)) { ///Might work without this we dont need to allight to specific tag
+
+//      }
+
+
+//        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+//
+//        Cam = detections != null && !detections.isEmpty();
+//        if (!Cam) return;
+//
+//        AprilTagDetection tag = detections.get(0);
+//        lastDetection = tag;
+//
+//        if (tag.robotPose == null) {
+//            Cam = false;
+//            return;
+//        }
+//
+//        Pose3D pose = tag.robotPose;
+//        RCx1 = pose.getPosition().x * 39.37;
+//        RCy1 = pose.getPosition().y * 39.37;
+//        RCh  = pose.getOrientation().getYaw(AngleUnit.RADIANS);
     }
 
     public void setCv(double x1, double y1, double h) {
@@ -144,62 +145,42 @@ public class CVSubsystem_VisionPortal {
     }
 
     /// Getters ///
-    public boolean getSide() { return side; }
+//    public boolean getSide() { return side; }
     public double getRCx1() { return RCx1; }
     public double getRCy1() { return RCy1; }
-    public double getRCh() { return RCh; }
+    //public double getRCh() { return RCh; }
 
     @Nullable
     public AprilTagDetection getLastDetection() { return lastDetection; }
 
-    public boolean camStatus() {
-        return visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING;
+    public Boolean hasDetection(){
+        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+        return detections != null && !detections.isEmpty();
     }
 
-    /// Angle helpers ///
-    private double wrapAngleRad(double a) {
-        a = (a + Math.PI) % (2.0 * Math.PI);
-        if (a < 0) a += 2.0 * Math.PI;
-        return a - Math.PI;
-    }
 
-    /** Returns horizontal offset from camera center (radians) */
-    public double getCameraOffset() {
-        if (lastDetection != null)
-            return Math.toRadians(lastDetection.ftcPose.x); // horizontal offset (degrees → rad)
-        return 0.0;
-    }
-
-    /** Returns how much turret must rotate to face the tag */
-    public double getTurretAngleToTag() {
-        return wrapAngleRad(getCameraOffset());
-    }
-
-    public boolean getCam(){return Cam;}
-
-    /** Motif enum, same as before */
-    public enum motif {
-        GPP(1, 21),
-        PGP(2, 22),
-        PPG(3, 23),
-        Na(0, -1);
-
-        private final int motifValue;
-        private final int num;
-
-        motif(int motifValue, int num) {
-            this.motifValue = motifValue;
-            this.num = num;
-        }
-
-        public int getMotifValue() { return motifValue; }
-        public int getInputID() { return num; }
-
-        public static motif FD(int num) {
-            for (motif m : values()) {
-                if (m.num == num) return m;
-            }
-            return Na;
-        }
-    }
+//    public enum motif {
+//        GPP(1, 21),
+//        PGP(2, 22),
+//        PPG(3, 23),
+//        Na(0, -1);
+//
+//        private final int motifValue;
+//        private final int num;
+//
+//        motif(int motifValue, int num) {
+//            this.motifValue = motifValue;
+//            this.num = num;
+//        }
+//
+//        public int getMotifValue() { return motifValue; }
+//        public int getInputID() { return num; }
+//
+//        public static motif FD(int num) {
+//            for (motif m : values()) {
+//                if (m.num == num) return m;
+//            }
+//            return Na;
+//        }
+//    }
 }
