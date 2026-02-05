@@ -196,6 +196,10 @@ public class LocalizationSubsystem {
         return kalmanY.getKalmanGain();
     }
 
+    public double getKalmangianH(){
+        return kalmanH.getKalmanGain();
+    }
+
 
     public boolean resetLocalizationFromCamera() {
         if (!cv.hasDetection()) {
