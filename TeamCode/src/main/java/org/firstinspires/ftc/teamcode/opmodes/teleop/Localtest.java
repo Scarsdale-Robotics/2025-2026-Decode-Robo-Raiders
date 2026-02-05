@@ -80,6 +80,14 @@ public class Localtest extends LinearOpMode {
                 local.resetLocalizationFromCamera();
                 circle = !circle;
             }
+
+            if(local.isInTopShootingZone()){
+                panelsManager.addLine("In top shooting zone");
+            }else if(local.isInBottomTriangle()){
+                panelsManager.addLine("In bottom shooting zone");
+            }else{
+                panelsManager.addLine("In no shooting zone");
+            }
         }
     }
 }
