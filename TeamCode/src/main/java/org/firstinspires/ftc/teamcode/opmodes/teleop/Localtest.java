@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 
 
+import com.bylazar.panels.*;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.bylazar.telemetry.TelemetryPluginConfig;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,6 +13,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem_VisionPortal;
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
+
+import java.util.List;
+
+import kotlin.Unit;
 
 @TeleOp(name = "Localtest")
 public class Localtest extends LinearOpMode {
@@ -18,7 +26,7 @@ public class Localtest extends LinearOpMode {
     LocalizationSubsystem local;
 
     boolean circle;
-
+    private TelemetryManager panelsManager;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -26,6 +34,13 @@ public class Localtest extends LinearOpMode {
         odom = new OdometrySubsystem(0,0,Math.PI/2, hardwareMap);
         local = new LocalizationSubsystem(0,0,Math.PI/2, hardwareMap);
         circle = true;
+
+        panelsManager = new TelemetryManager(
+                () -> new TelemetryPluginConfig(), //defualt config
+                (List<String> list) -> Unit.INSTANCE,
+                (Long interval) -> Unit.INSTANCE
+        );
+
 
         waitForStart();
         while(opModeIsActive()){
