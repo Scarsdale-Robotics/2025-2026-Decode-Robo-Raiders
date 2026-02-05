@@ -36,7 +36,6 @@ public class CVSubsystem_VisionPortal {
 
     private double startingHeading = 0; // robot-centric offset
 
-    //    private motif currentMotif;
     private AprilTagDetection lastDetection;
 
     public HardwareMap hm1;
