@@ -17,12 +17,15 @@ public class Localtest extends LinearOpMode {
     OdometrySubsystem odom;
     LocalizationSubsystem local;
 
+    boolean circle;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
         cv = new CVSubsystem_VisionPortal(0,0,Math.PI/2, hardwareMap);
         odom = new OdometrySubsystem(0,0,Math.PI/2, hardwareMap);
         local = new LocalizationSubsystem(0,0,Math.PI/2, hardwareMap);
+        circle = true;
 
         waitForStart();
         while(opModeIsActive()){
@@ -54,6 +57,11 @@ public class Localtest extends LinearOpMode {
             telemetry.addData("Ahl: ", local.getAH());
 
             telemetry.update();
+
+            if(circle && gamepad1.circle){
+                local.resetLocalizationFromCamera();
+                circle = !circle;
+            }
         }
     }
 }
