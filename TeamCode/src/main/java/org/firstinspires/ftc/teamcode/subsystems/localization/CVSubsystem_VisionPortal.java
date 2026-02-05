@@ -120,7 +120,6 @@ public class CVSubsystem_VisionPortal {
         if (RCh > Math.PI) RCh -= 2*Math.PI;
         if (RCh < -Math.PI) RCh += 2*Math.PI;
 
-        // Use team-specific tags
 //       if ((tag.id == 20 && side) || (tag.id == 24 && !side)) { ///Might work without this we dont need to allight to specific tag
 
 //      }

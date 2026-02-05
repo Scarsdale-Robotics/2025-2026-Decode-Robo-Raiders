@@ -235,5 +235,11 @@ public class LocalizationSubsystem {
         return true;
     }
 
+    public boolean isInShootingZone(){
+        if(Rx>)
+
+        return false;
+
+    }
 }
 
