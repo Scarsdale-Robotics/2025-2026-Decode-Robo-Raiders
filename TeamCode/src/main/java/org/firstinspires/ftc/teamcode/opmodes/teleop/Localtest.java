@@ -28,6 +28,7 @@ public class Localtest extends LinearOpMode {
     boolean circle;
     private TelemetryManager panelsManager;
 
+
     @Override
     public void runOpMode() throws InterruptedException {
         cv = new CVSubsystem_VisionPortal(0,0,Math.PI/2, hardwareMap);
@@ -42,36 +43,38 @@ public class Localtest extends LinearOpMode {
         );
 
 
+
+
         waitForStart();
         while(opModeIsActive()){
             cv.updateCV();
             odom.updateOdom();
             local.updateLocalization();
 
-            telemetry.addLine("ODOM");
-            telemetry.addData("xo: ", odom.getROx1());
-            telemetry.addData("yo: ", odom.getROy1());
-            telemetry.addData("ho: ", odom.getROh());
+            panelsManager.addLine("ODOM");
+            panelsManager.addData("xo: ", odom.getROx1());
+            panelsManager.addData("yo: ", odom.getROy1());
+            panelsManager.addData("ho: ", odom.getROh());
 
-            telemetry.addLine("CV");
-            telemetry.addData("xc: ", cv.getRCx1());
-            telemetry.addData("yc: ", cv.getRCy1());
-            telemetry.addData("yc: ", cv.getRCh());
+            panelsManager.addLine("CV");
+            panelsManager.addData("xc: ", cv.getRCx1());
+            panelsManager.addData("yc: ", cv.getRCy1());
+            panelsManager.addData("yc: ", cv.getRCh());
 
-            telemetry.addLine("LOCALIZATION");
-            telemetry.addData("xl: ", local.getX());
-            telemetry.addData("yl: ", local.getY());
-            telemetry.addData("hl: ", local.getH());
+            panelsManager.addLine("LOCALIZATION");
+            panelsManager.addData("xl: ", local.getX());
+            panelsManager.addData("yl: ", local.getY());
+            panelsManager.addData("hl: ", local.getH());
 
-            telemetry.addData("Vxl: ", local.getVX());
-            telemetry.addData("Vyl: ", local.getVY());
-            telemetry.addData("Vhl: ", local.getVH());
+            panelsManager.addData("Vxl: ", local.getVX());
+            panelsManager.addData("Vyl: ", local.getVY());
+            panelsManager.addData("Vhl: ", local.getVH());
 
-            telemetry.addData("Axl: ", local.getAX());
-            telemetry.addData("Ayl: ", local.getAY());
-            telemetry.addData("Ahl: ", local.getAH());
+            panelsManager.addData("Axl: ", local.getAX());
+            panelsManager.addData("Ayl: ", local.getAY());
+            panelsManager.addData("Ahl: ", local.getAH());
 
-            telemetry.update();
+            panelsManager.update(telemetry);
 
             if(circle && gamepad1.circle){
                 local.resetLocalizationFromCamera();
