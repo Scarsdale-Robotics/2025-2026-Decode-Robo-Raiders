@@ -193,5 +193,47 @@ public class LocalizationSubsystem {
         return kalmanY.getKalmanGain();
     }
 
+
+    public boolean resetLocalizationFromCamera() {
+        // Check if the camera has a valid detection
+        if (!cv.hasDetection()) {
+            return false; // No tag detected, can't reset
+        }
+
+        // Get camera-based position
+        double camX = cv.getRCx1();
+        double camY = cv.getRCy1();
+        double camH = cv.getRCh(); // Make sure CVSubsystem returns heading if available
+
+        // Reset odometry
+        odom.setPinpoint(camX, camY, camH);
+
+        // Reset Kalman filters with camera values
+        kalmanX = new Kalman(camX, 0.05, 0.3, 0.7);
+        kalmanY = new Kalman(camY, 0.05, 0.3, 0.7);
+
+        // Reset stored positions and history
+        Rx = camX;
+        Ry = camY;
+        Rh = camH;
+
+        xHistory.clear();
+        yHistory.clear();
+        hHistory.clear();
+        tHistory.clear();
+
+        // Add initial camera reading to history
+        xHistory.add(Rx);
+        yHistory.add(Ry);
+        hHistory.add(Rh);
+        tHistory.add(clock / 1000.0);
+
+        // Reset velocities and accelerations
+        Vx = Vy = Vh = 0.0;
+        Ax = Ay = Ah = 0.0;
+
+        return true; // Reset successful
+    }
+
 }
 

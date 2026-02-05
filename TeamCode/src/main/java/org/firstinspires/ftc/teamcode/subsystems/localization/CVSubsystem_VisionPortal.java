@@ -34,7 +34,9 @@ public class CVSubsystem_VisionPortal {
     private double RCy1;
     private double RCh; // heading in radians
 
-//    private motif currentMotif;
+    private double startingHeading = 0; // robot-centric offset
+
+    //    private motif currentMotif;
     private AprilTagDetection lastDetection;
 
     public HardwareMap hm1;
@@ -81,6 +83,7 @@ public class CVSubsystem_VisionPortal {
         this.RCx1 = x1;
         this.RCy1 = y1;
         this.RCh = h;
+        this.startingHeading = h; // set robot-centric reference
 
         init();
     }
@@ -111,44 +114,32 @@ public class CVSubsystem_VisionPortal {
         Pose3D pose = tag.robotPose;
         RCx1 = pose.getPosition().x * 39.37;
         RCy1 = pose.getPosition().y * 39.37;
-        RCh  = pose.getOrientation().getYaw(AngleUnit.RADIANS);
+
+        double rawYaw = pose.getOrientation().getYaw(AngleUnit.RADIANS);
+
+        RCh  = rawYaw - startingHeading;
+        if (RCh > Math.PI) RCh -= 2*Math.PI;
+        if (RCh < -Math.PI) RCh += 2*Math.PI;
 
         // Use team-specific tags
 //       if ((tag.id == 20 && side) || (tag.id == 24 && !side)) { ///Might work without this we dont need to allight to specific tag
 
 //      }
 
-
-//        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
-//
-//        Cam = detections != null && !detections.isEmpty();
-//        if (!Cam) return;
-//
-//        AprilTagDetection tag = detections.get(0);
-//        lastDetection = tag;
-//
-//        if (tag.robotPose == null) {
-//            Cam = false;
-//            return;
-//        }
-//
-//        Pose3D pose = tag.robotPose;
-//        RCx1 = pose.getPosition().x * 39.37;
-//        RCy1 = pose.getPosition().y * 39.37;
-//        RCh  = pose.getOrientation().getYaw(AngleUnit.RADIANS);
     }
 
     public void setCv(double x1, double y1, double h) {
         this.RCx1 = x1;
         this.RCy1 = y1;
         this.RCh = h;
+        this.startingHeading = h; // reset robot-centric reference
     }
 
     /// Getters ///
 //    public boolean getSide() { return side; }
     public double getRCx1() { return RCx1; }
     public double getRCy1() { return RCy1; }
-    //public double getRCh() { return RCh; }
+    public double getRCh() { return RCh; }
 
     @Nullable
     public AprilTagDetection getLastDetection() { return lastDetection; }
@@ -158,29 +149,4 @@ public class CVSubsystem_VisionPortal {
         return detections != null && !detections.isEmpty();
     }
 
-
-//    public enum motif {
-//        GPP(1, 21),
-//        PGP(2, 22),
-//        PPG(3, 23),
-//        Na(0, -1);
-//
-//        private final int motifValue;
-//        private final int num;
-//
-//        motif(int motifValue, int num) {
-//            this.motifValue = motifValue;
-//            this.num = num;
-//        }
-//
-//        public int getMotifValue() { return motifValue; }
-//        public int getInputID() { return num; }
-//
-//        public static motif FD(int num) {
-//            for (motif m : values()) {
-//                if (m.num == num) return m;
-//            }
-//            return Na;
-//        }
-//    }
 }

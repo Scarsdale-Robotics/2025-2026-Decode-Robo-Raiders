@@ -38,6 +38,7 @@ public class Localtest extends LinearOpMode {
             telemetry.addLine("CV");
             telemetry.addData("xc: ", cv.getRCx1());
             telemetry.addData("yc: ", cv.getRCy1());
+            telemetry.addData("yc: ", cv.getRcH());
 
             telemetry.addLine("LOCALIZATION");
             telemetry.addData("xl: ", local.getX());
@@ -52,12 +53,7 @@ public class Localtest extends LinearOpMode {
             telemetry.addData("Ayl: ", local.getAY());
             telemetry.addData("Ahl: ", local.getAH());
 
-
-
-
-
             telemetry.update();
-
         }
     }
 }
