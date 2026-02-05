@@ -235,11 +235,17 @@ public class LocalizationSubsystem {
         return true;
     }
 
-    public boolean isInShootingZone(){
-        if(Rx>)
+    public boolean isInTopShootingZone() {
+        if (Rx < 0 || Rx > 144 || Ry > 144) return false;
+        double bottomY = Math.abs(Rx - 72) + 72;
+        return !(Ry < bottomY);
+    }
 
-        return false;
-
+    public boolean isInBottomTriangle() {
+        if (Rx < 48 || Rx > 96 || Ry < 0) return false;
+        double leftY  = Rx - 48;
+        double rightY = -Rx + 96;
+        return !(Ry > leftY) && !(Ry > rightY);
     }
 }
 
