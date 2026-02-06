@@ -82,7 +82,7 @@ public class CVSubsystem_VisionPortal {
         this.RCx1 = x1;
         this.RCy1 = y1;
         this.RCh = h;
-        this.startingHeading = h; // set robot-centric reference
+        this.startingHeading = h;
 
         init();
     }
