@@ -2,14 +2,22 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+
 import com.bylazar.panels.*;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.bylazar.telemetry.TelemetryPluginConfig;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem_VisionPortal;
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
@@ -29,6 +37,10 @@ public class Localtest extends LinearOpMode {
     private TelemetryManager panelsManager;
 
 
+    Pose pose;
+
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         cv = new CVSubsystem_VisionPortal(0,0,Math.PI/2, hardwareMap);
@@ -36,12 +48,12 @@ public class Localtest extends LinearOpMode {
         local = new LocalizationSubsystem(0,0,Math.PI/2, hardwareMap);
         circle = true;
 
+
         panelsManager = new TelemetryManager(
                 () -> new TelemetryPluginConfig(), //defualt config
                 (List<String> list) -> Unit.INSTANCE,
                 (Long interval) -> Unit.INSTANCE
         );
-
 
 
 
