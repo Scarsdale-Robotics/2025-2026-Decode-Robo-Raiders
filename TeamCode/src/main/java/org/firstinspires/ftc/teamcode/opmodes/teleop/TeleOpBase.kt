@@ -26,7 +26,6 @@ import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.speed1
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
-import org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
@@ -89,7 +88,7 @@ open class TeleOpBase(
                 TurretPhiSubsystem,
                 TurretThetaSubsystem
             ),
-//            PedroComponent(Constants::createFollower),
+            PedroComponent(Constants::createFollower),
             BulkReadComponent,
             BindingsComponent
         )
@@ -315,7 +314,22 @@ open class TeleOpBase(
                 gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
             } else {
                 // reset position
-                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
+                val resetPose = Pose(
+                    resetModeParams.x,
+                    resetModeParams.y,
+                    resetModeParams.h.inRad
+                )
+
+                // reset local
+                local?.setPos(
+                    resetModeParams.x,
+                    resetModeParams.y,
+                    resetModeParams.h.inRad
+                )
+
+                // reset pedro
+                PedroComponent.follower.setPose(resetPose)
+
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
             }
@@ -336,7 +350,7 @@ open class TeleOpBase(
 
         local?.updateLocalization()
         PedroComponent.follower.update()
-        follower.setPose(getPoseFromLocalization());
+        PedroComponent.follower.setPose(getPoseFromLocalization());
 //        PedroComponent.follower.update() //maybe should update after not before
 
 
