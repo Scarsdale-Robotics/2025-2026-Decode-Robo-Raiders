@@ -37,6 +37,7 @@ class BasicTeleOp(): NextFTCOpMode() {
     private val rfw = MotorEx("rfw");
     private val rbw = MotorEx("rbw");
 
+
     companion object {
         @JvmField var speed1 = 0.0;
         @JvmField var shootAngleDegrees = 60;
