@@ -106,7 +106,7 @@ open class TeleOpBase(
             false
         )
 
-        local = LocalizationSubsystem(0.0,0.0,0.0, hardwareMap);
+        local = LocalizationSubsystem(0.0,0.0,0.0, hardwareMap); //FIX WITH STARTING POS
 
         gateIntakeChain = PedroComponent.follower.pathBuilder()
             .addPath(
