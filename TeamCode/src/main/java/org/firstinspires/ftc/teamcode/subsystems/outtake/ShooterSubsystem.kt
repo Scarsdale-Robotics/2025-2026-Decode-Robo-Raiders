@@ -42,6 +42,7 @@ object ShooterSubsystem : Subsystem {
             velPid(pidCoefficients)
         }
 
+        // todo: tune shooting controller
         shootingController = controlSystem {
             basicFF(ffCoefficients)
             velPid(shootingCoefficients)
@@ -53,8 +54,20 @@ object ShooterSubsystem : Subsystem {
         motor2.power = power;
     }
 
-    class On(speed: Double) : RunToState(controller, KineticState(velocity=speed));
-    var off = RunToVelocity(controller, 0.0).requires(this).named("FlywheelOff").setInterruptible(true);
+    fun setControllerGoals(velocity: Double) {
+        controller.goal = KineticState(velocity=velocity);
+        shootingController.goal = KineticState(velocity=velocity);
+    }
+
+    class On(private val velocity: Double): Command() {
+        override val isDone = true;
+
+        override fun start() {
+            setControllerGoals(velocity)
+        }
+    }
+
+    var off = On(0.0);
 
     class Manual(
         private val shooterPower: Supplier<Double>
@@ -77,7 +90,7 @@ object ShooterSubsystem : Subsystem {
         }
 
         override fun start() {
-            controller.goal = KineticState(velocity=powerByDistance(dxy));
+            setControllerGoals(powerByDistance(dxy))
         }
     }
 
@@ -85,15 +98,9 @@ object ShooterSubsystem : Subsystem {
     var lastPos = 0.0;
     var elapsedTime: ElapsedTime = ElapsedTime();
     override fun periodic() {
-        var power = controller.calculate(
+        val power = (if (isShooting) shootingController else controller).calculate(
             motor2.state.times(-1.0)
         ).coerceIn(0.0, 1.0);
-
-        if (isShooting) {
-            power = shootingController.calculate(
-                motor2.state.times(-1.0)
-            ).coerceIn(0.0, 1.0)
-        }
 
         setMotorPowers(power);
 

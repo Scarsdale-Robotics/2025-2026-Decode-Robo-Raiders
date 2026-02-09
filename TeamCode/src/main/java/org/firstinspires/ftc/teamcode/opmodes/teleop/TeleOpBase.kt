@@ -263,13 +263,13 @@ open class TeleOpBase(
                 MagServoSubsystem.run,
                 MagblockServoSubsystem.unblock
             )()
-//            ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
+            ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
         } whenBecomesFalse {
             ParallelGroup(
                 MagServoSubsystem.stop,
                 MagblockServoSubsystem.block
             )()
-//            ShooterSubsystem.isShooting = false
+            ShooterSubsystem.isShooting = false
         }
 
         // manual mode toggle
@@ -285,10 +285,8 @@ open class TeleOpBase(
             val dxy = hypot(dx, dy)
             val dxp = dx + vx * distanceToTime(dxy)
             val dyp = dy + vy * distanceToTime(dxy)
-            val dxyp = hypot(dxp, dyp)
-            val hp = h + vh * distanceToTime(dxyp)
             TurretPhiSubsystem.AutoAim(
-                dxp, dyp, hp, phiTrim
+                dxp, dyp, h, phiTrim
             )()
         }
 
@@ -343,7 +341,6 @@ open class TeleOpBase(
         val dxp = dx + vx * distanceToTime(dxy)
         val dyp = dy + vy * distanceToTime(dxy)
         val dxyp = hypot(dxp, dyp)
-        val hp = h + vh * distanceToTime(dxyp)
 
         if (resetMode) {
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
