@@ -73,7 +73,7 @@ open class TeleOpBase(
                 IntakeMotorSubsystem,
                 MagMotorSubsystem,
                 MagblockServoSubsystem,
-                MagServoSubsystem,
+//                MagServoSubsystem,
                 ShooterSubsystem,
                 TurretPhiSubsystem,
                 TurretThetaSubsystem
@@ -87,7 +87,7 @@ open class TeleOpBase(
     override fun onInit() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
-        MagServoSubsystem.stop()
+//        MagServoSubsystem.stop()
 
         driverControlled = PedroDriverControlled(
             Gamepads.gamepad1.leftStickY.map { if (isBlue) it else -it },
@@ -255,18 +255,18 @@ open class TeleOpBase(
 //            Gamepads.gamepad1.leftTrigger.greaterThan(0.0)
 //        )
 //        magServoDrive();
-        Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
-        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
+//        Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
+//        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
         Gamepads.gamepad1.circle whenBecomesTrue {
             ParallelGroup(
-                MagServoSubsystem.run,
+//                MagServoSubsystem.run,
                 MagblockServoSubsystem.unblock
             )()
             ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
         } whenBecomesFalse {
             ParallelGroup(
-                MagServoSubsystem.stop,
+//                MagServoSubsystem.stop,
                 MagblockServoSubsystem.block
             )()
             ShooterSubsystem.isShooting = false
@@ -279,7 +279,7 @@ open class TeleOpBase(
             gamepad2.rumble(450);
         }
 
-        Gamepads.gamepad2.circle whenTrue {
+        Gamepads.gamepad2.cross whenFalse {
             val dx = goalX - x
             val dy = goalY - y
             val dxy = hypot(dx, dy)

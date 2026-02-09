@@ -31,7 +31,7 @@ object ShooterSubsystem : Subsystem {
 
     @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 0.75);
     @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
-    @JvmField var shootingCoefficients = PIDCoefficients(999999.9, 0.0, 0.0)
+    @JvmField var shootingCoefficients = PIDCoefficients(1.0, 0.0, 0.0)
 
     private val controller: ControlSystem;
     private val shootingController: ControlSystem;
