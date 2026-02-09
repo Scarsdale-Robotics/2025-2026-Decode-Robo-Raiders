@@ -89,7 +89,6 @@ class AutonBlueFarPark: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         val goalY = 144.0 - 3.0
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
-
     }
 
 
