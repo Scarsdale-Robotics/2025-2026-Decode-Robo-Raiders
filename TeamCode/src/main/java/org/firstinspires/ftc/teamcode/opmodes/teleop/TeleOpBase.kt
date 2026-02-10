@@ -130,13 +130,14 @@ open class TeleOpBase(
                     Pos(AutonPositions.shootPoseFar, isBlue)
                 )
             )
-            .setHeadingInterpolation(
-                HeadingInterpolator.linearFromPoint(
-                    PedroComponent.follower::getHeading,
-                    Pos(AutonPositions.shootPoseFar, isBlue).heading,
-                    0.9
-                )
-            )
+            .setTangentHeadingInterpolation()
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.linearFromPoint(
+//                    PedroComponent.follower::getHeading,
+//                    Pos(AutonPositions.shootPoseFar, isBlue).heading,
+//                    0.9
+//                )
+//            )
             .build()
 
         closeShootChain = PedroComponent.follower.pathBuilder()
@@ -146,13 +147,14 @@ open class TeleOpBase(
                     Pos(AutonPositions.shootPoseClose, isBlue)
                 )
             )
-            .setHeadingInterpolation(
-                HeadingInterpolator.linearFromPoint(
-                    PedroComponent.follower::getHeading,
-                    Pos(AutonPositions.shootPoseClose, isBlue).heading,
-                    0.9
-                )
-            )
+            .setTangentHeadingInterpolation()
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.linearFromPoint(
+//                    PedroComponent.follower::getHeading,
+//                    Pos(AutonPositions.shootPoseClose, isBlue).heading,
+//                    0.9
+//                )
+//            )
             .build()
 
         parkChain = PedroComponent.follower.pathBuilder()
@@ -162,13 +164,14 @@ open class TeleOpBase(
                     Pos(AutonPositions.parkPoseFull, isBlue)
                 )
             )
-            .setHeadingInterpolation(
-                HeadingInterpolator.linearFromPoint(
-                    PedroComponent.follower::getHeading,
-                    Pos(AutonPositions.parkPoseFull, isBlue).heading,
-                    1.0
-                )
-            )
+            .setTangentHeadingInterpolation()
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.linearFromPoint(
+//                    PedroComponent.follower::getHeading,
+//                    Pos(AutonPositions.parkPoseFull, isBlue).heading,
+//                    1.0
+//                )
+//            )
             .build()
 
         val file = File(Lefile.filePath)
@@ -204,27 +207,29 @@ open class TeleOpBase(
         (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
             .whenBecomesTrue {
                 val path = FollowPath(farShootChain!!)
-                ParallelGroup(
-                    TurretPhiSubsystem.AutoAim(
-                        goalX - Pos(AutonPositions.shootPoseFar, isBlue).x,
-                        goalY - Pos(AutonPositions.shootPoseFar, isBlue).y,
-                        Pos(AutonPositions.shootPoseFar, isBlue).heading.rad
-                    ),
-                    path
-                )()
+                path()
+//                ParallelGroup(
+//                    TurretPhiSubsystem.AutoAim(
+//                        goalX - Pos(AutonPositions.shootPoseFar, isBlue).x,
+//                        goalY - Pos(AutonPositions.shootPoseFar, isBlue).y,
+//                        Pos(AutonPositions.shootPoseFar, isBlue).heading.rad
+//                    ),
+//                    path
+//                )()
                 activeDriveMacros.add(path)
             }
         (if (isBlue) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft)
             .whenBecomesTrue {
                 val path = FollowPath(closeShootChain!!)
-                ParallelGroup(
-                    TurretPhiSubsystem.AutoAim(
-                        goalX - Pos(AutonPositions.shootPoseClose, isBlue).x,
-                        goalY - Pos(AutonPositions.shootPoseClose, isBlue).y,
-                        Pos(AutonPositions.shootPoseClose, isBlue).heading.rad
-                    ),
-                    path
-                )()
+                path()
+//                ParallelGroup(
+//                    TurretPhiSubsystem.AutoAim(
+//                        goalX - Pos(AutonPositions.shootPoseClose, isBlue).x,
+//                        goalY - Pos(AutonPositions.shootPoseClose, isBlue).y,
+//                        Pos(AutonPositions.shootPoseClose, isBlue).heading.rad
+//                    ),
+//                    path
+//                )()
                 activeDriveMacros.add(path)
             }
         Gamepads.gamepad1.leftBumper whenBecomesTrue {
