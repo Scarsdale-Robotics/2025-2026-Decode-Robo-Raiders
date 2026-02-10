@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
+import com.pedropathing.follower.Follower
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
@@ -36,6 +37,7 @@ class BasicTeleOp(): NextFTCOpMode() {
     private val rfw = MotorEx("rfw");
     private val rbw = MotorEx("rbw");
 
+
     companion object {
         @JvmField var speed1 = 0.0;
         @JvmField var shootAngleDegrees = 60;
@@ -44,6 +46,8 @@ class BasicTeleOp(): NextFTCOpMode() {
         @JvmField var goalX = 3.0;
         @JvmField var goalY = 144.0 - 3.0;
     }
+
+
 
     val x: Double
         get() {

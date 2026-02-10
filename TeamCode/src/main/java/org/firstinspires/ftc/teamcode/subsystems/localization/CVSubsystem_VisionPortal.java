@@ -18,6 +18,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
 ///re written with Vision Portal supposedly the exact same thing
@@ -34,21 +36,23 @@ public class CVSubsystem_VisionPortal {
     private double RCy1;
     private double RCh; // heading in radians
 
-    private boolean side; // True = blue, False = red
+    private double startingHeading = 0; // robot-centric offset
 
-    private motif currentMotif;
     private AprilTagDetection lastDetection;
 
     public HardwareMap hm1;
 
-    public CVSubsystem_VisionPortal(double x1, double y1, double h, boolean side, HardwareMap hm) {
+    private static final double CAM_X = 0.0;   // f+ / b- //TUNE
+    private static final double CAM_Y = 0.0;   // l+ / r- //TUNE
+    private static final double CAM_Z = 0.0;   //TUNE (height)
+    public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
         hm1 = hm;
 
 
         // Initialize IMU
         imu = hm1.get(IMU.class, "imu");
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot( ///tune
                 RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
         );
@@ -80,11 +84,14 @@ public class CVSubsystem_VisionPortal {
 
 
 
-        this.RCx1 = x1;
-        this.RCy1 = y1;
-        this.RCh = h;
-        this.side = side;
+        double offsetX = CAM_X * Math.cos(h) - CAM_Y * Math.sin(h);
+        double offsetY = CAM_X * Math.sin(h) + CAM_Y * Math.cos(h);
 
+        this.RCx1 = x1 - offsetX;
+        this.RCy1 = y1 - offsetY;
+
+        this.RCh = h;
+        this.startingHeading = h;
         init();
     }
 
@@ -100,51 +107,46 @@ public class CVSubsystem_VisionPortal {
         imu.resetYaw();
     }
 
-    /** Reads latest AprilTag and sets the motif if any valid detection */
-    public motif getMotifc() {
-        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
 
-        if (detections != null && !detections.isEmpty()) {
-            AprilTagDetection tag = detections.get(0);
-            int id = tag.id;
-            currentMotif = motif.FD(id);
-            lastDetection = tag;
-            return currentMotif;
-        }
 
-        return motif.Na;
-    }
-
-    /** Updates the robot's camera-based pose */
     public void updateCV() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
-        Cam = true ? aprilTagProcessor.getDetections() != null : false;
-
-        if (Cam){return;}
-
+        if (detections == null || detections.isEmpty()) return;
 
         AprilTagDetection tag = detections.get(0);
-        lastDetection = tag;
+        if (tag.robotPose == null) return;
 
-        // Use team-specific tags
-        if ((tag.id == 20 && side) || (tag.id == 24 && !side)) {
-            Pose3D pose = tag.robotPose;
-            if (pose != null) {
-                RCx1 = pose.getPosition().x * 39.37;
-                RCy1 = pose.getPosition().y * 39.37;
-                RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
-            }
-        }
+        Pose3D pose = tag.robotPose;
+
+        double camX = pose.getPosition().toUnit(DistanceUnit.INCH).x;
+        double camY = pose.getPosition().toUnit(DistanceUnit.INCH).y;
+        double camHeading = pose.getOrientation().getYaw(AngleUnit.RADIANS);
+
+        double offsetX = CAM_X * Math.cos(camHeading) - CAM_Y * Math.sin(camHeading);
+        double offsetY = CAM_X * Math.sin(camHeading) + CAM_Y * Math.cos(camHeading);
+
+        RCx1 = camX - offsetX;
+        RCy1 = camY - offsetY;
+
+        RCh = camHeading - startingHeading;
+        if (RCh > Math.PI) RCh -= 2 * Math.PI;
+        if (RCh < -Math.PI) RCh += 2 * Math.PI;
+
+//       if ((tag.id == 20 && side) || (tag.id == 24 && !side)) { ///Might work without this we dont need to allight to specific tag
+
+//      }
+
     }
 
     public void setCv(double x1, double y1, double h) {
         this.RCx1 = x1;
         this.RCy1 = y1;
         this.RCh = h;
+        this.startingHeading = h; // reset robot-centric reference
     }
 
     /// Getters ///
-    public boolean getSide() { return side; }
+//    public boolean getSide() { return side; }
     public double getRCx1() { return RCx1; }
     public double getRCy1() { return RCy1; }
     public double getRCh() { return RCh; }
@@ -152,54 +154,9 @@ public class CVSubsystem_VisionPortal {
     @Nullable
     public AprilTagDetection getLastDetection() { return lastDetection; }
 
-    public boolean camStatus() {
-        return visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING;
+    public Boolean hasDetection(){
+        List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
+        return detections != null && !detections.isEmpty();
     }
 
-    /// Angle helpers ///
-    private double wrapAngleRad(double a) {
-        a = (a + Math.PI) % (2.0 * Math.PI);
-        if (a < 0) a += 2.0 * Math.PI;
-        return a - Math.PI;
-    }
-
-    /** Returns horizontal offset from camera center (radians) */
-    public double getCameraOffset() {
-        if (lastDetection != null)
-            return Math.toRadians(lastDetection.ftcPose.x); // horizontal offset (degrees → rad)
-        return 0.0;
-    }
-
-    /** Returns how much turret must rotate to face the tag */
-    public double getTurretAngleToTag() {
-        return wrapAngleRad(getCameraOffset());
-    }
-
-    public boolean getCam(){return Cam;}
-
-    /** Motif enum, same as before */
-    public enum motif {
-        GPP(1, 21),
-        PGP(2, 22),
-        PPG(3, 23),
-        Na(0, -1);
-
-        private final int motifValue;
-        private final int num;
-
-        motif(int motifValue, int num) {
-            this.motifValue = motifValue;
-            this.num = num;
-        }
-
-        public int getMotifValue() { return motifValue; }
-        public int getInputID() { return num; }
-
-        public static motif FD(int num) {
-            for (motif m : values()) {
-                if (m.num == num) return m;
-            }
-            return Na;
-        }
-    }
 }

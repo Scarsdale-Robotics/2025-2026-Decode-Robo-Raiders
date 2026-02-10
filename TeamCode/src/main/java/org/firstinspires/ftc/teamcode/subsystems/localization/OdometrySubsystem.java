@@ -39,7 +39,7 @@ public class OdometrySubsystem {
     }
 
     if (pinpoint == null) {
-      throw new IllegalArgumentException("Pinpoint device not found in HardwareMap. Check DS config name!");
+      throw new IllegalArgumentException("u fucked up");
     }
 
     // Initialize the device
