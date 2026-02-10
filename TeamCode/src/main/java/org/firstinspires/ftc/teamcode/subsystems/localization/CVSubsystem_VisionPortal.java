@@ -84,11 +84,14 @@ public class CVSubsystem_VisionPortal {
 
 
 
-        this.RCx1 = x1;
-        this.RCy1 = y1;
+        double offsetX = CAM_X * Math.cos(h) - CAM_Y * Math.sin(h);
+        double offsetY = CAM_X * Math.sin(h) + CAM_Y * Math.cos(h);
+
+        this.RCx1 = x1 - offsetX;
+        this.RCy1 = y1 - offsetY;
+
         this.RCh = h;
         this.startingHeading = h;
-
         init();
     }
 
