@@ -38,10 +38,9 @@ import kotlin.math.abs
 import kotlin.math.hypot
 
 
-data class ResetModeParams(val x: Double, val y: Double, val h: Angle)
 
 @Configurable
-open class TeleOpBase(
+open class TeleOpBaseWithLocal(
     private val isBlue: Boolean,
     private val goalX: Double,
     private val goalY: Double,
@@ -51,19 +50,28 @@ open class TeleOpBase(
     private val distanceToTheta: (Double) -> Angle,
     private val distanceToTime: (Double) -> Double
 ): NextFTCOpMode() {
-    val x:  Double get() { return (PedroComponent.follower.pose.x);}
-    val y:  Double get() { return (PedroComponent.follower.pose.y);}
-    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
-    val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
-    val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
-    val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
+
+    var local: LocalizationSubsystem? = null;
+
+    val x: Double get() = local!!.getX()
+
+    val y: Double get() = local!!.getY()
+
+    val h: Angle get() = local!!.getH().rad
+
+    val vx: Double get() = local!!.getVX()
+
+    val vy: Double get() = local!!.getVY()
+
+    val vh: Angle get() = local!!.getVH().rad
+
 
     var gateIntakeChain: PathChain? = null;
     var farShootChain: PathChain? = null;
     var closeShootChain: PathChain? = null;
-    //    var closeIntakeChain: PathChain;
+//    var closeIntakeChain: PathChain;
     var driverControlled: PedroDriverControlled? = null;
-    //    var driverControlled: PedroDriverControlled;
+//    var driverControlled: PedroDriverControlled;
     var parkChain: PathChain? = null;
 
     init {
@@ -94,6 +102,8 @@ open class TeleOpBase(
             -Gamepads.gamepad1.rightStickX,
             false
         )
+
+        local = LocalizationSubsystem(0.0,0.0,0.0, hardwareMap); //FIX WITH STARTING POS
 
         gateIntakeChain = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -304,7 +314,22 @@ open class TeleOpBase(
                 gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
             } else {
                 // reset position
-                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
+                val resetPose = Pose(
+                    resetModeParams.x,
+                    resetModeParams.y,
+                    resetModeParams.h.inRad
+                )
+
+                // reset local
+                local?.setPos(
+                    resetModeParams.x,
+                    resetModeParams.y,
+                    resetModeParams.h.inRad
+                )
+
+                // reset pedro
+                PedroComponent.follower.setPose(resetPose)
+
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
             }
@@ -323,15 +348,19 @@ open class TeleOpBase(
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
 
+        local?.updateLocalization()
         PedroComponent.follower.update()
+        PedroComponent.follower.setPose(getPoseFromLocalization());
+//        PedroComponent.follower.update() //maybe should update after not before
+
 
         if (
             activeDriveMacros.isNotEmpty() &&
             (
                     abs(gamepad1.left_stick_x) > 0.0 ||
-                            abs(gamepad1.left_stick_y) > 0.0 ||
-                            abs(gamepad1.right_stick_x) > 0.0
-                    )
+                    abs(gamepad1.left_stick_y) > 0.0 ||
+                    abs(gamepad1.right_stick_x) > 0.0
+            )
         ) {
             // untrigger macro
             activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
@@ -397,6 +426,14 @@ open class TeleOpBase(
             x.toString() + "\n" +
                     y.toString() + "\n" +
                     h.inRad.toString() + "\n"
+        )
+    }
+
+    private fun getPoseFromLocalization(): Pose {
+        return Pose(
+            x,
+            y,
+            h.inRad
         )
     }
 }
