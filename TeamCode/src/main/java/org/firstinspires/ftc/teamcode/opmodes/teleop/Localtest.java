@@ -34,6 +34,7 @@ public class Localtest extends LinearOpMode {
     LocalizationSubsystem local;
 
     boolean circle;
+    boolean square;
     private TelemetryManager panelsManager;
 
 
@@ -43,9 +44,9 @@ public class Localtest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        cv = new CVSubsystem_VisionPortal(0,0,Math.PI/2, hardwareMap);
-        odom = new OdometrySubsystem(0,0,Math.PI/2, hardwareMap);
-        local = new LocalizationSubsystem(0,0,Math.PI/2, hardwareMap);
+        cv = new CVSubsystem_VisionPortal(0,0,Math.PI/2, hardwareMap); //starting pose
+        odom = new OdometrySubsystem(0,0,Math.PI/2, hardwareMap); //starting pose
+        local = new LocalizationSubsystem(0,0,Math.PI/2, hardwareMap); //starting pose
         circle = true;
 
 

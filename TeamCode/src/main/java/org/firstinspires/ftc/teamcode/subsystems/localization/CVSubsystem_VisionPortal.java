@@ -18,6 +18,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
 ///re written with Vision Portal supposedly the exact same thing
@@ -40,6 +42,9 @@ public class CVSubsystem_VisionPortal {
 
     public HardwareMap hm1;
 
+    private static final double CAM_X = 0.0;   // f+ / b- //TUNE
+    private static final double CAM_Y = 0.0;   // l+ / r- //TUNE
+    private static final double CAM_Z = 0.0;   //TUNE (height)
     public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
         hm1 = hm;
@@ -108,17 +113,21 @@ public class CVSubsystem_VisionPortal {
         AprilTagDetection tag = detections.get(0);
         if (tag.robotPose == null) return;
 
-        lastDetection = tag;
-
         Pose3D pose = tag.robotPose;
-        RCx1 = pose.getPosition().x * 39.37;
-        RCy1 = pose.getPosition().y * 39.37;
 
-        double rawYaw = pose.getOrientation().getYaw(AngleUnit.RADIANS);
+        double camX = pose.getPosition().toUnit(DistanceUnit.INCH).x;
+        double camY = pose.getPosition().toUnit(DistanceUnit.INCH).y;
+        double camHeading = pose.getOrientation().getYaw(AngleUnit.RADIANS);
 
-        RCh  = rawYaw - startingHeading;
-        if (RCh > Math.PI) RCh -= 2*Math.PI;
-        if (RCh < -Math.PI) RCh += 2*Math.PI;
+        double offsetX = CAM_X * Math.cos(camHeading) - CAM_Y * Math.sin(camHeading);
+        double offsetY = CAM_X * Math.sin(camHeading) + CAM_Y * Math.cos(camHeading);
+
+        RCx1 = camX - offsetX;
+        RCy1 = camY - offsetY;
+
+        RCh = camHeading - startingHeading;
+        if (RCh > Math.PI) RCh -= 2 * Math.PI;
+        if (RCh < -Math.PI) RCh += 2 * Math.PI;
 
 //       if ((tag.id == 20 && side) || (tag.id == 24 && !side)) { ///Might work without this we dont need to allight to specific tag
 
