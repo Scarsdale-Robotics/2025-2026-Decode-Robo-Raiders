@@ -42,8 +42,8 @@ public class CVSubsystem_VisionPortal {
 
     public HardwareMap hm1;
 
-    private static final double CAM_X = 0.0;   // f+ / b- //TUNE
-    private static final double CAM_Y = 0.0;   // l+ / r- //TUNE
+    private static final double CAM_X = -4.88119055118;   // f+ / b- //TUNE
+    private static final double CAM_Y = -4.38726968504;   // l+ / r- //TUNE
     private static final double CAM_Z = 0.0;   //TUNE (height)
     public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
