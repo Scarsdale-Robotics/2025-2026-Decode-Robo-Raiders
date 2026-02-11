@@ -53,17 +53,17 @@ open class TeleOpBaseWithLocal(
 
     var local: LocalizationSubsystem? = null;
 
-    val x: Double get() = local!!.getX()
+    val x: Double get() = local!!.x
 
-    val y: Double get() = local!!.getY()
+    val y: Double get() = local!!.y
 
-    val h: Angle get() = local!!.getH().rad
+    val h: Angle get() = local!!.h.rad
 
-    val vx: Double get() = local!!.getVX()
+    val vx: Double get() = local!!.vx
 
-    val vy: Double get() = local!!.getVY()
+    val vy: Double get() = local!!.vy
 
-    val vh: Angle get() = local!!.getVH().rad
+    val vh: Angle get() = local!!.vh.rad
 
 
     var gateIntakeChain: PathChain? = null;
@@ -102,8 +102,6 @@ open class TeleOpBaseWithLocal(
             -Gamepads.gamepad1.rightStickX,
             false
         )
-
-        local = LocalizationSubsystem(0.0,0.0,0.0, hardwareMap); //FIX WITH STARTING POS
 
         gateIntakeChain = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -190,6 +188,7 @@ open class TeleOpBaseWithLocal(
         val startH = content[2].toDouble()
 
         PedroComponent.follower.pose = Pose(startX, startY, startH)
+        local = LocalizationSubsystem(startX, startY, startH, hardwareMap);
     }
 
     private var autoAimEnabled = true;
@@ -328,7 +327,7 @@ open class TeleOpBaseWithLocal(
                 )
 
                 // reset pedro
-                PedroComponent.follower.setPose(resetPose)
+                PedroComponent.follower.pose = resetPose
 
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
@@ -350,7 +349,7 @@ open class TeleOpBaseWithLocal(
 
         local?.updateLocalization()
         PedroComponent.follower.update()
-        PedroComponent.follower.setPose(getPoseFromLocalization());
+        PedroComponent.follower.pose = getPoseFromLocalization();
 //        PedroComponent.follower.update() //maybe should update after not before
 
 

@@ -129,14 +129,14 @@ open class TeleOpBase(
                     Pos(AutonPositions.shootPoseFar, isBlue)
                 )
             )
-            .setTangentHeadingInterpolation()
-//            .setHeadingInterpolation(
-//                HeadingInterpolator.linearFromPoint(
-//                    PedroComponent.follower::getHeading,
-//                    Pos(AutonPositions.shootPoseFar, isBlue).heading,
-//                    0.9
-//                )
-//            )
+//            .setTangentHeadingInterpolation()
+            .setHeadingInterpolation(
+                HeadingInterpolator.linearFromPoint(
+                    PedroComponent.follower::getHeading,
+                    Pos(AutonPositions.shootPoseFar, isBlue).heading,
+                    0.9
+                )
+            )
             .build()
 
         closeShootChain = PedroComponent.follower.pathBuilder()
@@ -146,14 +146,14 @@ open class TeleOpBase(
                     Pos(AutonPositions.shootPoseClose, isBlue)
                 )
             )
-            .setTangentHeadingInterpolation()
-//            .setHeadingInterpolation(
-//                HeadingInterpolator.linearFromPoint(
-//                    PedroComponent.follower::getHeading,
-//                    Pos(AutonPositions.shootPoseClose, isBlue).heading,
-//                    0.9
-//                )
-//            )
+//            .setTangentHeadingInterpolation()
+            .setHeadingInterpolation(
+                HeadingInterpolator.linearFromPoint(
+                    PedroComponent.follower::getHeading,
+                    Pos(AutonPositions.shootPoseClose, isBlue).heading,
+                    0.9
+                )
+            )
             .build()
 
         parkChain = PedroComponent.follower.pathBuilder()
