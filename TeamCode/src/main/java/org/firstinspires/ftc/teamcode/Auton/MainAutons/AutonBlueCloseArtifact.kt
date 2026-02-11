@@ -29,7 +29,7 @@ import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
+//import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
 
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
@@ -66,12 +66,12 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
     }
 
     companion object {
-        val delayStartShoot: Double = 1.0
-        val DelayBeforeShoot: Double = 0.55
-        val delayAfterEachShoot: Double = 2.0 //currently at a really high #
-        val DelayFromRampIntake: Double = 1.8
+        val delayStartShoot: Double = 2.0
+        val DelayBeforeShoot: Double = 0.25
+        val delayAfterEachShoot: Double = 0.5 //currently at a really high #
+        val DelayFromRampIntake: Double = 1.0
         val DelayInIntake: Double = 1.1
-        val DelayAfterIntake: Double = 0.3
+//        val DelayAfterIntake: Double = 0.0
         val DelayAtLever: Double = 0.05
 
         val goalX = 3.0
@@ -122,7 +122,8 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.intake2Pos),
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
+            .setTangentHeadingInterpolation()
+//            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
             .build()
 
         //1st Go Shoot
@@ -232,25 +233,24 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
         get() = ParallelGroup(
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
-            MagServoSubsystem.run,
+//            MagServoSubsystem.run,
             MagblockServoSubsystem.block
         )
     val TravelCommand: Command
         get() = ParallelGroup(
             IntakeMotorSubsystem.off,
             MagMotorSubsystem.off,
-            MagServoSubsystem.stop,
+//            MagServoSubsystem.stop,
             MagblockServoSubsystem.block
         )
     val ShootCommand: Command
         get() = ParallelGroup(
             MagblockServoSubsystem.unblock,
-            MagMotorSubsystem.On(0.85),
+            MagMotorSubsystem.On(1.0),
             IntakeMotorSubsystem.intake,
-            MagServoSubsystem.run
+//            MagServoSubsystem.run
         )
 
-    ///FIX AUTNOMOUS RUNNER
     /////////////////////////
     ////Autonomous Runner////
     /////////////////////////
@@ -258,16 +258,13 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
         get() = SequentialGroup(
             //Main Group
             SequentialGroup( //Shoots PRELOAD
-                ParallelGroup(
-//                    TurretPhiSubsystem.SetTargetPhi(5.075.rad),
-                    FollowPath(robotShootPreload!!),
-                    Delay(delayStartShoot),
-                ),
+                FollowPath(robotShootPreload!!),
+                Delay(delayStartShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
                 IntakeCommand,
 //                FollowPath(robotIntake1!!), //robot goes to intake
-                Delay(DelayAfterIntake),
+//                Delay(DelayAfterIntake),
             ),
 
             ParallelGroup( //Robot goes back to FAR Shoot Position
@@ -349,7 +346,7 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
                 Delay(delayAfterEachShoot),
                 IntakeCommand,
                 FollowPath(robotIntake2!!), //robot goes to intake
-                Delay(DelayAfterIntake),
+//                Delay(DelayAfterIntake),
             ),
 
             ParallelGroup( //Robot goes back to FAR Shoot Position
@@ -366,7 +363,7 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
                 Delay(delayAfterEachShoot),
                 IntakeCommand,
                 FollowPath(robotIntake3!!), //robot goes to intake
-                Delay(DelayAfterIntake),
+//                Delay(DelayAfterIntake),
             ),
 
             ParallelGroup( //Robot goes back to FAR Shoot Position
@@ -427,7 +424,7 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
         ShooterSubsystem.off()
         IntakeMotorSubsystem.off()
         MagMotorSubsystem.off()
-        MagServoSubsystem.stop()
+//        MagServoSubsystem.stop()
         MagblockServoSubsystem.block()
 
         PedroComponent.follower.setStartingPose(AutonPositions.Blue(AutonPositions.startPoseClose))
