@@ -25,7 +25,6 @@ import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.speed1
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
-import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
@@ -188,9 +187,12 @@ open class TeleOpBase(
     var activeDriveMacros = mutableListOf<Command>()
 
     private var phiTrim = 0.0.deg;
-    var speedFactor = 1.0;
+    var speedFactorDrive = 1.0;
+    var speedFactorIntake = 1.0;
+    var lowerOverridePower = 0.0;
 
     override fun onStartButtonPressed() {
+        MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
 
         gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
@@ -238,20 +240,28 @@ open class TeleOpBase(
         }
 
         Gamepads.gamepad1.rightBumper whenBecomesTrue {
-            speedFactor = 0.5;
+            speedFactorDrive = 0.5;
         } whenBecomesFalse {
-            speedFactor = 1.0;
+            speedFactorDrive = 1.0;
+        }
+
+        Gamepads.gamepad2.leftBumper whenBecomesTrue {
+            speedFactorDrive = 0.5;
+        } whenBecomesFalse {
+            speedFactorDrive = 1.0;
         }
 
         val lowerMotorDrive = MagMotorSubsystem.DriverCommand(
-            Gamepads.gamepad2.rightTrigger,
-            Gamepads.gamepad2.leftTrigger
+            Gamepads.gamepad2.rightTrigger.map { it * speedFactorIntake },
+            Gamepads.gamepad2.leftTrigger.map { it * speedFactorIntake },
+            { lowerOverridePower }
         );
         lowerMotorDrive();
 
         val intakeMotorDrive = IntakeMotorSubsystem.DriverCommand(
-            Gamepads.gamepad2.rightTrigger,
-            Gamepads.gamepad2.leftTrigger
+            Gamepads.gamepad2.rightTrigger.map { it * speedFactorIntake },
+            Gamepads.gamepad2.leftTrigger.map { it * speedFactorIntake },
+            { lowerOverridePower }
         )
         intakeMotorDrive()
 
@@ -262,13 +272,15 @@ open class TeleOpBase(
 //        Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
 //        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
-        Gamepads.gamepad1.circle whenBecomesTrue {
+        Gamepads.gamepad2.circle whenBecomesTrue {
+            lowerOverridePower = 1.0;
             ParallelGroup(
 //                MagServoSubsystem.run,
                 MagblockServoSubsystem.unblock
             )()
             ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
         } whenBecomesFalse {
+            lowerOverridePower = 0.0;
             ParallelGroup(
 //                MagServoSubsystem.stop,
                 MagblockServoSubsystem.block

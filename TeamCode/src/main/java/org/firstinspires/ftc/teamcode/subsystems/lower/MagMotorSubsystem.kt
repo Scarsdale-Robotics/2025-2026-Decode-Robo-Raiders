@@ -39,7 +39,8 @@ object MagMotorSubsystem : Subsystem {
 
     class DriverCommand(
         private val inPower: Supplier<Double>,
-        private val outPower: Supplier<Double>
+        private val outPower: Supplier<Double>,
+        private val override: Supplier<Double>
     ) : Command() {
         override val isDone = false;
 
@@ -53,7 +54,8 @@ object MagMotorSubsystem : Subsystem {
         }
 
         override fun update() {
-            motor.power = inPower.get() - outPower.get();
+            if (override.get() != 0.0) motor.power = override.get()
+            else motor.power = inPower.get() - outPower.get();
         }
     }
 }

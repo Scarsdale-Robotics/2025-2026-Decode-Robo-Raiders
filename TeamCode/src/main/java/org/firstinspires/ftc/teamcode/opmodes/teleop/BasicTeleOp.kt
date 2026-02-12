@@ -3,21 +3,26 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.follower.Follower
+import com.pedropathing.geometry.Pose
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
+import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import dev.nextftc.hardware.driving.FieldCentric
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants.createFollower
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
@@ -47,32 +52,7 @@ class BasicTeleOp(): NextFTCOpMode() {
         @JvmField var goalY = 144.0 - 3.0;
     }
 
-
-
-    val x: Double
-        get() {
-            if (odom != null) {
-                return odom!!.rOx1;
-            }
-            return 0.0;
-        }
-    val y: Double
-        get() {
-            if (odom != null) {
-                return odom!!.rOy1;
-            }
-            return 0.0;
-        }
-    val h: Angle
-        get() {
-            if (odom != null) {
-                return odom!!.rOh.rad;
-            }
-            return 0.0.rad;
-        }
-
-    private var odom: OdometrySubsystem? = null;
-    override fun onInit() {
+    init {
         addComponents(
             SubsystemComponent(
                 LowerSubsystem,
@@ -82,19 +62,28 @@ class BasicTeleOp(): NextFTCOpMode() {
                 TurretThetaSubsystem,
                 TurretPhiSubsystem
             ),
+            PedroComponent(Constants::createFollower),
             BindingsComponent,
             BulkReadComponent
         )
+    }
 
+
+    val x:  Double get() { return (PedroComponent.follower.pose.x);}
+    val y:  Double get() { return (PedroComponent.follower.pose.y);}
+    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
+
+//    private var odom: OdometrySubsystem? = null;
+    override fun onInit() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
         MagServoSubsystem.stop()
-        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
+//        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
     }
 
     var speedFactor = 1.0;
     override fun onStartButtonPressed() {
-        odom!!.setPinpoint(72.0, 72.0, -PI / 2)
+        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
 
@@ -123,40 +112,44 @@ class BasicTeleOp(): NextFTCOpMode() {
 //        )
 //        driveCommand();
 
-        val lowerMotorDrive = MagMotorSubsystem.DriverCommandDefaultOn(
-            Gamepads.gamepad1.leftTrigger
+        val lowerMotorDrive = MagMotorSubsystem.DriverCommand(
+            Gamepads.gamepad1.rightTrigger,
+            Gamepads.gamepad1.leftTrigger,
+            { 0.0 }
         );
         lowerMotorDrive();
 
-        val magDrive = MagServoSubsystem.DriverCommandDefaultOn(
-            Gamepads.gamepad1.leftTrigger.greaterThan(0.0)
+        val intakeMotorDrive = IntakeMotorSubsystem.DriverCommand(
+            Gamepads.gamepad1.rightTrigger,
+            Gamepads.gamepad1.leftTrigger,
+            { 0.0 }
         )
-        magDrive();
+        intakeMotorDrive()
+
+//        val magDrive = MagServoSubsystem.DriverCommandDefaultOn(
+//            Gamepads.gamepad1.leftTrigger.greaterThan(0.0)
+//        )
+//        magDrive();
 
         Gamepads.gamepad1.circle
             .whenTrue(MagblockServoSubsystem.unblock)
             .whenBecomesFalse(MagblockServoSubsystem.block)
 
-
-        val dx = Supplier { goalX - x }
-        val dy = Supplier { goalY - y }
-        val dxy = Supplier { hypot(dx.get(), dy.get()) }
-
-//        TurretPhiSubsystem.AutoAim(
-//            dx, dy, { h }
-//        )()
     }
 
     override fun onUpdate() {
-        odom!!.updateOdom()
+        PedroComponent.follower.update()
+        TurretPhiSubsystem.AutoAim(
+            goalX - x, goalY - y, h
+        )()
         TurretThetaSubsystem.SetTargetTheta(shootAngleDegrees.deg)()
         ShooterSubsystem.On(speed1)();
-        telemetry.addData("x (inch)", odom!!.rOx1);
-        telemetry.addData("y (inch)", odom!!.rOy1);
-        telemetry.addData("h (radians)", odom!!.rOh);
+        telemetry.addData("x (inch)", x);
+        telemetry.addData("y (inch)", y);
+        telemetry.addData("h (radians)", h);
         telemetry.addData(
             "distanceToGoal",
-            hypot((3 - odom!!.rOx1), (141 - odom!!.rOy1))
+            hypot((3 - x), (141 - y))
         );
         telemetry.addData("ShooterSpeed", speed1);
         telemetry.addData("Angle", shootAngleDegrees.deg);

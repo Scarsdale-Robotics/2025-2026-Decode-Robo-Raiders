@@ -29,9 +29,9 @@ object ShooterSubsystem : Subsystem {
 //    private val motor1 = MotorEx("shooter1");
     private val motor2 = MotorEx("shooter2").reversed();
 
-    @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 0.75);
-    @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
-    @JvmField var shootingCoefficients = PIDCoefficients(0.1, 0.0, 0.0)
+    @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 1.0);
+    @JvmField var pidCoefficients = PIDCoefficients(0.0, 0.01, 0.0)
+    @JvmField var shootingCoefficients = PIDCoefficients(0.0, 0.01, 0.0)
 
     private val controller: ControlSystem;
     private val shootingController: ControlSystem;

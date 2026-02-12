@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem.setMot
 import org.opencv.video.BackgroundSubtractor
 import java.util.function.Supplier
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
@@ -67,22 +68,20 @@ object TurretPhiSubsystem : Subsystem {
     // 0.0 --> robot forward
     var targetPhi: Angle = 0.0.rad
         get() {
-            return norm(
-                PI.rad * (motor.currentPosition - ENCODERS_FORWARD) /
+            return PI.rad * (motor.currentPosition - ENCODERS_FORWARD) /
                         (ENCODERS_FORWARD - ENCODERS_BACKWARD)
-            )
         }
         private set;
 
     fun norm(angle: Angle): Angle {
 //        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
-        val tolerance = PI / 6;
+        val tolerance = Math.toRadians(10.0);
         var a = angle.inRad;
 
-        while (a < 0.3 - 2 * PI - tolerance) {
+        while (a < 0.27 - 2 * PI - tolerance) {
             a += 2 * PI;
         }
-        while (a > 0.3 + tolerance) {
+        while (a > 0.27 + tolerance) {
             a -= 2 * PI;
         }
         return a.rad;
@@ -115,7 +114,24 @@ object TurretPhiSubsystem : Subsystem {
             if (lastCommand != null) {
                 CommandManager.cancelCommand(lastCommand!!)
             }
-            val currCommand = SetTargetPhi(atan2(dy, dx).rad - rh, ofsTurret);
+
+            val normAngle = (atan2(dy, dx).rad - rh).inRad
+            val upper = normAngle + 2 * PI;
+            val lower = normAngle - 2 * PI;
+            var closestDist = abs(normAngle - targetPhi.inRad)
+            val upperDist = abs(upper - targetPhi.inRad)
+            val lowerDist = abs(lower - targetPhi.inRad)
+
+            var closest = normAngle;
+            if (upperDist < closestDist) {
+                closest = upper
+                closestDist = upperDist
+            }
+            if (lowerDist < closestDist) {
+                closest = lower
+            }
+
+            val currCommand = SetTargetPhi(closest.rad, ofsTurret);
             currCommand();
             lastCommand = currCommand;
         }
