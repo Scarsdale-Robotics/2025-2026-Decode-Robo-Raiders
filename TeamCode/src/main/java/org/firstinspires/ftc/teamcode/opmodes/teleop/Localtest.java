@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.panels.*;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -27,6 +28,7 @@ import java.util.List;
 import kotlin.Unit;
 
 @TeleOp(name = "Localtest")
+@Configurable
 public class Localtest extends LinearOpMode {
 
     CVSubsystem_VisionPortal cv;
