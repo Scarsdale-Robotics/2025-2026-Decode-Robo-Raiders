@@ -48,8 +48,8 @@ public class Localtest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         cv = new CVSubsystem_VisionPortal(0,0,Math.PI/2, hardwareMap); //starting pose
         odom = new OdometrySubsystem(0,0,Math.PI/2, hardwareMap); //starting pose
-        local = new LocalizationSubsystem(0,0,Math.PI/2, hardwareMap); //starting pose
-        circle = true;
+//        local = new LocalizationSubsystem(0,0,Math.PI/2, hardwareMap); //starting pose
+     //   circle = true;
 
 
         panelsManager = new TelemetryManager(
@@ -64,8 +64,7 @@ public class Localtest extends LinearOpMode {
         while(opModeIsActive()){
             cv.updateCV();
             odom.updateOdom();
-            local.updateLocalization();
-
+//            local.updateLocalization();
             panelsManager.addLine("ODOM");
             panelsManager.addData("xo: ", odom.getROx1());
             panelsManager.addData("yo: ", odom.getROy1());
@@ -76,33 +75,33 @@ public class Localtest extends LinearOpMode {
             panelsManager.addData("yc: ", cv.getRCy1());
             panelsManager.addData("yc: ", cv.getRCh());
 
-            panelsManager.addLine("LOCALIZATION");
-            panelsManager.addData("xl: ", local.getX());
-            panelsManager.addData("yl: ", local.getY());
-            panelsManager.addData("hl: ", local.getH());
-
-            panelsManager.addData("Vxl: ", local.getVX());
-            panelsManager.addData("Vyl: ", local.getVY());
-            panelsManager.addData("Vhl: ", local.getVH());
-
-            panelsManager.addData("Axl: ", local.getAX());
-            panelsManager.addData("Ayl: ", local.getAY());
-            panelsManager.addData("Ahl: ", local.getAH());
+//            panelsManager.addLine("LOCALIZATION");
+//            panelsManager.addData("xl: ", local.getX());
+//            panelsManager.addData("yl: ", local.getY());
+//            panelsManager.addData("hl: ", local.getH());
+//
+//            panelsManager.addData("Vxl: ", local.getVX());
+//            panelsManager.addData("Vyl: ", local.getVY());
+//            panelsManager.addData("Vhl: ", local.getVH());
+//
+//            panelsManager.addData("Axl: ", local.getAX());
+//            panelsManager.addData("Ayl: ", local.getAY());
+//            panelsManager.addData("Ahl: ", local.getAH());
 
             panelsManager.update(telemetry);
 
-            if(circle && gamepad1.circle){
-                local.resetLocalizationFromCamera();
-                circle = !circle;
-            }
-
-            if(local.isInTopShootingZone()){
-                panelsManager.addLine("In top shooting zone");
-            }else if(local.isInBottomTriangle()){
-                panelsManager.addLine("In bottom shooting zone");
-            }else{
-                panelsManager.addLine("In no shooting zone");
-            }
+//            if(circle && gamepad1.circle){
+//                local.resetLocalizationFromCamera();
+//                circle = !circle;
+//            }
+//
+////            if(local.isInTopShootingZone()){
+//                panelsManager.addLine("In top shooting zone");
+//            }else if(local.isInBottomTriangle()){
+//                panelsManager.addLine("In bottom shooting zone");
+//            }else{
+//                panelsManager.addLine("In no shooting zone");
+//            }
         }
     }
 }

@@ -1,113 +1,121 @@
 package org.firstinspires.ftc.teamcode.subsystems.localization;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import androidx.annotation.Nullable;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
-///re written with Vision Portal supposedly the exact same thing
-/// scrcpy --no-audio --record=file.mkv
+
 public class CVSubsystem_VisionPortal {
+
     private final VisionPortal visionPortal;
     private final AprilTagProcessor aprilTagProcessor;
     private final IMU imu;
 
-    private boolean Cam;
-
-    // Robot’s current pose (in inches)
     private double RCx1;
     private double RCy1;
-    private double RCh; // heading in radians
-
-    private double startingHeading = 0; // robot-centric offset
+    private double RCh;
 
     private AprilTagDetection lastDetection;
 
-    public HardwareMap hm1;
+    private static final double CAM_X = -4.88119055118;
+    private static final double CAM_Y = -4.38726968504;
+    private static final double CAM_Z = 0.0;
 
-    private static final double CAM_X = -4.88119055118;   // f+ / b- //TUNE
-    private static final double CAM_Y = -4.38726968504;   // l+ / r- //TUNE
-    private static final double CAM_Z = 0.0;   //TUNE (height)
     public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
-        hm1 = hm;
+        imu = hm.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+                )
+        ));
 
+        AprilTagLibrary tagLibrary = new AprilTagLibrary.Builder()
+                .addTags(AprilTagGameDatabase.getCurrentGameTagLibrary())
+                .build();
 
-        // Initialize IMU
-        imu = hm1.get(IMU.class, "imu");
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot( ///tune
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
-        );
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
-        AprilTagLibrary.Builder myAprilTagLibraryBuilder = new AprilTagLibrary.Builder();
-        myAprilTagLibraryBuilder.addTags(AprilTagGameDatabase.getCurrentGameTagLibrary());
-        myAprilTagLibraryBuilder.build();
-
-        // Create AprilTag processor
         aprilTagProcessor = new AprilTagProcessor.Builder()
-                .setTagLibrary(myAprilTagLibraryBuilder.build()) ///check to make sure this works
+                .setTagLibrary(tagLibrary)
+
+                // (BROKEN)
+                /*
+                .setDrawTagOutline(true)
+                .setDrawAxes(true)
+                */
+
+                // FIX
+                .setCameraPose(
+                        new Position(
+                                DistanceUnit.INCH,
+                                CAM_X,
+                                CAM_Y,
+                                CAM_Z,
+                                0
+                        ), new YawPitchRollAngles(
+                                AngleUnit.RADIANS,0,0,0,0
+                        )
+                )
                 .setDrawTagOutline(true)
                 .setDrawAxes(true)
                 .build();
 
-        // Create Vision Portal (using built-in or webcam)
-        WebcamName webcamName = hm.get(WebcamName.class, "Cam");  ///has to be called Cam
+        WebcamName webcamName = hm.get(WebcamName.class, "Cam");
+
         visionPortal = new VisionPortal.Builder()
+
+                // YOUR ORIGINAL CODE (BROKEN)
+                /*
                 .setCamera(webcamName)
-                .enableLiveView(true)
-                .addProcessor(aprilTagProcessor)
+                .setCamera(BuiltinCameraDirection.BACK)
                 .setCameraResolution(new android.util.Size(640, 480))
-                .setCamera(BuiltinCameraDirection.BACK)// fallback if internal
                 .setAutoStartStreamOnBuild(true)
-                .setLiveViewContainerId(hm1.appContext.getResources().getIdentifier(
-                        "cameraMonitorViewId", "id", hm1.appContext.getPackageName()
-                ))
+                .setLiveViewContainerId(0)
+                */
+
+                // FIX
+                .setCamera(webcamName)
+                .setCameraResolution(new android.util.Size(640, 480))
+                .setLiveViewContainerId(
+                        hm.appContext.getResources().getIdentifier(
+                                "cameraMonitorViewId",
+                                "id",
+                                hm.appContext.getPackageName()
+                        )
+                )
+                .addProcessor(aprilTagProcessor)
+                .setAutoStartStreamOnBuild(true)
                 .build();
 
 
-
-        double offsetX = CAM_X * Math.cos(h) - CAM_Y * Math.sin(h);
-        double offsetY = CAM_X * Math.sin(h) + CAM_Y * Math.cos(h);
-
-        this.RCx1 = x1 - offsetX;
-        this.RCy1 = y1 - offsetY;
-
-        this.RCh = h;
-        this.startingHeading = h;
-        init();
+        RCx1 = x1;
+        RCy1 = y1;
+        RCh = h;
     }
 
     public void init() {
-        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
-            visionPortal.resumeStreaming();
-        }
         imu.resetYaw();
     }
 
     public void closeCam() {
         visionPortal.close();
-        imu.resetYaw();
     }
-
-
 
     public void updateCV() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
@@ -118,8 +126,11 @@ public class CVSubsystem_VisionPortal {
 
         Pose3D pose = tag.robotPose;
 
+        // YOUR ORIGINAL CODE (BROKEN)
+        /*
         double camX = pose.getPosition().toUnit(DistanceUnit.INCH).x;
         double camY = pose.getPosition().toUnit(DistanceUnit.INCH).y;
+
         double camHeading = pose.getOrientation().getYaw(AngleUnit.RADIANS);
 
         double offsetX = CAM_X * Math.cos(camHeading) - CAM_Y * Math.sin(camHeading);
@@ -129,34 +140,33 @@ public class CVSubsystem_VisionPortal {
         RCy1 = camY - offsetY;
 
         RCh = camHeading - startingHeading;
-        if (RCh > Math.PI) RCh -= 2 * Math.PI;
-        if (RCh < -Math.PI) RCh += 2 * Math.PI;
+        */
 
-//       if ((tag.id == 20 && side) || (tag.id == 24 && !side)) { ///Might work without this we dont need to allight to specific tag
+        // FIX
+        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x;
+        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y;
+        RCh = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-//      }
-
+        lastDetection = tag;
     }
 
     public void setCv(double x1, double y1, double h) {
-        this.RCx1 = x1;
-        this.RCy1 = y1;
-        this.RCh = h;
-        this.startingHeading = h; // reset robot-centric reference
+        RCx1 = x1;
+        RCy1 = y1;
+        RCh = h;
     }
 
-    /// Getters ///
-//    public boolean getSide() { return side; }
     public double getRCx1() { return RCx1; }
     public double getRCy1() { return RCy1; }
-    public double getRCh() { return RCh; }
+    public double getRCh()  { return RCh; }
 
     @Nullable
-    public AprilTagDetection getLastDetection() { return lastDetection; }
+    public AprilTagDetection getLastDetection() {
+        return lastDetection;
+    }
 
-    public Boolean hasDetection(){
+    public boolean hasDetection() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         return detections != null && !detections.isEmpty();
     }
-
 }
