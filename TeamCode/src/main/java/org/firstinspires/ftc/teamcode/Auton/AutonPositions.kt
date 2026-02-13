@@ -7,7 +7,7 @@ object AutonPositions {
     //base positions are in blue coordinates
 
     val startPose = Pose(56.43, 8.503, Math.toRadians(180.0)) // Start Pose of our robot.
-    val startPoseClose = Pose(26.8, 133.1, Math.toRadians(323.5)) // Start Pose of our robot.
+    val startPoseClose = Pose(26.893, 133.171, Math.toRadians(323.5)) // Start Pose of our robot.
     val startAutonControlPos = Pose(95.3, 58.5)
 
     val shootPoseClose =
