@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.TelemetryManager;
 import com.bylazar.telemetry.TelemetryPluginConfig;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem_VisionPortal;
 
@@ -10,6 +12,9 @@ import java.util.List;
 
 import kotlin.Unit;
 
+
+@TeleOp(name = "CvTest")
+@Configurable
 public class CvTest extends LinearOpMode {
 
     CVSubsystem_VisionPortal cv;
