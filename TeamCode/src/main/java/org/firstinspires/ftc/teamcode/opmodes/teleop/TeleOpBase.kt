@@ -88,9 +88,9 @@ open class TeleOpBase(
 //        MagServoSubsystem.stop()
 
         driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.map { if (isBlue) it else -it },
-            Gamepads.gamepad1.leftStickX.map { if (isBlue) it else -it },
-            -Gamepads.gamepad1.rightStickX,
+            Gamepads.gamepad1.leftStickY.deadZone(0.05).map { (if (isBlue) it else -it) * speedFactorDrive },
+            Gamepads.gamepad1.leftStickX.deadZone(0.05).map { (if (isBlue) it else -it) * speedFactorDrive },
+            -Gamepads.gamepad1.rightStickX.deadZone(0.05).map { it * speedFactorDrive },
             false
         )
 
