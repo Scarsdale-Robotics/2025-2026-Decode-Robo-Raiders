@@ -27,7 +27,7 @@ import java.util.function.Supplier
 @Configurable
 object ShooterSubsystem : Subsystem {
 //    private val motor1 = MotorEx("shooter1");
-    private val motor2 = MotorEx("shooter2").reversed();
+    private val motor2 = MotorEx("shooter2").reversed().brakeMode();
 
     @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 1.0);
     @JvmField var pidCoefficients = PIDCoefficients(0.0, 0.01, 0.0)

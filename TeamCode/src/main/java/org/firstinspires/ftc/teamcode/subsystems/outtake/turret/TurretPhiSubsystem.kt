@@ -33,7 +33,7 @@ import kotlin.time.TimeSource
 // left-right
 @Configurable
 object TurretPhiSubsystem : Subsystem {
-    private val motor = MotorEx("turret_phi");
+    private val motor = MotorEx("turret_phi").brakeMode();
 
     @JvmField var ENCODERS_FORWARD = 1367.0;
     @JvmField var ENCODERS_BACKWARD = 0.0;  // todo: TUNE
