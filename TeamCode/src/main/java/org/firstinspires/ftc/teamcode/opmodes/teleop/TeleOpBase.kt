@@ -20,7 +20,6 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
@@ -160,14 +159,14 @@ open class TeleOpBase(
                     Pos(AutonPositions.parkPoseFull, isBlue)
                 )
             )
-            .setTangentHeadingInterpolation()
-//            .setHeadingInterpolation(
-//                HeadingInterpolator.linearFromPoint(
-//                    PedroComponent.follower::getHeading,
-//                    Pos(AutonPositions.parkPoseFull, isBlue).heading,
-//                    1.0
-//                )
-//            )
+//            .setTangentHeadingInterpolation()
+            .setHeadingInterpolation(
+                HeadingInterpolator.linearFromPoint(
+                    PedroComponent.follower::getHeading,
+                    Pos(AutonPositions.parkPoseFull, isBlue).heading,
+                    1.0
+                )
+            )
             .build()
 
         val file = File(Lefile.filePath)
@@ -185,6 +184,8 @@ open class TeleOpBase(
     var activeDriveMacros = mutableListOf<Command>()
 
     private var phiTrim = 0.0.deg;
+    private var veloTrim = 0;
+
     var speedFactorDrive = 1.0;
     var speedFactorIntake = 1.0;
     var lowerOverridePower = 0.0;
@@ -207,28 +208,12 @@ open class TeleOpBase(
             .whenBecomesTrue {
                 val path = FollowPath(farShootChain!!)
                 path()
-//                ParallelGroup(
-//                    TurretPhiSubsystem.AutoAim(
-//                        goalX - Pos(AutonPositions.shootPoseFar, isBlue).x,
-//                        goalY - Pos(AutonPositions.shootPoseFar, isBlue).y,
-//                        Pos(AutonPositions.shootPoseFar, isBlue).heading.rad
-//                    ),
-//                    path
-//                )()
                 activeDriveMacros.add(path)
             }
         (if (isBlue) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft)
             .whenBecomesTrue {
                 val path = FollowPath(closeShootChain!!)
                 path()
-//                ParallelGroup(
-//                    TurretPhiSubsystem.AutoAim(
-//                        goalX - Pos(AutonPositions.shootPoseClose, isBlue).x,
-//                        goalY - Pos(AutonPositions.shootPoseClose, isBlue).y,
-//                        Pos(AutonPositions.shootPoseClose, isBlue).heading.rad
-//                    ),
-//                    path
-//                )()
                 activeDriveMacros.add(path)
             }
         Gamepads.gamepad1.leftBumper whenBecomesTrue {
@@ -272,17 +257,11 @@ open class TeleOpBase(
 
         Gamepads.gamepad2.circle whenBecomesTrue {
             lowerOverridePower = 1.0;
-            ParallelGroup(
-//                MagServoSubsystem.run,
-                MagblockServoSubsystem.unblock
-            )()
+            MagblockServoSubsystem.unblock()
             ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
         } whenBecomesFalse {
             lowerOverridePower = 0.0;
-            ParallelGroup(
-//                MagServoSubsystem.stop,
-                MagblockServoSubsystem.block
-            )()
+            MagblockServoSubsystem.block()
             ShooterSubsystem.isShooting = false
         }
 
@@ -319,12 +298,20 @@ open class TeleOpBase(
                 gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
             }
         }
+
         // I think l/r only makes sense when robot facing away (approx same direction person is facing)
         Gamepads.gamepad2.dpadRight whenBecomesTrue {
             phiTrim -= 2.0.deg
         }
         Gamepads.gamepad2.dpadLeft whenBecomesTrue {
             phiTrim += 2.0.deg
+        }
+
+        Gamepads.gamepad2.rightBumper whenBecomesTrue {
+            veloTrim += 10;
+        }
+        Gamepads.gamepad2.rightBumper whenBecomesTrue {
+            veloTrim -= 10;
         }
     }
 
@@ -360,7 +347,7 @@ open class TeleOpBase(
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
             ShooterSubsystem.AutoAim(
                 dxyp,
-                distanceToVelocity
+                { distanceToVelocity(it) + veloTrim }
             )()
             TurretThetaSubsystem.AutoAim(
                 dxyp,
@@ -371,7 +358,7 @@ open class TeleOpBase(
                 dxp,
                 dyp,
                 h,
-                distanceToVelocity,
+                { distanceToVelocity(it) + veloTrim },
                 distAndVeloToTheta
             )
         } else {
