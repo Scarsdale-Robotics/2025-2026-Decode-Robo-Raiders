@@ -18,6 +18,8 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsyst
 import java.util.function.Supplier
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 import kotlin.time.ComparableTimeMark
 import kotlin.time.DurationUnit
@@ -52,7 +54,7 @@ object TurretThetaSubsystem : Subsystem {
         private set
 
     fun norm(angle: Angle): Angle {
-        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
+        return min(max(atan2(sin(angle.inRad), cos(angle.inRad)).rad.inDeg, 55.0), 63.0).deg;
     }
 
     class SetTargetTheta(val angle: Angle) : SetPositions(

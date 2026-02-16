@@ -11,5 +11,5 @@ object LowerSubsystem : SubsystemGroup(
     IntakeMotorSubsystem,
     MagMotorSubsystem,
     MagblockServoSubsystem,
-    MagServoSubsystem
+//    MagServoSubsystem
 )

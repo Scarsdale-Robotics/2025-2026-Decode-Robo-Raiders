@@ -33,6 +33,11 @@ object ShooterSubsystem : Subsystem {
     @JvmField var pidCoefficients = PIDCoefficients(0.0, 0.01, 0.0)
     @JvmField var shootingCoefficients = PIDCoefficients(0.0, 0.01, 0.0)
 
+    public val velocity: Double
+        get() {
+            return controller.lastMeasurement.velocity;
+        }
+
     private val controller: ControlSystem;
     private val shootingController: ControlSystem;
 

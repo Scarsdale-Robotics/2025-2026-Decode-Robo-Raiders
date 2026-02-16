@@ -20,11 +20,14 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.speed1
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
+import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
@@ -47,7 +50,7 @@ open class TeleOpBase(
     private val resetModeParams: ResetModeParams,
     private val resetModePhiAngle: Angle,
     private val distanceToVelocity: (Double) -> Double,
-    private val distanceToTheta: (Double) -> Angle,
+    private val distAndVeloToTheta: (Double, Double) -> Angle,
     private val distanceToTime: (Double) -> Double
 ): NextFTCOpMode() {
     val x:  Double get() { return (PedroComponent.follower.pose.x);}
@@ -68,13 +71,8 @@ open class TeleOpBase(
     init {
         addComponents(
             SubsystemComponent(
-                IntakeMotorSubsystem,
-                MagMotorSubsystem,
-                MagblockServoSubsystem,
-//                MagServoSubsystem,
-                ShooterSubsystem,
-                TurretPhiSubsystem,
-                TurretThetaSubsystem
+                LowerSubsystem,
+                OuttakeSubsystem
             ),
             PedroComponent(Constants::createFollower),
             BulkReadComponent,
@@ -88,9 +86,9 @@ open class TeleOpBase(
 //        MagServoSubsystem.stop()
 
         driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.deadZone(0.05).map { (if (isBlue) it else -it) * speedFactorDrive },
-            Gamepads.gamepad1.leftStickX.deadZone(0.05).map { (if (isBlue) it else -it) * speedFactorDrive },
-            -Gamepads.gamepad1.rightStickX.deadZone(0.05).map { it * speedFactorDrive },
+            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
+            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
+            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
             false
         )
 
@@ -246,9 +244,9 @@ open class TeleOpBase(
         }
 
         Gamepads.gamepad2.leftBumper whenBecomesTrue {
-            speedFactorDrive = 0.5;
+            speedFactorIntake = 0.5;
         } whenBecomesFalse {
-            speedFactorDrive = 1.0;
+            speedFactorIntake = 1.0;
         }
 
         val lowerMotorDrive = MagMotorSubsystem.DriverCommand(
@@ -366,20 +364,16 @@ open class TeleOpBase(
             )()
             TurretThetaSubsystem.AutoAim(
                 dxyp,
-                distanceToTheta
+                { distAndVeloToTheta(dxyp, ShooterSubsystem.velocity) },
             )()
         } else if (autoAimEnabled) {
-            ShooterSubsystem.AutoAim(
-                dxyp,
-                distanceToVelocity
-            )()
-//            TurretPhiSubsystem.AutoAim(
-//                dxp, dyp, hp, phiTrim
-//            )()
-            TurretThetaSubsystem.AutoAim(
-                dxyp,
-                distanceToTheta
-            )()
+            OuttakeSubsystem.AutoAim(
+                dxp,
+                dyp,
+                h,
+                distanceToVelocity,
+                distAndVeloToTheta
+            )
         } else {
             //ShooterSubsystem.Manual(
 

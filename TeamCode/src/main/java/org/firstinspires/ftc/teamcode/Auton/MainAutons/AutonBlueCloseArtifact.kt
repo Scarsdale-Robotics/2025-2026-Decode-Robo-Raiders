@@ -395,9 +395,9 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
             dxy,
             { distanceToVelocity(it) }
         )()
-//        TurretPhiSubsystem.AutoAim(
-//            dx, dy, hp.rad
-//        )()
+        TurretPhiSubsystem.AutoAim(
+            dx, dy, hp.rad
+        )()
         TurretThetaSubsystem.AutoAim(
             dxyp,
             { distanceToTheta(it) }
