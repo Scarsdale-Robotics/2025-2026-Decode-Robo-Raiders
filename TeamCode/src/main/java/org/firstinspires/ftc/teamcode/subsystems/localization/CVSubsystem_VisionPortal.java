@@ -35,7 +35,7 @@ public class CVSubsystem_VisionPortal {
 
     private static final double CAM_X = -4.88119055118;
     private static final double CAM_Y = -4.38726968504;
-    private static final double CAM_Z = 0.0;
+    private static final double CAM_Z = 0.0; // tune
 
     public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
@@ -69,7 +69,11 @@ public class CVSubsystem_VisionPortal {
                                 CAM_Z,
                                 0
                         ), new YawPitchRollAngles(
-                                AngleUnit.RADIANS,0,0,0,0
+                                AngleUnit.RADIANS,
+                                Math.toRadians(90), // 90 deg = vertical image
+                                Math.toRadians(-45), //45 deg from the horiziontal (floor)
+                                0,
+                                0
                         )
                 )
                 .setDrawTagOutline(true)
