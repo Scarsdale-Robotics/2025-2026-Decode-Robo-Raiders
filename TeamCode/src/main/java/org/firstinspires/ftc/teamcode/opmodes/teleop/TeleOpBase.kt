@@ -270,7 +270,7 @@ open class TeleOpBase(
 //        Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
 //        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
-        Gamepads.gamepad2.circle whenBecomesTrue {
+        Gamepads.gamepad1.circle whenBecomesTrue {
             lowerOverridePower = 1.0;
             ParallelGroup(
 //                MagServoSubsystem.run,
@@ -286,10 +286,12 @@ open class TeleOpBase(
             ShooterSubsystem.isShooting = false
         }
 
+        // notify d1
+        Gamepads.gamepad2.dpadUp whenBecomesTrue { gamepad1.rumble(450) }
+
         // manual mode toggle
         Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.triangle whenBecomesTrue {
             autoAimEnabled = !autoAimEnabled;
-            gamepad1.rumble(450);
             gamepad2.rumble(450);
         }
 
