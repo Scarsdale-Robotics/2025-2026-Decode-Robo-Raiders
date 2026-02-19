@@ -35,7 +35,7 @@ public class CVSubsystem_VisionPortal {
 
     private static final double CAM_X = -4.88119055118;
     private static final double CAM_Y = -4.38726968504;
-    private static final double CAM_Z = 0.0;
+    private static final double CAM_Z = 0.0; // tune
 
     public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
@@ -69,7 +69,11 @@ public class CVSubsystem_VisionPortal {
                                 CAM_Z,
                                 0
                         ), new YawPitchRollAngles(
-                                AngleUnit.RADIANS,0,0,0,0
+                                AngleUnit.RADIANS,
+                                Math.toRadians(90), // 90 deg = vertical image
+                                Math.toRadians(-45), //45 deg from the horiziontal (floor)
+                                0,
+                                0
                         )
                 )
                 .setDrawTagOutline(true)
@@ -121,10 +125,20 @@ public class CVSubsystem_VisionPortal {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         if (detections == null || detections.isEmpty()) return;
 
-        AprilTagDetection tag = detections.get(0);
-        if (tag.robotPose == null) return;
+        AprilTagDetection best = null;
+        double bestRange = Double.MAX_VALUE;
 
-        Pose3D pose = tag.robotPose;
+        for (AprilTagDetection d : detections) {
+            if (d.ftcPose != null && d.ftcPose.range < bestRange) {
+                best = d;
+                bestRange = d.ftcPose.range;
+            }
+        }
+
+        if (best == null) return;
+        if (best.robotPose == null) return;
+
+        Pose3D pose = best.robotPose;
 
         // YOUR ORIGINAL CODE (BROKEN)
         /*
@@ -147,7 +161,7 @@ public class CVSubsystem_VisionPortal {
         RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y;
         RCh = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-        lastDetection = tag;
+        lastDetection = best;
     }
 
     public void setCv(double x1, double y1, double h) {
