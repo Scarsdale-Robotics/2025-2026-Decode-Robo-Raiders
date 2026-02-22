@@ -255,7 +255,7 @@ open class TeleOpBase(
 //        Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
 //        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
-        Gamepads.gamepad1.circle whenBecomesTrue {
+        Gamepads.gamepad1.rightTrigger greaterThan 0.05 whenBecomesTrue {
             lowerOverridePower = 1.0;
             MagblockServoSubsystem.unblock()
             ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
