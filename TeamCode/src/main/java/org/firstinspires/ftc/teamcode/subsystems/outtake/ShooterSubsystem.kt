@@ -98,8 +98,6 @@ object ShooterSubsystem : Subsystem {
             motor2.state.times(-1.0)
         ).coerceIn(-0.1, 1.0);
 
-        if (-0.05 < power && power < 0.0) power = 0.0;
-
         setMotorPowers(power);
 
         val measuredVel = (motor2.currentPosition - lastPos)/elapsedTime.time();
