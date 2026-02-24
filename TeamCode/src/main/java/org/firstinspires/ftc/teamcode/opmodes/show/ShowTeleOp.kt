@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmodes.show
 
+import com.pedropathing.geometry.Pose
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
+import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
@@ -14,9 +16,14 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import kotlin.math.PI
+import kotlin.math.hypot
 
 class ShowTeleOp : NextFTCOpMode() {
+
+    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
 
     init {
         addComponents(
@@ -28,6 +35,10 @@ class ShowTeleOp : NextFTCOpMode() {
             BulkReadComponent,
             BindingsComponent
         )
+    }
+
+    override fun onInit() {
+        PedroComponent.follower.pose = Pose(0.0, 0.0, -PI / 2)
     }
 
     var lowerOverridePower = 0.0;
@@ -69,13 +80,22 @@ class ShowTeleOp : NextFTCOpMode() {
     }
 
     var lastRuntime = 0.0
-    var dxyp = 20.0
+    var dyp = 20.0;
+    var dxp = 0.0;
     override fun onUpdate() {
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
 
-        telemetry.addData("Goal Dist (in), dxyp [DPAD UP/DOWN TO ADJUST]", dxyp);
+        telemetry.addData("dyp [DPAD U/D TO ADJUST]", dyp);
+        telemetry.addData("dxp [DPAD L/R TO ADJUST]", dxp);
 
+        val dxyp = hypot(dxp, dyp);
+
+        TurretPhiSubsystem.AutoAim(
+            dxp,
+            dyp,
+            h
+        )
         ShooterSubsystem.AutoAim(
             dxyp,
             { distanceToVelocity(it) }
