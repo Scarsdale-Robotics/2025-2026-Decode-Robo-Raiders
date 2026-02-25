@@ -49,7 +49,7 @@ class BasicTeleOp(): NextFTCOpMode() {
         @JvmField var isBlue = true;
 
         @JvmField var goalX = 3.0;
-        @JvmField var goalY = 144.0 - 3.0;
+        @JvmField var goalY = 144.0 - 6.0;
     }
 
     init {

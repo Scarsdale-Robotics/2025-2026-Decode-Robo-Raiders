@@ -70,8 +70,8 @@ public class CVSubsystem_VisionPortal {
                                 0
                         ), new YawPitchRollAngles(
                                 AngleUnit.RADIANS,
-                                Math.toRadians(90), // 90 deg = vertical image
-                                Math.toRadians(-45), //45 deg from the horiziontal (floor)
+                                Math.toRadians(0), // 90 deg = vertical image // 0 deg = horizontal image
+                                Math.toRadians(-75), //45 deg from the horiziontal (floor) // -75deg is 15degg from floor
                                 0,
                                 0
                         )
