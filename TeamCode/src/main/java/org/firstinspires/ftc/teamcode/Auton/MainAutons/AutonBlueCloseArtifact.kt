@@ -79,6 +79,7 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
     }
+    private var stopShooterAutoAim = false;
 
     /////////////////
     ////Positions////
@@ -108,8 +109,6 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
 //    private var robotIntake4: PathChain? = null
 //    private var robotGoToShoot4: PathChain? = null
     private var robotPark: PathChain? = null
-
-    private var stopShooterAutoAim = false;
 
     ////////////////////
     ////Path Builder////
@@ -259,12 +258,14 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
     private val autonomousRoutine: Command
         get() = SequentialGroup(
             //Main Group
-            SequentialGroup( //Shoots PRELOAD
+            ParallelGroup( //Shoots PRELOAD
                 FollowPath(robotShootPreload!!),
-                Delay(delayStartShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
+                SequentialGroup(
+                    Delay(delayStartShoot),
+                    ShootCommand,
+                    Delay(delayAfterEachShoot),
+                    IntakeCommand,
+                ),
 //                FollowPath(robotIntake1!!), //robot goes to intake
 //                Delay(DelayAfterIntake),
             ),
@@ -403,6 +404,9 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
         TurretPhiSubsystem.AutoAim(
             dx, dy, PedroComponent.follower.pose.heading.rad
         )()
+//        TurretPhiSubsystem.AutoAim(
+//            dx, dy, hp.rad
+//        )()
         TurretThetaSubsystem.AutoAim(
             dxyp,
             { distanceToTheta(it) }
