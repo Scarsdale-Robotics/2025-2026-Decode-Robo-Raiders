@@ -10,6 +10,20 @@ object AutonPositions {
     val startPoseClose = Pose(33.1371, 137.9536, Math.toRadians(270.0)) // Start Pose of our robot.
     val startAutonControlPos = Pose(95.3, 58.5)
 
+    //====CoOp Specific Positions====
+    val startCoOpControlPos = Pose(91.6, 91.2)
+
+    val coOpFirstStartGateOpen = Pose(17.0, 72.4, Math.toRadians(180.0))
+
+    val coOpStartGateOpen = Pose(17.8, 63.1, Math.toRadians(180.0))
+    val coOpStartGateOpenControlPos = Pose(41.2, 66.85)
+
+    val CoOpCommonIntakeControlPos1 = Pose(-40.0, 85.0)
+    val CoOpCommonIntakeControlPos2 = Pose(82.0, 32.0)
+    val CoOpCommonIntake = Pose(12.0, 36.0, Math.toRadians(180.0)) // Intake Pos1
+
+    //======CoOp Positions END=======
+
     val shootPoseClose =
         Pose(57.0, 76.6, Math.toRadians(145.0)) // Close Shoot Pose of our robot.
     val shootPoseFar =
@@ -33,7 +47,7 @@ object AutonPositions {
     val intake2Pos = Pose(19.0, 58.0, Math.toRadians(180.0)) // Intake Pos2
     val intake2ControlPos = Pose(61.7, 71.0)
 
-    val intake1Pos = Pose(21.5, 84.0, Math.toRadians(180.0)) // Intake Pos3
+    val intake1Pos = Pose(21.4, 84.0, Math.toRadians(180.0)) // Intake Pos3
 
     fun Blue(bluePose: Pose): Pose { return bluePose }
     fun Red(bluePose: Pose): Pose {
