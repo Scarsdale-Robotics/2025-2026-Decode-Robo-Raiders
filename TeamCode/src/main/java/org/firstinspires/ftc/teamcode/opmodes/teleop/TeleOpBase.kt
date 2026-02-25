@@ -345,6 +345,11 @@ open class TeleOpBase(
         val dyp = dy + vy * distanceToTime(dxy)
         val dxyp = hypot(dxp, dyp)
 
+        PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
+        PanelsTelemetry.telemetry.addData("SHOOTING?", ShooterSubsystem.isShooting);
+        PanelsTelemetry.telemetry.addData("DISTANCE TO GOAL (in)", dxy);
+        PanelsTelemetry.telemetry.addData("TIME-ADJ DISTANCE TO GOAL (in)", dxyp);
+
         if (resetMode) {
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
             ShooterSubsystem.AutoAim(
@@ -382,7 +387,7 @@ open class TeleOpBase(
 
 //        PanelsTelemetry.telemetry.addData("Vx (in/s)", vx)
 //        PanelsTelemetry.telemetry.addData("Vy (in/s)", vy)
-        PanelsTelemetry.telemetry.addData("CMD", CommandManager.snapshot)
+        PanelsTelemetry.telemetry.addData("cmd snp", CommandManager.snapshot)
         PanelsTelemetry.telemetry.update()
     }
 

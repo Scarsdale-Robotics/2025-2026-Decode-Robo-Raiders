@@ -82,6 +82,7 @@ class BasicTeleOp(): NextFTCOpMode() {
     }
 
     var speedFactor = 1.0;
+    var lowerOverridePower = 0.0;
     override fun onStartButtonPressed() {
         PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         MagblockServoSubsystem.unblock()
@@ -115,14 +116,14 @@ class BasicTeleOp(): NextFTCOpMode() {
         val lowerMotorDrive = MagMotorSubsystem.DriverCommand(
             Gamepads.gamepad1.rightTrigger,
             Gamepads.gamepad1.leftTrigger,
-            { 0.0 }
+            { lowerOverridePower }
         );
         lowerMotorDrive();
 
         val intakeMotorDrive = IntakeMotorSubsystem.DriverCommand(
             Gamepads.gamepad1.rightTrigger,
             Gamepads.gamepad1.leftTrigger,
-            { 0.0 }
+            { lowerOverridePower }
         )
         intakeMotorDrive()
 
@@ -131,9 +132,15 @@ class BasicTeleOp(): NextFTCOpMode() {
 //        )
 //        magDrive();
 
-        Gamepads.gamepad1.circle
-            .whenTrue(MagblockServoSubsystem.unblock)
-            .whenBecomesFalse(MagblockServoSubsystem.block)
+        Gamepads.gamepad1.circle whenBecomesTrue {
+            lowerOverridePower = 1.0;
+            MagblockServoSubsystem.unblock()
+            ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
+        } whenBecomesFalse {
+            lowerOverridePower = 0.0;
+            MagblockServoSubsystem.block()
+            ShooterSubsystem.isShooting = false
+        }
 
     }
 

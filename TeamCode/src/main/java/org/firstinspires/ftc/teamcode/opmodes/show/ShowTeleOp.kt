@@ -71,12 +71,12 @@ class ShowTeleOp : NextFTCOpMode() {
         }
     }
 
-    override fun distanceToVelocity(dist: Double): Double {
-
+    fun distanceToVelocity(dist: Double): Double {
+        return 0.0; // TODO
     }
 
-    override fun distAndVeloToTheta(dist: Double, velo: Double): Angle {
-
+    fun distAndVeloToTheta(dist: Double, velo: Double): Angle {
+        return 0.0.rad; // TODO
     }
 
     var lastRuntime = 0.0

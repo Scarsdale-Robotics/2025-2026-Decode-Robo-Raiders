@@ -26,6 +26,7 @@ object ShooterSubsystem : Subsystem {
 
     public val velocity: Double
         get() {
+            if (isShooting) return shootingController.lastMeasurement.velocity;
             return controller.lastMeasurement.velocity;
         }
 
