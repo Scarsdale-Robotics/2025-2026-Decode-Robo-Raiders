@@ -8,7 +8,6 @@ import dev.nextftc.control.KineticState
 import dev.nextftc.control.builder.controlSystem
 import dev.nextftc.control.feedback.PIDCoefficients
 import dev.nextftc.control.feedforward.BasicFeedforwardParameters
-import dev.nextftc.control.interpolators.InterpolatorElement
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
@@ -20,9 +19,9 @@ object ShooterSubsystem : Subsystem {
 //    private val motor1 = MotorEx("shooter1");
     private val motor2 = MotorEx("shooter2").reversed();
 
-    @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0, 0.0, 1.0);
-    @JvmField var pidCoefficients = PIDCoefficients(0.0, 0.01, 0.0)
-    @JvmField var shootingCoefficients = PIDCoefficients(0.0, 0.01, 0.0)
+    @JvmField var ffCoefficients = BasicFeedforwardParameters(0.0003, 0.0, 0.0);
+    @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
+    @JvmField var shootingCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
 
     public val velocity: Double
         get() {
@@ -77,7 +76,7 @@ object ShooterSubsystem : Subsystem {
 
     class AutoAim(
         private val dxy: Double,
-        private val powerByDistance: (Double) -> Double,  // get by running curve of best fit on collected data
+        private val veloByDistance: (Double) -> Double,  // get by running curve of best fit on collected data
     ) : Command() {
         override val isDone = true;
 
@@ -86,7 +85,7 @@ object ShooterSubsystem : Subsystem {
         }
 
         override fun start() {
-            setControllerGoals(powerByDistance(dxy))
+            setControllerGoals(veloByDistance(dxy))
         }
     }
 
@@ -96,7 +95,7 @@ object ShooterSubsystem : Subsystem {
     override fun periodic() {
         var power = (if (isShooting) shootingController else controller).calculate(
             motor2.state.times(-1.0)
-        ).coerceIn(-0.1, 1.0);
+        ).coerceIn(-0.2, 1.0);
 
         setMotorPowers(power);
 

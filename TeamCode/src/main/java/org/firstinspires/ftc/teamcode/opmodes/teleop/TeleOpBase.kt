@@ -35,6 +35,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsyst
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.hypot
 
@@ -48,8 +49,10 @@ open class TeleOpBase(
     private val goalY: Double,
     private val resetModeParams: ResetModeParams,
     private val resetModePhiAngle: Angle,
-    private val distanceToVelocity: (Double) -> Double,
-    private val distAndVeloToTheta: (Double, Double) -> Angle,
+    private val distanceToVelocityClose: (Double) -> Double,
+    private val distAndVeloToThetaClose: (Double, Double) -> Angle,
+    private val distanceToVelocityFar: (Double) -> Double,
+    private val distAndVeloToThetaFar: (Double, Double) -> Angle,
     private val distanceToTime: (Double) -> Double
 ): NextFTCOpMode() {
     val x:  Double get() { return (PedroComponent.follower.pose.x);}
@@ -175,7 +178,8 @@ open class TeleOpBase(
         val startY = content[1].toDouble()
         val startH = content[2].toDouble()
 
-        PedroComponent.follower.pose = Pose(startX, startY, startH)
+        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
+//        PedroComponent.follower.pose = Pose(startX, startY, startH)
     }
 
     private var autoAimEnabled = true;
@@ -349,20 +353,46 @@ open class TeleOpBase(
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
             ShooterSubsystem.AutoAim(
                 dxyp,
-                { distanceToVelocity(it) + veloTrim }
+                { dist ->
+                    (
+                            if (dist > 120.0)
+                                distanceToVelocityFar(dist)
+                            else
+                                distanceToVelocityClose(dist)
+                    ) + veloTrim
+                }
             )()
             TurretThetaSubsystem.AutoAim(
                 dxyp,
-                { distAndVeloToTheta(dxyp, ShooterSubsystem.velocity) },
+                { dist ->
+                    if (dist > 120.0)
+                        distAndVeloToThetaFar(dxyp, ShooterSubsystem.velocity)
+                    else
+                        distAndVeloToThetaClose(dxyp, ShooterSubsystem.velocity)
+                },
             )()
         } else if (autoAimEnabled) {
-            OuttakeSubsystem.AutoAim(
-                dxp,
-                dyp,
-                h,
-                { distanceToVelocity(it) + veloTrim },
-                distAndVeloToTheta
-            )
+            TurretPhiSubsystem.AutoAim(dxp, dyp, h)();
+            ShooterSubsystem.AutoAim(
+                dxyp,
+                { dist ->
+                    (
+                            if (dist > 120.0)
+                                distanceToVelocityFar(dist)
+                            else
+                                distanceToVelocityClose(dist)
+                            ) + veloTrim
+                }
+            )()
+            TurretThetaSubsystem.AutoAim(
+                dxyp,
+                { dist ->
+                    if (dist > 120.0)
+                        distAndVeloToThetaFar(dxyp, ShooterSubsystem.velocity)
+                    else
+                        distAndVeloToThetaClose(dxyp, ShooterSubsystem.velocity)
+                },
+            )()
         } else {
             //ShooterSubsystem.Manual(
 
