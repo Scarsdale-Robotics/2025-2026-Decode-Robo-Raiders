@@ -331,9 +331,9 @@ open class TeleOpBase(
         if (
             activeDriveMacros.isNotEmpty() &&
             (
-                    abs(gamepad1.left_stick_x) > 0.0 ||
-                            abs(gamepad1.left_stick_y) > 0.0 ||
-                            abs(gamepad1.right_stick_x) > 0.0
+                    abs(gamepad1.left_stick_x) > 0.02 ||
+                            abs(gamepad1.left_stick_y) > 0.02 ||
+                            abs(gamepad1.right_stick_x) > 0.02
                     )
         ) {
             // untrigger macro

@@ -79,12 +79,12 @@ class BasicTeleOp(): NextFTCOpMode() {
         MagMotorSubsystem.off()
         MagServoSubsystem.stop()
 //        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
+        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
     }
 
     var speedFactor = 1.0;
     var lowerOverridePower = 0.0;
     override fun onStartButtonPressed() {
-        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
 
