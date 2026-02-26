@@ -8,7 +8,6 @@ import com.pedropathing.paths.HeadingInterpolator
 import com.pedropathing.paths.PathChain
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
-import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
@@ -38,6 +37,8 @@ import java.io.File
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.hypot
+import kotlin.math.max
+import kotlin.math.min
 
 
 data class ResetModeParams(val x: Double, val y: Double, val h: Angle)
@@ -182,6 +183,8 @@ open class TeleOpBase(
 //        PedroComponent.follower.pose = Pose(startX, startY, startH)
     }
 
+    private val BORD = 88;
+
     private var autoAimEnabled = true;
     private var resetMode = false;
 
@@ -192,6 +195,7 @@ open class TeleOpBase(
 
     var speedFactorDrive = 1.0;
     var speedFactorIntake = 1.0;
+    var shootTransferSpeedFactor = 1.0;
     var lowerOverridePower = 0.0;
 
     override fun onStartButtonPressed() {
@@ -260,7 +264,11 @@ open class TeleOpBase(
 //        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
         Gamepads.gamepad1.rightTrigger greaterThan 0.05 whenBecomesTrue {
-            lowerOverridePower = 1.0;
+            if (dxyp > BORD) {
+                lowerOverridePower = 0.8 * shootTransferSpeedFactor;
+            } else {
+                lowerOverridePower = 1.0 * shootTransferSpeedFactor;
+            }
             MagblockServoSubsystem.unblock()
             ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
         } whenBecomesFalse {
@@ -319,9 +327,17 @@ open class TeleOpBase(
         Gamepads.gamepad2.rightBumper whenBecomesTrue {
             veloTrim -= 10;
         }
+
+        Gamepads.gamepad2.dpadUp whenBecomesTrue {
+            shootTransferSpeedFactor = min(shootTransferSpeedFactor + 0.1, 1.0)
+        }
+        Gamepads.gamepad2.dpadDown whenBecomesTrue {
+            shootTransferSpeedFactor = max(shootTransferSpeedFactor - 0.1, 0.0)
+        }
     }
 
     var lastRuntime = 0.0
+    var dxyp = 0.0;
     override fun onUpdate() {
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
@@ -347,7 +363,7 @@ open class TeleOpBase(
         val dxy = hypot(dx, dy)
         val dxp = dx + vx * distanceToTime(dxy)
         val dyp = dy + vy * distanceToTime(dxy)
-        val dxyp = hypot(dxp, dyp)
+        dxyp = hypot(dxp, dyp)
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
         PanelsTelemetry.telemetry.addData("SHOOTING?", ShooterSubsystem.isShooting);
@@ -360,7 +376,7 @@ open class TeleOpBase(
                 dxyp,
                 { dist ->
                     (
-                            if (dist > 120.0)
+                            if (dist > BORD)
                                 distanceToVelocityFar(dist)
                             else
                                 distanceToVelocityClose(dist)
@@ -370,7 +386,7 @@ open class TeleOpBase(
             TurretThetaSubsystem.AutoAim(
                 dxyp,
                 { dist ->
-                    if (dist > 120.0)
+                    if (dist > BORD)
                         distAndVeloToThetaFar(dxyp, ShooterSubsystem.velocity)
                     else
                         distAndVeloToThetaClose(dxyp, ShooterSubsystem.velocity)
@@ -382,7 +398,7 @@ open class TeleOpBase(
                 dxyp,
                 { dist ->
                     (
-                            if (dist > 120.0)
+                            if (dist > BORD)
                                 distanceToVelocityFar(dist)
                             else
                                 distanceToVelocityClose(dist)
@@ -392,7 +408,7 @@ open class TeleOpBase(
             TurretThetaSubsystem.AutoAim(
                 dxyp,
                 { dist ->
-                    if (dist > 120.0)
+                    if (dist > BORD)
                         distAndVeloToThetaFar(dxyp, ShooterSubsystem.velocity)
                     else
                         distAndVeloToThetaClose(dxyp, ShooterSubsystem.velocity)

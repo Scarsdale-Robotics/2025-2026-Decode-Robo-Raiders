@@ -5,6 +5,7 @@ import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import java.lang.Math.pow
 import kotlin.math.PI
+import kotlin.math.ln
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -17,15 +18,21 @@ class TeleOpBlue : TeleOpBase(
     resetModeParams = ResetModeParams(144.0 - 8.127, 6.5, (PI / 2.0).rad),
     resetModePhiAngle = (-180.0).deg,
     distanceToVelocityClose = { dist ->
-        -0.120936 * dist * dist + 24.33705 * dist + 71.32418
+        -0.016772 * dist.pow(2) +
+                7.82068 * dist +
+                638.1726
     },
     distAndVeloToThetaClose = { dist, velo -> max(min(
-        -0.00130433 * dist * dist +
-                -0.00000964864 * velo * velo +
-                0.0116661 * dist +
-                -0.0249701 * velo +
-                0.000230304 * dist * velo +
-                85.88317,
+        0.000217156 * dist.pow(3) +
+                -0.000104074 * dist.pow(2) * velo +
+                0.000015072 * dist * velo.pow(2) +
+                -6.84068 * 10.0.pow(-7.0) * velo.pow(3) +
+                0.0655632 * dist.pow(2) +
+                -0.0168192 * dist * velo +
+                0.00103424 * velo.pow(2) +
+                3.92855 * dist +
+                -0.44738 * velo +
+                118.82247,
         63.0
     ), 55.0).deg },
     distanceToVelocityFar = { dist ->
@@ -41,6 +48,6 @@ class TeleOpBlue : TeleOpBase(
         63.0
     ), 55.0).deg},
 //    distanceToTheta = { max(min(-0.000153176 * it * it + 0.00180231 * it + 63.63936, 63.0), 55.0).deg },
-    distanceToTime = { 0.0 }  // todo: tune  // is over seconds, not milliseconds
+    distanceToTime = { -2.44 + 0.706 * ln(it) }  // todo: tune  // is over seconds, not milliseconds
 //    distanceToTime = { -0.739 + 0.0185 * it + -4.6E-05 * it * it }
 )

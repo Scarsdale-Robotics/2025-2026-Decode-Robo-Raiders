@@ -54,8 +54,7 @@ object MagMotorSubsystem : Subsystem {
         }
 
         override fun update() {
-            if (override.get() != 0.0) motor.power = override.get()
-            else motor.power = inPower.get() - outPower.get();
+            motor.power = inPower.get() - outPower.get() + override.get();
         }
     }
 }
