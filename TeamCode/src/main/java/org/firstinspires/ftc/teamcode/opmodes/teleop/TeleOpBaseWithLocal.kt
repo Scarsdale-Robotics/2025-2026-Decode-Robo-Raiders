@@ -72,20 +72,10 @@ open class TeleOpBaseWithLocal(
     var closeShootChain: PathChain? = null;
 //    var closeIntakeChain: PathChain;
     var driverControlled: PedroDriverControlled? = null;
-//    var driverControlled: PedroDriverControlled;
-    var parkChain: PathChain? = null;
+//
 
     init {
         addComponents(
-            SubsystemComponent(
-                IntakeMotorSubsystem,
-                MagMotorSubsystem,
-                MagblockServoSubsystem,
-//                MagServoSubsystem,
-                ShooterSubsystem,
-                TurretPhiSubsystem,
-                TurretThetaSubsystem
-            ),
             PedroComponent(Constants::createFollower),
             BulkReadComponent,
             BindingsComponent
@@ -165,22 +155,7 @@ open class TeleOpBaseWithLocal(
 //            )
             .build()
 
-        parkChain = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierLine(
-                    PedroComponent.follower::getPose,
-                    Pos(AutonPositions.parkPoseFull, isBlue)
-                )
-            )
-            .setTangentHeadingInterpolation()
-//            .setHeadingInterpolation(
-//                HeadingInterpolator.linearFromPoint(
-//                    PedroComponent.follower::getHeading,
-//                    Pos(AutonPositions.parkPoseFull, isBlue).heading,
-//                    1.0
-//                )
-//            )
-            .build()
+
 
         val file = File(Lefile.filePath)
         val content = file.readText().split("\n")
@@ -192,12 +167,10 @@ open class TeleOpBaseWithLocal(
         local = LocalizationSubsystem(startX, startY, startH, hardwareMap);
     }
 
-    private var autoAimEnabled = true;
-    private var resetMode = false;
+
 
     var activeDriveMacros = mutableListOf<Command>()
 
-    private var phiTrim = 0.0.deg;
     var speedFactor = 1.0;
 
     var speedFactorDrive = 1.0;
@@ -245,11 +218,6 @@ open class TeleOpBaseWithLocal(
 //                )()
                 activeDriveMacros.add(path)
             }
-        Gamepads.gamepad1.leftBumper whenBecomesTrue {
-            val path = FollowPath(parkChain!!)
-            path()
-            activeDriveMacros.add(path)
-        }
 
         Gamepads.gamepad1.rightBumper whenBecomesTrue {
             speedFactor = 0.5;
@@ -257,96 +225,18 @@ open class TeleOpBaseWithLocal(
             speedFactor = 1.0;
         }
 
-        val lowerMotorDrive = MagMotorSubsystem.DriverCommand(
-            Gamepads.gamepad2.rightTrigger.map { it * speedFactorIntake },
-            Gamepads.gamepad2.leftTrigger.map { it * speedFactorIntake },
-            { lowerOverridePower }
-        );
-        lowerMotorDrive();
 
-        val intakeMotorDrive = IntakeMotorSubsystem.DriverCommand(
-            Gamepads.gamepad2.rightTrigger.map { it * speedFactorIntake },
-            Gamepads.gamepad2.leftTrigger.map { it * speedFactorIntake },
-            { lowerOverridePower }
-        )
-        intakeMotorDrive()
 
-//        val magServoDrive = MagServoSubsystem.DriverCommandDefaultOn(
-//            Gamepads.gamepad1.leftTrigger.greaterThan(0.0)
-//        )
-//        magServoDrive();
-//        Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
-//        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
-        Gamepads.gamepad1.circle whenBecomesTrue {
-            ParallelGroup(
-//                MagServoSubsystem.run,
-                MagblockServoSubsystem.unblock
-            )()
-            ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
-        } whenBecomesFalse {
-            ParallelGroup(
-//                MagServoSubsystem.stop,
-                MagblockServoSubsystem.block
-            )()
-            ShooterSubsystem.isShooting = false
-        }
 
-        // manual mode toggle
-        Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.triangle whenBecomesTrue {
-            autoAimEnabled = !autoAimEnabled;
-            gamepad1.rumble(450);
-            gamepad2.rumble(450);
-        }
 
-        Gamepads.gamepad2.cross whenFalse {
-            val dx = goalX - x
-            val dy = goalY - y
-            val dxy = hypot(dx, dy)
-            val dxp = dx + vx * distanceToTime(dxy)
-            val dyp = dy + vy * distanceToTime(dxy)
-            TurretPhiSubsystem.AutoAim(
-                dxp, dyp, h, phiTrim
-            )()
-        }
+
 
         // not trimming in reset mode
         // reset mode toggle
-        Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.rightBumper whenBecomesTrue {
-            resetMode = !resetMode;
-            if (resetMode) {
-                // 180.0.deg corresponds to turret facing backwards
-                gamepad2.rumble(200)
-                gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
-            } else {
-                // reset position
-                val resetPose = Pose(
-                    resetModeParams.x,
-                    resetModeParams.y,
-                    resetModeParams.h.inRad
-                )
 
-                // reset local
-                local?.setPos(
-                    resetModeParams.x,
-                    resetModeParams.y,
-                    resetModeParams.h.inRad
-                )
-
-                // reset pedro
-                PedroComponent.follower.pose = resetPose
-
-                gamepad2.rumble(200)
-                gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
-            }
-        }
         // I think l/r only makes sense when robot facing away (approx same direction person is facing)
-        Gamepads.gamepad2.dpadRight whenBecomesTrue {
-            phiTrim -= 2.0.deg
-        }
-        Gamepads.gamepad2.dpadLeft whenBecomesTrue {
-            phiTrim += 2.0.deg
-        }
+
     }
 
     var lastRuntime = 0.0
@@ -374,40 +264,7 @@ open class TeleOpBaseWithLocal(
             PedroComponent.follower.startTeleopDrive()
         }
 
-        val dx = goalX - x
-        val dy = goalY - y
-        val dxy = hypot(dx, dy)
-        val dxp = dx + vx * distanceToTime(dxy)
-        val dyp = dy + vy * distanceToTime(dxy)
-        val dxyp = hypot(dxp, dyp)
 
-        if (resetMode) {
-            TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
-            ShooterSubsystem.AutoAim(
-                dxyp,
-                distanceToVelocity
-            )()
-            TurretThetaSubsystem.AutoAim(
-                dxyp,
-                distanceToTheta
-            )()
-        } else if (autoAimEnabled) {
-            ShooterSubsystem.AutoAim(
-                dxyp,
-                distanceToVelocity
-            )()
-//            TurretPhiSubsystem.AutoAim(
-//                dxp, dyp, hp, phiTrim
-//            )()
-            TurretThetaSubsystem.AutoAim(
-                dxyp,
-                distanceToTheta
-            )()
-        } else {
-            //ShooterSubsystem.Manual(
-
-            //)
-        }
 
         telemetry.addData("x (inch)", x);
         telemetry.addData("y (inch)", y);
