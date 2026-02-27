@@ -183,7 +183,7 @@ open class TeleOpBase(
 //        PedroComponent.follower.pose = Pose(startX, startY, startH)
     }
 
-    private val BORD = 88;
+    private val BORDY = 48;
 
     private var autoAimEnabled = true;
     private var resetMode = false;
@@ -264,10 +264,10 @@ open class TeleOpBase(
 //        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
         Gamepads.gamepad1.rightTrigger greaterThan 0.05 whenBecomesTrue {
-            if (dxyp > BORD) {
-                lowerOverridePower = 0.8 * shootTransferSpeedFactor;
+            lowerOverridePower = if (y < BORDY) {
+                0.8 * shootTransferSpeedFactor;
             } else {
-                lowerOverridePower = 1.0 * shootTransferSpeedFactor;
+                1.0 * shootTransferSpeedFactor;
             }
             MagblockServoSubsystem.unblock()
             ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
@@ -361,8 +361,8 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-        val dxp = dx + vx * distanceToTime(dxy)
-        val dyp = dy + vy * distanceToTime(dxy)
+        val dxp = dx - vx * distanceToTime(dxy)
+        val dyp = dy - vy * distanceToTime(dxy)
         dxyp = hypot(dxp, dyp)
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
@@ -376,7 +376,7 @@ open class TeleOpBase(
                 dxyp,
                 { dist ->
                     (
-                            if (dist > BORD)
+                            if (y < BORDY)
                                 distanceToVelocityFar(dist)
                             else
                                 distanceToVelocityClose(dist)
@@ -386,10 +386,10 @@ open class TeleOpBase(
             TurretThetaSubsystem.AutoAim(
                 dxyp,
                 { dist ->
-                    if (dist > BORD)
-                        distAndVeloToThetaFar(dxyp, ShooterSubsystem.velocity)
+                    if (y < BORDY)
+                        distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                     else
-                        distAndVeloToThetaClose(dxyp, ShooterSubsystem.velocity)
+                        distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
                 },
             )()
         } else if (autoAimEnabled) {
@@ -398,7 +398,7 @@ open class TeleOpBase(
                 dxyp,
                 { dist ->
                     (
-                            if (dist > BORD)
+                            if (y < BORDY)
                                 distanceToVelocityFar(dist)
                             else
                                 distanceToVelocityClose(dist)
@@ -408,7 +408,7 @@ open class TeleOpBase(
             TurretThetaSubsystem.AutoAim(
                 dxyp,
                 { dist ->
-                    if (dist > BORD)
+                    if (y < BORDY)
                         distAndVeloToThetaFar(dxyp, ShooterSubsystem.velocity)
                     else
                         distAndVeloToThetaClose(dxyp, ShooterSubsystem.velocity)
