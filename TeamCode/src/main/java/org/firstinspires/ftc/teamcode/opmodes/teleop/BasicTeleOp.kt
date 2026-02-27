@@ -96,9 +96,9 @@ class BasicTeleOp(): NextFTCOpMode() {
             -Gamepads.gamepad1.leftStickY.map { it*speedFactor },
             Gamepads.gamepad1.leftStickX.map { it*speedFactor },
             Gamepads.gamepad1.rightStickX.map { it*speedFactor },
-            FieldCentric({
-                if (isBlue) (h.inRad - PI).rad else h
-            })
+//            FieldCentric({
+//                if (isBlue) (h.inRad - PI).rad else h
+//            })
         )
         mecanum();
 
