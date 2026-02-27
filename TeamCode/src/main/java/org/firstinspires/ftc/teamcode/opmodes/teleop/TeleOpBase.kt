@@ -287,11 +287,6 @@ open class TeleOpBase(
         }
 
         Gamepads.gamepad2.cross whenFalse {
-            val dx = goalX - x
-            val dy = goalY - y
-            val dxy = hypot(dx, dy)
-            val dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-            val dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
             if (resetMode) {
                 TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
             } else if (autoAimEnabled) {
@@ -344,6 +339,8 @@ open class TeleOpBase(
 
     var lastRuntime = 0.0
     var dxyp = 0.0;
+    var dxp = 0.0;
+    var dyp = 0.0;
     override fun onUpdate() {
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
@@ -367,8 +364,8 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-        val dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        val dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
