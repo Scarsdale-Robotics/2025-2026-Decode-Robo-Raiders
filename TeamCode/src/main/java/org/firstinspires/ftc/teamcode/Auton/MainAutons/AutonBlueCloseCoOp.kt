@@ -5,14 +5,12 @@ import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
-import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
-import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
@@ -27,7 +25,6 @@ import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
@@ -36,7 +33,7 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
-import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORDY
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaClose
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaFar
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToTimeClose
@@ -45,7 +42,6 @@ import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityC
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityFar
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
-import kotlin.math.PI
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
@@ -345,11 +341,11 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         val dy = AutonBlueFarArtifact.Companion.goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
         val dxp = dx - PedroComponent.follower.velocity.xComponent * (
-                if (PedroComponent.follower.pose.y < BORDY) distanceToTimeFar(dxy)
+                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
                 else distanceToTimeClose(dxy)
                 )
         val dyp = dy - PedroComponent.follower.velocity.yComponent * (
-                if (PedroComponent.follower.pose.y < BORDY) distanceToTimeFar(dxy)
+                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
                 else distanceToTimeClose(dxy)
                 )
         val dxyp = hypot(dxp, dyp)
@@ -359,7 +355,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 dxyp,
                 { dist ->
                     (
-                            if (PedroComponent.follower.velocity.yComponent < BORDY)
+                            if (PedroComponent.follower.velocity.yComponent < BORD_Y)
                                 distanceToVelocityFar(dist)
                             else
                                 distanceToVelocityClose(dist)
@@ -371,7 +367,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         TurretThetaSubsystem.AutoAim(
             dxyp,
             { dist ->
-                if (PedroComponent.follower.velocity.yComponent < BORDY)
+                if (PedroComponent.follower.velocity.yComponent < BORD_Y)
                     distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                 else
                     distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)

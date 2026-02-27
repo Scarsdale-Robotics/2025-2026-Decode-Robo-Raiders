@@ -2,14 +2,12 @@ package org.firstinspires.ftc.teamcode.utils
 
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
-import kotlin.math.ln
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.pow
 import kotlin.math.sqrt
 
 object AutoAimConstants {
-    val BORDY = 48;
+    const val BORD_Y = 48;
 
     fun distanceToVelocityClose(d: Double): Double {
         val (b0, b1, b2) = arrayOf(

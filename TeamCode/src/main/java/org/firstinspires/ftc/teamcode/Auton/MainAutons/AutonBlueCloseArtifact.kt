@@ -12,11 +12,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
-import dev.nextftc.core.commands.groups.ParallelRaceGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.Angle
-import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
@@ -27,7 +24,6 @@ import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
@@ -36,7 +32,7 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
-import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORDY
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaClose
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaFar
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToTimeClose
@@ -45,10 +41,7 @@ import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityC
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityFar
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
-import kotlin.math.PI
 import kotlin.math.hypot
-import kotlin.math.max
-import kotlin.math.min
 
 @Autonomous(name = "Auton Blue Close Artifact", group = "Auton")
 @Configurable
@@ -400,11 +393,11 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
         val dy = AutonBlueFarArtifact.Companion.goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
         val dxp = dx - PedroComponent.follower.velocity.xComponent * (
-                if (PedroComponent.follower.pose.y < BORDY) distanceToTimeFar(dxy)
+                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
                 else distanceToTimeClose(dxy)
         )
         val dyp = dy - PedroComponent.follower.velocity.yComponent * (
-                if (PedroComponent.follower.pose.y < BORDY) distanceToTimeFar(dxy)
+                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
                 else distanceToTimeClose(dxy)
         )
         val dxyp = hypot(dxp, dyp)
@@ -414,7 +407,7 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
                 dxyp,
                 { dist ->
                     (
-                        if (PedroComponent.follower.velocity.yComponent < BORDY)
+                        if (PedroComponent.follower.velocity.yComponent < BORD_Y)
                             distanceToVelocityFar(dist)
                         else
                             distanceToVelocityClose(dist)
@@ -426,7 +419,7 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
         TurretThetaSubsystem.AutoAim(
             dxyp,
             { dist ->
-                if (PedroComponent.follower.velocity.yComponent < BORDY)
+                if (PedroComponent.follower.velocity.yComponent < BORD_Y)
                     distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                 else
                     distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)

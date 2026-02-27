@@ -32,7 +32,7 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
-import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORDY
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.PI
@@ -264,7 +264,7 @@ open class TeleOpBase(
 //        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
         Gamepads.gamepad1.rightTrigger greaterThan 0.05 whenBecomesTrue {
-            lowerOverridePower = if (y < BORDY) {
+            lowerOverridePower = if (y < BORD_Y) {
                 0.8 * shootTransferSpeedFactor;
             } else {
                 1.0 * shootTransferSpeedFactor;
@@ -290,11 +290,17 @@ open class TeleOpBase(
             val dx = goalX - x
             val dy = goalY - y
             val dxy = hypot(dx, dy)
-            val dxp = dx - vx * (if (y < BORDY) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-            val dyp = dy - vy * (if (y < BORDY) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-            TurretPhiSubsystem.AutoAim(
-                dxp, dyp, h, phiTrim
-            )()
+            val dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+            val dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+            if (resetMode) {
+                TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
+            } else if (autoAimEnabled) {
+                TurretPhiSubsystem.AutoAim(
+                    dxp, dyp, h, phiTrim
+                )()
+            } else {
+                // manual
+            }
         }
 
         // not trimming in reset mode
@@ -361,8 +367,8 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-        val dxp = dx - vx * (if (y < BORDY) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        val dyp = dy - vy * (if (y < BORDY) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        val dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        val dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
@@ -371,12 +377,11 @@ open class TeleOpBase(
         PanelsTelemetry.telemetry.addData("TIME-ADJ DISTANCE TO GOAL (in)", dxyp);
 
         if (resetMode) {
-            TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
             ShooterSubsystem.AutoAim(
                 dxyp,
                 { dist ->
                     (
-                            if (y < BORDY)
+                            if (y < BORD_Y)
                                 distanceToVelocityFar(dist)
                             else
                                 distanceToVelocityClose(dist)
@@ -386,19 +391,18 @@ open class TeleOpBase(
             TurretThetaSubsystem.AutoAim(
                 dxyp,
                 { dist ->
-                    if (y < BORDY)
+                    if (y < BORD_Y)
                         distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                     else
                         distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
                 },
             )()
         } else if (autoAimEnabled) {
-            TurretPhiSubsystem.AutoAim(dxp, dyp, h)();
             ShooterSubsystem.AutoAim(
                 dxyp,
                 { dist ->
                     (
-                            if (y < BORDY)
+                            if (y < BORD_Y)
                                 distanceToVelocityFar(dist)
                             else
                                 distanceToVelocityClose(dist)
@@ -408,7 +412,7 @@ open class TeleOpBase(
             TurretThetaSubsystem.AutoAim(
                 dxyp,
                 { dist ->
-                    if (y < BORDY)
+                    if (y < BORD_Y)
                         distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                     else
                         distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
