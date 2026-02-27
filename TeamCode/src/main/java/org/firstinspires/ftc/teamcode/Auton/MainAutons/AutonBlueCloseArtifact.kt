@@ -82,7 +82,7 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
         val DelayAtLever: Double = 0.05
 
         val goalX = 3.0
-        val goalY = 144.0 - 3.0
+        val goalY = 144.0 - 6.0
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
     }
