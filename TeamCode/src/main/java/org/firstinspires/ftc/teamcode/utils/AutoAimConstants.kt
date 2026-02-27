@@ -11,14 +11,14 @@ object AutoAimConstants {
 
     fun distanceToVelocityClose(d: Double): Double {
         val (b0, b1, b2) = arrayOf(
-            -609.4652, 304.04375, -11.0255
+            -111.68989, 159.803, -4.00802
         );
         return b0 + b1 * sqrt(d) + b2 * d;
     }
 
     fun distAndVeloToThetaClose(d: Double, v: Double): Angle {
         val (b0, b1, b2, b3, b4) = arrayOf(
-            77.50779, -0.429656, 4507231.16, -263782.983, 5613.57621
+            70.90073, -0.366685, 7519899.79, -225684.275, 4969.34854
         );
         return max(min((
                 b0 +
