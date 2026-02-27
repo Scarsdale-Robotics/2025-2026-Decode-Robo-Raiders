@@ -94,7 +94,7 @@ open class TeleOpBase(
             Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
             Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
             -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
-            false
+            true
         )
 
         gateIntakeChain = PedroComponent.follower.pathBuilder()
@@ -375,7 +375,7 @@ open class TeleOpBase(
 
         if (resetMode) {
             ShooterSubsystem.AutoAim(
-                dxyp,
+                dxy,
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -396,7 +396,7 @@ open class TeleOpBase(
             )()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
-                dxyp,
+                dxy,
                 { dist ->
                     (
                             if (y < BORD_Y)
