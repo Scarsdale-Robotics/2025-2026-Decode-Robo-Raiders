@@ -53,14 +53,6 @@ public class CVSubsystem_VisionPortal {
 
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setTagLibrary(tagLibrary)
-
-                // (BROKEN)
-                /*
-                .setDrawTagOutline(true)
-                .setDrawAxes(true)
-                */
-
-                // FIX
                 .setCameraPose(
                         new Position(
                                 DistanceUnit.INCH,
@@ -70,9 +62,9 @@ public class CVSubsystem_VisionPortal {
                                 0
                         ), new YawPitchRollAngles(
                                 AngleUnit.RADIANS,
-                                Math.toRadians(0), // 90 deg = vertical image // 0 deg = horizontal image
-                                Math.toRadians(-75), //45 deg from the horiziontal (floor) // -75deg is 15degg from floor
-                                0,
+                                0.0,
+                                Math.toRadians(15),
+                                Math.PI,
                                 0
                         )
                 )
@@ -83,17 +75,6 @@ public class CVSubsystem_VisionPortal {
         WebcamName webcamName = hm.get(WebcamName.class, "Cam");
 
         visionPortal = new VisionPortal.Builder()
-
-                // YOUR ORIGINAL CODE (BROKEN)
-                /*
-                .setCamera(webcamName)
-                .setCamera(BuiltinCameraDirection.BACK)
-                .setCameraResolution(new android.util.Size(640, 480))
-                .setAutoStartStreamOnBuild(true)
-                .setLiveViewContainerId(0)
-                */
-
-                // FIX
                 .setCamera(webcamName)
                 .setCameraResolution(new android.util.Size(640, 480))
                 .setLiveViewContainerId(
@@ -140,7 +121,6 @@ public class CVSubsystem_VisionPortal {
 
         Pose3D pose = best.robotPose;
 
-        // YOUR ORIGINAL CODE (BROKEN)
         /*
         double camX = pose.getPosition().toUnit(DistanceUnit.INCH).x;
         double camY = pose.getPosition().toUnit(DistanceUnit.INCH).y;
@@ -156,7 +136,6 @@ public class CVSubsystem_VisionPortal {
         RCh = camHeading - startingHeading;
         */
 
-        // FIX
         RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x;
         RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y;
         RCh = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
