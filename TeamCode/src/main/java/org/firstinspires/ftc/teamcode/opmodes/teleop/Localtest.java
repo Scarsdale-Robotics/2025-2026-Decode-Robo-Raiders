@@ -46,8 +46,8 @@ public class Localtest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        cv = new CVSubsystem_VisionPortal(72.0,72.0,Math.PI/2, hardwareMap); //starting pose
-        odom = new OdometrySubsystem(72.0,72.0,Math.PI/2, hardwareMap); //starting pose
+        cv = new CVSubsystem_VisionPortal(72.0,72.0,(-Math.PI/2), hardwareMap); //starting pose
+        odom = new OdometrySubsystem(72.0,72.0,(-Math.PI/2), hardwareMap); //starting pose
 //        local = new LocalizationSubsystem(0,0,Math.PI/2, hardwareMap); //starting pose
      //   circle = true;
 
