@@ -63,7 +63,7 @@ public class CVSubsystem_VisionPortal {
                         ), new YawPitchRollAngles(
                                 AngleUnit.RADIANS,
                                 Math.PI,
-                                Math.toRadians(15),
+                                -Math.toRadians(15),
                                 Math.PI,
                                 0
                         )
