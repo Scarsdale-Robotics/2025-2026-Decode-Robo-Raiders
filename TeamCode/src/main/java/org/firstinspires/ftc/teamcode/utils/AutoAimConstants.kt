@@ -9,6 +9,8 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 object AutoAimConstants {
+    val BORDY = 48;
+
     fun distanceToVelocityClose(d: Double): Double {
         val (b0, b1, b2) = arrayOf(
             -609.4652, 304.04375, -11.0255
@@ -49,9 +51,16 @@ object AutoAimConstants {
         ), 63.0), 55.0).deg;
     }
 
-    // first ball
-    fun distanceToTime(d: Double): Double {
-        val (b0, b1) = arrayOf(-0.77681, 0.158807)
-        return b0 + b1 * sqrt(d)
+    // first ball time (seconds)
+    fun distanceToTimeClose(d: Double): Double {
+        val (b0, b1, b2) = arrayOf(-12.17499, 2.91218, -0.165714)
+        return b0 + b1 * sqrt(d) + b2 * d
     }
+
+    // first ball time
+    fun distanceToTimeFar(d: Double): Double {
+        val (b0, b1, b2) = arrayOf(11.10757, -1.96187, 0.0939321)
+        return b0 + b1 * sqrt(d) + b2 * d
+    }
+
 }

@@ -36,6 +36,13 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORDY
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaClose
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaFar
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToTimeClose
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToTimeFar
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityClose
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityFar
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.PI
@@ -79,7 +86,6 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
     }
-    private var stopShooterAutoAim = false;
 
     /////////////////
     ////Positions////
@@ -388,28 +394,43 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
             ),
         )
 
+    private var stopShooterAutoAim = false;
     override fun onUpdate() {
         val dx = AutonBlueFarArtifact.Companion.goalX - PedroComponent.follower.pose.x
         val dy = AutonBlueFarArtifact.Companion.goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-        val dxp = dx + PedroComponent.follower.velocity.xComponent * distanceToTime(dxy)
-        val dyp = dy + PedroComponent.follower.velocity.yComponent * distanceToTime(dxy)
+        val dxp = dx - PedroComponent.follower.velocity.xComponent * (
+                if (PedroComponent.follower.pose.y < BORDY) distanceToTimeFar(dxy)
+                else distanceToTimeClose(dxy)
+        )
+        val dyp = dy - PedroComponent.follower.velocity.yComponent * (
+                if (PedroComponent.follower.pose.y < BORDY) distanceToTimeFar(dxy)
+                else distanceToTimeClose(dxy)
+        )
         val dxyp = hypot(dxp, dyp)
+
         if (!stopShooterAutoAim) {
             ShooterSubsystem.AutoAim(
-                dxy,
-                { distanceToVelocity(it) }
+                dxyp,
+                { dist ->
+                    (
+                        if (PedroComponent.follower.velocity.yComponent < BORDY)
+                            distanceToVelocityFar(dist)
+                        else
+                            distanceToVelocityClose(dist)
+                    )
+                }
             )()
         }
-        TurretPhiSubsystem.AutoAim(
-            dx, dy, PedroComponent.follower.pose.heading.rad
-        )()
-//        TurretPhiSubsystem.AutoAim(
-//            dx, dy, hp.rad
-//        )()
+        TurretPhiSubsystem.AutoAim(dxp, dyp, PedroComponent.follower.pose.heading.rad)();
         TurretThetaSubsystem.AutoAim(
             dxyp,
-            { distanceToTheta(it) }
+            { dist ->
+                if (PedroComponent.follower.velocity.yComponent < BORDY)
+                    distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
+                else
+                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
+            },
         )()
 
         // These loop the movements of the robot, these must be called continuously in order to work
@@ -441,16 +462,6 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
 
     /** This method is called continuously after Init while waiting for "play".  */
     override fun onWaitForStart() {}
-
-    fun distanceToTime(it: Double): Double {
-        return it * 0.0;
-    }
-    fun distanceToVelocity(it: Double): Double {
-        return 0.0127 * it * it + 1.81 * it + 937.0;
-    }
-    fun distanceToTheta(it: Double): Angle {
-        return max(min(-0.224*it+74, 63.0), 55.0).deg;
-    }
 
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system  */

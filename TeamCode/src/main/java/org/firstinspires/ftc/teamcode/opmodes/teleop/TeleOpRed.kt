@@ -21,5 +21,6 @@ class TeleOpRed : TeleOpBase(
     distAndVeloToThetaClose = { d, v -> AutoAimConstants.distAndVeloToThetaClose(d, v) },
     distanceToVelocityFar = { d -> AutoAimConstants.distanceToVelocityFar(d) },
     distAndVeloToThetaFar = { d, v -> AutoAimConstants.distAndVeloToThetaFar(d, v) },
-    distanceToTime = { d -> AutoAimConstants.distanceToTime(d) }   // todo: tune  // is over seconds, not milliseconds
+    distanceToTimeClose = { d -> AutoAimConstants.distanceToTimeClose(d) },
+    distanceToTimeFar = { d -> AutoAimConstants.distanceToTimeFar(d) }
 )

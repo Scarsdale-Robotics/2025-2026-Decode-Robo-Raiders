@@ -32,6 +32,7 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORDY
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.PI
@@ -54,7 +55,8 @@ open class TeleOpBase(
     private val distAndVeloToThetaClose: (Double, Double) -> Angle,
     private val distanceToVelocityFar: (Double) -> Double,
     private val distAndVeloToThetaFar: (Double, Double) -> Angle,
-    private val distanceToTime: (Double) -> Double
+    private val distanceToTimeClose: (Double) -> Double,
+    private val distanceToTimeFar: (Double) -> Double
 ): NextFTCOpMode() {
     val x:  Double get() { return (PedroComponent.follower.pose.x);}
     val y:  Double get() { return (PedroComponent.follower.pose.y);}
@@ -183,8 +185,6 @@ open class TeleOpBase(
 //        PedroComponent.follower.pose = Pose(startX, startY, startH)
     }
 
-    private val BORDY = 48;
-
     private var autoAimEnabled = true;
     private var resetMode = false;
 
@@ -290,8 +290,8 @@ open class TeleOpBase(
             val dx = goalX - x
             val dy = goalY - y
             val dxy = hypot(dx, dy)
-            val dxp = dx + vx * distanceToTime(dxy)
-            val dyp = dy + vy * distanceToTime(dxy)
+            val dxp = dx - vx * (if (y < BORDY) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+            val dyp = dy - vy * (if (y < BORDY) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
             TurretPhiSubsystem.AutoAim(
                 dxp, dyp, h, phiTrim
             )()
@@ -361,8 +361,8 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-        val dxp = dx - vx * distanceToTime(dxy)
-        val dyp = dy - vy * distanceToTime(dxy)
+        val dxp = dx - vx * (if (y < BORDY) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        val dyp = dy - vy * (if (y < BORDY) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
@@ -409,9 +409,9 @@ open class TeleOpBase(
                 dxyp,
                 { dist ->
                     if (y < BORDY)
-                        distAndVeloToThetaFar(dxyp, ShooterSubsystem.velocity)
+                        distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                     else
-                        distAndVeloToThetaClose(dxyp, ShooterSubsystem.velocity)
+                        distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
                 },
             )()
         } else {
