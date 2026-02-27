@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop
 
+import com.bylazar.configurables.annotations.Configurable
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.HeadingInterpolator
 import com.pedropathing.paths.PathChain
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.components.BindingsComponent
-import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
-import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
@@ -19,16 +19,12 @@ import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
-import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
-import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.speed1
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LocalizationSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.hypot
 
+@TeleOp(name = "FollowerTest")
+@Configurable
 class FollowerTest: NextFTCOpMode() {
 
     var local: LocalizationSubsystem? = null;
