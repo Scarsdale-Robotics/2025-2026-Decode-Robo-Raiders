@@ -85,17 +85,27 @@ open class TeleOpBase(
         )
     }
 
+    var lockDirection = false;
     override fun onInit() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
 //        MagServoSubsystem.stop()
 
+        // ROBOT CENTRIC:
+        val scaleDrive: (Double) -> Double = { inp -> (inp - 0.1) / 0.9 * 1.1 }
         driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
-            false
+            Gamepads.gamepad1.leftStickY.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
+            Gamepads.gamepad1.leftStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
+            -Gamepads.gamepad1.rightStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
+            true
         )
+        // FIELD CENTRIC:
+//        driverControlled = PedroDriverControlled(
+//            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
+//            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
+//            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
+//            false
+//        )
 
         gateIntakeChain = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -192,6 +202,7 @@ open class TeleOpBase(
 
     private var phiTrim = 0.0.deg;
     private var veloTrim = 0;
+    private var hoodTrim = 0.0.deg;
 
     var speedFactorDrive = 1.0;
     var speedFactorIntake = 1.0;
@@ -236,11 +247,11 @@ open class TeleOpBase(
             speedFactorDrive = 1.0;
         }
 
-        Gamepads.gamepad2.leftBumper whenBecomesTrue {
-            speedFactorIntake = 0.5;
-        } whenBecomesFalse {
-            speedFactorIntake = 1.0;
-        }
+//        Gamepads.gamepad2.leftBumper whenBecomesTrue {
+//            speedFactorIntake = 0.5;
+//        } whenBecomesFalse {
+//            speedFactorIntake = 1.0;
+//        }
 
         val lowerMotorDrive = MagMotorSubsystem.DriverCommand(
             Gamepads.gamepad2.rightTrigger.map { it * speedFactorIntake },
@@ -278,15 +289,15 @@ open class TeleOpBase(
         }
 
         // notify d1
-        Gamepads.gamepad2.dpadUp whenBecomesTrue { gamepad1.rumble(450) }
+//        Gamepads.gamepad2.dpadUp whenBecomesTrue { gamepad1.rumble(450) }
 
         // manual mode toggle
-        Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.triangle whenBecomesTrue {
-            autoAimEnabled = !autoAimEnabled;
-            gamepad2.rumble(450);
-        }
+//        Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.triangle whenBecomesTrue {
+//            autoAimEnabled = !autoAimEnabled;
+//            gamepad2.rumble(450);
+//        }
 
-        Gamepads.gamepad2.cross whenFalse {
+        Gamepads.gamepad2.square whenFalse {
             if (resetMode) {
                 TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
             } else if (autoAimEnabled) {
@@ -325,14 +336,21 @@ open class TeleOpBase(
         Gamepads.gamepad2.rightBumper whenBecomesTrue {
             veloTrim += 10;
         }
-        Gamepads.gamepad2.rightBumper whenBecomesTrue {
+        Gamepads.gamepad2.leftBumper whenBecomesTrue {
             veloTrim -= 10;
         }
 
         Gamepads.gamepad2.dpadUp whenBecomesTrue {
-            shootTransferSpeedFactor = min(shootTransferSpeedFactor + 0.1, 1.0)
+            hoodTrim += 0.5.deg;
         }
         Gamepads.gamepad2.dpadDown whenBecomesTrue {
+            hoodTrim -= 0.5.deg;
+        }
+
+        Gamepads.gamepad2.triangle whenBecomesTrue {
+            shootTransferSpeedFactor = min(shootTransferSpeedFactor + 0.1, 1.0)
+        }
+        Gamepads.gamepad2.cross whenBecomesTrue {
             shootTransferSpeedFactor = max(shootTransferSpeedFactor - 0.1, 0.0)
         }
     }
@@ -342,6 +360,15 @@ open class TeleOpBase(
     var dxp = 0.0;
     var dyp = 0.0;
     override fun onUpdate() {
+        telemetry.addLine("TRIMMING:")
+        telemetry.addData("PHI TRIM", abs(phiTrim.inDeg).toString() + " deg " + if (phiTrim.inDeg < 0.0) "RIGHT" else "LEFT");
+        telemetry.addData("VELO TRIM", "$veloTrim tps");
+        telemetry.addData("HOOD TRIM", abs(hoodTrim.inDeg).toString() + " deg " + if (hoodTrim.inDeg < 0.0) "FLATTER" else "CURVIER");
+
+        telemetry.addLine()
+        telemetry.addData("SHOOT TRANSFER SPEED FACTOR", shootTransferSpeedFactor);
+
+        telemetry.addLine("==================")
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
 
@@ -375,7 +402,7 @@ open class TeleOpBase(
 
         if (resetMode) {
             ShooterSubsystem.AutoAim(
-                dxyp,
+                dxy,
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -388,31 +415,35 @@ open class TeleOpBase(
             TurretThetaSubsystem.AutoAim(
                 dxyp,
                 { dist ->
-                    if (y < BORD_Y)
-                        distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
-                    else
-                        distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
+                    (
+                            if (y < BORD_Y)
+                                distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
+                            else
+                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
+                    ) + hoodTrim
                 },
             )()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
-                dxyp,
+                dxy * 0.5 + dxyp * 0.5,  // TODO: hope this is not sus
                 { dist ->
                     (
                             if (y < BORD_Y)
                                 distanceToVelocityFar(dist)
                             else
                                 distanceToVelocityClose(dist)
-                            ) + veloTrim
+                    ) + veloTrim
                 }
             )()
             TurretThetaSubsystem.AutoAim(
                 dxyp,
                 { dist ->
-                    if (y < BORD_Y)
-                        distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
-                    else
-                        distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
+                    (
+                            if (y < BORD_Y)
+                                distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
+                            else
+                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
+                    ) + hoodTrim
                 },
             )()
         } else {
