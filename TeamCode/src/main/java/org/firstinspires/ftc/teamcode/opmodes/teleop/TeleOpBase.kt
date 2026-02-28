@@ -368,6 +368,16 @@ open class TeleOpBase(
         telemetry.addLine()
         telemetry.addData("SHOOT TRANSFER SPEED FACTOR", shootTransferSpeedFactor);
 
+//        Runtime.getRuntime().gc()
+
+        telemetry.addLine("==================")
+
+        telemetry.addData("Memory Left", Runtime.getRuntime().maxMemory() -
+                Runtime.getRuntime().totalMemory() +
+                Runtime.getRuntime().freeMemory())
+        telemetry.addData("Memory Used", Runtime.getRuntime().totalMemory() -
+                Runtime.getRuntime().freeMemory())
+
         telemetry.addLine("==================")
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
