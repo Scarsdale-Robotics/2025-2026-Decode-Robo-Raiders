@@ -32,7 +32,7 @@ object AutonPositions {
     //======CoOp Positions END=======
 
     val shootPoseClose =
-        Pose(57.0, 76.6, Math.toRadians(145.0)) // Close Shoot Pose of our robot.
+        Pose(57.0, 76.6, Math.toRadians(200.0)) // Close Shoot Pose of our robot.
     val shootPoseFar =
         Pose(51.7, 15.9, Math.toRadians(180.0)) // Far Shoot Pose of our robot.
     val gateOpenPose =

@@ -118,7 +118,7 @@ open class TeleOpBase(
                 HeadingInterpolator.linearFromPoint(
                     PedroComponent.follower::getHeading,
                     Pos(AutonPositions.gateOpenPose, isBlue).heading,
-                    0.75
+                    0.2
                 )
             )
             .addPath(
@@ -146,7 +146,7 @@ open class TeleOpBase(
                 HeadingInterpolator.linearFromPoint(
                     PedroComponent.follower::getHeading,
                     Pos(AutonPositions.shootPoseFar, isBlue).heading,
-                    0.9
+                    0.2
                 )
             )
             .build()
@@ -163,7 +163,7 @@ open class TeleOpBase(
                 HeadingInterpolator.linearFromPoint(
                     PedroComponent.follower::getHeading,
                     Pos(AutonPositions.shootPoseClose, isBlue).heading,
-                    0.9
+                    0.2
                 )
             )
             .build()
