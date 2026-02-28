@@ -12,6 +12,7 @@ import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
@@ -46,7 +47,7 @@ import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 
-@Autonomous(name = "Auton Blue Close CoOp", group = "Auton")
+@Autonomous(name = "[MAIN-18] Auton Blue Close CoOp", group = "Auton")
 @Configurable
 class AutonBlueCloseCoOp: NextFTCOpMode() {
     //////////////////////
@@ -329,7 +330,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 ShootCommand,
                 Delay(delayAfterEachShoot),
                 TravelCommand,
-                { stopShooterAutoAim = true } as Command,
+                InstantCommand { stopShooterAutoAim = true },
                 ShooterSubsystem.On(9999.0),
                 FollowPath(robotPark!!), //robot goes to intake
             ),
@@ -352,10 +353,10 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 
         if (!stopShooterAutoAim) {
             ShooterSubsystem.AutoAim(
-                dxyp,
+                dxy,
                 { dist ->
                     (
-                            if (PedroComponent.follower.velocity.yComponent < BORD_Y)
+                            if (PedroComponent.follower.pose.y < BORD_Y)
                                 distanceToVelocityFar(dist)
                             else
                                 distanceToVelocityClose(dist)
@@ -367,7 +368,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         TurretThetaSubsystem.AutoAim(
             dxyp,
             { dist ->
-                if (PedroComponent.follower.velocity.yComponent < BORD_Y)
+                if (PedroComponent.follower.pose.y < BORD_Y)
                     distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                 else
                     distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
