@@ -92,7 +92,7 @@ open class TeleOpBase(
 //        MagServoSubsystem.stop()
 
         // ROBOT CENTRIC:
-        val scaleDrive: (Double) -> Double = { inp -> (inp - 0.1) / 0.9 * 1.1 }
+        val scaleDrive: (Double) -> Double = { inp -> (inp - 0.1) / 0.9 * 1.1 } // [0.0, 0.1] deadzone (0.0 power), [0.1, 0.9] 0.0 --> 1.0 power, [0.9, 1.0] 1.0 power
         driverControlled = PedroDriverControlled(
             Gamepads.gamepad1.leftStickY.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
             Gamepads.gamepad1.leftStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
