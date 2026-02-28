@@ -85,17 +85,27 @@ open class TeleOpBase(
         )
     }
 
+    var lockDirection = false;
     override fun onInit() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
 //        MagServoSubsystem.stop()
 
+        // ROBOT CENTRIC:
+        val scaleDrive: (Double) -> Double = { inp -> (inp - 0.1) / 0.9 * 1.1 }
         driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
+            Gamepads.gamepad1.leftStickY.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
+            Gamepads.gamepad1.leftStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
+            -Gamepads.gamepad1.rightStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
             true
         )
+        // FIELD CENTRIC:
+//        driverControlled = PedroDriverControlled(
+//            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
+//            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
+//            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
+//            false
+//        )
 
         gateIntakeChain = PedroComponent.follower.pathBuilder()
             .addPath(
