@@ -247,11 +247,11 @@ open class TeleOpBase(
             speedFactorDrive = 1.0;
         }
 
-        Gamepads.gamepad2.leftBumper whenBecomesTrue {
-            speedFactorIntake = 0.5;
-        } whenBecomesFalse {
-            speedFactorIntake = 1.0;
-        }
+//        Gamepads.gamepad2.leftBumper whenBecomesTrue {
+//            speedFactorIntake = 0.5;
+//        } whenBecomesFalse {
+//            speedFactorIntake = 1.0;
+//        }
 
         val lowerMotorDrive = MagMotorSubsystem.DriverCommand(
             Gamepads.gamepad2.rightTrigger.map { it * speedFactorIntake },
@@ -289,7 +289,7 @@ open class TeleOpBase(
         }
 
         // notify d1
-        Gamepads.gamepad2.dpadUp whenBecomesTrue { gamepad1.rumble(450) }
+//        Gamepads.gamepad2.dpadUp whenBecomesTrue { gamepad1.rumble(450) }
 
         // manual mode toggle
 //        Gamepads.gamepad2.leftBumper and Gamepads.gamepad2.triangle whenBecomesTrue {
