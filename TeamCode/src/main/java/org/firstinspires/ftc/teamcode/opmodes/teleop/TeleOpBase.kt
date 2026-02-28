@@ -425,7 +425,7 @@ open class TeleOpBase(
             )()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
-                dxy * 0.5 + dxyp * 0.5,  // TODO: hope this is not sus
+                dxy * 0.8 + dxyp * 0.2,  // TODO: hope this is not sus
                 { dist ->
                     (
                             if (y < BORD_Y)
