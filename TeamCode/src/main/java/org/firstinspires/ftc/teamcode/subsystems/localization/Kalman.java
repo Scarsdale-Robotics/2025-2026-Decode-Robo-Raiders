@@ -15,9 +15,9 @@ public class Kalman {
         this.r = r;
     }
 
-    public void predict(double prediction) {
-        if (!Double.isFinite(prediction)) return;
-        x = prediction;
+    public void predict(double delta) {
+        if (!Double.isFinite(delta)) return;
+        x += delta;
         p += q;
     }
 
@@ -25,6 +25,27 @@ public class Kalman {
         if (!Double.isFinite(measurement)) return;
         k = p / (p + r);
         x = x + k * (measurement - x);
+        p = (1 - k) * p;
+    }
+
+    public void predictAngle(double delta) {
+        if (!Double.isFinite(delta)) return;
+        x += delta;
+        //[-pi, pi]
+        while (x > Math.PI) x -= 2 * Math.PI;
+        while (x < -Math.PI) x += 2 * Math.PI;
+        p += q;
+    }
+
+    public void correctAngle(double measurement) {
+        if (!Double.isFinite(measurement)) return;
+        k = p / (p + r);
+        double diff = measurement - x;
+        while (diff > Math.PI) diff -= 2 * Math.PI;
+        while (diff < -Math.PI) diff += 2 * Math.PI;
+        x = x + k * diff;
+        while (x > Math.PI) x -= 2 * Math.PI;
+        while (x < -Math.PI) x += 2 * Math.PI;
         p = (1 - k) * p;
     }
 
