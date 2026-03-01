@@ -125,7 +125,9 @@ class FollowerTest: NextFTCOpMode() {
         telemetry.addData("x (inch)", x);
         telemetry.addData("y (inch)", y);
         telemetry.addData("h (deg)", h.inDeg);
-        telemetry.addData("Kalmain gain x", )
+        telemetry.addData("Kalmain gain x", local!!.kalmangainX)
+        telemetry.addData("Kalmain gain y", local!!.kalmangainY)
+        telemetry.addData("Kalmain gain h", local!!.kalmangianH)
         telemetry.update()
     }
 

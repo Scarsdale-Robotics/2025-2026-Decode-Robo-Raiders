@@ -48,6 +48,10 @@ public class KalmanTest extends LinearOpMode {
             panelsManager.addData("Ayl: ", local.getAY());
             panelsManager.addData("Ahl: ", local.getAH());
 
+            panelsManager.addData("Kalmain gain x", local.getKalmangainX());
+            panelsManager.addData("Kalmain gain y", local.getKalmangainY());
+            panelsManager.addData("Kalmain gain h", local.getKalmangianH());
+
             panelsManager.update(telemetry);
 
 
