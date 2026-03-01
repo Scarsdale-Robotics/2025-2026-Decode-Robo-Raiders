@@ -103,7 +103,7 @@ open class TeleOpBase(
         driverControlled = PedroDriverControlled(
             Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
             Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
+            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * it * speedFactorDrive },  // TODO: check if it * it is okay
             false
         )
 
@@ -412,7 +412,7 @@ open class TeleOpBase(
 
         if (resetMode) {
             ShooterSubsystem.AutoAim(
-                dxyp,
+                dxy,
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -423,7 +423,7 @@ open class TeleOpBase(
                 }
             )()
             TurretThetaSubsystem.AutoAim(
-                dxyp,
+                dxy,
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -435,7 +435,7 @@ open class TeleOpBase(
             )()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
-                dxyp,  // TODO: hope this is not sus
+                dxy * 0.8 + dxyp * 0.2,  // TODO: hope this is not sus
                 { dist ->
                     (
                             if (y < BORD_Y)
