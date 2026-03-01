@@ -3,7 +3,6 @@ import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
@@ -44,9 +43,9 @@ import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.hypot
 
-@Autonomous(name = "[MAIN-24] Auton Blue Close Artifact", group = "Auton")
+@Autonomous(name = "[MAIN-6] Auton Red Close Artifact", group = "Auton")
 @Configurable
-class AutonBlueCloseArtifact24: NextFTCOpMode() {
+class AutonRedCloseArtifact6: NextFTCOpMode() {
     //////////////////////
     ////Base Variables////
     //////////////////////
@@ -68,12 +67,12 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     companion object {
         val delayStartShoot: Double = 0.75
-        val DelayBeforeShoot: Double = 0.1
-        val delayAfterEachShoot: Double = 0.56 //currently at a really high #
+        val DelayBeforeShoot: Double = 0.25
+        val delayAfterEachShoot: Double = 0.5 //currently at a really high #
         val DelayFromRampIntake: Double = 0.25
         val DelayInIntake: Double = 0.75
         //        val DelayAfterIntake: Double = 0.0
-        val DelayAtLever: Double = 0.08
+        val DelayAtLever: Double = 0.1
 
         val goalX = 3.0
         val goalY = 144.0 - 6.0
@@ -100,8 +99,6 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     private var robotGoToShoot2: PathChain? = null
 
     private var robotOpenLeverFromFar: PathChain? = null
-    private var robotOpenLeverFromClose: PathChain? = null
-
     private var robotBackupFromRamp: PathChain? = null
     private var LeverGoShoot: PathChain? = null
 
@@ -123,152 +120,141 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         robotShootPreload = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.startPoseClose),
-                    AutonPositions.Blue(AutonPositions.start24ShootPos)
+                    AutonPositions.Red(AutonPositions.startPoseClose),
+                    AutonPositions.Red(AutonPositions.start24ShootPos)
                 )
             )
 //            .setTangentHeadingInterpolation()
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.start24ShootPos).heading)
             .build()
         //1st Intake
         robotIntake1 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.start24ShootPos),
-                    AutonPositions.Blue(AutonPositions.intake1Pos24)
+                    AutonPositions.Red(AutonPositions.start24ShootPos),
+                    AutonPositions.Red(AutonPositions.intake1Pos24)
                 )
             )
 //            .setTangentHeadingInterpolation()
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.intake1Pos24).heading)
             .build()
         //1st Go Shoot
         robotGoToShoot1 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.intake1Pos24),
-                    AutonPositions.Blue(AutonPositions.start24ShootPos)
+                    AutonPositions.Red(AutonPositions.intake1Pos24),
+                    AutonPositions.Red(AutonPositions.start24ShootPos)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
-            .build()
-
-        // Go to Gate
-        robotOpenLeverFromClose = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierLine(
-                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.gateOpenPose),
-                )
-            )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.gateOpenPose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.start24ShootPos).heading)
             .build()
 
         // Go to Gate
         robotOpenLeverFromFar = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.shootPoseFar),
-                    AutonPositions.Blue(AutonPositions.gateOpenPose),
+                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Red(AutonPositions.gateOpenPose),
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.gateOpenPose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.gateOpenPose).heading)
             .build()
 
         //backs up from lever to stay legal
         robotBackupFromRamp = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.gateOpenPose),
-                    AutonPositions.Blue(AutonPositions.gateAfterOpenPose),
+                    AutonPositions.Red(AutonPositions.gateOpenPose),
+                    AutonPositions.Red(AutonPositions.gateAfterOpenPose),
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.gateAfterOpenPose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.gateAfterOpenPose).heading)
             .build()
 
         //Lever Go Shoot
         LeverGoShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.gateAfterOpenPose),
-                    AutonPositions.Blue(AutonPositions.shootPoseClose)
+                    AutonPositions.Red(AutonPositions.gateAfterOpenPose),
+                    AutonPositions.Red(AutonPositions.shootPoseClose)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.shootPoseClose).heading)
             .build()
 
         //2nd Intake
         robotIntake2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.start24ShootPos),
-                    AutonPositions.Blue(AutonPositions.intake2Pos24)
+                    AutonPositions.Red(AutonPositions.start24ShootPos),
+                    AutonPositions.Red(AutonPositions.intake2Pos24)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake2Pos24).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.intake2Pos24).heading)
             .build()
 
         //2nd Go Shoot
         robotGoToShoot2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.intake2Pos24),
-                    AutonPositions.Blue(AutonPositions.shootPoseClose)
+                    AutonPositions.Red(AutonPositions.intake2Pos24),
+                    AutonPositions.Red(AutonPositions.shootPoseClose)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.shootPoseClose).heading)
             .build()
 
         //3rd Intake
         robotIntake3 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.intake3Pos24)
+                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Red(AutonPositions.intake3Pos24)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake3Pos24).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.intake3Pos24).heading)
             .build()
 
         //3rd Go Shoot
         robotGoToShoot3 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.intake3Pos),
-                    AutonPositions.Blue(AutonPositions.shootPoseFar)
+                    AutonPositions.Red(AutonPositions.intake3Pos),
+                    AutonPositions.Red(AutonPositions.shootPoseFar)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake3Pos).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.intake3Pos).heading)
             .build()
         //3rd Intake
         roboCommonIntake = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.shootPoseFar),
-                    AutonPositions.Blue(AutonPositions.commonIntakePos)
+                    AutonPositions.Red(AutonPositions.shootPoseFar),
+                    AutonPositions.Red(AutonPositions.commonIntakePos)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.commonIntakePos).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.commonIntakePos).heading)
             .build()
 
         //3rd Go Shoot
         roboCommonGoShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.commonIntakePos),
-                    AutonPositions.Blue(AutonPositions.shootPoseFar)
+                    AutonPositions.Red(AutonPositions.commonIntakePos),
+                    AutonPositions.Red(AutonPositions.shootPoseFar)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseFar).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.shootPoseFar).heading)
             .build()
         //Go Park
         robotPark = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.shootPoseFar),
-                    AutonPositions.Blue(AutonPositions.robotPark24)
+                    AutonPositions.Red(AutonPositions.shootPoseFar),
+                    AutonPositions.Red(AutonPositions.robotPark24)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.autonParkPose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.autonParkPose).heading)
             .build()
     }
 
@@ -325,136 +311,10 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntake2!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShoot2!!)
-            ),
-
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-            SequentialGroup( //Shoots FIRST Intake, goes to intake from the lever
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotOpenLeverFromClose!!), //robot goes to intake
-                Delay(DelayAtLever),
-                FollowPath(robotBackupFromRamp!!),
-                Delay(DelayFromRampIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(LeverGoShoot!!)
-            ),
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-
-            SequentialGroup( //Shoots FIFTH Intake, goes to intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntake3!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShoot3!!)
-            ),
-
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-            SequentialGroup( //Shoots FIRST Intake, goes to intake from the lever
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotOpenLeverFromFar!!), //robot goes to intake
-                Delay(DelayAtLever),
-                FollowPath(robotBackupFromRamp!!),
-                Delay(DelayFromRampIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(LeverGoShoot!!)
-            ),
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-
-            ///////////////////////////////////////////
-            ///////////////COMMON INTAKE///////////////
-            ///////////////////////////////////////////
-            SequentialGroup( //Shoots FIFTH Intake, goes to intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(roboCommonIntake!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(roboCommonGoShoot!!)
-            ),
-
-            SequentialGroup( //Shoots FIFTH Intake, goes to intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(roboCommonIntake!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(roboCommonGoShoot!!)
-            ),
-
-            ///////////////////////////////////////////
-            ///////////////COMMON INTAKE///////////////
-            ///////////////////////////////////////////
-
-            SequentialGroup( //Shoots SIXTH Intake, goes to PARK
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                TravelCommand,
+                Delay(18.0),
                 InstantCommand { stopShooterAutoAim = true },
                 ShooterSubsystem.On(9999.0),
-                FollowPath(robotPark!!), //robot goes to intake
-            ),
+            )
         )
 
     private var stopShooterAutoAim = false;
@@ -520,7 +380,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //        MagServoSubsystem.stop()
         MagblockServoSubsystem.block()
 
-        PedroComponent.follower.setStartingPose(AutonPositions.Blue(AutonPositions.startPoseClose))
+        PedroComponent.follower.setStartingPose(AutonPositions.Red(AutonPositions.startPoseClose))
     }
 
     /** This method is called continuously after Init while waiting for "play".  */

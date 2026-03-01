@@ -40,7 +40,7 @@ object TurretPhiSubsystem : Subsystem {
 
     private val controller: ControlSystem;
 
-    @JvmField var squidCoefficients = PIDCoefficients(0.0035, 0.0, 0.0001);
+    @JvmField var squidCoefficients = PIDCoefficients(0.0025, 0.0, 0.00001);
 
 //    @JvmField var Ls = 0.0;
 //    @JvmField var Lv = 0.0;

@@ -92,20 +92,20 @@ open class TeleOpBase(
 //        MagServoSubsystem.stop()
 
         // ROBOT CENTRIC:
-        val scaleDrive: (Double) -> Double = { inp -> (inp - 0.1) / 0.9 * 1.1 } // [0.0, 0.1] deadzone (0.0 power), [0.1, 0.9] 0.0 --> 1.0 power, [0.9, 1.0] 1.0 power
-        driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
-            Gamepads.gamepad1.leftStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
-            -Gamepads.gamepad1.rightStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
-            true
-        )
-        // FIELD CENTRIC:
+//        val scaleDrive: (Double) -> Double = { inp -> (inp - 0.1) / 0.9 + 0.1 } // [0.0, 0.1] deadzone (0.0 power), [0.1, 0.9] 0.0 --> 1.0 power, [0.9, 1.0] 1.0 power
 //        driverControlled = PedroDriverControlled(
-//            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-//            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-//            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
-//            false
+//            -Gamepads.gamepad1.leftStickY.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
+//            -Gamepads.gamepad1.leftStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
+//            -Gamepads.gamepad1.rightStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
+//            true
 //        )
+        // FIELD CENTRIC:
+        driverControlled = PedroDriverControlled(
+            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
+            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
+            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
+            false
+        )
 
         gateIntakeChain = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -191,8 +191,8 @@ open class TeleOpBase(
         val startY = content[1].toDouble()
         val startH = content[2].toDouble()
 
-        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
-//        PedroComponent.follower.pose = Pose(startX, startY, startH)
+//        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
+        PedroComponent.follower.pose = Pose(startX, startY, startH)
     }
 
     private var autoAimEnabled = true;
@@ -412,7 +412,7 @@ open class TeleOpBase(
 
         if (resetMode) {
             ShooterSubsystem.AutoAim(
-                dxy,
+                dxyp,
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -435,7 +435,7 @@ open class TeleOpBase(
             )()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
-                dxy * 0.8 + dxyp * 0.2,  // TODO: hope this is not sus
+                dxyp,  // TODO: hope this is not sus
                 { dist ->
                     (
                             if (y < BORD_Y)
