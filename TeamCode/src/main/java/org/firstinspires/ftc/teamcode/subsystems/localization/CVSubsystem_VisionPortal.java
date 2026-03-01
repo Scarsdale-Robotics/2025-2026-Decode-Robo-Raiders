@@ -25,7 +25,6 @@ public class CVSubsystem_VisionPortal {
 
     private final VisionPortal visionPortal;
     private final AprilTagProcessor aprilTagProcessor;
-    private final IMU imu;
 
     private double RCx1;
     private double RCy1;
@@ -39,13 +38,6 @@ public class CVSubsystem_VisionPortal {
 
     public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
-        imu = hm.get(IMU.class, "imu");
-        imu.initialize(new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
-                )
-        ));
 
         AprilTagLibrary tagLibrary = new AprilTagLibrary.Builder()
                 .addTags(AprilTagGameDatabase.getCurrentGameTagLibrary())
@@ -94,9 +86,7 @@ public class CVSubsystem_VisionPortal {
         RCh = h;
     }
 
-    public void init() {
-        imu.resetYaw();
-    }
+
 
     public void closeCam() {
         visionPortal.close();
@@ -121,27 +111,13 @@ public class CVSubsystem_VisionPortal {
 
         Pose3D pose = best.robotPose;
 
-        /*
-        double camX = pose.getPosition().toUnit(DistanceUnit.INCH).x;
-        double camY = pose.getPosition().toUnit(DistanceUnit.INCH).y;
-
-        double camHeading = pose.getOrientation().getYaw(AngleUnit.RADIANS);
-
-        double offsetX = CAM_X * Math.cos(camHeading) - CAM_Y * Math.sin(camHeading);
-        double offsetY = CAM_X * Math.sin(camHeading) + CAM_Y * Math.cos(camHeading);
-
-        RCx1 = camX - offsetX;
-        RCy1 = camY - offsetY;
-
-        RCh = camHeading - startingHeading;
-        */
-
         RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x;
         RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y;
-        RCh = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        RCh = pose.getOrientation().getYaw();
 
         lastDetection = best;
-    }
+    }   
+    
 
     public void setCv(double x1, double y1, double h) {
         RCx1 = x1;
@@ -152,11 +128,7 @@ public class CVSubsystem_VisionPortal {
     public double getRCx1() { return RCx1; }
     public double getRCy1() { return RCy1; }
     public double getRCh()  { return RCh; }
-
-    @Nullable
-    public AprilTagDetection getLastDetection() {
-        return lastDetection;
-    }
+    
 
     public boolean hasDetection() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
