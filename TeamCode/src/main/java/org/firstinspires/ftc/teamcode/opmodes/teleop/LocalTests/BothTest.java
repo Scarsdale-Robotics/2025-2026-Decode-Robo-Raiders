@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleop;
+package org.firstinspires.ftc.teamcode.opmodes.teleop.LocalTests;
+
+
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.TelemetryManager;
@@ -7,36 +9,58 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem_VisionPortal;
+import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem;
 
 import java.util.List;
 
 import kotlin.Unit;
 
-
-@TeleOp(name = "CvTest")
+@TeleOp(name = "Local5test")
 @Configurable
-public class CvTest extends LinearOpMode {
+public class BothTest extends LinearOpMode {
 
     CVSubsystem_VisionPortal cv;
+    OdometrySubsystem odom;
     private TelemetryManager panelsManager;
+
+
+
+
 
     @Override
     public void runOpMode() throws InterruptedException {
-        cv = new CVSubsystem_VisionPortal(0,0,Math.PI/2, hardwareMap); //starting pose
+        cv = new CVSubsystem_VisionPortal(72.0,72.0,(-Math.PI/2), hardwareMap); //starting pose
+        odom = new OdometrySubsystem(72.0,72.0,(-Math.PI/2), hardwareMap); //starting pose
+//
+
+
         panelsManager = new TelemetryManager(
                 () -> new TelemetryPluginConfig(), //defualt config
                 (List<String> list) -> Unit.INSTANCE,
                 (Long interval) -> Unit.INSTANCE
         );
 
+
+
         waitForStart();
+        odom = new OdometrySubsystem(72.0,72.0,(-Math.PI/2), hardwareMap); //starting pose
         while(opModeIsActive()){
             cv.updateCV();
+            odom.updateOdom();
+
+            panelsManager.addLine("ODOM");
+            panelsManager.addData("xo: ", odom.getROx1());
+            panelsManager.addData("yo: ", odom.getROy1());
+            panelsManager.addData("ho: ", odom.getROh());
+
             panelsManager.addLine("CV");
             panelsManager.addData("xc: ", cv.getRCx1());
             panelsManager.addData("yc: ", cv.getRCy1());
             panelsManager.addData("yc: ", cv.getRCh());
+
+
             panelsManager.update(telemetry);
+
         }
     }
 }
