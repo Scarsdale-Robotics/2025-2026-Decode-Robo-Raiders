@@ -111,9 +111,9 @@ public class CVSubsystem_VisionPortal {
 
         Pose3D pose = best.robotPose;
 
-        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x;
-        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y;
-        RCh = pose.getOrientation().getYaw();
+        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
+        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
+        RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
 
         lastDetection = best;
     }   
