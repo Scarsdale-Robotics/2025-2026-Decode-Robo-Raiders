@@ -64,6 +64,8 @@ open class TeleOpBase(
     val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
     val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
+    val ax: Double get() { return (PedroComponent.follower.acceleration.xComponent);}
+    val ay: Double get() { return (PedroComponent.follower.acceleration.yComponent);}
 
     var gateIntakeChain: PathChain? = null;
     var farShootChain: PathChain? = null;
@@ -401,8 +403,8 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dxp = dx - (vx + 0.05 * ax) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dyp = dy - (vy + 0.05 * ay) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
