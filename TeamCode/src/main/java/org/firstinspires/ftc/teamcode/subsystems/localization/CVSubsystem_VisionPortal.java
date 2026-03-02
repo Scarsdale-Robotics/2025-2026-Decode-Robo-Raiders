@@ -7,10 +7,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -40,6 +42,12 @@ public class CVSubsystem_VisionPortal {
 
 
         AprilTagLibrary tagLibrary = new AprilTagLibrary.Builder()
+//                .addTag(20, "BlueTarget",
+//                        6.5, new VectorF(-58.3727f, -55.6425f, 29.5f), DistanceUnit.INCH,
+//                        new Quaternion(0.2182149f, -0.2182149f, -0.6725937f, 0.6725937f, 0))
+//                .addTag(24, "RedTarget",
+//                        6.5, new VectorF(-58.3727f, 55.6425f, 29.5f), DistanceUnit.INCH,
+//                        new Quaternion(0.6725937f, -0.6725937f, -0.2182149f, 0.2182149f, 0))
                 .addTags(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .build();
 
