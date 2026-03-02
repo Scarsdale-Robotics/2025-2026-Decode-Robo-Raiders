@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleop
+package org.firstinspires.ftc.teamcode.opmodes.teleop.LocalTests
 
 import com.bylazar.configurables.annotations.Configurable
 import com.pedropathing.geometry.BezierLine
@@ -116,10 +116,18 @@ class FollowerTest: NextFTCOpMode() {
             activeDriveMacros.clear()
             PedroComponent.follower.startTeleopDrive()
         }
+        this.UpdateTelemetry();
 
+    }
+
+    private fun UpdateTelemetry() {
+        telemetry.addLine("Local")
         telemetry.addData("x (inch)", x);
         telemetry.addData("y (inch)", y);
-        telemetry.addData("h (radians)", h);
+        telemetry.addData("h (deg)", h.inDeg);
+        telemetry.addData("Kalmain gain x", local!!.kalmangainX)
+        telemetry.addData("Kalmain gain y", local!!.kalmangainY)
+        telemetry.addData("Kalmain gain h", local!!.kalmangianH)
         telemetry.update()
     }
 

@@ -20,17 +20,15 @@ public class OdometrySubsystem {
   private double ROy1;
   private double ROh;
   private double Vx, Vy, omega;
-  private double distance;
+  private double distFromOrigin;
 
-//  private Supplier<Double> ofsXSupplier, ofsYSupplier;
-//  private double ofsX, ofsY;
+
 
   public OdometrySubsystem(double x1, double y1, double h, HardwareMap hm) {
     if (hm == null) {
       throw new IllegalArgumentException("HardwareMap is null — OpMode may not be initialized yet.");
     }
 
-    // Try to get the GoBilda Pinpoint hardware safely
     try {
       pinpoint = hm.get(GoBildaPinpointDriver.class, "pinpoint");
     } catch (Exception e) {
@@ -61,10 +59,7 @@ public class OdometrySubsystem {
     updateOdom();
   }
 
-//  public void setOffsetSuppliers(Supplier<Double> ofsXSupplier, Supplier<Double> ofsYSupplier) {
-//    this.ofsXSupplier = ofsXSupplier;
-//    this.ofsYSupplier = ofsYSupplier;
-//  }
+
 
   ElapsedTime time = null;
   double rxl = 0.0, ryl = 0.0, rhl = 0.0;
@@ -87,7 +82,8 @@ public class OdometrySubsystem {
       time = new ElapsedTime();
     }
 
-    distance = Math.hypot(ROx1, ROy1);  // dist a little misleading: this is not dist travelled, this is dist from (0, 0)
+    distFromOrigin = Math.hypot(ROx1, ROy1);
+
   }
 
   public void setPinpoint(double x1, double y1, double h) {
@@ -118,5 +114,5 @@ public class OdometrySubsystem {
     return omega;
   }
 
-  public double getDistance() { return distance; }
+  public double getDistFromOrigin() { return distFromOrigin; }
 }
