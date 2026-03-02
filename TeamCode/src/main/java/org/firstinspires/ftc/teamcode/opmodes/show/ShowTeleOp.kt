@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants
 import kotlin.math.PI
 import kotlin.math.hypot
 
@@ -71,14 +72,6 @@ class ShowTeleOp : NextFTCOpMode() {
         }
     }
 
-    fun distanceToVelocity(dist: Double): Double {
-        return 0.0; // TODO
-    }
-
-    fun distAndVeloToTheta(dist: Double, velo: Double): Angle {
-        return 0.0.rad; // TODO
-    }
-
     var lastRuntime = 0.0
     var dyp = 20.0;
     var dxp = 0.0;
@@ -98,11 +91,11 @@ class ShowTeleOp : NextFTCOpMode() {
         )
         ShooterSubsystem.AutoAim(
             dxyp,
-            { distanceToVelocity(it) }
+            { dist -> AutoAimConstants.distanceToVelocityClose(dist) }
         )()
         TurretThetaSubsystem.AutoAim(
             dxyp,
-            { distAndVeloToTheta(dxyp, ShooterSubsystem.velocity) },
+            { dist -> AutoAimConstants.distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) }
         )()
 
         telemetry.update()

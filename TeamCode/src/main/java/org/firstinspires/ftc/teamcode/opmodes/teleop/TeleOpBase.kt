@@ -64,6 +64,8 @@ open class TeleOpBase(
     val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
     val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
+    val ax: Double get() { return (PedroComponent.follower.acceleration.xComponent);}
+    val ay: Double get() { return (PedroComponent.follower.acceleration.yComponent);}
 
     var gateIntakeChain: PathChain? = null;
     var farShootChain: PathChain? = null;
@@ -103,7 +105,7 @@ open class TeleOpBase(
         driverControlled = PedroDriverControlled(
             Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
             Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
+            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * it * speedFactorDrive },  // TODO: check if it * it is okay
             false
         )
 
@@ -401,8 +403,8 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dxp = dx - (vx + 0.05 * ax) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dyp = dy - (vy + 0.05 * ay) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
@@ -412,7 +414,7 @@ open class TeleOpBase(
 
         if (resetMode) {
             ShooterSubsystem.AutoAim(
-                dxyp,
+                dxy,
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -423,7 +425,7 @@ open class TeleOpBase(
                 }
             )()
             TurretThetaSubsystem.AutoAim(
-                dxyp,
+                dxy,
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -435,7 +437,8 @@ open class TeleOpBase(
             )()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
-                dxyp,  // TODO: hope this is not sus
+//                dxy * 0.8 + dxyp * 0.2,  // TODO: hope this is not sus
+                dxyp,
                 { dist ->
                     (
                             if (y < BORD_Y)

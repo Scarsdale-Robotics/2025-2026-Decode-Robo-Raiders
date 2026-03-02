@@ -59,14 +59,15 @@ public class LocalizationSubsystem {
         odom.updateOdom();
 
 
-        kalmanX.predict(odom.getROx1());
-        kalmanY.predict(odom.getROy1());
-        kalmanH.predict(odom.getROh());
+        kalmanX.predict(odom.getROx1() - Rx);
+        kalmanY.predict(odom.getROy1() - Ry);
+        kalmanH.predictAngle(odom.getROh() - Rh);
+
 
         if (cv.hasDetection()) {
           kalmanX.correct(cv.getRCx1());
           kalmanY.correct(cv.getRCy1());
-          kalmanH.correct(cv.getRCh());
+          kalmanH.correctAngle(cv.getRCh());
         }
 
         Rx = kalmanX.getEstimate();
@@ -98,40 +99,25 @@ public class LocalizationSubsystem {
     private double computeFirstDerivative(LinkedList<Double> values, LinkedList<Double> times) {
         int n = values.size();
         if (n < 2) return 0.0;
-
-        if (n >= 5) {
-            double h = (times.get(4) - times.get(0)) / 4.0;
-            return (-values.get(4) + 8 * values.get(3) - 8 * values.get(1) + values.get(0)) / (12 * h);
-        }
-
-        double h = (times.get(n - 1) - times.get(0)) / (n - 1);
-        return (values.get(n - 1) - values.get(0)) / (times.get(n - 1) - times.get(0));
+        return (values.getLast() - values.getFirst()) / (times.getLast() - times.getFirst());
     }
 
     private double computeSecondDerivative(LinkedList<Double> values, LinkedList<Double> times) {
         int n = values.size();
         if (n < 3) return 0.0;
-
-        if (n >= 5) {
-            double h = (times.get(4) - times.get(0)) / 4.0;
-            return (-values.get(4) + 16 * values.get(3) - 30 * values.get(2) + 16 * values.get(1) - values.get(0)) / (12 * h * h);
-        }
-
-        double h1 = times.get(1) - times.get(0);
-        double h2 = times.get(n - 1) - times.get(n - 2);
-        if (n == 3) {
-            double h = (times.get(2) - times.get(0)) / 2.0;
-            return (values.get(2) - 2 * values.get(1) + values.get(0)) / (h * h);
-        }
-        double h = (times.get(n - 1) - times.get(0)) / (n - 1);
-        return (values.get(n - 1) - 2 * values.get(n / 2) + values.get(0)) / (h * h);
+        int mid = n / 2;
+        double h1 = times.get(mid) - times.getFirst();
+        double h2 = times.getLast() - times.get(mid);
+        return 2 * (values.getLast() * h1 - values.get(mid) * (h1 + h2) + values.getFirst() * h2)
+                / (h1 * h2 * (h1 + h2));
     }
 
     public void setPos(double x1, double y1, double h) {
         cv.setCv(x1, y1, h);
         odom.setPinpoint(x1, y1, h);
-        kalmanX = new Kalman(x1, 0.05, 0.3, 0.7); // higher q = less trust in odom | higher r = less trust in cam
-        kalmanY = new Kalman(y1, 0.05, 0.3, 0.7); // higher q = less trust in odom | higher r = less trust in cam
+        kalmanX = new Kalman(x1, 0.05, 0.3, 0.7);
+        kalmanY = new Kalman(y1, 0.05, 0.3, 0.7);
+        kalmanH = new Kalman(h, 0.05, 0.3, 0.7);
     }
 
 
@@ -214,6 +200,7 @@ public class LocalizationSubsystem {
 
         kalmanX = new Kalman(camX, 0.05, 0.3, 0.7);
         kalmanY = new Kalman(camY, 0.05, 0.3, 0.7);
+        kalmanH = new Kalman(camH, 0.05, 0.3, 0.7);
 
         Rx = camX;
         Ry = camY;

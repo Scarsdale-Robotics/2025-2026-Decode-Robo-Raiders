@@ -7,16 +7,19 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Quaternion;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
@@ -25,7 +28,6 @@ public class CVSubsystem_VisionPortal {
 
     private final VisionPortal visionPortal;
     private final AprilTagProcessor aprilTagProcessor;
-    private final IMU imu;
 
     private double RCx1;
     private double RCy1;
@@ -39,15 +41,14 @@ public class CVSubsystem_VisionPortal {
 
     public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
-        imu = hm.get(IMU.class, "imu");
-        imu.initialize(new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
-                )
-        ));
 
         AprilTagLibrary tagLibrary = new AprilTagLibrary.Builder()
+//                .addTag(20, "BlueTarget",
+//                        6.5, new VectorF(-58.3727f, -55.6425f, 29.5f), DistanceUnit.INCH,
+//                        new Quaternion(0.2182149f, -0.2182149f, -0.6725937f, 0.6725937f, 0))
+//                .addTag(24, "RedTarget",
+//                        6.5, new VectorF(-58.3727f, 55.6425f, 29.5f), DistanceUnit.INCH,
+//                        new Quaternion(0.6725937f, -0.6725937f, -0.2182149f, 0.2182149f, 0))
                 .addTags(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .build();
 
@@ -94,9 +95,7 @@ public class CVSubsystem_VisionPortal {
         RCh = h;
     }
 
-    public void init() {
-        imu.resetYaw();
-    }
+
 
     public void closeCam() {
         visionPortal.close();
@@ -117,31 +116,22 @@ public class CVSubsystem_VisionPortal {
         }
 
         if (best == null) return;
-        if (best.robotPose == null) return;
+//        if (best.ftcPose == null) return;
 
-        Pose3D pose = best.robotPose;
+        AprilTagPoseFtc pose = best.ftcPose;
 
-        /*
-        double camX = pose.getPosition().toUnit(DistanceUnit.INCH).x;
-        double camY = pose.getPosition().toUnit(DistanceUnit.INCH).y;
 
-        double camHeading = pose.getOrientation().getYaw(AngleUnit.RADIANS);
+        RCx1 = pose.x;
+        RCy1 = pose.y;
+        RCh = pose.yaw;
 
-        double offsetX = CAM_X * Math.cos(camHeading) - CAM_Y * Math.sin(camHeading);
-        double offsetY = CAM_X * Math.sin(camHeading) + CAM_Y * Math.cos(camHeading);
-
-        RCx1 = camX - offsetX;
-        RCy1 = camY - offsetY;
-
-        RCh = camHeading - startingHeading;
-        */
-
-        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x;
-        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y;
-        RCh = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+//        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
+//        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
+//        RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
 
         lastDetection = best;
-    }
+    }   
+    
 
     public void setCv(double x1, double y1, double h) {
         RCx1 = x1;
@@ -153,9 +143,10 @@ public class CVSubsystem_VisionPortal {
     public double getRCy1() { return RCy1; }
     public double getRCh()  { return RCh; }
 
-    @Nullable
-    public AprilTagDetection getLastDetection() {
-        return lastDetection;
+    private double normalizeAngle(double angle) {
+        while (angle > Math.PI)  angle -= 2 * Math.PI;
+        while (angle < -Math.PI) angle += 2 * Math.PI;
+        return angle;
     }
 
     public boolean hasDetection() {
