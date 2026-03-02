@@ -168,10 +168,10 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .addPath(
                 BezierLine(
                     AutonPositions.Blue(AutonPositions.shootPoseFar),
-                    AutonPositions.Blue(AutonPositions.gateOpenPose),
+                    AutonPositions.Blue(AutonPositions.gateOpenPoseFromFar),
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.gateOpenPose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.gateOpenPoseFromFar).heading)
             .build()
 
         //backs up from lever to stay legal
@@ -321,7 +321,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 FollowPath(robotGoToShoot1!!)
             ),
 
-            SequentialGroup( //Shoots FOURTH Intake, goes to intake
+            SequentialGroup( //Shoots FIRST Intake, goes to intake
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
@@ -341,7 +341,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
-            SequentialGroup( //Shoots FIRST Intake, goes to intake from the lever
+            SequentialGroup( //Shoots SECOND Intake, goes to intake from the lever
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
@@ -363,7 +363,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
 
-            SequentialGroup( //Shoots FIFTH Intake, goes to intake
+            SequentialGroup( //Shoots THIRD Intake, goes to intake
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
@@ -383,7 +383,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
-            SequentialGroup( //Shoots FIRST Intake, goes to intake from the lever
+            SequentialGroup( //Shoots FOURTH Intake, goes to intake from the lever
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
@@ -408,45 +408,45 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             ///////////////////////////////////////////
             ///////////////COMMON INTAKE///////////////
             ///////////////////////////////////////////
-            SequentialGroup( //Shoots FIFTH Intake, goes to intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(roboCommonIntake!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
+//            SequentialGroup( //Shoots FIFTH Intake, goes to intake
+//                Delay(DelayBeforeShoot),
+//                ShootCommand,
+//                Delay(delayAfterEachShoot),
+//                IntakeCommand,
+//                FollowPath(roboCommonIntake!!), //robot goes to intake
+////                Delay(DelayAfterIntake),
+//            ),
+//
+//            ParallelGroup( //Robot goes back to FAR Shoot Position
+//                SequentialGroup(
+//                    Delay(DelayInIntake),
+//                    TravelCommand,
+//                ),
+//                FollowPath(roboCommonGoShoot!!)
+//            ),
 
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(roboCommonGoShoot!!)
-            ),
-
-            SequentialGroup( //Shoots FIFTH Intake, goes to intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(roboCommonIntake!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(roboCommonGoShoot!!)
-            ),
+//            SequentialGroup( //Shoots SIXTH Intake, goes to intake
+//                Delay(DelayBeforeShoot),
+//                ShootCommand,
+//                Delay(delayAfterEachShoot),
+//                IntakeCommand,
+//                FollowPath(roboCommonIntake!!), //robot goes to intake
+////                Delay(DelayAfterIntake),
+//            ),
+//
+//            ParallelGroup( //Robot goes back to FAR Shoot Position
+//                SequentialGroup(
+//                    Delay(DelayInIntake),
+//                    TravelCommand,
+//                ),
+//                FollowPath(roboCommonGoShoot!!)
+//            ),
 
             ///////////////////////////////////////////
             ///////////////COMMON INTAKE///////////////
             ///////////////////////////////////////////
 
-            SequentialGroup( //Shoots SIXTH Intake, goes to PARK
+            SequentialGroup( //Shoots SEVENTH Intake, goes to PARK
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
