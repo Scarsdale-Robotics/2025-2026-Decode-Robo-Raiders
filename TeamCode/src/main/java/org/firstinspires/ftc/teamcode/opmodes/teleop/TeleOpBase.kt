@@ -221,23 +221,23 @@ open class TeleOpBase(
 
         driverControlled!!()
 
-        Gamepads.gamepad1.dpadUp whenBecomesTrue {
-            val path = FollowPath(gateIntakeChain!!)
-            path()
-            activeDriveMacros.add(path)
-        }
-        (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
-            .whenBecomesTrue {
-                val path = FollowPath(farShootChain!!)
-                path()
-                activeDriveMacros.add(path)
-            }
-        (if (isBlue) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft)
-            .whenBecomesTrue {
-                val path = FollowPath(closeShootChain!!)
-                path()
-                activeDriveMacros.add(path)
-            }
+//        Gamepads.gamepad1.dpadUp whenBecomesTrue {
+//            val path = FollowPath(gateIntakeChain!!)
+//            path()
+//            activeDriveMacros.add(path)
+//        }
+//        (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
+//            .whenBecomesTrue {
+//                val path = FollowPath(farShootChain!!)
+//                path()
+//                activeDriveMacros.add(path)
+//            }
+//        (if (isBlue) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft)
+//            .whenBecomesTrue {
+//                val path = FollowPath(closeShootChain!!)
+//                path()
+//                activeDriveMacros.add(path)
+//            }
         Gamepads.gamepad1.leftBumper whenBecomesTrue {
             val path = FollowPath(parkChain!!)
             path()
@@ -387,19 +387,19 @@ open class TeleOpBase(
 
         PedroComponent.follower.update()
 
-        if (
-            activeDriveMacros.isNotEmpty() &&
-            (
-                    abs(gamepad1.left_stick_x) > 0.02 ||
-                            abs(gamepad1.left_stick_y) > 0.02 ||
-                            abs(gamepad1.right_stick_x) > 0.02
-                    )
-        ) {
-            // untrigger macro
-            activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
-            activeDriveMacros.clear()
-            PedroComponent.follower.startTeleopDrive()
-        }
+//        if (
+//            activeDriveMacros.isNotEmpty() &&
+//            (
+//                    abs(gamepad1.left_stick_x) > 0.02 ||
+//                            abs(gamepad1.left_stick_y) > 0.02 ||
+//                            abs(gamepad1.right_stick_x) > 0.02
+//                    )
+//        ) {
+//            // untrigger macro
+//            activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
+//            activeDriveMacros.clear()
+//            PedroComponent.follower.startTeleopDrive()
+//        }
 
         val dx = goalX - x
         val dy = goalY - y
