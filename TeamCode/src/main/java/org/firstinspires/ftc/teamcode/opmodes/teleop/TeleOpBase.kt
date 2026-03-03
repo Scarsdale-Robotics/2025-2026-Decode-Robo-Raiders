@@ -104,9 +104,9 @@ open class TeleOpBase(
 //        )
         // FIELD CENTRIC:
         driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },  // TODO: check if it * it is okay
+            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (gamepad1.left_stick_x > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
+            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (gamepad1.left_stick_y > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
+            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
             false
         )
 
