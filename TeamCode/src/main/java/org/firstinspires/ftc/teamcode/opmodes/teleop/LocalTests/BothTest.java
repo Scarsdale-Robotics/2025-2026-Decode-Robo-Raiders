@@ -15,7 +15,7 @@ import java.util.List;
 
 import kotlin.Unit;
 
-@TeleOp(name = "Local5test")
+@TeleOp(name = "Local7test")
 @Configurable
 public class BothTest extends LinearOpMode {
 
@@ -43,7 +43,7 @@ public class BothTest extends LinearOpMode {
 
 
         waitForStart();
-        odom = new OdometrySubsystem(72.0,72.0,(-Math.PI/2), hardwareMap); //starting pose
+        odom.setPinpoint(72.0,72.0,(-Math.PI/2)); //starting pose
         while(opModeIsActive()){
             cv.updateCV();
             odom.updateOdom();

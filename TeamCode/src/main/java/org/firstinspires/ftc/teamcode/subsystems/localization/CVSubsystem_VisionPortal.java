@@ -63,7 +63,7 @@ public class CVSubsystem_VisionPortal {
                                 0
                         ), new YawPitchRollAngles(
                                 AngleUnit.RADIANS,
-                                Math.PI,
+                                -Math.PI,
                                 -Math.toRadians(15),
                                 Math.PI,
                                 0
@@ -109,7 +109,7 @@ public class CVSubsystem_VisionPortal {
         double bestRange = Double.MAX_VALUE;
 
         for (AprilTagDetection d : detections) {
-            if (d.ftcPose != null && d.ftcPose.range < bestRange) {
+            if (d.robotPose != null && d.ftcPose.range < bestRange) {
                 best = d;
                 bestRange = d.ftcPose.range;
             }
@@ -118,20 +118,21 @@ public class CVSubsystem_VisionPortal {
         if (best == null) return;
 //        if (best.ftcPose == null) return;
 
-        AprilTagPoseFtc pose = best.ftcPose;
+
+        Pose3D pose = best.robotPose;
 
 
-        RCx1 = pose.x;
-        RCy1 = pose.y;
-        RCh = pose.yaw;
+        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
+        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
+        RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
 
 //        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
 //        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
 //        RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
 
         lastDetection = best;
-    }   
-    
+    }
+
 
     public void setCv(double x1, double y1, double h) {
         RCx1 = x1;
