@@ -44,7 +44,7 @@ import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.hypot
 
-@Autonomous(name = "[MAIN-18] Auton Blue Close Artifact", group = "Auton")
+@Autonomous(name = "[NATHAN-18] Auton Blue Close Artifact", group = "Auton")
 @Configurable
 class AutonBlueCloseArtifact18Nathan: NextFTCOpMode() {
     //////////////////////
