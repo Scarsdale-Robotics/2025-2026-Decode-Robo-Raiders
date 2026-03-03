@@ -3,6 +3,7 @@ import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
+import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
@@ -77,6 +78,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
         val goalX = 3.0
         val goalY = 144.0 - 6.0
+
+        val intakeSpeed = 0.7
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
     }
@@ -168,10 +171,10 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .addPath(
                 BezierLine(
                     AutonPositions.Blue(AutonPositions.shootPoseFar),
-                    AutonPositions.Blue(AutonPositions.gateOpenPose),
+                    AutonPositions.Blue(AutonPositions.gateOpenPoseFromFar),
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.gateOpenPose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.gateOpenPoseFromFar).heading)
             .build()
 
         //backs up from lever to stay legal
@@ -215,7 +218,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
+            .setLinearHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake2Pos24).heading, AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
+//            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
             .build()
 
         //3rd Intake
@@ -272,25 +276,35 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .build()
     }
 
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(intakeSpeed)}
+    val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
+
+
+
     ///////////////////////////
     ////Main Auton Commands////
     ///////////////////////////
     val IntakeCommand: Command
         get() = ParallelGroup(
+            intakePower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
 //            MagServoSubsystem.run,
             MagblockServoSubsystem.block
+
         )
     val TravelCommand: Command
         get() = ParallelGroup(
+            maxPower,
             IntakeMotorSubsystem.off,
             MagMotorSubsystem.off,
 //            MagServoSubsystem.stop,
-            MagblockServoSubsystem.block
+            MagblockServoSubsystem.block,
+
         )
     val ShootCommand: Command
         get() = ParallelGroup(
+            maxPower,
             MagblockServoSubsystem.unblock,
             MagMotorSubsystem.On(1.0),
             IntakeMotorSubsystem.intake,
@@ -321,7 +335,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 FollowPath(robotGoToShoot1!!)
             ),
 
-            SequentialGroup( //Shoots FOURTH Intake, goes to intake
+            SequentialGroup( //Shoots FIRST Intake, goes to intake
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
@@ -341,7 +355,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
-            SequentialGroup( //Shoots FIRST Intake, goes to intake from the lever
+            SequentialGroup( //Shoots SECOND Intake, goes to intake from the lever
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
@@ -363,7 +377,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
 
-            SequentialGroup( //Shoots FIFTH Intake, goes to intake
+            SequentialGroup( //Shoots THIRD Intake, goes to intake
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
@@ -383,7 +397,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
-            SequentialGroup( //Shoots FIRST Intake, goes to intake from the lever
+            SequentialGroup( //Shoots FOURTH Intake, goes to intake from the lever
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
@@ -408,45 +422,45 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             ///////////////////////////////////////////
             ///////////////COMMON INTAKE///////////////
             ///////////////////////////////////////////
-            SequentialGroup( //Shoots FIFTH Intake, goes to intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(roboCommonIntake!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
+//            SequentialGroup( //Shoots FIFTH Intake, goes to intake
+//                Delay(DelayBeforeShoot),
+//                ShootCommand,
+//                Delay(delayAfterEachShoot),
+//                IntakeCommand,
+//                FollowPath(roboCommonIntake!!), //robot goes to intake
+////                Delay(DelayAfterIntake),
+//            ),
+//
+//            ParallelGroup( //Robot goes back to FAR Shoot Position
+//                SequentialGroup(
+//                    Delay(DelayInIntake),
+//                    TravelCommand,
+//                ),
+//                FollowPath(roboCommonGoShoot!!)
+//            ),
 
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(roboCommonGoShoot!!)
-            ),
-
-            SequentialGroup( //Shoots FIFTH Intake, goes to intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(roboCommonIntake!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(roboCommonGoShoot!!)
-            ),
+//            SequentialGroup( //Shoots SIXTH Intake, goes to intake
+//                Delay(DelayBeforeShoot),
+//                ShootCommand,
+//                Delay(delayAfterEachShoot),
+//                IntakeCommand,
+//                FollowPath(roboCommonIntake!!), //robot goes to intake
+////                Delay(DelayAfterIntake),
+//            ),
+//
+//            ParallelGroup( //Robot goes back to FAR Shoot Position
+//                SequentialGroup(
+//                    Delay(DelayInIntake),
+//                    TravelCommand,
+//                ),
+//                FollowPath(roboCommonGoShoot!!)
+//            ),
 
             ///////////////////////////////////////////
             ///////////////COMMON INTAKE///////////////
             ///////////////////////////////////////////
 
-            SequentialGroup( //Shoots SIXTH Intake, goes to PARK
+            SequentialGroup( //Shoots SEVENTH Intake, goes to PARK
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
@@ -454,7 +468,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 InstantCommand { stopShooterAutoAim = true },
                 ShooterSubsystem.On(9999.0),
                 FollowPath(robotPark!!), //robot goes to intake
-            ),
+            )
         )
 
     private var stopShooterAutoAim = false;

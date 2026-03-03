@@ -40,6 +40,7 @@ import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sign
 
 
 data class ResetModeParams(val x: Double, val y: Double, val h: Angle)
@@ -105,7 +106,7 @@ open class TeleOpBase(
         driverControlled = PedroDriverControlled(
             Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
             Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (isBlue) it else -it) * speedFactorDrive },
-            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * it * speedFactorDrive },  // TODO: check if it * it is okay
+            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },  // TODO: check if it * it is okay
             false
         )
 

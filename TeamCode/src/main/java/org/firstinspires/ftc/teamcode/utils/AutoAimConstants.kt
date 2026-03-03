@@ -50,24 +50,47 @@ object AutoAimConstants {
                 ), 63.0), 55.0).deg;
     }
 
+    // todo: retune
     fun distanceToVelocityFar(d: Double): Double {
-        val (b0, b1, b2) = arrayOf(
-            2907.55323, -437.74778, 26.97694
-        );
-        return b0 + b1 * sqrt(d) + b2 * d;
+        val (b0, b1) = arrayOf(331.92644, 8.39963)
+        return b0 + b1 * d
     }
 
+//    fun distanceToVelocityFar(d: Double): Double {
+//        val (b0, b1, b2) = arrayOf(
+//            2907.55323, -437.74778, 26.97694
+//        );
+//        return b0 + b1 * sqrt(d) + b2 * d;
+//    }
+
+    // todo: redo
     fun distAndVeloToThetaFar(d: Double, v: Double): Angle {
-        val (b0, b1, b2, b3, b4) = arrayOf(
-            195.7715, -0.709742, 515380256.0, -9231672.5, 35387.6019
+//        val (b0, b1, b2, b3, b4) = arrayOf(
+//            0.0132524, 0.000895715, -0.000145183, -5.41118, 0.351313
+//        );
+//        val b5 = 168.64602
+//        return max(min((b0*d*d+b1*d*v+b2*v*v+b3*d+b4*v+b5), 63.0), 55.0).deg;
+
+        val (b0, b1, b2, b3) = arrayOf(
+            117.08157, -0.195638, -645202.755, 1192.83621
         );
         return max(min((
                 b0 +
-                b1 * d +
-                b2 / (v * v) +
-                b3 * d / (v * v) +
-                b4 * (d * d) / (v * v)
-        ), 63.0), 55.0).deg;
+                        b1 * d +
+                        b2 * d / (v * v) +
+                        b3 * (d * d) / (v * v)
+                ), 63.0), 55.0).deg;
+
+//        val (b0, b1, b2, b3, b4) = arrayOf(
+//            195.7715, -0.709742, 515380256.0, -9231672.5, 35387.6019
+//        );
+//        return max(min((
+//                b0 +
+//                b1 * d +
+//                b2 / (v * v) +
+//                b3 * d / (v * v) +
+//                b4 * (d * d) / (v * v)
+//        ), 63.0), 55.0).deg;
     }
 
     // first ball time (seconds)
