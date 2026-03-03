@@ -368,7 +368,7 @@ class AutonBlueCloseArtifact18Nathan: NextFTCOpMode() {
                 ShootCommand,
                 Delay(delayAfterEachShoot),
                 IntakeCommand,
-                FollowPath(robotIntake1!!, true, 0.8),
+                FollowPath(robotIntake1!!, false, 0.8),
                 Delay(DelayAfterIntake),
             ),
 
@@ -386,7 +386,7 @@ class AutonBlueCloseArtifact18Nathan: NextFTCOpMode() {
                 ShootCommand,
                 Delay(delayAfterEachShoot),
                 IntakeCommand,
-                FollowPath(robotIntake2!!, true, 0.8), //robot goes to intake
+                FollowPath(robotIntake2!!, false, 0.8), //robot goes to intake
                 Delay(DelayAfterIntake),
             ),
 
@@ -429,7 +429,7 @@ class AutonBlueCloseArtifact18Nathan: NextFTCOpMode() {
                 ShootCommand,
                 Delay(delayAfterEachShoot),
                 IntakeCommand,
-                FollowPath(robotIntake3!!, true, 0.8), //robot goes to intake
+                FollowPath(robotIntake3!!, false, 0.8), //robot goes to intake
                 Delay(DelayAfterIntake),
             ),
 
