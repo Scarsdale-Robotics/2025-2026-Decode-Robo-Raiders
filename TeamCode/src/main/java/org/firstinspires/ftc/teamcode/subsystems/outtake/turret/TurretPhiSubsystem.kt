@@ -40,7 +40,7 @@ object TurretPhiSubsystem : Subsystem {
 
     private val controller: ControlSystem;
 
-    @JvmField var squidCoefficients = PIDCoefficients(0.0025, 0.0, 0.00001);
+    @JvmField var squidCoefficients = PIDCoefficients(0.002, 0.0, 0.00008);
 
 //    @JvmField var Ls = 0.0;
 //    @JvmField var Lv = 0.0;
@@ -75,16 +75,28 @@ object TurretPhiSubsystem : Subsystem {
 
     fun norm(angle: Angle): Angle {
 //        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
-        val tolerance = Math.toRadians(10.0);
+        val tolerance = Math.toRadians(19.0);
         var a = angle.inRad;
 
-        while (a < 0.27 - 2 * PI - tolerance) {
+        val LOWER = Math.toRadians(51.0) - 2*PI;
+        val UPPER = Math.toRadians(51.0);
+
+        while (a < LOWER - tolerance) {
             a += 2 * PI;
         }
-        while (a > 0.27 + tolerance) {
+        while (a > UPPER + tolerance) {
             a -= 2 * PI;
         }
-        return a.rad;
+        return a.coerceIn(LOWER, UPPER).rad;
+//        Math.max(Math.min(a, UPPER), LOWER).rad;
+
+//        while (a < 0.27 - 2 * PI - tolerance) {
+//            a += 2 * PI;
+//        }
+//        while (a > 0.27 + tolerance) {
+//            a -= 2 * PI;
+//        }
+//        return a.rad;
 //        return max(min(a, PI / 4.0), -7.0 * PI / 4.0).rad
     }
 
