@@ -35,10 +35,13 @@ public class CVSubsystem_VisionPortal {
 
     private AprilTagDetection lastDetection;
 
-    private static final double CAM_X = -4.88119055118;
-    private static final double CAM_Y = -4.38726968504;
-    private static final double CAM_Z = 0.0; // tune
+    private static final double CAM_X = -8; //-4.25462244094;
+    private static final double CAM_Y = 5; //this might be postive beacuse this is the robots left
+    private static final double CAM_Z = 0; // tune
 
+
+//    double camXE;
+//    double camYE;
     public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
 
@@ -56,16 +59,12 @@ public class CVSubsystem_VisionPortal {
                 .setTagLibrary(tagLibrary)
                 .setCameraPose(
                         new Position(
-                                DistanceUnit.INCH,
-                                CAM_X,
-                                CAM_Y,
-                                CAM_Z,
-                                0
+                                DistanceUnit.INCH, 0.0, 0.0, 0.0, 0
                         ), new YawPitchRollAngles(
                                 AngleUnit.RADIANS,
-                                -Math.PI,
-                                -Math.toRadians(15),
+                                0.0,
                                 Math.PI,
+                                0.0,
                                 0
                         )
                 )
@@ -122,9 +121,12 @@ public class CVSubsystem_VisionPortal {
         Pose3D pose = best.robotPose;
 
 
-        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
-        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
+        RCx1 = -pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
+        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
         RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
+
+//        camXE = RCx1 - 72.0;
+//        camYE = RCy1 -72.0;
 
 //        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
 //        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
@@ -154,4 +156,12 @@ public class CVSubsystem_VisionPortal {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         return detections != null && !detections.isEmpty();
     }
+
+//    public double getCamXE() {
+//        return camXE;
+//    }
+//
+//    public double getCamYE() {
+//        return camYE;
+//    }
 }

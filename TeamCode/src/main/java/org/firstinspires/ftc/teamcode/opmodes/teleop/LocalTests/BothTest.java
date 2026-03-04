@@ -15,7 +15,7 @@ import java.util.List;
 
 import kotlin.Unit;
 
-@TeleOp(name = "Local7test")
+@TeleOp(name = "Local9test")
 @Configurable
 public class BothTest extends LinearOpMode {
 
@@ -58,9 +58,12 @@ public class BothTest extends LinearOpMode {
             panelsManager.addData("yc: ", cv.getRCy1());
             panelsManager.addData("yc: ", cv.getRCh());
 
+            panelsManager.addLine("ERROR");
+            panelsManager.addData("Xe: ", odom.getROx1() - cv.getRCx1());
+            panelsManager.addData("Ye: ", odom.getROy1() - cv.getRCy1());
+
 
             panelsManager.update(telemetry);
-
         }
     }
 }
