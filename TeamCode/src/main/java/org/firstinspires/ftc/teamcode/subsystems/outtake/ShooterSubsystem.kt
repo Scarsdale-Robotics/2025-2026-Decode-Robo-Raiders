@@ -22,27 +22,18 @@ object ShooterSubsystem : Subsystem {
     // 0.00032 kV, 0.001 kA
     @JvmField var ffCoefficients = BasicFeedforwardParameters(0.00039, 0.001, 0.0);
     @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
-    @JvmField var shootingCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
 
     public val velocity: Double
         get() {
-            if (isShooting) return shootingController.lastMeasurement.velocity;
             return controller.lastMeasurement.velocity;
         }
 
     private val controller: ControlSystem;
-    private val shootingController: ControlSystem;
 
     init {
         controller = controlSystem {
             basicFF(ffCoefficients)
             velPid(pidCoefficients)
-        }
-
-        // todo: tune shooting controller
-        shootingController = controlSystem {
-            basicFF(ffCoefficients)
-            velPid(shootingCoefficients)
         }
     }
 
@@ -53,7 +44,6 @@ object ShooterSubsystem : Subsystem {
 
     fun setControllerGoals(velocity: Double) {
         controller.goal = KineticState(velocity=velocity);
-        shootingController.goal = KineticState(velocity=velocity);
     }
 
     class On(private val velocity: Double): Command() {
@@ -95,7 +85,7 @@ object ShooterSubsystem : Subsystem {
     var lastPos = 0.0;
     var elapsedTime: ElapsedTime = ElapsedTime();
     override fun periodic() {
-        var power = (if (isShooting) shootingController else controller).calculate(
+        var power = controller.calculate(
             motor2.state.times(-1.0)
         ).coerceIn(-0.0, 1.0);
 
