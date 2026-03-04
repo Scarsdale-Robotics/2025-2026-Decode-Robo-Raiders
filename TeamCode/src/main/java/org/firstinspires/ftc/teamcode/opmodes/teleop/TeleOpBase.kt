@@ -212,6 +212,7 @@ open class TeleOpBase(
     var shootTransferSpeedFactor = 1.0;
     var lowerOverridePower = 0.0;
 
+    //TODO: REMINDER TO CHECK ANTI-PEDRO BRANCH
     override fun onStartButtonPressed() {
         MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
