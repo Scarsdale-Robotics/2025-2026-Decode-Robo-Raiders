@@ -149,6 +149,8 @@ open class TeleOpBase(
             BulkReadComponent,
             BindingsComponent
         )
+        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
+        odom!!.updateOdom()
     }
 
     var lockDirection = false;
@@ -258,8 +260,14 @@ open class TeleOpBase(
 //        val startH = content[2].toDouble()
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
-        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
 //        PedroComponent.follower.pose = Pose(startX, startY, startH)
+        val file = File(Lefile.filePath)
+        val content = file.readText().split("\n")
+        val startX = content[0].toDouble()
+        val startY = content[1].toDouble()
+        val startH = content[2].toDouble()
+
+        odom!!.setPinpoint(startX, startY, startH)
     }
 
     private var autoAimEnabled = true;
@@ -277,14 +285,6 @@ open class TeleOpBase(
     var lowerOverridePower = 0.0;
 
     override fun onStartButtonPressed() {
-        val file = File(Lefile.filePath)
-        val content = file.readText().split("\n")
-        val startX = content[0].toDouble()
-        val startY = content[1].toDouble()
-        val startH = content[2].toDouble()
-
-        odom!!.setPinpoint(startX, startY, startH)
-
         MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
 
@@ -385,17 +385,17 @@ open class TeleOpBase(
 //            gamepad2.rumble(450);
 //        }
 
-        Gamepads.gamepad2.square whenFalse {
-            if (resetMode) {
-                TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
-            } else if (autoAimEnabled) {
-                TurretPhiSubsystem.AutoAim(
-                    dxp, dyp, h, phiTrim
-                )()
-            } else {
-                // manual
-            }
-        }
+//        Gamepads.gamepad2.square whenFalse {
+//            if (resetMode) {
+//                TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
+//            } else if (autoAimEnabled) {
+//                TurretPhiSubsystem.AutoAim(
+//                    dxp, dyp, h, phiTrim
+//                )()
+//            } else {
+//                // manual
+//            }
+//        }
 
         // not trimming in reset mode
         // reset mode toggle
@@ -525,6 +525,7 @@ open class TeleOpBase(
                     ) + hoodTrim
                 },
             )()
+            TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
                 dxy * 0.8 + dxyp * 0.2,  // TODO: hope this is not sus
@@ -549,6 +550,9 @@ open class TeleOpBase(
                     ) + hoodTrim
                 },
             )()
+            TurretPhiSubsystem.AutoAim(
+                dxp, dyp, h, phiTrim
+            )()
         } else {
             //ShooterSubsystem.Manual(
 
@@ -571,7 +575,6 @@ open class TeleOpBase(
         PanelsTelemetry.telemetry.addData("cmd snp", CommandManager.snapshot)
         PanelsTelemetry.telemetry.update()
     }
-
     override fun onStop() {
         val file = File(Lefile.filePath)
         file.writeText(
