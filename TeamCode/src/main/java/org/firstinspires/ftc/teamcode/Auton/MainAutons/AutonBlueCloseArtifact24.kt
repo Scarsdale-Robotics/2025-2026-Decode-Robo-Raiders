@@ -69,18 +69,18 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     }
 
     companion object {
-        val delayStartShoot: Double = 0.75
+        val delayStartShoot: Double = 0.5
         val DelayBeforeShoot: Double = 0.08
         val delayAfterEachShoot: Double = 0.55 //currently at a really high #
-        val DelayFromRampIntake: Double = 0.15
-        val DelayInIntake: Double = 0.5
+        val DelayFromRampIntake: Double = 0.08
+        val DelayInIntake: Double = 0.95
         //        val DelayAfterIntake: Double = 0.0
-        val DelayAtLever: Double = 0.08
+        val DelayAtLever: Double = 0.05
 
         val goalX = 3.0
         val goalY = 144.0 - 6.0
 
-        val intakeSpeed = 0.25
+        val intakeSpeed = 0.35
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
     }
@@ -143,7 +143,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 )
             )
 //            .setTangentHeadingInterpolation()
-            .addParametricCallback(0.7, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.65, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
             .build()
         //1st Go Shoot
@@ -165,12 +165,13 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.gateOpenPose),
                 )
             )
-            .setLinearHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
-                AutonPositions.Blue(AutonPositions.gateOpenPose).heading,
-                0.9,
-                0.7
-            )
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.gateOpenPose).heading)
+//            .setLinearHeadingInterpolation(
+//                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
+//                AutonPositions.Blue(AutonPositions.gateOpenPose).heading,
+//                0.9,
+//                0.7
+//            )
             .build()
 
         // Go to Gate
@@ -242,7 +243,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.intake3Pos24)
                 )
             )
-            .addParametricCallback(0.85, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.75, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
                 AutonPositions.Blue(AutonPositions.intake3Pos24).heading,
@@ -269,8 +270,12 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.commonIntakePos)
                 )
             )
-            .setTangentHeadingInterpolation()
-            .addParametricCallback(0.9, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .setLinearHeadingInterpolation(
+            AutonPositions.Blue(AutonPositions.shootPoseFar).heading,
+            AutonPositions.Blue(AutonPositions.commonIntakePos).heading,
+            0.8
+            )
+            .addParametricCallback(0.8, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .build()
 
         //3rd Go Shoot
@@ -330,7 +335,6 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             MagblockServoSubsystem.block,
 
         )
-
     val ShootCommand: Command
         get() = ParallelGroup(
             maxPower,
@@ -396,6 +400,26 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
             //////////////////Lever Portion//////////////////
+            SequentialGroup( //Shoots SECOND Intake, goes to intake from the lever
+                Delay(DelayBeforeShoot),
+                ShootCommand,
+                Delay(delayAfterEachShoot),
+                TravelCommand,
+                FollowPath(robotOpenLeverFromClose!!), //robot goes to intake
+                Delay(DelayAtLever),
+                FollowPath(robotBackupFromRamp!!),
+                Delay(DelayFromRampIntake),
+            ),
+
+            ParallelGroup( //Robot goes back to FAR Shoot Position
+                SequentialGroup(
+                    IntakeAfterCommand,
+                    Delay(DelayInIntake),
+                    TravelCommand,
+                ),
+                FollowPath(LeverGoShoot!!)
+            ),
+
             SequentialGroup( //Shoots SECOND Intake, goes to intake from the lever
                 Delay(DelayBeforeShoot),
                 ShootCommand,
@@ -482,25 +506,6 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 ),
                 FollowPath(roboCommonGoShoot!!)
             ),
-
-            SequentialGroup( //Shoots SIXTH Intake, goes to intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                TravelCommand,
-                FollowPath(roboCommonIntake!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    IntakeAfterCommand,
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(roboCommonGoShoot!!)
-            ),
-
             ///////////////////////////////////////////
             ///////////////COMMON INTAKE///////////////
             ///////////////////////////////////////////
@@ -518,11 +523,11 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     private var stopShooterAutoAim = false;
     override fun onUpdate() {
+
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-        val dxp = dx
-            - (PedroComponent.follower.velocity.xComponent
+        val dxp = dx - (PedroComponent.follower.velocity.xComponent
             + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
                 if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
                 else distanceToTimeClose(dxy)

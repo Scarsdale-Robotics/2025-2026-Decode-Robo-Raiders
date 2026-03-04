@@ -39,11 +39,11 @@ object AutonPositions {
     val shootPoseFar =
         Pose(51.7, 15.9, Math.toRadians(180.0)) // Far Shoot Pose of our robot.
     val gateOpenPose =
-        Pose(19.6, 68.0, Math.toRadians(180.0)) // Gate Open Pose of our robot.
+        Pose(19.6, 63.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
     val gateOpenPoseFromFar =
-        Pose(19.6, 68.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
+        Pose(19.6, 58.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
     val gateAfterOpenPose = //F FTC MADE OUR MAIN STRATEGY ILLEGAL
-        Pose(19.6, 64.0, Math.toRadians(125.0)) // Gate After Open Pose of our robot.
+        Pose(19.6, 58.0, Math.toRadians(125.0)) // Gate After Open Pose of our robot.
 
     val parkPoseFull = Pose(37.5, 31.0, Math.toRadians(270.0))
 
