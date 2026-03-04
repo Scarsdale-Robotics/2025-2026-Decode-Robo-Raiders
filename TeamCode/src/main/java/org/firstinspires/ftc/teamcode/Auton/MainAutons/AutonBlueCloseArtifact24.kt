@@ -133,11 +133,12 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 )
             )
 //            .setTangentHeadingInterpolation()
-            .setLinearHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.startPoseClose).heading,
-                AutonPositions.Blue(AutonPositions.start24ShootPos).heading,
-                0.9
-            )
+//            .setLinearHeadingInterpolation(
+//                AutonPositions.Blue(AutonPositions.startPoseClose).heading,
+//                AutonPositions.Blue(AutonPositions.start24ShootPos).heading,
+//                0.85
+//            )
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
             .build()
         //1st Intake
         robotIntake1 = PedroComponent.follower.pathBuilder()
@@ -148,12 +149,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 )
             )
 //            .setTangentHeadingInterpolation()
-            .addParametricCallback(0.92, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
-            .setLinearHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.start24ShootPos).heading,
-                AutonPositions.Blue(AutonPositions.intake1Pos24).heading,
-                0.9
-            )
+            .addParametricCallback(0.95, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
             .build()
         //1st Go Shoot
         robotGoToShoot1 = PedroComponent.follower.pathBuilder()
@@ -163,11 +160,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.start24ShootPos)
                 )
             )
-            .setLinearHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.intake1Pos24).heading,
-                AutonPositions.Blue(AutonPositions.start24ShootPos).heading,
-                0.9
-            )
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
             .build()
 
         // Go to Gate
@@ -182,7 +175,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
                 AutonPositions.Blue(AutonPositions.gateOpenPose).heading,
-                0.9
+                0.85
             )
 //            .setLinearHeadingInterpolation(
 //                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
@@ -219,7 +212,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.gateOpenPose).heading,
                 AutonPositions.Blue(AutonPositions.gateAfterOpenPose).heading,
-                0.9
+                0.75
             )
             .build()
 
@@ -234,7 +227,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.gateAfterOpenPose).heading,
                 AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
-                0.9
+                0.65
             )
             .build()
 
@@ -246,12 +239,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.intake2Pos24)
                 )
             )
-            .addParametricCallback(0.92, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
-            .setLinearHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.start24ShootPos).heading,
-                AutonPositions.Blue(AutonPositions.intake2Pos24).heading,
-                0.9
-            )
+            .addParametricCallback(0.95, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake2Pos24).heading)
             .build()
 
         //2nd Go Shoot
@@ -262,7 +251,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
-            .setLinearHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake2Pos24).heading, AutonPositions.Blue(AutonPositions.shootPoseClose).heading, 0.9)
+            .setLinearHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake2Pos24).heading, AutonPositions.Blue(AutonPositions.shootPoseClose).heading, 0.5)
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
             .build()
 
@@ -274,11 +263,11 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.intake3Pos24)
                 )
             )
-            .addParametricCallback(0.92, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.95, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
                 AutonPositions.Blue(AutonPositions.intake3Pos24).heading,
-                0.9
+                0.65
             )
             .build()
 
@@ -293,7 +282,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.intake3Pos).heading,
                 AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
-                0.9
+                0.65
             )
             .build()
         //3rd Intake
@@ -308,9 +297,9 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setLinearHeadingInterpolation(
             AutonPositions.Blue(AutonPositions.shootPoseFar).heading,
             AutonPositions.Blue(AutonPositions.commonIntakePos).heading,
-            0.9
+            0.75
             )
-            .addParametricCallback(0.92, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.95, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .build()
 
         //3rd Go Shoot
@@ -324,7 +313,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.commonIntakePos).heading,
                 AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
-                0.9
+                0.75
             )
             .build()
         //Go Park
