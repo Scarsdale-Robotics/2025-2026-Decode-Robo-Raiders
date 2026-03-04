@@ -521,11 +521,14 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-        val dxp = dx - PedroComponent.follower.velocity.xComponent * (
+        val dxp = dx
+            - (PedroComponent.follower.velocity.xComponent
+            + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
                 if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
                 else distanceToTimeClose(dxy)
-                )
-        val dyp = dy - PedroComponent.follower.velocity.yComponent * (
+        )
+        val dyp = dy - (PedroComponent.follower.velocity.yComponent
+            + 0.05 * PedroComponent.follower.acceleration.yComponent) * (
                 if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
                 else distanceToTimeClose(dxy)
                 )

@@ -14,15 +14,15 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
-    kotlinOptions { jvmTarget = '1.8' }
     namespace = 'org.firstinspires.ftc.teamcode'
 
+    compileSdk 34
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    compileSdk 34
     defaultConfig {
         minSdk 24
     }
@@ -38,4 +38,5 @@ dependencies {
     implementation 'dev.nextftc:hardware:1.0.1' // If you would like to use the hardware module
     implementation 'dev.nextftc.extensions:pedro:1.0.0'
     implementation "com.bylazar:fullpanels:1.0.9"
+    implementation 'androidx.core:core-ktx:1.17.0'
 }
