@@ -187,10 +187,10 @@ open class TeleOpBase(
         Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
         Gamepads.gamepad1.circle whenBecomesTrue ParallelGroup(
-            MagServoSubsystem.run,
+//            MagServoSubsystem.run,
             MagblockServoSubsystem.unblock
         ) whenBecomesFalse ParallelGroup(
-            MagServoSubsystem.stop,
+//            MagServoSubsystem.stop,
             MagblockServoSubsystem.block
         )
 
