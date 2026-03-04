@@ -18,14 +18,14 @@ public class BasicOpMode extends LinearOpMode {
     DcMotor frontL = hardwareMap.get(DcMotor.class, "lfw");
     DcMotor backR = hardwareMap.get(DcMotor.class, "rbw");
     DcMotor backL = hardwareMap.get(DcMotor.class, "lbw");
-    DcMotor tp = hardwareMap.get(DcMotor.class, "turret_phi");
+//  DcMotor tp = hardwareMap.get(DcMotor.class, "turret_phi");
     DcMotor shooter2 = hardwareMap.get(DcMotor.class, "shooter2");
     DcMotor magazine = hardwareMap.get(DcMotor.class, "magazine");
     DcMotor intake = hardwareMap.get(DcMotor.class, "intake");
 
     @Override
     public void runOpMode() throws InterruptedException {
-        DcMotor[] motors = { frontR, frontL, backR, backL, tp, shooter2, magazine, intake };
+        DcMotor[] motors = { frontR, frontL, backR, backL, shooter2, magazine, intake };
 
         for(int i = 0; i< motors.length; i++){
             motors[i].setPower(1);

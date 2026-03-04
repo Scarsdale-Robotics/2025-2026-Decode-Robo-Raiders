@@ -15,7 +15,7 @@ import java.util.List;
 
 import kotlin.Unit;
 
-@TeleOp(name = "Local9test")
+@TeleOp(name = "Local81[7 test")
 @Configurable
 public class BothTest extends LinearOpMode {
 

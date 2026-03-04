@@ -37,7 +37,7 @@ public class CVSubsystem_VisionPortal {
 
     private static final double CAM_X = -8; //-4.25462244094;
     private static final double CAM_Y = 5; //this might be postive beacuse this is the robots left
-    private static final double CAM_Z = 0; // tune
+    private static final double CAM_Z = 7.6; // tune
 
 
 //    double camXE;
@@ -59,15 +59,16 @@ public class CVSubsystem_VisionPortal {
                 .setTagLibrary(tagLibrary)
                 .setCameraPose(
                         new Position(
-                                DistanceUnit.INCH, 0.0, 0.0, 0.0, 0
+                                DistanceUnit.INCH, -4.2, -4.5,7.7, 0
                         ), new YawPitchRollAngles(
-                                AngleUnit.RADIANS,
+                                AngleUnit.DEGREES,
                                 0.0,
-                                Math.PI,
+                                75,
                                 0.0,
                                 0
                         )
                 )
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
                 .setDrawTagOutline(true)
                 .setDrawAxes(true)
                 .build();
@@ -121,8 +122,8 @@ public class CVSubsystem_VisionPortal {
         Pose3D pose = best.robotPose;
 
 
-        RCx1 = -pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
-        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
+        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
+        RCy1 = -pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
         RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
 
 //        camXE = RCx1 - 72.0;
