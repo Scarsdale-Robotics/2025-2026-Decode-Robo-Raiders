@@ -31,16 +31,22 @@ object AutoAimConstants {
 
 
     fun distanceToVelocityClose(d: Double): Double {
-        val (b0, b1, b2) = arrayOf(
-            111.68989, 159.803, -4.00802
-        );
+        val b0 = 111.68989
+        val b1 = 159.803
+        val b2 = -4.00802
+
         return b0 + b1 * sqrt(d) + b2 * d;
     }
 
     fun distAndVeloToThetaClose(d: Double, v: Double): Angle {
-        val (b0, b1, b2, b3, b4) = arrayOf(
-            70.90073, -0.366685, 7519899.79, -225684.275, 4969.34854
-        );
+        val b0 = 70.90073
+        val b1 = -0.366685
+        val b2 = 7519899.79
+        val b3 = -225684.275
+        val b4 = 4969.34854
+
+        if (v == 0.0) return 63.0.deg;
+
         return max(min((
                 b0 +
                         b1 * d +
@@ -52,7 +58,8 @@ object AutoAimConstants {
 
     // todo: retune
     fun distanceToVelocityFar(d: Double): Double {
-        val (b0, b1) = arrayOf(331.92644, 8.39963)
+        val b0 = 331.92644;
+        val b1 = 8.39963;
         return b0 + b1 * d
     }
 
@@ -71,9 +78,13 @@ object AutoAimConstants {
 //        val b5 = 168.64602
 //        return max(min((b0*d*d+b1*d*v+b2*v*v+b3*d+b4*v+b5), 63.0), 55.0).deg;
 
-        val (b0, b1, b2, b3) = arrayOf(
-            117.08157, -0.195638, -645202.755, 1192.83621
-        );
+        val b0 = 117.08157;
+        val b1 = -0.195638;
+        val b2 = -645202.755;
+        val b3 = 1192.83621;
+
+        if (v == 0.0) return 63.0.deg;
+
         return max(min((
                 b0 +
                         b1 * d +
@@ -95,13 +106,19 @@ object AutoAimConstants {
 
     // first ball time (seconds)
     fun distanceToTimeClose(d: Double): Double {
-        val (b0, b1, b2) = arrayOf(-12.17499, 2.91218, -0.165714)
+        val b0 = -12.17499
+        val b1 = 2.91218
+        val b2 = -0.165714
+
         return b0 + b1 * sqrt(d) + b2 * d
     }
 
     // first ball time
     fun distanceToTimeFar(d: Double): Double {
-        val (b0, b1, b2) = arrayOf(11.10757, -1.96187, 0.0939321)
+        val b0 = 11.10757
+        val b1 = -1.96187
+        val b2 = 0.0939321
+
         return b0 + b1 * sqrt(d) + b2 * d
     }
 
