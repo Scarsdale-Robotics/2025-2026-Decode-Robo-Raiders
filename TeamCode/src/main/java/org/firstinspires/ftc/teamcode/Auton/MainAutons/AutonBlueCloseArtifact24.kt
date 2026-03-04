@@ -55,6 +55,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     private var pathTimer: Timer? = null
     var actionTimer: Timer? = null;
     var opmodeTimer: Timer? = null;
+    var pathStarted: Boolean? = false
     init { addComponents(
         PedroComponent(Constants::createFollower),
         SubsystemComponent(
@@ -69,7 +70,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     }
 
     companion object {
-        val delayStartShoot: Double = 0.5
+        val delayStartShoot: Double = 0.4
         val DelayBeforeShoot: Double = 0.08
         val delayAfterEachShoot: Double = 0.55 //currently at a really high #
         val DelayFromRampIntake: Double = 0.08
@@ -523,7 +524,13 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     private var stopShooterAutoAim = false;
     override fun onUpdate() {
-
+//        if (pathStarted!! && opmodeTimer!!.elapsedTime >= 29.5) {
+//            PedroComponent.follower.setMaxPower(0.0)
+//            PedroComponent.follower.breakFollowing()
+//            IntakeMotorSubsystem.off
+//            MagMotorSubsystem.off
+//            MagblockServoSubsystem.block
+//        }
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
@@ -597,6 +604,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
      * It runs all the setup actions, including building paths and starting the path system  */
     override fun onStartButtonPressed() {
         autonomousRoutine()
+        pathStarted = true
 
         opmodeTimer!!.resetTimer()
         actionTimer!!.resetTimer()
