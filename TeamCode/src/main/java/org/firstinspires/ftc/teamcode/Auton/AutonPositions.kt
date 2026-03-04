@@ -16,9 +16,9 @@ object AutonPositions {
 
     //====24 Specific Positions====
     val start24ShootPos = Pose(24.9, 105.6, Math.toRadians(270.0))
-    val intake1Pos24 = Pose(22.9, 90.8, Math.toRadians(270.0))
-    val intake2Pos24 = Pose(22.9, 66.0, Math.toRadians(270.0))
-    val intake3Pos24 = Pose(23.9, 43.3, Math.toRadians(270.0))
+    val intake1Pos24 = Pose(26.5, 90.8, Math.toRadians(270.0))
+    val intake2Pos24 = Pose(26.5, 66.0, Math.toRadians(270.0))
+    val intake3Pos24 = Pose(26.5, 43.3, Math.toRadians(270.0))
     val robotPark24 = Pose(42.8, 10.9, Math.toRadians(180.0))
 
     //====CoOp Specific Positions====
@@ -35,22 +35,24 @@ object AutonPositions {
     //======CoOp Positions END=======
 
     val shootPoseClose =
-        Pose(60.0, 76.6, Math.toRadians(200.0)) // Close Shoot Pose of our robot.
+        Pose(60.0, 76.6, Math.toRadians(180.0)) // Close Shoot Pose of our robot.
     val shootPoseFar =
         Pose(51.7, 15.9, Math.toRadians(180.0)) // Far Shoot Pose of our robot.
     val gateOpenPose =
-        Pose(19.6, 68.0, Math.toRadians(180.0)) // Gate Open Pose of our robot.
+        Pose(21.1, 62.5, Math.toRadians(180.0)) // Gate Open Pose of our robot.
+    val gateOpenControlPos =
+        Pose(56.7, 51.2)
     val gateOpenPoseFromFar =
-        Pose(19.6, 68.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
+        Pose(21.1, 58.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
     val gateAfterOpenPose = //F FTC MADE OUR MAIN STRATEGY ILLEGAL
-        Pose(19.6, 64.0, Math.toRadians(125.0)) // Gate After Open Pose of our robot.
+        Pose(17.1, 56.0, Math.toRadians(125.0)) // Gate After Open Pose of our robot.
 
     val parkPoseFull = Pose(37.5, 31.0, Math.toRadians(270.0))
 
     val commonIntakePos = Pose(14.0, 10.9, Math.toRadians(180.0))
     val commonIntakeControlPos = Pose(54.8, 36.7)
 
-    val autonParkPose = Pose(48.0, 76.6, Math.toRadians(180.0))
+    val autonParkPose = Pose(50.0, 76.6, Math.toRadians(180.0))
 
     // Non-constant positions
     val intake3Pos = Pose(21.4, 36.0, Math.toRadians(180.0)) // Intake Pos1

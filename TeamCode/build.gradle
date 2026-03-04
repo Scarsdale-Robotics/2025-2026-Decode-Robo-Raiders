@@ -31,13 +31,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'dev.frozenmilk.sinister.sloth.load'
 
 android {
-    kotlinOptions { jvmTarget = '1.8' }
     namespace = 'org.firstinspires.ftc.teamcode'
 
+    compileSdk 36
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    compileSdk 34
     defaultConfig {
         minSdk 24
     }

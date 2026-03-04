@@ -33,14 +33,14 @@ import kotlin.time.TimeSource
 // left-right
 @Configurable
 object TurretPhiSubsystem : Subsystem {
-    private val motor = MotorEx("turret_phi").floatMode();
+    private val motor = MotorEx("turret_phi").brakeMode();
 
     @JvmField var ENCODERS_FORWARD = 1254.63342295;
     @JvmField var ENCODERS_BACKWARD = 0.0;  // todo: TUNE
 
     private val controller: ControlSystem;
 
-    @JvmField var squidCoefficients = PIDCoefficients(0.002, 0.0, 0.0);
+    @JvmField var squidCoefficients = PIDCoefficients(0.002, 0.0, 0.00005);
 
 //    @JvmField var Ls = 0.0;
 //    @JvmField var Lv = 0.0;

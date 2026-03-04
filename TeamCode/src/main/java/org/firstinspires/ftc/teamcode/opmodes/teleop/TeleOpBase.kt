@@ -19,6 +19,9 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import dev.nextftc.hardware.driving.FieldCentric
+import dev.nextftc.hardware.driving.MecanumDriverControlled
+import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
@@ -26,6 +29,7 @@ import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.speed
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
@@ -59,14 +63,74 @@ open class TeleOpBase(
     private val distanceToTimeClose: (Double) -> Double,
     private val distanceToTimeFar: (Double) -> Double
 ): NextFTCOpMode() {
-    val x:  Double get() { return (PedroComponent.follower.pose.x);}
-    val y:  Double get() { return (PedroComponent.follower.pose.y);}
-    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
-    val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
-    val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
-    val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
-    val ax: Double get() { return (PedroComponent.follower.acceleration.xComponent);}
-    val ay: Double get() { return (PedroComponent.follower.acceleration.yComponent);}
+
+    private val lfw = MotorEx("lfw").reversed();
+    private val lbw = MotorEx("lbw").reversed();
+    private val rfw = MotorEx("rfw");
+    private val rbw = MotorEx("rbw");
+
+    private var odom: OdometrySubsystem? = null;
+
+    private var ofsX = 0.0;
+    private var ofsY = 0.0;
+    private var ofsH = 0.0;
+
+    val x: Double
+        get() {
+            if (odom != null) {
+                return odom!!.rOx1 + ofsX;
+            }
+            return 0.0;
+        }
+    val y: Double
+        get() {
+            if (odom != null) {
+                return odom!!.rOy1 + ofsY;
+            }
+            return 0.0;
+        }
+    val h: Angle
+        get() {
+            if (odom != null) {
+                return odom!!.rOh.rad + ofsH.rad;
+            }
+            return 0.0.rad;
+        }
+    val vx: Double
+        get() {
+            if (odom != null) {
+                return odom!!.vx;
+            }
+            return 0.0;
+        }
+    val vy: Double
+        get() {
+            if (odom != null) {
+                return odom!!.vy;
+            }
+            return 0.0;
+        }
+    val vh: Angle
+        get() {
+            if (odom != null) {
+                return odom!!.omega.rad;
+            }
+            return 0.0.rad;
+        }
+//    val ax: Double
+//        get() {
+//            if (odom != null) {
+//                return odom!!.ax;
+//            }
+//            return 0.0;
+//        }
+//    val ay: Double
+//        get() {
+//            if (odom != null) {
+//                return odom!!.ay;
+//            }
+//            return 0.0;
+//        }
 
     var gateIntakeChain: PathChain? = null;
     var farShootChain: PathChain? = null;
@@ -82,10 +146,11 @@ open class TeleOpBase(
                 LowerSubsystem,
                 OuttakeSubsystem
             ),
-            PedroComponent(Constants::createFollower),
             BulkReadComponent,
             BindingsComponent
         )
+        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
+        odom!!.updateOdom()
     }
 
     var lockDirection = false;
@@ -103,99 +168,106 @@ open class TeleOpBase(
 //            true
 //        )
         // FIELD CENTRIC:
-        driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (gamepad1.left_stick_x > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
-            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (gamepad1.left_stick_y > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
-            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
-            false
-        )
+//        driverControlled = PedroDriverControlled(
+//            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (gamepad1.left_stick_x > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
+//            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (gamepad1.left_stick_y > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
+//            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
+//            false
+//        )
+//
+//        gateIntakeChain = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    PedroComponent.follower::getPose,
+//                    Pos(AutonPositions.gateOpenPose, isBlue)
+//                )
+//            )
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.linearFromPoint(
+//                    PedroComponent.follower::getHeading,
+//                    Pos(AutonPositions.gateOpenPose, isBlue).heading,
+//                    0.2
+//                )
+//            )
+//            .addPath(
+//                BezierLine(
+//                    Pos(AutonPositions.gateOpenPose, isBlue),
+//                    Pos(AutonPositions.gateAfterOpenPose, isBlue)
+//                )
+//            )
+//            .setLinearHeadingInterpolation(
+//                Pos(AutonPositions.gateOpenPose, isBlue).heading,
+//                Pos(AutonPositions.gateAfterOpenPose, isBlue).heading,
+//                0.8
+//            )
+//            .build()
+//
+//        farShootChain = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    PedroComponent.follower::getPose,
+//                    Pos(AutonPositions.shootPoseFar, isBlue)
+//                )
+//            )
+////            .setTangentHeadingInterpolation()
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.linearFromPoint(
+//                    PedroComponent.follower::getHeading,
+//                    Pos(AutonPositions.shootPoseFar, isBlue).heading,
+//                    0.2
+//                )
+//            )
+//            .build()
+//
+//        closeShootChain = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    PedroComponent.follower::getPose,
+//                    Pos(AutonPositions.shootPoseClose, isBlue)
+//                )
+//            )
+////            .setTangentHeadingInterpolation()
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.linearFromPoint(
+//                    PedroComponent.follower::getHeading,
+//                    Pos(AutonPositions.shootPoseClose, isBlue).heading,
+//                    0.2
+//                )
+//            )
+//            .build()
+//
+//        parkChain = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    PedroComponent.follower::getPose,
+//                    Pos(AutonPositions.parkPoseFull, isBlue)
+//                )
+//            )
+////            .setTangentHeadingInterpolation()
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.linearFromPoint(
+//                    PedroComponent.follower::getHeading,
+//                    Pos(AutonPositions.parkPoseFull, isBlue).heading,
+//                    1.0
+//                )
+//            )
+//            .build()
 
-        gateIntakeChain = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierLine(
-                    PedroComponent.follower::getPose,
-                    Pos(AutonPositions.gateOpenPose, isBlue)
-                )
-            )
-            .setHeadingInterpolation(
-                HeadingInterpolator.linearFromPoint(
-                    PedroComponent.follower::getHeading,
-                    Pos(AutonPositions.gateOpenPose, isBlue).heading,
-                    0.2
-                )
-            )
-            .addPath(
-                BezierLine(
-                    Pos(AutonPositions.gateOpenPose, isBlue),
-                    Pos(AutonPositions.gateAfterOpenPose, isBlue)
-                )
-            )
-            .setLinearHeadingInterpolation(
-                Pos(AutonPositions.gateOpenPose, isBlue).heading,
-                Pos(AutonPositions.gateAfterOpenPose, isBlue).heading,
-                0.8
-            )
-            .build()
+//        val file = File(Lefile.filePath)
+//        val content = file.readText().split("\n")
+//        val startX = content[0].toDouble()
+//        val startY = content[1].toDouble()
+//        val startH = content[2].toDouble()
 
-        farShootChain = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierLine(
-                    PedroComponent.follower::getPose,
-                    Pos(AutonPositions.shootPoseFar, isBlue)
-                )
-            )
-//            .setTangentHeadingInterpolation()
-            .setHeadingInterpolation(
-                HeadingInterpolator.linearFromPoint(
-                    PedroComponent.follower::getHeading,
-                    Pos(AutonPositions.shootPoseFar, isBlue).heading,
-                    0.2
-                )
-            )
-            .build()
-
-        closeShootChain = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierLine(
-                    PedroComponent.follower::getPose,
-                    Pos(AutonPositions.shootPoseClose, isBlue)
-                )
-            )
-//            .setTangentHeadingInterpolation()
-            .setHeadingInterpolation(
-                HeadingInterpolator.linearFromPoint(
-                    PedroComponent.follower::getHeading,
-                    Pos(AutonPositions.shootPoseClose, isBlue).heading,
-                    0.2
-                )
-            )
-            .build()
-
-        parkChain = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierLine(
-                    PedroComponent.follower::getPose,
-                    Pos(AutonPositions.parkPoseFull, isBlue)
-                )
-            )
-//            .setTangentHeadingInterpolation()
-            .setHeadingInterpolation(
-                HeadingInterpolator.linearFromPoint(
-                    PedroComponent.follower::getHeading,
-                    Pos(AutonPositions.parkPoseFull, isBlue).heading,
-                    1.0
-                )
-            )
-            .build()
-
+//        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
+//        PedroComponent.follower.pose = Pose(startX, startY, startH)
         val file = File(Lefile.filePath)
         val content = file.readText().split("\n")
         val startX = content[0].toDouble()
         val startY = content[1].toDouble()
         val startH = content[2].toDouble()
 
-//        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
-        PedroComponent.follower.pose = Pose(startX, startY, startH)
+        odom!!.setPinpoint(startX, startY, startH)
     }
 
     private var autoAimEnabled = true;
@@ -216,33 +288,46 @@ open class TeleOpBase(
         MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
 
-        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
-        gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
+//        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
+//        gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
 
-        driverControlled!!()
+        val mecanum = MecanumDriverControlled(
+            lfw,
+            rfw,
+            lbw,
+            rbw,
+            -Gamepads.gamepad1.leftStickY.map { it*speedFactorDrive },
+            Gamepads.gamepad1.leftStickX.map { it*speedFactorDrive },
+            Gamepads.gamepad1.rightStickX.map { it*speedFactorDrive },
+            FieldCentric {
+                if (isBlue) (h.inRad - PI).rad else h
+            }
+        )
+        mecanum();
+//        driverControlled!!()
 
-        Gamepads.gamepad1.dpadUp whenBecomesTrue {
-            val path = FollowPath(gateIntakeChain!!)
-            path()
-            activeDriveMacros.add(path)
-        }
-        (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
-            .whenBecomesTrue {
-                val path = FollowPath(farShootChain!!)
-                path()
-                activeDriveMacros.add(path)
-            }
-        (if (isBlue) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft)
-            .whenBecomesTrue {
-                val path = FollowPath(closeShootChain!!)
-                path()
-                activeDriveMacros.add(path)
-            }
-        Gamepads.gamepad1.leftBumper whenBecomesTrue {
-            val path = FollowPath(parkChain!!)
-            path()
-            activeDriveMacros.add(path)
-        }
+//        Gamepads.gamepad1.dpadUp whenBecomesTrue {
+//            val path = FollowPath(gateIntakeChain!!)
+//            path()
+//            activeDriveMacros.add(path)
+//        }
+//        (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
+//            .whenBecomesTrue {
+//                val path = FollowPath(farShootChain!!)
+//                path()
+//                activeDriveMacros.add(path)
+//            }
+//        (if (isBlue) Gamepads.gamepad1.dpadRight else Gamepads.gamepad1.dpadLeft)
+//            .whenBecomesTrue {
+//                val path = FollowPath(closeShootChain!!)
+//                path()
+//                activeDriveMacros.add(path)
+//            }
+//        Gamepads.gamepad1.leftBumper whenBecomesTrue {
+//            val path = FollowPath(parkChain!!)
+//            path()
+//            activeDriveMacros.add(path)
+//        }
 
         Gamepads.gamepad1.rightBumper whenBecomesTrue {
             speedFactorDrive = 0.5;
@@ -300,17 +385,17 @@ open class TeleOpBase(
 //            gamepad2.rumble(450);
 //        }
 
-        Gamepads.gamepad2.square whenFalse {
-            if (resetMode) {
-                TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
-            } else if (autoAimEnabled) {
-                TurretPhiSubsystem.AutoAim(
-                    dxp, dyp, h, phiTrim
-                )()
-            } else {
-                // manual
-            }
-        }
+//        Gamepads.gamepad2.square whenFalse {
+//            if (resetMode) {
+//                TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
+//            } else if (autoAimEnabled) {
+//                TurretPhiSubsystem.AutoAim(
+//                    dxp, dyp, h, phiTrim
+//                )()
+//            } else {
+//                // manual
+//            }
+//        }
 
         // not trimming in reset mode
         // reset mode toggle
@@ -322,7 +407,8 @@ open class TeleOpBase(
                 gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
             } else {
                 // reset position
-                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
+                odom!!.setPinpoint(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
+//                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
             }
@@ -385,27 +471,30 @@ open class TeleOpBase(
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
 
-        PedroComponent.follower.update()
+//        PedroComponent.follower.update()
+        odom!!.updateOdom();
 
-        if (
-            activeDriveMacros.isNotEmpty() &&
-            (
-                    abs(gamepad1.left_stick_x) > 0.02 ||
-                            abs(gamepad1.left_stick_y) > 0.02 ||
-                            abs(gamepad1.right_stick_x) > 0.02
-                    )
-        ) {
-            // untrigger macro
-            activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
-            activeDriveMacros.clear()
-            PedroComponent.follower.startTeleopDrive()
-        }
+//        if (
+//            activeDriveMacros.isNotEmpty() &&
+//            (
+//                    abs(gamepad1.left_stick_x) > 0.02 ||
+//                            abs(gamepad1.left_stick_y) > 0.02 ||
+//                            abs(gamepad1.right_stick_x) > 0.02
+//                    )
+//        ) {
+//            // untrigger macro
+//            activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
+//            activeDriveMacros.clear()
+//            PedroComponent.follower.startTeleopDrive()
+//        }
 
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-        dxp = dx - (vx + 0.05 * ax) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        dyp = dy - (vy + 0.05 * ay) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+//        dxp = dx - (vx + 0.05 * ax) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+//        dyp = dy - (vy + 0.05 * ay) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy)
+        dxp = dx - (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dyp = dy - (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
@@ -436,6 +525,7 @@ open class TeleOpBase(
                     ) + hoodTrim
                 },
             )()
+            TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
                 dxy * 0.8 + dxyp * 0.2,  // TODO: hope this is not sus
@@ -460,6 +550,9 @@ open class TeleOpBase(
                     ) + hoodTrim
                 },
             )()
+            TurretPhiSubsystem.AutoAim(
+                dxp, dyp, h, phiTrim
+            )()
         } else {
             //ShooterSubsystem.Manual(
 
@@ -482,7 +575,6 @@ open class TeleOpBase(
         PanelsTelemetry.telemetry.addData("cmd snp", CommandManager.snapshot)
         PanelsTelemetry.telemetry.update()
     }
-
     override fun onStop() {
         val file = File(Lefile.filePath)
         file.writeText(
