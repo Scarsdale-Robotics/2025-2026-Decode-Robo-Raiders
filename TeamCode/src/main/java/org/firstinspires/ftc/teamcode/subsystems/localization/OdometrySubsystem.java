@@ -75,7 +75,10 @@ public class OdometrySubsystem {
     if (time != null) {
       Vx = (ROx1 - rxl) / time.seconds();
       Vy = (ROy1 - ryl) / time.seconds();
-      omega = (ROh - rhl) / time.seconds();
+      double dh = ROh - rhl;
+      while (dh >  Math.PI) dh -= 2 * Math.PI;
+      while (dh < -Math.PI) dh += 2 * Math.PI;
+      omega = dh / time.seconds();
 
       time.reset();
     } else {

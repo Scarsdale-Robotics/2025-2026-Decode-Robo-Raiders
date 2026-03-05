@@ -46,12 +46,6 @@ public class CVSubsystem_VisionPortal {
 
 
         AprilTagLibrary tagLibrary = new AprilTagLibrary.Builder()
-//                .addTag(20, "BlueTarget",
-//                        6.5, new VectorF(-58.3727f, -55.6425f, 29.5f), DistanceUnit.INCH,
-//                        new Quaternion(0.2182149f, -0.2182149f, -0.6725937f, 0.6725937f, 0))
-//                .addTag(24, "RedTarget",
-//                        6.5, new VectorF(-58.3727f, 55.6425f, 29.5f), DistanceUnit.INCH,
-//                        new Quaternion(0.6725937f, -0.6725937f, -0.2182149f, 0.2182149f, 0))
                 .addTags(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .build();
 
@@ -62,9 +56,9 @@ public class CVSubsystem_VisionPortal {
                                 DistanceUnit.INCH, -4.2, -4.5,7.7, 0
                         ), new YawPitchRollAngles(
                                 AngleUnit.DEGREES,
-                                0.0,
-                                75,
-                                0.0,
+                                180,
+                                -75,
+                                180,
                                 0
                         )
                 )
@@ -109,7 +103,7 @@ public class CVSubsystem_VisionPortal {
         double bestRange = Double.MAX_VALUE;
 
         for (AprilTagDetection d : detections) {
-            if (d.robotPose != null && d.ftcPose.range < bestRange) {
+            if (d.robotPose != null && d.ftcPose != null && d.ftcPose.range < bestRange) {
                 best = d;
                 bestRange = d.ftcPose.range;
             }
