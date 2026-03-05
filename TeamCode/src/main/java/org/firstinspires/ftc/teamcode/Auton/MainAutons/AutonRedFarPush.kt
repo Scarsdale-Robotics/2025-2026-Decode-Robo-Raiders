@@ -177,8 +177,9 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
             .build()
         closeToGate = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierLine(
+                BezierCurve(
                     AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Red(AutonPositions.gateOpenControlPos),
                     AutonPositions.Red(AutonPositions.gateOpenPose)
                 )
             )
@@ -190,10 +191,9 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
             .build()
         gateToAfter = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierCurve(
+                BezierLine(
                     AutonPositions.Red(AutonPositions.gateOpenPose),
-                    AutonPositions.Red(AutonPositions.altAfterOpenControlPose),
-                    AutonPositions.Red(AutonPositions.altAfterOpenPose),
+                    AutonPositions.Red(AutonPositions.gateAfterOpenPose),
                 )
             )
             .setConstantHeadingInterpolation(Math.toRadians(0.0))
@@ -201,7 +201,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         gateToShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Red(AutonPositions.altAfterOpenPose),
+                    AutonPositions.Red(AutonPositions.gateAfterOpenPose),
                     AutonPositions.Red(AutonPositions.shootPoseClose)
                 )
             )

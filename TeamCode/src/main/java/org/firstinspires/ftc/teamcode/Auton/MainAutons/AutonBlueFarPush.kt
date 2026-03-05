@@ -201,7 +201,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         gateToShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.altAfterOpenPose),
+                    AutonPositions.Blue(AutonPositions.gateAfterOpenPose),
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )

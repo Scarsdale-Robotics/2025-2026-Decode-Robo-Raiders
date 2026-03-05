@@ -34,22 +34,22 @@ object AutonPositions {
 
     //====24 Specific Positions====
     val start24ShootPos = Pose(24.9, 105.6, Math.toRadians(270.0))
-    val intake1Pos24 = Pose(29.5, 90.8, Math.toRadians(270.0))
-    val intake2Pos24 = Pose(29.5, 66.0, Math.toRadians(270.0))
-    val intake3Pos24 = Pose(29.5, 43.3, Math.toRadians(270.0))
+    val intake1Pos24 = Pose(27.7, 90.8, Math.toRadians(270.0))
+    val intake2Pos24 = Pose(27.7, 66.0, Math.toRadians(270.0))
+    val intake3Pos24 = Pose(27.7, 43.3, Math.toRadians(270.0))
     val robotPark24 = Pose(42.8, 10.9, Math.toRadians(180.0))
 
     //====CoOp Specific Positions====
     val startCoOpControlPos = Pose(91.6, 91.2)
 
-    val coOpFirstStartGateOpen = Pose(17.0, 72.4, Math.toRadians(180.0))
+    val coOpFirstStartGateOpen = Pose(20.2, 72.4, Math.toRadians(180.0))
     val coOpFirstGateOpenControlPos = Pose(27.1, 77.11, Math.toRadians(180.0))
-    val coOpStartGateOpen = Pose(17.8, 63.1, Math.toRadians(180.0))
+    val coOpStartGateOpen = Pose(20.2, 63.1, Math.toRadians(180.0))
     val coOpStartGateOpenControlPos = Pose(41.2, 66.85)
 
     val CoOpCommonIntakeControlPos1 = Pose(-40.0, 85.0)
     val CoOpCommonIntakeControlPos2 = Pose(82.0, 32.0)
-    val CoOpCommonIntake = Pose(12.0, 36.0, Math.toRadians(180.0)) // Intake Pos1
+    val CoOpCommonIntake = Pose(15.0, 36.0, Math.toRadians(180.0)) // Intake Pos1
     //======CoOp Positions END=======
 
     val shootPoseClose =
