@@ -71,8 +71,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     companion object {
         val delayStartShoot: Double = 0.4
-        val DelayBeforeShoot: Double = 0.08
-        val delayAfterEachShoot: Double = 0.55 //currently at a really high #
+        val DelayBeforeShoot: Double = 0.1
+        val delayAfterEachShoot: Double = 0.54 //currently at a really high #
         val DelayFromRampIntake: Double = 0.1
         val DelayInIntake: Double = 0.95
         //        val DelayAfterIntake: Double = 0.0
@@ -81,7 +81,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         val goalX = 3.0
         val goalY = 144.0 - 6.0
 
-        val intakeSpeed = 0.35
+        val intakeSpeed = 0.5
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
     }
@@ -227,7 +227,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.gateAfterOpenPose).heading,
                 AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
-                0.65
+                0.9
             )
             .build()
 
