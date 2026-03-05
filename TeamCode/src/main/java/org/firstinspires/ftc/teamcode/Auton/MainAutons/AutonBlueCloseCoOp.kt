@@ -135,7 +135,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 )
             )
 //            .setTangentHeadingInterpolation()
-            .addParametricCallback(0.95, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.90, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
             .build()
 
@@ -158,7 +158,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.coOpFirstStartGateOpen).heading)
             .build()
 
         //2nd Intake
@@ -170,6 +170,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.coOpStartGateOpen)
                 )
             )
+            .addParametricCallback(0.90, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.coOpStartGateOpen).heading)
             .build()
 
@@ -194,6 +195,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.CoOpCommonIntake)
                 )
             )
+            .addParametricCallback(0.95, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.CoOpCommonIntake).heading)
             .build()
 
@@ -269,7 +271,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
-//                IntakeCommand,
+                TravelCommand,
                 FollowPath(robotIntake1!!),
             ),
 
@@ -277,7 +279,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 //                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 48.0)).rad),
                 SequentialGroup(
                     Delay(DelayInIntake),
-                    TravelCommand,
+                    IntakeAfterCommand,
                 ),
                 FollowPath(robotGoToShoot1!!)
             ),
@@ -286,14 +288,14 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
-                IntakeCommand,
+                TravelCommand,
                 FollowPath(robotIntake2!!), //robot goes to intake
             ),
 
             ParallelGroup( //Robot goes back to CLOSE Shoot Position
                 SequentialGroup(
                     Delay(DelayInIntake),
-                    TravelCommand,
+                    IntakeAfterCommand,
                 ),
                 FollowPath(robotGoToShoot2!!)
             ),
@@ -302,14 +304,14 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
-                IntakeCommand,
+                TravelCommand,
                 FollowPath(robotIntake2!!), //robot goes to intake
             ),
 
             ParallelGroup( //Robot goes back to FAR Shoot Position
                 SequentialGroup(
                     Delay(DelayInIntake),
-                    TravelCommand,
+                    IntakeAfterCommand,
                 ),
                 FollowPath(robotGoToShoot2!!)
             ),
@@ -321,14 +323,14 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
-                IntakeCommand,
+                TravelCommand,
                 FollowPath(robotCommonIntake!!), //robot goes to intake
             ),
 
             ParallelGroup( //Robot goes back to FAR Shoot Position
                 SequentialGroup(
                     Delay(DelayInIntake),
-                    TravelCommand,
+                    IntakeAfterCommand,
                 ),
                 FollowPath(robotCommonGoShoot!!)
             ),
@@ -337,7 +339,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 Delay(DelayBeforeShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
-                IntakeCommand,
+                TravelCommand,
                 Delay(DelayForParterBot), //Temporary Pos for this delay until figure out how needed or changed delay has to be
                 FollowPath(robotCommonIntake!!), //robot goes to intake
             ),
@@ -345,7 +347,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
             ParallelGroup( //Robot goes back to FAR Shoot Position
                 SequentialGroup(
                     Delay(DelayInIntake),
-                    TravelCommand,
+                    IntakeAfterCommand,
                 ),
                 FollowPath(robotCommonGoShoot!!)
             ),

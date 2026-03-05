@@ -57,7 +57,7 @@ object AutonPositions {
     val shootPoseFar =
         Pose(51.7, 15.9, Math.toRadians(180.0)) // Far Shoot Pose of our robot.
     val gateOpenPose =
-        Pose(21.0, 66.0, Math.toRadians(180.0)) // Gate Open Pose of our robot.
+        Pose(21.0, 66.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
     val gateOpenControlPos =
         Pose(56.7, 51.2)
     val gateOpenPoseFromFar =

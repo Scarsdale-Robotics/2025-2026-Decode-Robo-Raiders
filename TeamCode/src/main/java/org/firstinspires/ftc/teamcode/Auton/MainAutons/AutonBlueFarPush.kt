@@ -83,10 +83,10 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         val delayStartup = 2.0;
         val delayFarShoot = 0.8;
         val delayAtGate = 0.001;
-        val delayPreShoot = 0.08;
+        val delayPreShoot = 0.11;
         val delayCloseShoot = 0.35;
         val delayAfterIntake = 0.0;
-        val delayInIntake = 0.4;
+        val delayInIntake = 0.5;
 
         val goalX = 3.0
         val goalY = 144.0 - 6.0
@@ -177,8 +177,9 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             .build()
         closeToGate = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierLine(
+                BezierCurve(
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.gateOpenControlPos),
                     AutonPositions.Blue(AutonPositions.gateOpenPose)
                 )
             )
@@ -190,10 +191,9 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             .build()
         gateToAfter = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierCurve(
+                BezierLine(
                     AutonPositions.Blue(AutonPositions.gateOpenPose),
-                    AutonPositions.Blue(AutonPositions.altAfterOpenControlPose),
-                    AutonPositions.Blue(AutonPositions.altAfterOpenPose),
+                    AutonPositions.Blue(AutonPositions.gateAfterOpenPose),
                 )
             )
             .setConstantHeadingInterpolation(Math.toRadians(180.0))
@@ -438,12 +438,12 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-        val dxp = dx - (PedroComponent.follower.velocity.xComponent
+        val dxp = dx - (0.8*PedroComponent.follower.velocity.xComponent
                 + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
                 if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
                 else AutoAimConstants.distanceToTimeClose(dxy)
         )
-        val dyp = dy - (PedroComponent.follower.velocity.yComponent
+        val dyp = dy - (0.8*PedroComponent.follower.velocity.yComponent
                 + 0.05 * PedroComponent.follower.acceleration.yComponent) * (
                 if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
                 else AutoAimConstants.distanceToTimeClose(dxy)
