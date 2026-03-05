@@ -27,7 +27,7 @@ object AutonPositions {
     val L3IntakePose = Pose(20.0, 35.7, Math.toRadians(-180.0))
     val L3IntakeControlPose = Pose(50.5, 38.8)
 
-    val HPZPose = Pose(13.4, 15.3, Math.toRadians(-96.0))
+    val HPZPose = Pose(11.4, 14.3, Math.toRadians(-96.0))
     val HPZControlPose = Pose(13.4, 44.6)
 
     val pApark = Pose(52.5, 71.8)
@@ -64,7 +64,7 @@ object AutonPositions {
         Pose(21.1, 58.0, Math.toRadians(140.0)) // Gate Open Pose of our robot.
     val gateAfterOpenPose = Pose(17.1, 53.0, Math.toRadians(125.0)) // Gate After Open Pose of our robot.
     val altAfterOpenPose = Pose(18.0, 54.4, Math.toRadians(180.0)) // Gate After Open Pose of our robot.
-    val altAfterOpenControlPose = Pose(32.4, 57.7)
+    val altAfterOpenControlPose = Pose(28.4, 57.7)
 //=======
 //        Pose(15.0, 56.0, Math.toRadians(140.0)) // Gate After Open Pose of our robot.
 //>>>>>>> Stashed changes
