@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.show
 
 import com.pedropathing.geometry.Pose
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
@@ -22,6 +23,7 @@ import org.firstinspires.ftc.teamcode.utils.AutoAimConstants
 import kotlin.math.PI
 import kotlin.math.hypot
 
+@TeleOp(name="SHOW TELE OP")
 class ShowTeleOp : NextFTCOpMode() {
 
     val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
@@ -61,9 +63,13 @@ class ShowTeleOp : NextFTCOpMode() {
         )
         intakeMotorDrive()
 
-        Gamepads.gamepad1.circle whenBecomesTrue {
+        Gamepads.gamepad1.circle whenTrue {
             lowerOverridePower = 1.0;
             MagblockServoSubsystem.unblock()
+            TurretThetaSubsystem.AutoAim(
+                dxyp,
+                { dist -> AutoAimConstants.distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) }
+            )()
             ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
         } whenBecomesFalse {
             lowerOverridePower = 0.0;
@@ -75,6 +81,7 @@ class ShowTeleOp : NextFTCOpMode() {
     var lastRuntime = 0.0
     var dyp = 20.0;
     var dxp = 0.0;
+    var dxyp = 0.0;
     override fun onUpdate() {
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
@@ -82,20 +89,16 @@ class ShowTeleOp : NextFTCOpMode() {
         telemetry.addData("dyp [DPAD U/D TO ADJUST]", dyp);
         telemetry.addData("dxp [DPAD L/R TO ADJUST]", dxp);
 
-        val dxyp = hypot(dxp, dyp);
+        dxyp = hypot(dxp, dyp);
 
         TurretPhiSubsystem.AutoAim(
             dxp,
             dyp,
             h
-        )
+        )()
         ShooterSubsystem.AutoAim(
             dxyp,
             { dist -> AutoAimConstants.distanceToVelocityClose(dist) }
-        )()
-        TurretThetaSubsystem.AutoAim(
-            dxyp,
-            { dist -> AutoAimConstants.distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) }
         )()
 
         telemetry.update()

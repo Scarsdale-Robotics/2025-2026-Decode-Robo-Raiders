@@ -91,6 +91,8 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
 
         val goalX = 3.0
         val goalY = 144.0 - 6.0
+
+        var pathStarted = false;
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
     }
@@ -426,13 +428,13 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
         )
 
     override fun onUpdate() {
-//        if (pathStarted!! && opmodeTimer!!.elapsedTime >= 29.5) {
-//            PedroComponent.follower.setMaxPower(0.0)
-//            PedroComponent.follower.breakFollowing()
-//            IntakeMotorSubsystem.off
-//            MagMotorSubsystem.off
-//            MagblockServoSubsystem.block
-//        }
+        if (pathStarted && opmodeTimer!!.elapsedTime >= 29.5) {
+            PedroComponent.follower.setMaxPower(0.0)
+            PedroComponent.follower.breakFollowing()
+            IntakeMotorSubsystem.off()
+            MagMotorSubsystem.off()
+            MagblockServoSubsystem.block()
+        }
 
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
@@ -447,7 +449,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
                 if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
                 else AutoAimConstants.distanceToTimeClose(dxy)
         )
-        val dxyp = hypot(dxp, dyp)
+        val dxyp = hypot(dxp, dyp) - 2
         if (!stopShooterAutoAim) {
             ShooterSubsystem.AutoAim(
                 dxyp,
@@ -512,6 +514,8 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
 
         opmodeTimer!!.resetTimer()
         actionTimer!!.resetTimer()
+
+        pathStarted = true;
 //        setPathState(AutonPath.RobotShoot1)
     }
 
