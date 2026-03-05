@@ -57,6 +57,5 @@ public class Kalman {
 
     public void setMeasurementNoise(double r) { this.r = r; }
 
-    // FIX: added missing setter for process noise — needed if you want to tune q at runtime
     public void setProcessNoise(double q) { this.q = q; }
 }
