@@ -62,6 +62,7 @@ public class CVSubsystem_VisionPortal {
 
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setTagLibrary(tagLibrary)
+                .setLensIntrinsics(1430,1457,480,620)
                 .setCameraPose(
                         new Position(
                                 DistanceUnit.INCH, 4.25462244094, -4.50787402, 7.57202637795, 0
@@ -114,7 +115,7 @@ public class CVSubsystem_VisionPortal {
         double bestRange = Double.MAX_VALUE;
 
         for (AprilTagDetection d : detections) {
-            if (d.robotPose != null && d.ftcPose.range < bestRange) {
+            if (d.robotPose != null && d.ftcPose != null && d.ftcPose.range < bestRange) {
                 best = d;
                 bestRange = d.ftcPose.range;
             }
