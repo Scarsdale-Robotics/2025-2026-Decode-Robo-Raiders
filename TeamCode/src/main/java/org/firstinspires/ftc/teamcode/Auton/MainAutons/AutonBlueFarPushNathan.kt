@@ -14,8 +14,6 @@ import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.Angle
-import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
@@ -42,8 +40,6 @@ import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityF
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.hypot
-import kotlin.math.max
-import kotlin.math.min
 
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
@@ -83,11 +79,11 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
     ////Constants////
     /////////////////
     companion object {
-        val delayStartup = 1.0;
+        val delayStartup = 2.0;
         val delayFarShoot = 0.8;
-        val delayPreShoot = 0.5;
+        val delayPreShoot = 0.0;
         val delayCloseShoot = 0.4;
-        val delayAfterIntake = 0.1;
+        val delayAfterIntake = 0.02;
         val delayInIntake = 0.75;
 
         val goalX = 3.0
@@ -108,7 +104,9 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
     // The different paths the robot will take in during Auton
     private var pushPath: PathChain? = null
 
-    private var L2Intake: PathChain? = null
+    private var pushToClose: PathChain? = null;
+
+    private var closeToL2: PathChain? = null
     private var L2Shoot: PathChain? = null
 
     private var closeToGate: PathChain? = null
@@ -139,9 +137,19 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
                     AutonPositions.Blue(AutonPositions.postPushPose),
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(90.0))
+            .setConstantHeadingInterpolation(Math.toRadians(-90.0))
             .build()
-        L2Intake = PedroComponent.follower.pathBuilder()
+        pushToClose = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierCurve(
+                    AutonPositions.Blue(AutonPositions.postPushPose),
+                    AutonPositions.Blue(AutonPositions.L2IntakeControlPose),
+                    AutonPositions.Blue(AutonPositions.L2IntakePose),
+                )
+            )
+            .setConstantHeadingInterpolation(Math.toRadians(-90.0))
+            .build()
+        closeToL2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
                     AutonPositions.Blue(AutonPositions.postPushPose),
@@ -308,15 +316,17 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
         get() = SequentialGroup(
             // push partner
             FollowPath(pushPath!!),
-            Delay(delayStartup),
+//            Delay(delayStartup),
+
+            FollowPath(pushToClose!!),
 
             // preload
-            ShootCommandFar,
-            Delay(delayFarShoot),
+            ShootCommandClose,
+            Delay(delayCloseShoot),
 
             // L2 cycle
             IntakeCommand,
-            FollowPath(L2Intake!!),  // intake L2
+            FollowPath(closeToL2!!),  // intake L2
             Delay(delayAfterIntake),
             ParallelGroup(  // shoot l2
                 SequentialGroup(
@@ -399,6 +409,24 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
         )
 
     override fun onUpdate() {
+//        if (pathStarted!! && opmodeTimer!!.elapsedTime >= 29.5) {
+//            PedroComponent.follower.setMaxPower(0.0)
+//            PedroComponent.follower.breakFollowing()
+//            IntakeMotorSubsystem.off
+//            MagMotorSubsystem.off
+//            MagblockServoSubsystem.block
+//        }
+//        val dxp = dx - (PedroComponent.follower.velocity.xComponent
+//            + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
+//                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
+//                else distanceToTimeClose(dxy)
+//        )
+//        val dyp = dy - (PedroComponent.follower.velocity.yComponent
+//            + 0.05 * PedroComponent.follower.acceleration.yComponent) * (
+//                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
+//                else distanceToTimeClose(dxy)
+//                )
+
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
@@ -434,6 +462,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
 //        forward.schedule()
         // Feedback to Driver Hub for debugging
 //        telemetry.addData("path state", pathState)
+
         telemetry.addData("x", PedroComponent.follower.pose.x)
         telemetry.addData("y", PedroComponent.follower.pose.y)
         telemetry.addData("heading", PedroComponent.follower.pose.heading)
@@ -449,8 +478,9 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
         ShooterSubsystem.off()
         IntakeMotorSubsystem.off()
         MagMotorSubsystem.off()
-        MagServoSubsystem.stop()
+//        MagServoSubsystem.stop()
         MagblockServoSubsystem.block()
+//        follower = Constants.createFollower(hardwareMap)
 
         PedroComponent.follower.setStartingPose(
             AutonPositions.Blue(AutonPositions.startPoseFarPush)

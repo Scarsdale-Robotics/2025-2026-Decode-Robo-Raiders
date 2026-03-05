@@ -15,19 +15,19 @@ object AutonPositions {
     val startAutonControlPos = Pose(95.3, 58.5)
 
     //====Push Auton====
-    val startPoseFarPush = Pose(64.0, 7.0, Math.toRadians(90.0))
-    val postPushPose = Pose(50.0, 7.0, Math.toRadians(90.0))
+    val startPoseFarPush = Pose(64.0, 13.4167, Math.toRadians(-90.0))
+    val postPushPose = Pose(50.0, 13.4167, Math.toRadians(-90.0))
 
-    val L2IntakePose = Pose(21.4, 60.8, Math.toRadians(-180.0))
-    val L2IntakeControlPose = Pose(63.8, 64.1)
+    val L2IntakePose = Pose(19.0, 60.8, Math.toRadians(-180.0))
+    val L2IntakeControlPose = Pose(51.2, 58.6)
 
     val L1IntakePose = Pose(21.4, 84.3, Math.toRadians(-180.0))
     val L1IntakeControlPose = Pose(42.6, 84.2)
 
-    val L3IntakePose = Pose(21.4, 35.7, Math.toRadians(-180.0))
+    val L3IntakePose = Pose(19.0, 35.7, Math.toRadians(-180.0))
     val L3IntakeControlPose = Pose(50.5, 38.8)
 
-    val HPZPose = Pose(10.6, 15.3, Math.toRadians(-96.0))
+    val HPZPose = Pose(14.6, 15.3, Math.toRadians(-96.0))
     val HPZControlPose = Pose(14.1, 44.6)
 
     val pApark = Pose(52.5, 71.8)

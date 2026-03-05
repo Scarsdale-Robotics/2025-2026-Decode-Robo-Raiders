@@ -39,8 +39,10 @@ object TurretPhiSubsystem : Subsystem {
     @JvmField var ENCODERS_BACKWARD = 0.0;  // todo: TUNE
 
     private val controller: ControlSystem;
+    private val secondaryController: ControlSystem;
 
     @JvmField var squidCoefficients = PIDCoefficients(0.002, 0.0, 0.00002);
+    @JvmField var secondarySquidCoefficients = PIDCoefficients(0.0005, 0.0, 0.00002);
 
 //    @JvmField var Ls = 0.0;
 //    @JvmField var Lv = 0.0;
@@ -54,6 +56,13 @@ object TurretPhiSubsystem : Subsystem {
             .build();
 
         controller.goal = KineticState()
+
+        secondaryController = ControlSystem()
+//            .posFilter { filter -> filter.custom(posSMO).build(); }
+            .posSquID(secondarySquidCoefficients)
+            .build();
+
+        secondaryController.goal = KineticState()
     }
 
     override fun initialize() {
@@ -167,14 +176,19 @@ object TurretPhiSubsystem : Subsystem {
     }
 
     override fun periodic() {
-        val power = controller.calculate(
+        secondaryController.goal = controller.goal
+        var power = controller.calculate(
             motor.state
         )
-        if (abs(controller.goal.position - controller.lastMeasurement.position) < 16.7) {
-            SetPower(motor, 0.0)
-        } else {
-            SetPower(motor, power).setInterruptible(true)()
+        val error = abs(controller.goal.position - controller.lastMeasurement.position)
+        if (error < 16.7) {
+            power = 0.0
+        } else if (error < 80.0) {
+            power = secondaryController.calculate(
+                motor.state
+            )
         }
+        SetPower(motor, power).setInterruptible(true)()
 
         PanelsTelemetry.telemetry.addData("phi enc", motor.currentPosition)
         PanelsTelemetry.telemetry.addData("ref", controller.reference)
