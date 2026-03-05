@@ -2,6 +2,10 @@ package org.firstinspires.ftc.teamcode.subsystems.localization;
 
 import androidx.annotation.Nullable;
 
+import com.pedropathing.ftc.InvertedFTCCoordinates;
+import com.pedropathing.ftc.PoseConverter;
+import com.pedropathing.geometry.PedroCoordinates;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -9,6 +13,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -59,12 +64,12 @@ public class CVSubsystem_VisionPortal {
                 .setTagLibrary(tagLibrary)
                 .setCameraPose(
                         new Position(
-                                DistanceUnit.INCH, -4.2, -4.5,7.7, 0
+                                DistanceUnit.INCH, 4.25462244094, -4.50787402, 7.57202637795, 0
                         ), new YawPitchRollAngles(
                                 AngleUnit.DEGREES,
-                                0.0,
-                                75,
-                                0.0,
+                                180,  // backwards
+                                -105,  // 15 deg above horizontal
+                                180,  // upside-down
                                 0
                         )
                 )
@@ -122,9 +127,20 @@ public class CVSubsystem_VisionPortal {
         Pose3D pose = best.robotPose;
 
 
-        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
-        RCy1 = -pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
-        RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
+        Pose ftcStandard = PoseConverter.pose2DToPose(
+                new Pose2D(
+                        DistanceUnit.INCH,
+                        pose.getPosition().toUnit(DistanceUnit.INCH).x,
+                        pose.getPosition().toUnit(DistanceUnit.INCH).y,
+                        AngleUnit.RADIANS,
+                        pose.getOrientation().getYaw(AngleUnit.RADIANS)
+                ),
+                InvertedFTCCoordinates.INSTANCE
+        );
+        Pose cvtPose = ftcStandard.getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+        RCx1 = cvtPose.getX();
+        RCy1 = cvtPose.getY();
+        RCh = cvtPose.getHeading();
 
 //        camXE = RCx1 - 72.0;
 //        camYE = RCy1 -72.0;
