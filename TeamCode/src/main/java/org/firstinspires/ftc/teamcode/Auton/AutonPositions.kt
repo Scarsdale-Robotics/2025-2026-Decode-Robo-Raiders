@@ -62,14 +62,12 @@ object AutonPositions {
         Pose(56.7, 51.2)
     val gateOpenPoseFromFar =
         Pose(21.1, 58.0, Math.toRadians(140.0)) // Gate Open Pose of our robot.
-    val gateAfterOpenPose = //F FTC MADE OUR MAIN STRATEGY ILLEGAL
-<<<<<<< Updated upstream
-        Pose(17.1, 53.0, Math.toRadians(125.0)) // Gate After Open Pose of our robot.
+    val gateAfterOpenPose = Pose(17.1, 53.0, Math.toRadians(125.0)) // Gate After Open Pose of our robot.
     val altAfterOpenPose = Pose(17.7, 54.4, Math.toRadians(180.0)) // Gate After Open Pose of our robot.
     val altAfterOpenControlPose = Pose(34.4, 57.7)
-=======
-        Pose(15.0, 56.0, Math.toRadians(140.0)) // Gate After Open Pose of our robot.
->>>>>>> Stashed changes
+//=======
+//        Pose(15.0, 56.0, Math.toRadians(140.0)) // Gate After Open Pose of our robot.
+//>>>>>>> Stashed changes
 
     val parkPoseFull = Pose(37.5, 31.0, Math.toRadians(270.0))
 
