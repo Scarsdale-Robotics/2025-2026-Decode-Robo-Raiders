@@ -562,11 +562,6 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //            MagMotorSubsystem.off
 //            MagblockServoSubsystem.block
 //        }
-        val dx = goalX - PedroComponent.follower.pose.x
-        val dy = goalY - PedroComponent.follower.pose.y
-        val dxy = hypot(dx, dy)
-        val dxp = dx;
-        val dyp = dy;
 //        val dxp = dx - (PedroComponent.follower.velocity.xComponent
 //            + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
 //                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
@@ -577,8 +572,13 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
 //                else distanceToTimeClose(dxy)
 //                )
-        val dxyp = hypot(dxp, dyp)
 
+        val dx = goalX - PedroComponent.follower.pose.x
+        val dy = goalY - PedroComponent.follower.pose.y
+        val dxy = hypot(dx, dy)
+        val dxp = dx;
+        val dyp = dy;
+        val dxyp = hypot(dxp, dyp)
         if (!stopShooterAutoAim) {
             ShooterSubsystem.AutoAim(
                 dxyp,

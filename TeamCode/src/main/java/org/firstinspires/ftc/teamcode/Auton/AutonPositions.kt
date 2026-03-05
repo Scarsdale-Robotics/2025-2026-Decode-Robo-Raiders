@@ -14,6 +14,24 @@ object AutonPositions {
 
     val startAutonControlPos = Pose(95.3, 58.5)
 
+    //====Push Auton====
+    val startPoseFarPush = Pose(64.0, 7.0, Math.toRadians(90.0))
+    val postPushPose = Pose(50.0, 7.0, Math.toRadians(90.0))
+
+    val L2IntakePose = Pose(21.4, 60.8, Math.toRadians(-180.0))
+    val L2IntakeControlPose = Pose(63.8, 64.1)
+
+    val L1IntakePose = Pose(21.4, 84.3, Math.toRadians(-180.0))
+    val L1IntakeControlPose = Pose(42.6, 84.2)
+
+    val L3IntakePose = Pose(21.4, 35.7, Math.toRadians(-180.0))
+    val L3IntakeControlPose = Pose(50.5, 38.8)
+
+    val HPZPose = Pose(10.6, 15.3, Math.toRadians(-96.0))
+    val HPZControlPose = Pose(14.1, 44.6)
+
+    val pApark = Pose(52.5, 71.8)
+
     //====24 Specific Positions====
     val start24ShootPos = Pose(24.9, 105.6, Math.toRadians(270.0))
     val intake1Pos24 = Pose(26.5, 90.8, Math.toRadians(270.0))
@@ -35,7 +53,7 @@ object AutonPositions {
     //======CoOp Positions END=======
 
     val shootPoseClose =
-        Pose(60.0, 76.6, Math.toRadians(180.0)) // Close Shoot Pose of our robot.
+        Pose(60.0, 76.6, Math.toRadians(188.0)) // Close Shoot Pose of our robot.
     val shootPoseFar =
         Pose(51.7, 15.9, Math.toRadians(180.0)) // Far Shoot Pose of our robot.
     val gateOpenPose =
@@ -45,7 +63,9 @@ object AutonPositions {
     val gateOpenPoseFromFar =
         Pose(21.1, 58.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
     val gateAfterOpenPose = //F FTC MADE OUR MAIN STRATEGY ILLEGAL
-        Pose(17.1, 56.0, Math.toRadians(125.0)) // Gate After Open Pose of our robot.
+        Pose(17.1, 53.0, Math.toRadians(125.0)) // Gate After Open Pose of our robot.
+    val altAfterOpenPose = Pose(17.7, 54.4, Math.toRadians(180.0)) // Gate After Open Pose of our robot.
+    val altAfterOpenControlPose = Pose(34.4, 57.7)
 
     val parkPoseFull = Pose(37.5, 31.0, Math.toRadians(270.0))
 

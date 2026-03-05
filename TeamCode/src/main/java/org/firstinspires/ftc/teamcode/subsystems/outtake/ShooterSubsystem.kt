@@ -87,7 +87,7 @@ object ShooterSubsystem : Subsystem {
     override fun periodic() {
         var power = controller.calculate(
             motor2.state.times(-1.0)
-        ).coerceIn(-0.0, 1.0);
+        ).coerceIn(-0.167, 1.0);
 
         setMotorPowers(power);
 
