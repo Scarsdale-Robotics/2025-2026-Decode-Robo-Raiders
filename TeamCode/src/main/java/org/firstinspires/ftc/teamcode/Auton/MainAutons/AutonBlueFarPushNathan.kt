@@ -19,6 +19,7 @@ import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
+import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueCloseArtifact24.Companion.intakeSpeed
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
@@ -32,6 +33,7 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaClose
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaFar
@@ -81,10 +83,11 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
     companion object {
         val delayStartup = 2.0;
         val delayFarShoot = 0.8;
-        val delayPreShoot = 0.0;
-        val delayCloseShoot = 0.4;
-        val delayAfterIntake = 0.02;
-        val delayInIntake = 0.75;
+        val delayAtGate = 0.01;
+        val delayPreShoot = 0.4;
+        val delayCloseShoot = 0.35;
+        val delayAfterIntake = 0.0;
+        val delayInIntake = 0.67;
 
         val goalX = 3.0
         val goalY = 144.0 - 6.0
@@ -143,8 +146,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
             .addPath(
                 BezierCurve(
                     AutonPositions.Blue(AutonPositions.postPushPose),
-                    AutonPositions.Blue(AutonPositions.L2IntakeControlPose),
-                    AutonPositions.Blue(AutonPositions.L2IntakePose),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
             .setConstantHeadingInterpolation(Math.toRadians(-90.0))
@@ -157,7 +159,8 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
                     AutonPositions.Blue(AutonPositions.L2IntakePose),
                 )
             )
-            .setTangentHeadingInterpolation()
+            .addParametricCallback(0.9, intakePower)
+            .setConstantHeadingInterpolation(Math.toRadians(-180.0))
             .build()
         L2Shoot = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -166,6 +169,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
+            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
@@ -212,6 +216,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
                     AutonPositions.Blue(AutonPositions.L1IntakePose),
                 )
             )
+            .addParametricCallback(0.9, intakePower)
             .setTangentHeadingInterpolation()
             .build()
         L1Shoot = PedroComponent.follower.pathBuilder()
@@ -221,6 +226,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
+            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
@@ -233,6 +239,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
                     AutonPositions.Blue(AutonPositions.L3IntakePose),
                 )
             )
+            .addParametricCallback(0.9, intakePower)
             .setTangentHeadingInterpolation()
             .build()
         L3Shoot = PedroComponent.follower.pathBuilder()
@@ -242,6 +249,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
+            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
@@ -279,8 +287,12 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
             .build()
     }
 
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.8)}
+    val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
+
     val IntakeCommand: Command
         get() = ParallelGroup(
+            intakePower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
             MagServoSubsystem.run,
@@ -288,6 +300,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
         )
     val TravelCommand: Command
         get() = ParallelGroup(
+            maxPower,
             IntakeMotorSubsystem.off,
             MagMotorSubsystem.off,
             MagServoSubsystem.stop,
@@ -295,6 +308,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
         )
     val ShootCommandClose: Command
         get() = ParallelGroup(
+            maxPower,
             MagblockServoSubsystem.unblock,
             MagMotorSubsystem.On(1.0),
             IntakeMotorSubsystem.intake,
@@ -302,6 +316,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
         )
     val ShootCommandFar: Command
         get() = ParallelGroup(
+            maxPower,
             MagblockServoSubsystem.unblock,
             MagMotorSubsystem.On(0.85),
             IntakeMotorSubsystem.intake,
@@ -321,6 +336,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
             FollowPath(pushToClose!!),
 
             // preload
+            Delay(delayPreShoot),
             ShootCommandClose,
             Delay(delayCloseShoot),
 
@@ -342,6 +358,7 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
 
             // gate cycle
             FollowPath(closeToGate!!),
+            Delay(delayAtGate),
             IntakeCommand,
             FollowPath(gateToAfter!!),
             Delay(delayAfterIntake),
@@ -416,22 +433,20 @@ class AutonBlueFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 i
 //            MagMotorSubsystem.off
 //            MagblockServoSubsystem.block
 //        }
-//        val dxp = dx - (PedroComponent.follower.velocity.xComponent
-//            + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
-//                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
-//                else distanceToTimeClose(dxy)
-//        )
-//        val dyp = dy - (PedroComponent.follower.velocity.yComponent
-//            + 0.05 * PedroComponent.follower.acceleration.yComponent) * (
-//                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
-//                else distanceToTimeClose(dxy)
-//                )
 
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-        val dxp = dx;
-        val dyp = dy;
+        val dxp = dx - (PedroComponent.follower.velocity.xComponent
+                + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
+                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
+                else AutoAimConstants.distanceToTimeClose(dxy)
+        )
+        val dyp = dy - (PedroComponent.follower.velocity.yComponent
+                + 0.05 * PedroComponent.follower.acceleration.yComponent) * (
+                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
+                else AutoAimConstants.distanceToTimeClose(dxy)
+        )
         val dxyp = hypot(dxp, dyp)
         if (!stopShooterAutoAim) {
             ShooterSubsystem.AutoAim(

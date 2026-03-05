@@ -69,54 +69,62 @@ open class TeleOpBase(
     private val rfw = MotorEx("rfw");
     private val rbw = MotorEx("rbw");
 
-    private var odom: OdometrySubsystem? = null;
+//    private var odom: OdometrySubsystem? = null;
+    val x:  Double get() { return (PedroComponent.follower.pose.x);}
+    val y:  Double get() { return (PedroComponent.follower.pose.y);}
+    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
+    val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
+    val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
+    val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
+    val ax: Double get() { return (PedroComponent.follower.acceleration.xComponent);}
+    val ay: Double get() { return (PedroComponent.follower.acceleration.yComponent);}
 
-    private var ofsX = 0.0;
-    private var ofsY = 0.0;
-    private var ofsH = 0.0;
+//    private var ofsX = 0.0;
+//    private var ofsY = 0.0;
+//    private var ofsH = 0.0;
 
-    val x: Double
-        get() {
-            if (odom != null) {
-                return odom!!.rOx1 + ofsX;
-            }
-            return 0.0;
-        }
-    val y: Double
-        get() {
-            if (odom != null) {
-                return odom!!.rOy1 + ofsY;
-            }
-            return 0.0;
-        }
-    val h: Angle
-        get() {
-            if (odom != null) {
-                return odom!!.rOh.rad + ofsH.rad;
-            }
-            return 0.0.rad;
-        }
-    val vx: Double
-        get() {
-            if (odom != null) {
-                return odom!!.vx;
-            }
-            return 0.0;
-        }
-    val vy: Double
-        get() {
-            if (odom != null) {
-                return odom!!.vy;
-            }
-            return 0.0;
-        }
-    val vh: Angle
-        get() {
-            if (odom != null) {
-                return odom!!.omega.rad;
-            }
-            return 0.0.rad;
-        }
+//    val x: Double
+//        get() {
+//            if (odom != null) {
+//                return odom!!.rOx1 + ofsX;
+//            }
+//            return 0.0;
+//        }
+//    val y: Double
+//        get() {
+//            if (odom != null) {
+//                return odom!!.rOy1 + ofsY;
+//            }
+//            return 0.0;
+//        }
+//    val h: Angle
+//        get() {
+//            if (odom != null) {
+//                return odom!!.rOh.rad + ofsH.rad;
+//            }
+//            return 0.0.rad;
+//        }
+//    val vx: Double
+//        get() {
+//            if (odom != null) {
+//                return odom!!.vx;
+//            }
+//            return 0.0;
+//        }
+//    val vy: Double
+//        get() {
+//            if (odom != null) {
+//                return odom!!.vy;
+//            }
+//            return 0.0;
+//        }
+//    val vh: Angle
+//        get() {
+//            if (odom != null) {
+//                return odom!!.omega.rad;
+//            }
+//            return 0.0.rad;
+//        }
 //    val ax: Double
 //        get() {
 //            if (odom != null) {
@@ -146,6 +154,7 @@ open class TeleOpBase(
                 LowerSubsystem,
                 OuttakeSubsystem
             ),
+            PedroComponent(Constants::createFollower),
             BulkReadComponent,
             BindingsComponent
         )
@@ -166,12 +175,12 @@ open class TeleOpBase(
 //            true
 //        )
         // FIELD CENTRIC:
-//        driverControlled = PedroDriverControlled(
-//            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (gamepad1.left_stick_x > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
-//            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (gamepad1.left_stick_y > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
-//            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
-//            false
-//        )
+        driverControlled = PedroDriverControlled(
+            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (gamepad1.left_stick_x > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
+            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (gamepad1.left_stick_y > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
+            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
+            false
+        )
 //
 //        gateIntakeChain = PedroComponent.follower.pathBuilder()
 //            .addPath(
@@ -251,24 +260,25 @@ open class TeleOpBase(
 //            )
 //            .build()
 
-//        val file = File(Lefile.filePath)
-//        val content = file.readText().split("\n")
-//        val startX = content[0].toDouble()
-//        val startY = content[1].toDouble()
-//        val startH = content[2].toDouble()
-
-//        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
-//        PedroComponent.follower.pose = Pose(startX, startY, startH)
-        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
-
-
         val file = File(Lefile.filePath)
         val content = file.readText().split("\n")
         val startX = content[0].toDouble()
         val startY = content[1].toDouble()
         val startH = content[2].toDouble()
 
-        odom!!.setPinpoint(startX, startY, startH)
+//        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
+        PedroComponent.follower.pose = Pose(startX, startY, startH)
+//        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
+//        odom!!.updateOdom()
+
+
+//        val file = File(Lefile.filePath)
+//        val content = file.readText().split("\n")
+//        val startX = content[0].toDouble()
+//        val startY = content[1].toDouble()
+//        val startH = content[2].toDouble()
+//
+//        odom!!.setPinpoint(startX, startY, startH)
     }
 
     private var autoAimEnabled = true;
@@ -286,26 +296,35 @@ open class TeleOpBase(
     var lowerOverridePower = 0.0;
 
     override fun onStartButtonPressed() {
+//        val file = File(Lefile.filePath)
+//        val content = file.readText().split("\n")
+//        val startX = content[0].toDouble()
+//        val startY = content[1].toDouble()
+//        val startH = content[2].toDouble()
+//
+////        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
+//        PedroComponent.follower.pose = Pose(startX, startY, startH)
+
         MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
 
 //        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
 //        gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
 
-        val mecanum = MecanumDriverControlled(
-            lfw,
-            rfw,
-            lbw,
-            rbw,
-            -Gamepads.gamepad1.leftStickY.map { it*speedFactorDrive },
-            Gamepads.gamepad1.leftStickX.map { it*speedFactorDrive },
-            Gamepads.gamepad1.rightStickX.map { it*speedFactorDrive },
-            FieldCentric {
-                if (isBlue) (h.inRad - PI).rad else h
-            }
-        )
-        mecanum();
-//        driverControlled!!()
+//        val mecanum = MecanumDriverControlled(
+//            lfw,
+//            rfw,
+//            lbw,
+//            rbw,
+//            -Gamepads.gamepad1.leftStickY.map { it*speedFactorDrive },
+//            Gamepads.gamepad1.leftStickX.map { it*speedFactorDrive },
+//            Gamepads.gamepad1.rightStickX.map { it*speedFactorDrive },
+//            FieldCentric {
+//                if (isBlue) (h.inRad - PI).rad else h
+//            }
+//        )
+//        mecanum();
+        driverControlled!!()
 
 //        Gamepads.gamepad1.dpadUp whenBecomesTrue {
 //            val path = FollowPath(gateIntakeChain!!)
@@ -408,7 +427,7 @@ open class TeleOpBase(
                 gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
             } else {
                 // reset position
-                odom!!.setPinpoint(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
+                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
 //                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
@@ -472,8 +491,8 @@ open class TeleOpBase(
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
 
-//        PedroComponent.follower.update()
-        odom!!.updateOdom();
+        PedroComponent.follower.update()
+//        odom!!.updateOdom();
 
 //        if (
 //            activeDriveMacros.isNotEmpty() &&
