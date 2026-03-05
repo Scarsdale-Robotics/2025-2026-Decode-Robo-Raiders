@@ -287,8 +287,8 @@ open class TeleOpBase(
     var activeDriveMacros = mutableListOf<Command>()
 
     private var phiTrim = 0.0.deg;
-    private var veloTrim = -10;
-    private var hoodTrim = -0.5.deg;
+    private var veloTrim = 0;
+    private var hoodTrim = 0.0.deg;
 
     var speedFactorDrive = 1.0;
     var speedFactorIntake = 1.0;
@@ -511,10 +511,10 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-//        dxp = dx - (vx + 0.05 * ax) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-//        dyp = dy - (vy + 0.05 * ay) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy)
-        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dxp = dx - (vx + 0.05 * ax) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dyp = dy - (vy + 0.05 * ay) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+//        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+//        dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
@@ -548,8 +548,8 @@ open class TeleOpBase(
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
-                dxyp,  // TODO: hope this is not sus
-//                dxyp,
+//                dxyp,  // TODO: hope this is not sus
+                dxy + dxyp * 0.5,
                 { dist ->
                     (
                             if (y < BORD_Y)

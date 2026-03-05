@@ -160,7 +160,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.L2IntakePose),
                 )
             )
-            .addParametricCallback(0.9, intakePower)
+//            .addParametricCallback(0.9, intakePower)
             .setConstantHeadingInterpolation(Math.toRadians(-180.0))
             .build()
         L2Shoot = PedroComponent.follower.pathBuilder()
@@ -170,7 +170,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
-            .addParametricCallback(0.0, maxPower)
+//            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
@@ -217,7 +217,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.L1IntakePose),
                 )
             )
-            .addParametricCallback(0.9, intakePower)
+//            .addParametricCallback(0.9, intakePower)
             .setTangentHeadingInterpolation()
             .build()
         L1Shoot = PedroComponent.follower.pathBuilder()
@@ -227,7 +227,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
-            .addParametricCallback(0.0, maxPower)
+//            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
@@ -240,7 +240,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.L3IntakePose),
                 )
             )
-            .addParametricCallback(0.9, intakePower)
+//            .addParametricCallback(0.9, intakePower)
             .setTangentHeadingInterpolation()
             .build()
         L3Shoot = PedroComponent.follower.pathBuilder()
@@ -250,7 +250,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
-            .addParametricCallback(0.0, maxPower)
+//            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )

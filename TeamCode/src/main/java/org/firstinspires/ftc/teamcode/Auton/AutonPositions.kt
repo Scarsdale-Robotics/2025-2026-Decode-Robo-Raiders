@@ -19,7 +19,7 @@ object AutonPositions {
     val postPushPose = Pose(50.0, 14.0, Math.toRadians(-90.0))
 
     val L2IntakePose = Pose(20.0, 60.8, Math.toRadians(-180.0))
-    val L2IntakeControlPose = Pose(60.9, 65.3)
+    val L2IntakeControlPose = Pose(58.0, 65.3)
 
     val L1IntakePose = Pose(21.0, 84.3, Math.toRadians(-180.0))
     val L1IntakeControlPose = Pose(42.6, 84.2)
