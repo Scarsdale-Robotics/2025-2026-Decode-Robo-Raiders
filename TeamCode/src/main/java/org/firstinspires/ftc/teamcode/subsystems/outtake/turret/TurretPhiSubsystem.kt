@@ -170,7 +170,11 @@ object TurretPhiSubsystem : Subsystem {
         val power = controller.calculate(
             motor.state
         )
-        SetPower(motor, power).setInterruptible(true)()
+        if (abs(controller.goal.position - controller.lastMeasurement.position) < 16.7) {
+            SetPower(motor, 0.0)
+        } else {
+            SetPower(motor, power).setInterruptible(true)()
+        }
 
         PanelsTelemetry.telemetry.addData("phi enc", motor.currentPosition)
         PanelsTelemetry.telemetry.addData("ref", controller.reference)

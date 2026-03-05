@@ -149,8 +149,6 @@ open class TeleOpBase(
             BulkReadComponent,
             BindingsComponent
         )
-        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
-        odom!!.updateOdom()
     }
 
     var lockDirection = false;
@@ -261,6 +259,9 @@ open class TeleOpBase(
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
 //        PedroComponent.follower.pose = Pose(startX, startY, startH)
+        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
+
+
         val file = File(Lefile.filePath)
         val content = file.readText().split("\n")
         val startX = content[0].toDouble()
@@ -493,8 +494,8 @@ open class TeleOpBase(
         val dxy = hypot(dx, dy)
 //        dxp = dx - (vx + 0.05 * ax) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
 //        dyp = dy - (vy + 0.05 * ay) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy)
-        dxp = dx - (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        dyp = dy - (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
