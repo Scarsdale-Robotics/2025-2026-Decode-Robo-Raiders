@@ -51,6 +51,7 @@ public class CVSubsystem_VisionPortal {
 
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setTagLibrary(tagLibrary)
+                .setLensIntrinsics(1430,1457,480,620)
                 .setCameraPose(
                         new Position(
                                 DistanceUnit.INCH, -4.2, -4.5,7.7, 0
