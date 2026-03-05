@@ -20,6 +20,7 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
+import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueCloseArtifact24.Companion.intakeSpeed
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
@@ -70,14 +71,16 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
     }
 
     companion object {
-        val delayStartShoot: Double = 2.0
-        val DelayBeforeShoot: Double = 0.25
-        val delayAfterEachShoot: Double = 0.5 //currently at a really high #
+        val delayStartShoot: Double = 0.5
+        val DelayBeforeShoot: Double = 0.11
+        val delayAfterEachShoot: Double = 0.35 //currently at a really high #
         val DelayForParterBot: Double = 0.5
         val DelayInIntake: Double = 1.1
 
         val goalX = 3.0
         val goalY = 144.0 - 6.0
+
+        val intakeSpeed = 0.5
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
     }
@@ -94,6 +97,8 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
     /////////////
     // The different paths the robot will take in during Auton
     private var robotShootPreload: PathChain? = null
+
+    private var robotIntake1: PathChain? = null
     private var robotGoToShoot1: PathChain? = null //since preload also intakes, there is no intake1
 
     private var robotIntake2: PathChain? = null
@@ -113,20 +118,32 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         //Shoots preload and intakes once
         robotShootPreload = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierCurve(
+                BezierLine(
                     AutonPositions.Blue(AutonPositions.startPoseClose),
-                    AutonPositions.Blue(AutonPositions.startCoOpControlPos),
-                    AutonPositions.Blue(AutonPositions.intake1Pos),
+                    AutonPositions.Blue(AutonPositions.start24ShootPos),
                 )
             )
-            .setTangentHeadingInterpolation()
-//            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
+//            .setTangentHeadingInterpolation()
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
+            .build()
+
+        robotIntake1 = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    AutonPositions.Blue(AutonPositions.start24ShootPos),
+                    AutonPositions.Blue(AutonPositions.intake1Pos24)
+                )
+            )
+//            .setTangentHeadingInterpolation()
+            .addParametricCallback(0.95, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
             .build()
 
         robotFirstLeverOpen = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierLine(
-                    AutonPositions.Blue(AutonPositions.intake1Pos),
+                BezierCurve(
+                    AutonPositions.Blue(AutonPositions.intake1Pos24),
+                    AutonPositions.Blue(AutonPositions.coOpFirstGateOpenControlPos),
                     AutonPositions.Blue(AutonPositions.coOpFirstStartGateOpen),
                 )
             )
@@ -205,12 +222,26 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
     ///////////////////////////
     ////Main Auton Commands////
     ///////////////////////////
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(intakeSpeed)}
+    val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
+
     val IntakeCommand: Command
         get() = ParallelGroup(
+            intakePower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
 //            MagServoSubsystem.run,
             MagblockServoSubsystem.block
+
+        )
+    val IntakeAfterCommand: Command
+        get() = ParallelGroup(
+            maxPower,
+            IntakeMotorSubsystem.intake,
+            MagMotorSubsystem.intake,
+//            MagServoSubsystem.run,
+            MagblockServoSubsystem.block
+
         )
     val TravelCommand: Command
         get() = ParallelGroup(
@@ -233,16 +264,13 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
     private val autonomousRoutine: Command
         get() = SequentialGroup(
             //Main Group
-            ParallelGroup( //Shoots PRELOAD
+            SequentialGroup(
                 FollowPath(robotShootPreload!!),
-                SequentialGroup(
-                    Delay(delayStartShoot),
-                    ShootCommand,
-                    Delay(delayAfterEachShoot),
-                    IntakeCommand,
-                ),
-//                FollowPath(robotIntake1!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
+                Delay(DelayBeforeShoot),
+                ShootCommand,
+                Delay(delayAfterEachShoot),
+//                IntakeCommand,
+                FollowPath(robotIntake1!!),
             ),
 
             ParallelGroup( //Robot goes back to CLOSE Shoot Position

@@ -14,8 +14,6 @@ import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.Angle
-import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
@@ -34,6 +32,7 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaClose
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaFar
@@ -42,8 +41,6 @@ import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityF
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.hypot
-import kotlin.math.max
-import kotlin.math.min
 
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
@@ -57,9 +54,9 @@ import kotlin.math.min
 //4th slot = Auton type: Motif, Backup, Shooter, Artifact, CoOp
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__ __Artifact & Auton__ __ CoOp
-@Autonomous(name = "[PUSH-16] Auton Red Far Push", group = "Auton")
+@Autonomous(name = "[PUSH-18] Auton Red Far Push", group = "Auton")
 @Configurable
-class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
+class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
     //////////////////////
     ////Base Variables////
     //////////////////////
@@ -83,15 +80,18 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
     ////Constants////
     /////////////////
     companion object {
-        val delayStartup = 1.0;
+        val delayStartup = 2.0;
         val delayFarShoot = 0.8;
-        val delayPreShoot = 0.5;
-        val delayCloseShoot = 0.4;
-        val delayAfterIntake = 0.1;
-        val delayInIntake = 0.75;
+        val delayAtGate = 0.001;
+        val delayPreShoot = 0.12;
+        val delayCloseShoot = 0.35;
+        val delayAfterIntake = 0.0;
+        val delayInIntake = 0.4;
 
         val goalX = 144.0 - 3.0
         val goalY = 144.0 - 6.0
+
+        var pathStarted = false;
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
     }
@@ -108,7 +108,9 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
     // The different paths the robot will take in during Auton
     private var pushPath: PathChain? = null
 
-    private var L2Intake: PathChain? = null
+    private var pushToClose: PathChain? = null;
+
+    private var closeToL2: PathChain? = null
     private var L2Shoot: PathChain? = null
 
     private var closeToGate: PathChain? = null
@@ -139,9 +141,18 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
                     AutonPositions.Red(AutonPositions.postPushPose),
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(90.0))
+            .setConstantHeadingInterpolation(Math.toRadians(-90.0))
             .build()
-        L2Intake = PedroComponent.follower.pathBuilder()
+        pushToClose = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierCurve(
+                    AutonPositions.Red(AutonPositions.postPushPose),
+                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                )
+            )
+            .setConstantHeadingInterpolation(Math.toRadians(-90.0))
+            .build()
+        closeToL2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
                     AutonPositions.Red(AutonPositions.postPushPose),
@@ -149,7 +160,8 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
                     AutonPositions.Red(AutonPositions.L2IntakePose),
                 )
             )
-            .setTangentHeadingInterpolation()
+            .addParametricCallback(0.9, intakePower)
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         L2Shoot = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -158,6 +170,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
                     AutonPositions.Red(AutonPositions.shootPoseClose)
                 )
             )
+            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
@@ -183,7 +196,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
                     AutonPositions.Red(AutonPositions.altAfterOpenPose),
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
         gateToShoot = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -204,6 +217,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
                     AutonPositions.Red(AutonPositions.L1IntakePose),
                 )
             )
+            .addParametricCallback(0.9, intakePower)
             .setTangentHeadingInterpolation()
             .build()
         L1Shoot = PedroComponent.follower.pathBuilder()
@@ -213,6 +227,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
                     AutonPositions.Red(AutonPositions.shootPoseClose),
                 )
             )
+            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
@@ -225,6 +240,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
                     AutonPositions.Red(AutonPositions.L3IntakePose),
                 )
             )
+            .addParametricCallback(0.9, intakePower)
             .setTangentHeadingInterpolation()
             .build()
         L3Shoot = PedroComponent.follower.pathBuilder()
@@ -234,6 +250,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
                     AutonPositions.Red(AutonPositions.shootPoseClose),
                 )
             )
+            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
@@ -271,8 +288,12 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
             .build()
     }
 
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.8)}
+    val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
+
     val IntakeCommand: Command
         get() = ParallelGroup(
+            intakePower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
             MagServoSubsystem.run,
@@ -280,6 +301,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
         )
     val TravelCommand: Command
         get() = ParallelGroup(
+            maxPower,
             IntakeMotorSubsystem.off,
             MagMotorSubsystem.off,
             MagServoSubsystem.stop,
@@ -287,6 +309,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
         )
     val ShootCommandClose: Command
         get() = ParallelGroup(
+            maxPower,
             MagblockServoSubsystem.unblock,
             MagMotorSubsystem.On(1.0),
             IntakeMotorSubsystem.intake,
@@ -294,6 +317,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
         )
     val ShootCommandFar: Command
         get() = ParallelGroup(
+            maxPower,
             MagblockServoSubsystem.unblock,
             MagMotorSubsystem.On(0.85),
             IntakeMotorSubsystem.intake,
@@ -307,16 +331,19 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
     private val autonomousRoutine: Command
         get() = SequentialGroup(
             // push partner
+            maxPower,
             FollowPath(pushPath!!),
-            Delay(delayStartup),
+//            Delay(delayStartup),
+            FollowPath(pushToClose!!),
 
             // preload
-            ShootCommandFar,
-            Delay(delayFarShoot),
+            Delay(delayPreShoot),
+            ShootCommandClose,
+            Delay(delayCloseShoot),
 
             // L2 cycle
             IntakeCommand,
-            FollowPath(L2Intake!!),  // intake L2
+            FollowPath(closeToL2!!),  // intake L2
             Delay(delayAfterIntake),
             ParallelGroup(  // shoot l2
                 SequentialGroup(
@@ -332,6 +359,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
 
             // gate cycle
             FollowPath(closeToGate!!),
+            Delay(delayAtGate),
             IntakeCommand,
             FollowPath(gateToAfter!!),
             Delay(delayAfterIntake),
@@ -399,12 +427,28 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
         )
 
     override fun onUpdate() {
+//        if (pathStarted && opmodeTimer!!.elapsedTime >= 29.75) {
+//            PedroComponent.follower.setMaxPower(0.0)
+//            PedroComponent.follower.breakFollowing()
+//            IntakeMotorSubsystem.off()
+//            MagMotorSubsystem.off()
+//            MagblockServoSubsystem.block()
+//        }
+
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-        val dxp = dx;
-        val dyp = dy;
-        val dxyp = hypot(dxp, dyp)
+        val dxp = dx - (PedroComponent.follower.velocity.xComponent
+                + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
+                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
+                else AutoAimConstants.distanceToTimeClose(dxy)
+                )
+        val dyp = dy - (PedroComponent.follower.velocity.yComponent
+                + 0.05 * PedroComponent.follower.acceleration.yComponent) * (
+                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
+                else AutoAimConstants.distanceToTimeClose(dxy)
+                )
+        val dxyp = hypot(dxp, dyp) - 2
         if (!stopShooterAutoAim) {
             ShooterSubsystem.AutoAim(
                 dxyp,
@@ -434,6 +478,7 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
 //        forward.schedule()
         // Feedback to Driver Hub for debugging
 //        telemetry.addData("path state", pathState)
+
         telemetry.addData("x", PedroComponent.follower.pose.x)
         telemetry.addData("y", PedroComponent.follower.pose.y)
         telemetry.addData("heading", PedroComponent.follower.pose.heading)
@@ -449,8 +494,9 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
         ShooterSubsystem.off()
         IntakeMotorSubsystem.off()
         MagMotorSubsystem.off()
-        MagServoSubsystem.stop()
+//        MagServoSubsystem.stop()
         MagblockServoSubsystem.block()
+//        follower = Constants.createFollower(hardwareMap)
 
         PedroComponent.follower.setStartingPose(
             AutonPositions.Red(AutonPositions.startPoseFarPush)
@@ -467,6 +513,8 @@ class AutonRedFarPushNathan: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is
 
         opmodeTimer!!.resetTimer()
         actionTimer!!.resetTimer()
+
+        pathStarted = true;
 //        setPathState(AutonPath.RobotShoot1)
     }
 

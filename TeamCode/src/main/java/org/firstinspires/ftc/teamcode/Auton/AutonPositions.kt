@@ -43,7 +43,7 @@ object AutonPositions {
     val startCoOpControlPos = Pose(91.6, 91.2)
 
     val coOpFirstStartGateOpen = Pose(17.0, 72.4, Math.toRadians(180.0))
-
+    val coOpFirstGateOpenControlPos = Pose(27.1, 77.11, Math.toRadians(180.0))
     val coOpStartGateOpen = Pose(17.8, 63.1, Math.toRadians(180.0))
     val coOpStartGateOpenControlPos = Pose(41.2, 66.85)
 
@@ -57,7 +57,7 @@ object AutonPositions {
     val shootPoseFar =
         Pose(51.7, 15.9, Math.toRadians(180.0)) // Far Shoot Pose of our robot.
     val gateOpenPose =
-        Pose(21.0, 63.0, Math.toRadians(180.0)) // Gate Open Pose of our robot.
+        Pose(21.0, 66.0, Math.toRadians(180.0)) // Gate Open Pose of our robot.
     val gateOpenControlPos =
         Pose(56.7, 51.2)
     val gateOpenPoseFromFar =

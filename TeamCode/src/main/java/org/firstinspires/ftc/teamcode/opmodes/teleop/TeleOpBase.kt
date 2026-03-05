@@ -287,8 +287,8 @@ open class TeleOpBase(
     var activeDriveMacros = mutableListOf<Command>()
 
     private var phiTrim = 0.0.deg;
-    private var veloTrim = 0;
-    private var hoodTrim = 0.0.deg;
+    private var veloTrim = -10;
+    private var hoodTrim = -0.5.deg;
 
     var speedFactorDrive = 1.0;
     var speedFactorIntake = 1.0;
@@ -548,7 +548,7 @@ open class TeleOpBase(
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
-                dxy * 0.8 + dxyp * 0.2,  // TODO: hope this is not sus
+                dxyp,  // TODO: hope this is not sus
 //                dxyp,
                 { dist ->
                     (
