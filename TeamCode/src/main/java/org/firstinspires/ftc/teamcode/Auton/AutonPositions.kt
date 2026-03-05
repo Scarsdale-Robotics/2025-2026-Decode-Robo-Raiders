@@ -34,9 +34,9 @@ object AutonPositions {
 
     //====24 Specific Positions====
     val start24ShootPos = Pose(24.9, 105.6, Math.toRadians(270.0))
-    val intake1Pos24 = Pose(27.5, 90.8, Math.toRadians(270.0))
-    val intake2Pos24 = Pose(27.5, 66.0, Math.toRadians(270.0))
-    val intake3Pos24 = Pose(27.5, 43.3, Math.toRadians(270.0))
+    val intake1Pos24 = Pose(29.5, 90.8, Math.toRadians(270.0))
+    val intake2Pos24 = Pose(29.5, 66.0, Math.toRadians(270.0))
+    val intake3Pos24 = Pose(29.5, 43.3, Math.toRadians(270.0))
     val robotPark24 = Pose(42.8, 10.9, Math.toRadians(180.0))
 
     //====CoOp Specific Positions====
