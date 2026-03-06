@@ -549,7 +549,7 @@ open class TeleOpBase(
         } else if (autoAimEnabled) {
             ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
-                dxy + dxyp * 0.5,
+                min(dxy, dxyp),
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -560,7 +560,7 @@ open class TeleOpBase(
                 }
             )()
             TurretThetaSubsystem.AutoAim(
-                dxyp,
+                min(dxy, dxyp),
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -570,9 +570,15 @@ open class TeleOpBase(
                     ) + hoodTrim
                 },
             )()
-            TurretPhiSubsystem.AutoAim(
-                dxp, dyp, h, phiTrim
-            )()
+            if (dxy < dxyp) {
+                TurretPhiSubsystem.AutoAim(
+                    dx, dy, h, phiTrim
+                )()
+            } else {
+                TurretPhiSubsystem.AutoAim(
+                    dxp, dyp, h, phiTrim
+                )()
+            }
         } else {
             //ShooterSubsystem.Manual(
 
