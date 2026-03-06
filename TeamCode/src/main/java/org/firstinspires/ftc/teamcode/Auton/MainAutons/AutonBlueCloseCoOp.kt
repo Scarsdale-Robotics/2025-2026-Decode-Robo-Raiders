@@ -72,11 +72,11 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 
     companion object {
         val delayStartShoot: Double = 0.4
-        val DelayBeforeShoot: Double = 0.11
+        val DelayBeforeShoot: Double = 0.12
         val delayAfterEachShoot: Double = 0.35 //currently at a really high #
         val DelayForParterBot: Double = 0.4
         val DelayInIntake: Double = 0.7
-        val delayAtGate: Double = 0.35
+        val delayAtGate: Double = 0.2
 
         val goalX = 3.0
         val goalY = 144.0 - 6.0
@@ -281,7 +281,15 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 Delay(delayAfterEachShoot),
                 TravelCommand,
                 FollowPath(robotIntake1!!),
-                FollowPath(robotFirstLeverOpen!!),
+
+                ParallelGroup( //Robot goes back to CLOSE Shoot Position
+                    SequentialGroup(
+                        IntakeAfterCommand,
+                        Delay(DelayInIntake),
+                        TravelCommand
+                    ),
+                    FollowPath(robotFirstLeverOpen!!),
+                ),
                 Delay(delayAtGate),
             ),
 

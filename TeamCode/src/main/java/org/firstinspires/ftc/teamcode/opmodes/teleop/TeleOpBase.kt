@@ -547,7 +547,8 @@ open class TeleOpBase(
             )()
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
-            val sotmFactor = 1 - ((dxyp - dxy) / 10.0).coerceIn(0.0, 1.0);
+//            val sotmFactor = 1 - ((dxyp - dxy) / 10.0).coerceIn(0.0, 1.0);
+            var sotmFactor = 0.0;
             ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
                 dxyp * sotmFactor + dxy * (1 - sotmFactor),

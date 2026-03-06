@@ -71,8 +71,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     companion object {
         val delayStartShoot: Double = 0.4
-        val DelayBeforeShoot: Double = 0.1
-        val delayAfterEachShoot: Double = 0.54 //currently at a really high #
+        val DelayBeforeShoot: Double = 0.12
+        val delayAfterEachShoot: Double = 0.38 //currently at a really high #
         val DelayFromRampIntake: Double = 0.1
         val DelayInIntake: Double = 0.95
         //        val DelayAfterIntake: Double = 0.0

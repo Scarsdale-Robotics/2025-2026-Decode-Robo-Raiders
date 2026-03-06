@@ -267,7 +267,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
     private val autonomousRoutine: Command
         get() = SequentialGroup(
             //Main Group
-            SequentialGroup( //Shoots PRELOA+D
+            SequentialGroup( //Shoots PRELOAD
                 ParallelGroup(
                     TurretPhiSubsystem.SetTargetPhi(5.075.rad),
                     Delay(AutonBlueFarArtifact.Companion.delayStartShoot),

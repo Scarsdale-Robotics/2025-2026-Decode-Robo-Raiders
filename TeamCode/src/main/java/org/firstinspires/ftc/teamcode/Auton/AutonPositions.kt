@@ -28,8 +28,8 @@ object AutonPositions {
     val L3IntakePose = Pose(20.0, 35.7, Math.toRadians(-180.0))
     val L3IntakeControlPose = Pose(50.5, 38.8)
 
-    val HPZPose = Pose(11.4, 14.3, Math.toRadians(-96.0))
-    val HPZControlPose = Pose(13.4, 44.6)
+    val HPZPose = Pose(14.0, 14.3, Math.toRadians(-96.0))
+    val HPZControlPose = Pose(14.4, 45.6)
 
     val pApark = Pose(52.5, 71.8)
 
@@ -58,7 +58,9 @@ object AutonPositions {
     val shootPoseFar =
         Pose(51.7, 15.9, Math.toRadians(180.0)) // Far Shoot Pose of our robot.
     val gateOpenPose =
-        Pose(21.0, 66.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
+        Pose(21.0, 55.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
+//    val altGateOpenPose =
+//        Pose(21.0, 54.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
     val gateOpenControlPos =
         Pose(56.7, 51.2)
     val gateOpenPoseFromFar =

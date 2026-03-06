@@ -23,10 +23,11 @@ object ShooterSubsystem : Subsystem {
     @JvmField var ffCoefficients = BasicFeedforwardParameters(0.00039, 0.001, 0.0);
     @JvmField var pidCoefficients = PIDCoefficients(0.016, 0.0, 0.0)
 
-    public val velocity: Double
-        get() {
-            return controller.lastMeasurement.velocity;
-        }
+//    public val velocity: Double
+//        get() {
+//            return controller.lastMeasurement.velocity;
+//        }
+    var velocity = 0.0;
 
     private val controller: ControlSystem;
 
@@ -87,11 +88,12 @@ object ShooterSubsystem : Subsystem {
     override fun periodic() {
         var power = controller.calculate(
             motor2.state.times(-1.0)
-        ).coerceIn(-0.22, 1.0);
+        ).coerceIn(-0.0, 1.0);
 
         setMotorPowers(power);
 
         val measuredVel = (motor2.currentPosition - lastPos)/elapsedTime.time();
+        velocity = measuredVel;
         lastPos = motor2.currentPosition;
         elapsedTime.reset()
 
