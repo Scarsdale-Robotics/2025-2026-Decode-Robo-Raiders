@@ -76,10 +76,23 @@ class ShowTeleOp : NextFTCOpMode() {
             MagblockServoSubsystem.block()
             ShooterSubsystem.isShooting = false
         }
+
+        Gamepads.gamepad1.dpadUp whenBecomesTrue {
+            dyp += 5.0;
+        }
+        Gamepads.gamepad1.dpadDown whenBecomesTrue {
+            dyp -= 5.0;
+        }
+        Gamepads.gamepad1.dpadLeft whenBecomesTrue {
+            dxp -= 5.0;
+        }
+        Gamepads.gamepad1.dpadRight whenBecomesTrue {
+            dxp += 5.0;
+        }
     }
 
     var lastRuntime = 0.0
-    var dyp = 20.0;
+    var dyp = 25.0;
     var dxp = 0.0;
     var dxyp = 0.0;
     override fun onUpdate() {
