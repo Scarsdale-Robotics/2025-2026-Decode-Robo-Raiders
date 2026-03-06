@@ -70,8 +70,8 @@ open class TeleOpBase(
     private val rbw = MotorEx("rbw");
 
 //    private var odom: OdometrySubsystem? = null;
-    val x:  Double get() { return (PedroComponent.follower.pose.x);}
-    val y:  Double get() { return (PedroComponent.follower.pose.y);}
+    val x:  Double get() { return (PedroComponent.follower.pose.x + ofsX);}
+    val y:  Double get() { return (PedroComponent.follower.pose.y + ofsY);}
     val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
     val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
     val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
@@ -295,6 +295,9 @@ open class TeleOpBase(
     var shootTransferSpeedFactor = 1.0;
     var lowerOverridePower = 0.0;
 
+    var ofsX = 0.0;
+    var ofsY = 0.0;
+
     override fun onStartButtonPressed() {
 //        val file = File(Lefile.filePath)
 //        val content = file.readText().split("\n")
@@ -462,6 +465,35 @@ open class TeleOpBase(
         Gamepads.gamepad2.cross whenBecomesTrue {
             shootTransferSpeedFactor = max(shootTransferSpeedFactor - 0.1, 0.0)
         }
+
+        Gamepads.gamepad2.leftStickX lessThan -0.9 whenBecomesTrue {
+            if (isBlue) {
+                ofsY += 1;
+            } else {
+                ofsY -= 1;
+            }
+        }
+        Gamepads.gamepad2.leftStickX greaterThan 0.9 whenBecomesTrue {
+            if (isBlue) {
+                ofsY -= 1;
+            } else {
+                ofsY += 1;
+            }
+        }
+        Gamepads.gamepad2.leftStickY greaterThan 0.9 whenBecomesTrue {
+            if (isBlue) {
+                ofsX -= 1;
+            } else {
+                ofsX += 1;
+            }
+        }
+        Gamepads.gamepad2.leftStickY lessThan -0.9 whenBecomesTrue {
+            if (isBlue) {
+                ofsX += 1;
+            } else {
+                ofsX -= 1;
+            }
+        }
     }
 
     var lastRuntime = 0.0
@@ -473,6 +505,8 @@ open class TeleOpBase(
         telemetry.addData("PHI TRIM", abs(phiTrim.inDeg).toString() + " deg " + if (phiTrim.inDeg < 0.0) "RIGHT" else "LEFT");
         telemetry.addData("VELO TRIM", "$veloTrim tps");
         telemetry.addData("HOOD TRIM", abs(hoodTrim.inDeg).toString() + " deg " + if (hoodTrim.inDeg < 0.0) "FLATTER" else "CURVIER");
+        telemetry.addData("X TRIM", ofsX);
+        telemetry.addData("Y TRIM", ofsY)
 
         telemetry.addLine()
         telemetry.addData("SHOOT TRANSFER SPEED FACTOR", shootTransferSpeedFactor);
@@ -541,7 +575,7 @@ open class TeleOpBase(
                             if (y < BORD_Y)
                                 distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                             else
-                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
+                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) + 2.5.deg
                     ) + hoodTrim
                 },
             )()
@@ -568,7 +602,7 @@ open class TeleOpBase(
                             if (y < BORD_Y)
                                 distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                             else
-                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
+                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) + 2.5.deg
                     ) + hoodTrim
                 },
             )()

@@ -78,8 +78,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         //        val DelayAfterIntake: Double = 0.0
         val DelayAtLever: Double = 0.00
 
-        val goalX = 3.0
-        val goalY = 144.0 - 6.0
+        val goalX = 1.0
+        val goalY = 144.0 - 1.0
 
         val intakeSpeed = 0.5
 //        var directionGoalX = 4.0;

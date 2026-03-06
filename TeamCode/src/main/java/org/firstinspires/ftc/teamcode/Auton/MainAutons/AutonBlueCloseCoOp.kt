@@ -78,8 +78,8 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         val DelayInIntake: Double = 0.7
         val delayAtGate: Double = 0.2
 
-        val goalX = 3.0
-        val goalY = 144.0 - 6.0
+        val goalX = 1.0
+        val goalY = 144.0 - 1.0
 
         val intakeSpeed = 0.5
 //        var directionGoalX = 4.0;
@@ -416,10 +416,10 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         TurretThetaSubsystem.AutoAim(
             dxyp,
             { dist ->
-                if (PedroComponent.follower.pose.y < BORD_Y)
+                (if (PedroComponent.follower.pose.y < BORD_Y)
                     distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                 else
-                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
+                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)) + 1.deg
             },
         )()
 

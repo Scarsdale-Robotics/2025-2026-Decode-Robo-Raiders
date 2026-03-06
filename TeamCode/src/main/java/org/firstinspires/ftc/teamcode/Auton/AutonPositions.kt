@@ -16,19 +16,19 @@ object AutonPositions {
     val startAutonControlPos = Pose(95.3, 58.5)
 
     //====Push Auton====
-    val startPoseFarPush = Pose(63.714, 13.4167, Math.toRadians(-90.0))
-    val postPushPose = Pose(50.0, 14.0, Math.toRadians(-90.0))
+    val startPoseFarPush = Pose(63.714, 10.7, Math.toRadians(270.0))
+    val postPushPose = Pose(50.0, 14.0, Math.toRadians(270.0))
 
-    val L2IntakePose = Pose(20.0, 60.8, Math.toRadians(-180.0))
+    val L2IntakePose = Pose(22.0, 60.8, Math.toRadians(180.0))
     val L2IntakeControlPose = Pose(58.0, 65.3)
 
-    val L1IntakePose = Pose(21.0, 84.3, Math.toRadians(-180.0))
+    val L1IntakePose = Pose(22.0, 84.3, Math.toRadians(180.0))
     val L1IntakeControlPose = Pose(42.6, 84.2)
 
-    val L3IntakePose = Pose(20.0, 35.7, Math.toRadians(-180.0))
+    val L3IntakePose = Pose(22.0, 35.7, Math.toRadians(180.0))
     val L3IntakeControlPose = Pose(50.5, 38.8)
 
-    val HPZPose = Pose(14.0, 14.3, Math.toRadians(-96.0))
+    val HPZPose = Pose(13.8, 13.6, Math.toRadians(263.0))
     val HPZControlPose = Pose(14.4, 45.6)
 
     val pApark = Pose(52.5, 71.8)
@@ -54,18 +54,18 @@ object AutonPositions {
     //======CoOp Positions END=======
 
     val shootPoseClose =
-        Pose(60.0, 76.6, Math.toRadians(188.0)) // Close Shoot Pose of our robot.
+        Pose(56.2, 93.0, Math.toRadians(188.0)) // Close Shoot Pose of our robot.
     val shootPoseFar =
         Pose(51.7, 15.9, Math.toRadians(180.0)) // Far Shoot Pose of our robot.
     val gateOpenPose =
-        Pose(21.0, 55.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
+        Pose(15.1, 58.2, Math.toRadians(150.0)) // Gate Open Pose of our robot.
 //    val altGateOpenPose =
 //        Pose(21.0, 54.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
     val gateOpenControlPos =
         Pose(56.7, 51.2)
     val gateOpenPoseFromFar =
         Pose(21.1, 58.0, Math.toRadians(140.0)) // Gate Open Pose of our robot.
-    val gateAfterOpenPose = Pose(17.1, 53.0, Math.toRadians(125.0)) // Gate After Open Pose of our robot.
+    val gateAfterOpenPose = Pose(17.1, 54.5, Math.toRadians(140.0)) // Gate After Open Pose of our robot.
     val altAfterOpenPose = Pose(18.0, 54.4, Math.toRadians(180.0)) // Gate After Open Pose of our robot.
     val altAfterOpenControlPose = Pose(28.4, 57.7)
 //=======
@@ -81,7 +81,7 @@ object AutonPositions {
 
     // Non-constant positions
     val intake3Pos = Pose(21.4, 36.0, Math.toRadians(180.0)) // Intake Pos1
-    val intake3ControlPos = Pose(48.4, 32.0)
+    val intake3ControlPos = Pose(55.4, 32.0)
 
     val intake2Pos = Pose(19.0, 58.0, Math.toRadians(180.0)) // Intake Pos2
     val intake2ControlPos = Pose(61.7, 71.0)
@@ -93,7 +93,7 @@ object AutonPositions {
     fun Red(bluePose: Pose): Pose {
         return Pose(144.0 - bluePose.x, bluePose.y, Math.toRadians(blueRedConvertAngle(Math.toDegrees(bluePose.heading))))
     }
-    fun Red(rads: Double): Double { return blueRedConvertAngle(rads) }
+    fun Red(rads: Double): Double { return Math.toRadians(blueRedConvertAngle(Math.toDegrees(rads))) }
 
     fun Pos(bluePose: Pose, isBlue: Boolean): Pose {
         return if (isBlue) Blue(bluePose) else Red(bluePose);
