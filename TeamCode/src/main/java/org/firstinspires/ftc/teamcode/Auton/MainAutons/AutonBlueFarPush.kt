@@ -141,7 +141,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.postPushPose),
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(-90.0))
+            .setConstantHeadingInterpolation(AutonPositions.Blue(Math.toRadians(-90.0)))
             .build()
         pushToClose = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -150,7 +150,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(-90.0))
+            .setConstantHeadingInterpolation(AutonPositions.Blue(Math.toRadians(-90.0)))
             .build()
         closeToL2 = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -196,7 +196,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.gateAfterOpenPose),
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(180.0))
+            .setConstantHeadingInterpolation(AutonPositions.Blue(Math.toRadians(180.0)))
             .build()
         gateToShoot = PedroComponent.follower.pathBuilder()
             .addPath(

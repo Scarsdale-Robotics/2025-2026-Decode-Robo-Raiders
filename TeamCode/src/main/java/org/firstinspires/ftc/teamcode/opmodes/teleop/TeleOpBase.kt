@@ -547,9 +547,10 @@ open class TeleOpBase(
             )()
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
+            val sotmFactor = 1 - ((dxyp - dxy) / 10.0).coerceIn(0.0, 1.0);
             ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
-                min(dxy, dxyp),
+                dxyp * sotmFactor + dxy * (1 - sotmFactor),
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -560,7 +561,7 @@ open class TeleOpBase(
                 }
             )()
             TurretThetaSubsystem.AutoAim(
-                min(dxy, dxyp),
+                dxyp * sotmFactor + dxy * (1 - sotmFactor),
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -570,15 +571,11 @@ open class TeleOpBase(
                     ) + hoodTrim
                 },
             )()
-            if (dxy < dxyp) {
-                TurretPhiSubsystem.AutoAim(
-                    dx, dy, h, phiTrim
-                )()
-            } else {
-                TurretPhiSubsystem.AutoAim(
-                    dxp, dyp, h, phiTrim
-                )()
-            }
+            TurretPhiSubsystem.AutoAim(
+                dxp * sotmFactor + dx * (1 - sotmFactor),
+                dyp * sotmFactor + dy * (1 - sotmFactor),
+                h, phiTrim
+            )()
         } else {
             //ShooterSubsystem.Manual(
 

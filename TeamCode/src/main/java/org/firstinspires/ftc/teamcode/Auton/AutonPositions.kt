@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Auton
 
 import com.pedropathing.geometry.Pose
+import dev.nextftc.core.units.Angle
 
 object AutonPositions {
 
@@ -86,9 +87,12 @@ object AutonPositions {
     val intake1Pos = Pose(21.4, 84.0, Math.toRadians(180.0)) // Intake Pos3
 
     fun Blue(bluePose: Pose): Pose { return bluePose }
+    fun Blue(rads: Double): Double { return rads }
     fun Red(bluePose: Pose): Pose {
         return Pose(144.0 - bluePose.x, bluePose.y, Math.toRadians(blueRedConvertAngle(Math.toDegrees(bluePose.heading))))
     }
+    fun Red(rads: Double): Double { return blueRedConvertAngle(rads) }
+
     fun Pos(bluePose: Pose, isBlue: Boolean): Pose {
         return if (isBlue) Blue(bluePose) else Red(bluePose);
     }
