@@ -11,7 +11,8 @@ object AutonPositions {
     val pushTeammatePose = Pose(55.7, 8.503, Math.toRadians(90.0)) // Start Pose of our robot.
 
 //    val startPoseClose = Pose(33.222, 135.5422, Math.toRadians(270.0)) // Start Pose of our robot.
-    val startPoseClose = Pose(17.1887, 115.3623, Math.toRadians(270.0))
+//    val startPoseClose = Pose(17.1887, 115.3623, Math.toRadians(270.0))
+    val startPoseClose = Pose(15.0, 115.3623, Math.toRadians(270.0))
 
     val startAutonControlPos = Pose(95.3, 58.5)
 
@@ -43,14 +44,21 @@ object AutonPositions {
     //====CoOp Specific Positions====
     val startCoOpControlPos = Pose(91.6, 91.2)
 
-    val coOpFirstStartGateOpen = Pose(20.2, 72.4, Math.toRadians(180.0))
+    val coOpFirstStartGateOpen = Pose(20.2, 76.4, Math.toRadians(180.0))
     val coOpFirstGateOpenControlPos = Pose(27.1, 77.11, Math.toRadians(180.0))
-    val coOpStartGateOpen = Pose(20.2, 63.1, Math.toRadians(180.0))
-    val coOpStartGateOpenControlPos = Pose(41.2, 66.85)
+    val coOpStartGateOpen = Pose(20.2, 64.1, Math.toRadians(180.0))
+    val coOpStartGateOpenControlPos = Pose(40.91428571428572, 58.28571428571429)
+    val coOpGateToCommonControlPos = Pose(40.0, 53.7)
 
     val CoOpCommonIntakeControlPos1 = Pose(-40.0, 85.0)
     val CoOpCommonIntakeControlPos2 = Pose(82.0, 32.0)
-    val CoOpCommonIntake = Pose(15.0, 36.0, Math.toRadians(180.0)) // Intake Pos1
+//    val CoOpCommonIntake = Pose(15.0, 36.0, Math.toRadians(180.0)) // Intake Pos1
+//    val CoOpCommonIntakeControlPos1 = Pose(40.0, 53.7)
+//    val CoOpCommonIntakeControlPos2 = Pose(82.0, 32.0)
+    val CoOpCommonIntake = Pose(15.0, 52.0, Math.toRadians(180.0)) // Intake Pos1
+    val CoOpFinalCommonControl = Pose(32.976716937561065, 56.13756877672464);
+    val CoOpFinalCommonIntake = Pose(15.0, 56.0, Math.toRadians(180.0))
+    val CoOpFinalCommonToShootControl = Pose(39.714285714285715, 65.78571428571428)
     //======CoOp Positions END=======
 
     val shootPoseClose =
@@ -77,7 +85,7 @@ object AutonPositions {
     val commonIntakePos = Pose(14.0, 10.9, Math.toRadians(180.0))
     val commonIntakeControlPos = Pose(54.8, 36.7)
 
-    val autonParkPose = Pose(50.0, 76.6, Math.toRadians(180.0))
+    val autonParkPose = Pose(43.42857142857144, 80.88571428571427, Math.toRadians(225.0))
 
     // Non-constant positions
     val intake3Pos = Pose(21.4, 36.0, Math.toRadians(180.0)) // Intake Pos1

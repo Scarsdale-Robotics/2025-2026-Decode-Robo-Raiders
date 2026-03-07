@@ -48,9 +48,9 @@ import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 
-@Autonomous(name = "[COOP-18] Auton Blue Close CoOp", group = "Auton")
+@Autonomous(name = "[COOP-18] Auton Red Close CoOp", group = "Auton")
 @Configurable
-class AutonBlueCloseCoOp: NextFTCOpMode() {
+class AutonRedCloseCoOp: NextFTCOpMode() {
     //////////////////////
     ////Base Variables////
     //////////////////////
@@ -78,7 +78,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         val DelayInIntake: Double = 0.4
         val delayAtGate: Double = 0.3
 
-        val goalX = 1.0
+        val goalX = 144.0 - 1.0
         val goalY = 144.0 - 1.0
 
         val intakeSpeed = 0.5
@@ -126,45 +126,45 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         robotShootPreload = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.startPoseClose),
-                    AutonPositions.Blue(AutonPositions.start24ShootPos),
+                    AutonPositions.Red(AutonPositions.startPoseClose),
+                    AutonPositions.Red(AutonPositions.start24ShootPos),
                 )
             )
 //tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
 //            .setTangentHeadingInterpolation()
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.start24ShootPos).heading)
             .build()
 
         robotIntake1 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.start24ShootPos),
-                    AutonPositions.Blue(AutonPositions.intake1Pos24)
+                    AutonPositions.Red(AutonPositions.start24ShootPos),
+                    AutonPositions.Red(AutonPositions.intake1Pos24)
                 )
             )
 //tc//            .setTimeoutConstraint(delayAfterIntake / 2.0)
 //            .setTangentHeadingInterpolation()
             .addParametricCallback(0.90, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .setConstantHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.intake1Pos24).heading
+                AutonPositions.Red(AutonPositions.intake1Pos24).heading
             )
             .build()
 
         robotFirstLeverOpen = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Blue(AutonPositions.intake1Pos24),
-                    AutonPositions.Blue(AutonPositions.coOpFirstGateOpenControlPos),
-                    AutonPositions.Blue(AutonPositions.coOpFirstStartGateOpen),
+                    AutonPositions.Red(AutonPositions.intake1Pos24),
+                    AutonPositions.Red(AutonPositions.coOpFirstGateOpenControlPos),
+                    AutonPositions.Red(AutonPositions.coOpFirstStartGateOpen),
                 )
             )
             .setLinearHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.intake1Pos24).heading,
-                AutonPositions.Blue(AutonPositions.coOpFirstStartGateOpen).heading,
+                AutonPositions.Red(AutonPositions.intake1Pos24).heading,
+                AutonPositions.Red(AutonPositions.coOpFirstStartGateOpen).heading,
                 0.5
             )
             .setConstantHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.coOpFirstStartGateOpen).heading
+                AutonPositions.Red(AutonPositions.coOpFirstStartGateOpen).heading
             )
             .build()
 
@@ -172,8 +172,8 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         robotGoToShoot1 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.coOpFirstStartGateOpen),
-                    AutonPositions.Blue(AutonPositions.shootPoseClose)
+                    AutonPositions.Red(AutonPositions.coOpFirstStartGateOpen),
+                    AutonPositions.Red(AutonPositions.shootPoseClose)
                 )
             )
 //tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
@@ -186,33 +186,33 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         robotIntake2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.coOpStartGateOpenControlPos),
-                    AutonPositions.Blue(AutonPositions.coOpStartGateOpen)
+                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Red(AutonPositions.coOpStartGateOpenControlPos),
+                    AutonPositions.Red(AutonPositions.coOpStartGateOpen)
                 )
             )
             .addParametricCallback(0.80, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .setLinearHeadingInterpolation(
-                AutonPositions.Blue(Math.toRadians(210.0)),
-                AutonPositions.Blue(Math.toRadians(180.0)),
+                AutonPositions.Red(Math.toRadians(210.0)),
+                AutonPositions.Red(Math.toRadians(180.0)),
                 0.9
             )
 //tc//            .setTimeoutConstraint(delayAfterIntake / 2.0)
 //            .setConstantHeadingInterpolation(
-//                AutonPositions.Blue(AutonPositions.coOpStartGateOpen).heading
+//                AutonPositions.Red(AutonPositions.coOpStartGateOpen).heading
 //            )
             .build()
 
         shootDirectToGate = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.coOpStartGateOpen)
+                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Red(AutonPositions.coOpStartGateOpen)
                 )
             )
 //            .addParametricCallback(0.80, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .setConstantHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.coOpStartGateOpen).heading
+                AutonPositions.Red(AutonPositions.coOpStartGateOpen).heading
             )
             .build()
 
@@ -220,49 +220,49 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         robotGoToShoot2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.coOpStartGateOpen),
-                    AutonPositions.Blue(AutonPositions.shootPoseClose)
+                    AutonPositions.Red(AutonPositions.coOpStartGateOpen),
+                    AutonPositions.Red(AutonPositions.shootPoseClose)
                 )
             )
 //tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
             .setConstantHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.coOpStartGateOpen).heading
+                AutonPositions.Red(AutonPositions.coOpStartGateOpen).heading
             )
             .build()
 
         gateToCommon = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Blue(AutonPositions.coOpStartGateOpen),
-                    AutonPositions.Blue(AutonPositions.coOpGateToCommonControlPos),
-                    AutonPositions.Blue(AutonPositions.commonIntakePos)
+                    AutonPositions.Red(AutonPositions.coOpStartGateOpen),
+                    AutonPositions.Red(AutonPositions.coOpGateToCommonControlPos),
+                    AutonPositions.Red(AutonPositions.commonIntakePos)
                 )
             )
             .addParametricCallback(0.90, IntakeCommand)
 //tc//            .setTimeoutConstraint(delayAfterIntake / 2.0)
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.coOpStartGateOpen).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.coOpStartGateOpen).heading)
             .build()
 
         //3rd Intake
 //        robotCommonIntake = PedroComponent.follower.pathBuilder()
 //            .addPath(
 //                BezierCurve(
-//                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-//                    AutonPositions.Blue(AutonPositions.CoOpCommonIntakeControlPos1),
-//                    AutonPositions.Blue(AutonPositions.CoOpCommonIntakeControlPos2),
-//                    AutonPositions.Blue(AutonPositions.CoOpCommonIntake)
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                    AutonPositions.Red(AutonPositions.CoOpCommonIntakeControlPos1),
+//                    AutonPositions.Red(AutonPositions.CoOpCommonIntakeControlPos2),
+//                    AutonPositions.Red(AutonPositions.CoOpCommonIntake)
 //                )
 //            )
 //            .addParametricCallback(0.90, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
-//            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.CoOpCommonIntake).heading)
+//            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.CoOpCommonIntake).heading)
 //            .build()
 
         //3rd Go Shoot
         robotCommonGoShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.CoOpCommonIntake),
-                    AutonPositions.Blue(AutonPositions.shootPoseClose)
+                    AutonPositions.Red(AutonPositions.CoOpCommonIntake),
+                    AutonPositions.Red(AutonPositions.shootPoseClose)
                 )
             )
 //tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
@@ -274,9 +274,9 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         robotFinalCommonIntake = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.CoOpFinalCommonControl),
-                    AutonPositions.Blue(AutonPositions.CoOpFinalCommonIntake),
+                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Red(AutonPositions.CoOpFinalCommonControl),
+                    AutonPositions.Red(AutonPositions.CoOpFinalCommonIntake),
                 )
             )
 //tc//            .setTimeoutConstraint(delayAfterIntake / 2.0)
@@ -287,14 +287,14 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         robotFinalCommonGoShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Blue(AutonPositions.CoOpFinalCommonIntake),
-                    AutonPositions.Blue(AutonPositions.CoOpFinalCommonControl),
-                    AutonPositions.Blue(AutonPositions.shootPoseClose)
+                    AutonPositions.Red(AutonPositions.CoOpFinalCommonIntake),
+                    AutonPositions.Red(AutonPositions.CoOpFinalCommonControl),
+                    AutonPositions.Red(AutonPositions.shootPoseClose)
                 )
             )
 //tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
             .setConstantHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.CoOpFinalCommonIntake.heading)
+                AutonPositions.Red(AutonPositions.CoOpFinalCommonIntake.heading)
             )
             .build()
 
@@ -302,13 +302,13 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         robotPark = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.autonParkPose)
+                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Red(AutonPositions.autonParkPose)
                 )
             )
 //tc//            .setTimeoutConstraint(0.0)
             .setConstantHeadingInterpolation(
-                AutonPositions.Blue(
+                AutonPositions.Red(
                     AutonPositions.autonParkPose.heading
                 )
             )
@@ -570,7 +570,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 //        MagServoSubsystem.stop()
         MagblockServoSubsystem.block()
 
-        PedroComponent.follower.setStartingPose(AutonPositions.Blue(AutonPositions.startPoseClose))
+        PedroComponent.follower.setStartingPose(AutonPositions.Red(AutonPositions.startPoseClose))
     }
 
     /** This method is called continuously after Init while waiting for "play".  */

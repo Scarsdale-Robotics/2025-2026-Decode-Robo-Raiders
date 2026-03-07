@@ -494,6 +494,16 @@ open class TeleOpBase(
                 ofsX -= 1;
             }
         }
+
+        // reset trims
+        Gamepads.gamepad2.rightStickButton whenBecomesTrue {
+            ofsX = 0.0;
+            ofsY = 0.0;
+            phiTrim = 0.0.rad;
+            veloTrim = 0;
+            hoodTrim = 0.0.deg;
+            gamepad2.rumble(500);
+        }
     }
 
     var lastRuntime = 0.0

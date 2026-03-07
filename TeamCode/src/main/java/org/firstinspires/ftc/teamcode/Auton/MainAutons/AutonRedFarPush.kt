@@ -152,6 +152,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.shootPoseClose),
                 )
             )
+//tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
             .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(270.0)))
             .build()
         closeToL2 = PedroComponent.follower.pathBuilder()
@@ -162,6 +163,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.L2IntakePose),
                 )
             )
+//tc//            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.66, IntakeCommand)
             .addParametricCallback(0.71, IntakeAfterCommand)
             .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(180.0)))
@@ -173,6 +175,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.shootPoseClose)
                 )
             )
+//tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
 //            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
@@ -210,6 +213,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.shootPoseClose)
                 )
             )
+//tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
@@ -222,6 +226,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.L1IntakePose),
                 )
             )
+//tc//            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.5, IntakeCommand)
             .addParametricCallback(0.535, IntakeAfterCommand)
             .setTangentHeadingInterpolation()
@@ -233,6 +238,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.shootPoseClose),
                 )
             )
+//tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
 //            .addParametricCallback(0.0, maxPower)
             .setLinearHeadingInterpolation(
                 AutonPositions.Red(AutonPositions.L1IntakePose).heading,
@@ -250,6 +256,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.L3IntakePose),
                 )
             )
+//tc//            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.63, IntakeCommand)
             .addParametricCallback(0.7, IntakeAfterCommand)
             .setTangentHeadingInterpolation()
@@ -261,6 +268,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.shootPoseClose),
                 )
             )
+//tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
 //            .addParametricCallback(0.0, maxPower)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
@@ -274,6 +282,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.HPZPose),
                 )
             )
+//tc//            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.86, IntakeCommand)
             .setTangentHeadingInterpolation()
             .build()
@@ -285,6 +294,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.shootPoseClose),
                 )
             )
+//tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
@@ -296,6 +306,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
                     AutonPositions.Red(AutonPositions.pApark),
                 )
             )
+//tc//            .setTimeoutConstraint(0.0)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
