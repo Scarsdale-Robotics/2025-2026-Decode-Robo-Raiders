@@ -602,7 +602,7 @@ open class TeleOpBase(
                             if (y < BORD_Y)
                                 distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                             else
-                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) + 2.5.deg
+                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) + 2.0.deg
                     ) + hoodTrim
                 },
             )()
