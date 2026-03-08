@@ -84,8 +84,8 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         val delayStartup = 2.0;
         val delayFarShoot = 0.8;
         val delayAtGate = 0.01;
-        val delayPreShoot = 0.79;
-        val delayCloseShoot = 0.35;
+        val delayPreShoot = 0.8;
+        val delayCloseShoot = 0.41;
         val delayAfterIntake = 0.0;
         val delayAfterGate = 0.75
         val delayInIntake = 0.4;
@@ -130,6 +130,12 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
 
     private var parkPath: PathChain? = null
 
+//    private val LOW_BRAKING = 0.6;
+//    private val HIGH_BRAKING = 0.8;
+
+    private val LOW_BRAKING = 0.75;
+    private val HIGH_BRAKING = 0.75;
+
     ////////////////////
     ////Path Builder////
     ////////////////////
@@ -138,86 +144,93 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         pushPath = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Red(AutonPositions.startPoseFarPush),
-                    AutonPositions.Red(AutonPositions.postPushPose),
+                    AutonPositions.Blue(AutonPositions.startPoseFarPush),
+                    AutonPositions.Blue(AutonPositions.postPushPose),
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(270.0)))
+            .setBrakingStrength(HIGH_BRAKING)
+            .setConstantHeadingInterpolation(AutonPositions.Blue(Math.toRadians(270.0)))
             .build()
         pushToClose = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Red(AutonPositions.postPushPose),
-                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.postPushPose),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
+            .setBrakingStrength(LOW_BRAKING)
 //            .addParametricCallback(0.75, intakePower)
 //            .addParametricCallback(0.98, maxPower)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
-            .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(270.0)))
+            .setConstantHeadingInterpolation(AutonPositions.Blue(Math.toRadians(270.0)))
             .build()
         closeToL2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Red(AutonPositions.shootPoseClose),
-                    AutonPositions.Red(AutonPositions.L2IntakeControlPose),
-                    AutonPositions.Red(AutonPositions.L2IntakePose),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.L2IntakeControlPose),
+                    AutonPositions.Blue(AutonPositions.L2IntakePose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
 ////            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.66, IntakeCommand)
             .addParametricCallback(0.71, IntakeAfterCommand)
-            .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(180.0)))
+            .setConstantHeadingInterpolation(AutonPositions.Blue(Math.toRadians(180.0)))
             .build()
         L2Shoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Red(AutonPositions.L2IntakePose),
-                    AutonPositions.Red(AutonPositions.shootPoseClose)
+                    AutonPositions.Blue(AutonPositions.L2IntakePose),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
+            .setBrakingStrength(LOW_BRAKING)
 //            .addParametricCallback(0.75, intakePower)
 //            .addParametricCallback(0.98, maxPower)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
 //            .addParametricCallback(0.0, maxPower)
-            .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(215.0)))
+            .setConstantHeadingInterpolation(AutonPositions.Blue(Math.toRadians(215.0)))
             .build()
         closeToGate = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Red(AutonPositions.shootPoseClose),
-                    AutonPositions.Red(AutonPositions.gateOpenControlPos),
-                    AutonPositions.Red(AutonPositions.gateOpenPose)
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.gateOpenControlPos),
+                    AutonPositions.Blue(AutonPositions.gateOpenPose)
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
             .addParametricCallback(0.75, intakePower)
             .addParametricCallback(0.98, maxPower)
             .setLinearHeadingInterpolation(
-                AutonPositions.Red(AutonPositions.shootPoseClose).heading,
-                AutonPositions.Red(AutonPositions.gateOpenPose).heading,
+                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
+                AutonPositions.Blue(AutonPositions.gateOpenPose).heading,
                 0.9
             )
             .build()
         gateToAfter = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Red(AutonPositions.gateOpenPose),
-                    AutonPositions.Red(AutonPositions.gateToShootControlPos),
-                    AutonPositions.Red(AutonPositions.gateAfterOpenPose),
+                    AutonPositions.Blue(AutonPositions.gateOpenPose),
+                    AutonPositions.Blue(AutonPositions.gateToShootControlPos),
+                    AutonPositions.Blue(AutonPositions.gateAfterOpenPose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
             .addParametricCallback(0.05, IntakeAfterCommand)
             .addParametricCallback(0.75, IntakeCommand)
-            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.gateAfterOpenPose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.gateAfterOpenPose).heading)
             .build()
         gateToShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Red(AutonPositions.gateAfterOpenPose),
-                    AutonPositions.Red(AutonPositions.gateToShootControlPos),
-                    AutonPositions.Red(AutonPositions.shootPoseClose)
+                    AutonPositions.Blue(AutonPositions.gateAfterOpenPose),
+                    AutonPositions.Blue(AutonPositions.gateToShootControlPos),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
 //            .addParametricCallback(0.75, intakePower)
 //            .addParametricCallback(0.98, maxPower)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
@@ -228,11 +241,12 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         closeToL1 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Red(AutonPositions.shootPoseClose),
-                    AutonPositions.Red(AutonPositions.L1IntakeControlPose),
-                    AutonPositions.Red(AutonPositions.L1IntakePose),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.L1IntakeControlPose),
+                    AutonPositions.Blue(AutonPositions.L1IntakePose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
 ////            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.5, IntakeCommand)
             .addParametricCallback(0.535, IntakeAfterCommand)
@@ -241,28 +255,30 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         L1Shoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Red(AutonPositions.L1IntakePose),
-                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.L1IntakePose),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
+            .setBrakingStrength(LOW_BRAKING)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
 //            .addParametricCallback(0.0, maxPower)
             .setLinearHeadingInterpolation(
-                AutonPositions.Red(AutonPositions.L1IntakePose).heading,
-                AutonPositions.Red(AutonPositions.shootPoseClose).heading,
+                AutonPositions.Blue(AutonPositions.L1IntakePose).heading,
+                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
             )
 //            .addParametricCallback(0.75, intakePower)
 //            .addParametricCallback(0.98, maxPower)
-            .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(215.0)))
+            .setConstantHeadingInterpolation(AutonPositions.Blue(Math.toRadians(215.0)))
             .build()
         closeToL3 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Red(AutonPositions.shootPoseClose),
-                    AutonPositions.Red(AutonPositions.L3IntakeControlPose),
-                    AutonPositions.Red(AutonPositions.L3IntakePose),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.L3IntakeControlPose),
+                    AutonPositions.Blue(AutonPositions.L3IntakePose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
 ////            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.63, IntakeCommand)
             .addParametricCallback(0.7, IntakeAfterCommand)
@@ -271,10 +287,11 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         L3Shoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Red(AutonPositions.L3IntakePose),
-                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.L3IntakePose),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
+            .setBrakingStrength(LOW_BRAKING)
 //            .addParametricCallback(0.85, intakePower)
 //            .addParametricCallback(0.98, maxPower)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
@@ -286,11 +303,12 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         closeToHPZ = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Red(AutonPositions.shootPoseClose),
-                    AutonPositions.Red(AutonPositions.HPZControlPose),
-                    AutonPositions.Red(AutonPositions.HPZPose),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.HPZControlPose),
+                    AutonPositions.Blue(AutonPositions.HPZPose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
 ////            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.86, IntakeCommand)
             .setTangentHeadingInterpolation()
@@ -298,11 +316,12 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         HPZShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    AutonPositions.Red(AutonPositions.HPZPose),
-                    AutonPositions.Red(AutonPositions.HPZControlPose),
-                    AutonPositions.Red(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.HPZPose),
+                    AutonPositions.Blue(AutonPositions.HPZControlPose),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
+            .setBrakingStrength(LOW_BRAKING)
 //            .addParametricCallback(0.75, intakePower)
 //            .addParametricCallback(0.98, maxPower)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
@@ -313,10 +332,11 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         parkPath = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Red(AutonPositions.shootPoseClose),
-                    AutonPositions.Red(AutonPositions.pApark),
+                    AutonPositions.Blue(AutonPositions.shootPoseClose),
+                    AutonPositions.Blue(AutonPositions.pApark),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
             .setTimeoutConstraint(0.0)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
@@ -551,7 +571,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
 //        follower = Constants.createFollower(hardwareMap)
 
         PedroComponent.follower.setStartingPose(
-            AutonPositions.Red(AutonPositions.startPoseFarPush)
+            AutonPositions.Blue(AutonPositions.startPoseFarPush)
         )
     }
 

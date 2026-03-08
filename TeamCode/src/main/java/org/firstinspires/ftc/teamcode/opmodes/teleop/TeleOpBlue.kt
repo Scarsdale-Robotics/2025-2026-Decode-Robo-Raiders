@@ -14,8 +14,8 @@ import kotlin.math.pow
 @TeleOp(name = "[BLUE] Tele Op")
 class TeleOpBlue : TeleOpBase(
     isBlue = true,
-    goalX = 2.2,
-    goalY = 144.0 - 2.2,
+    goalX = 3.0,
+    goalY = 144.0 - 5.0,
     resetModeParams = ResetModeParams(17.1887, 115.3623, 270.0.deg),
     resetModePhiAngle = (-180.0).deg,
     distanceToVelocityClose = { d -> AutoAimConstants.distanceToVelocityClose(d) },

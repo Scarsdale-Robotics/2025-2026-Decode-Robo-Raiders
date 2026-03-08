@@ -130,6 +130,12 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
 
     private var parkPath: PathChain? = null
 
+//    private val LOW_BRAKING = 0.6;
+//    private val HIGH_BRAKING = 0.8;
+
+    private val LOW_BRAKING = 0.75;
+    private val HIGH_BRAKING = 0.75;
+
     ////////////////////
     ////Path Builder////
     ////////////////////
@@ -142,6 +148,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.postPushPose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
             .setConstantHeadingInterpolation(AutonPositions.Blue(Math.toRadians(270.0)))
             .build()
         pushToClose = PedroComponent.follower.pathBuilder()
@@ -151,6 +158,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
+            .setBrakingStrength(LOW_BRAKING)
 //            .addParametricCallback(0.75, intakePower)
 //            .addParametricCallback(0.98, maxPower)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
@@ -164,6 +172,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.L2IntakePose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
 ////            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.66, IntakeCommand)
             .addParametricCallback(0.71, IntakeAfterCommand)
@@ -176,6 +185,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
+            .setBrakingStrength(LOW_BRAKING)
 //            .addParametricCallback(0.75, intakePower)
 //            .addParametricCallback(0.98, maxPower)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
@@ -190,6 +200,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.gateOpenPose)
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
             .addParametricCallback(0.75, intakePower)
             .addParametricCallback(0.98, maxPower)
             .setLinearHeadingInterpolation(
@@ -206,6 +217,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.gateAfterOpenPose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
             .addParametricCallback(0.05, IntakeAfterCommand)
             .addParametricCallback(0.75, IntakeCommand)
             .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.gateAfterOpenPose).heading)
@@ -218,6 +230,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
 //            .addParametricCallback(0.75, intakePower)
 //            .addParametricCallback(0.98, maxPower)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
@@ -233,6 +246,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.L1IntakePose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
 ////            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.5, IntakeCommand)
             .addParametricCallback(0.535, IntakeAfterCommand)
@@ -245,6 +259,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
+            .setBrakingStrength(LOW_BRAKING)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
 //            .addParametricCallback(0.0, maxPower)
             .setLinearHeadingInterpolation(
@@ -263,6 +278,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.L3IntakePose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
 ////            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.63, IntakeCommand)
             .addParametricCallback(0.7, IntakeAfterCommand)
@@ -275,6 +291,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
+            .setBrakingStrength(LOW_BRAKING)
 //            .addParametricCallback(0.85, intakePower)
 //            .addParametricCallback(0.98, maxPower)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
@@ -291,6 +308,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.HPZPose),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
 ////            .setTimeoutConstraint(delayAfterIntake / 2.0)
             .addParametricCallback(0.86, IntakeCommand)
             .setTangentHeadingInterpolation()
@@ -303,6 +321,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
                 )
             )
+            .setBrakingStrength(LOW_BRAKING)
 //            .addParametricCallback(0.75, intakePower)
 //            .addParametricCallback(0.98, maxPower)
 //            .setTimeoutConstraint(delayPreShoot / 2.0)
@@ -317,6 +336,7 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     AutonPositions.Blue(AutonPositions.pApark),
                 )
             )
+            .setBrakingStrength(HIGH_BRAKING)
             .setTimeoutConstraint(0.0)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()

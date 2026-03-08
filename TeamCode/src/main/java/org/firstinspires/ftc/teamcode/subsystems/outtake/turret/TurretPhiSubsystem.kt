@@ -183,7 +183,7 @@ object TurretPhiSubsystem : Subsystem {
         val error = abs(controller.goal.position - controller.lastMeasurement.position)
         if (error < 2.0) {
             power = 0.0
-        } else if (error < 150.0) {
+        } else if (error < 111.111) {
             power = secondaryController.calculate(
                 motor.state
             )

@@ -64,10 +64,10 @@ open class TeleOpBase(
     private val distanceToTimeFar: (Double) -> Double
 ): NextFTCOpMode() {
 
-    private val lfw = MotorEx("lfw").reversed();
-    private val lbw = MotorEx("lbw").reversed();
-    private val rfw = MotorEx("rfw");
-    private val rbw = MotorEx("rbw");
+//    private val lfw = MotorEx("lfw").reversed();
+//    private val lbw = MotorEx("lbw").reversed();
+//    private val rfw = MotorEx("rfw");
+//    private val rbw = MotorEx("rbw");
 
 //    private var odom: OdometrySubsystem? = null;
     val x:  Double get() { return (PedroComponent.follower.pose.x + ofsX);}
