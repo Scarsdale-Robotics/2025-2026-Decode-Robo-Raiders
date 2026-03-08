@@ -20,19 +20,19 @@ object AutonPositions {
     val startPoseFarPush = Pose(63.714, 10.7, Math.toRadians(270.0))
     val postPushPose = Pose(50.0, 14.0, Math.toRadians(270.0))
 
-    val L2IntakePose = Pose(22.0, 60.8, Math.toRadians(180.0))
-    val L2IntakeControlPose = Pose(58.0, 65.3)
+    val L2IntakePose = Pose(23.67, 60.8-4.0, Math.toRadians(180.0))
+    val L2IntakeControlPose = Pose(58.0, 65.3-4.0)
 
     val L1IntakePose = Pose(22.0, 84.3, Math.toRadians(180.0))
     val L1IntakeControlPose = Pose(42.6, 84.2)
 
-    val L3IntakePose = Pose(22.0, 35.7, Math.toRadians(180.0))
+    val L3IntakePose = Pose(21.0, 35.7, Math.toRadians(180.0))
     val L3IntakeControlPose = Pose(50.5, 38.8)
 
     val HPZPose = Pose(13.8, 13.6, Math.toRadians(263.0))
     val HPZControlPose = Pose(14.4, 45.6)
 
-    val pApark = Pose(52.5, 71.8)
+    val pApark = Pose(52.5, 65.8)
 
     //====24 Specific Positions====
     val start24ShootPos = Pose(24.9, 105.6, Math.toRadians(270.0))
@@ -47,7 +47,7 @@ object AutonPositions {
     val coOpFirstStartGateOpen = Pose(20.2, 76.4, Math.toRadians(180.0))
     val coOpFirstGateOpenControlPos = Pose(27.1, 77.11, Math.toRadians(180.0))
     val coOpStartGateOpen = Pose(20.2, 64.1, Math.toRadians(180.0))
-    val coOpStartGateOpenControlPos = Pose(40.91428571428572, 58.28571428571429)
+    val coOpStartGateOpenControlPos = Pose(40.914, 58.286)
     val coOpGateToCommonControlPos = Pose(40.0, 53.7)
 
     val CoOpCommonIntakeControlPos1 = Pose(-40.0, 85.0)
@@ -56,24 +56,27 @@ object AutonPositions {
 //    val CoOpCommonIntakeControlPos1 = Pose(40.0, 53.7)
 //    val CoOpCommonIntakeControlPos2 = Pose(82.0, 32.0)
     val CoOpCommonIntake = Pose(15.0, 52.0, Math.toRadians(180.0)) // Intake Pos1
-    val CoOpFinalCommonControl = Pose(32.976716937561065, 56.13756877672464);
+    val CoOpFinalCommonControl = Pose(32.977, 56.138);
     val CoOpFinalCommonIntake = Pose(15.0, 56.0, Math.toRadians(180.0))
-    val CoOpFinalCommonToShootControl = Pose(39.714285714285715, 65.78571428571428)
+    val CoOpFinalCommonToShootControl = Pose(39.714, 65.786)
     //======CoOp Positions END=======
 
     val shootPoseClose =
-        Pose(56.2, 93.0, Math.toRadians(188.0)) // Close Shoot Pose of our robot.
+        Pose(56.2, 93.0, Math.toRadians(210.0)) // Close Shoot Pose of our robot.
     val shootPoseFar =
         Pose(51.7, 15.9, Math.toRadians(180.0)) // Far Shoot Pose of our robot.
     val gateOpenPose =
-        Pose(15.1, 58.2, Math.toRadians(150.0)) // Gate Open Pose of our robot.
+        Pose(14.8, 56.2, Math.toRadians(150.0)) // Gate Open Pose of our robot.
+
+    val gateToShootControlPos =
+        Pose(39.071, 69.029)
 //    val altGateOpenPose =
 //        Pose(21.0, 54.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
     val gateOpenControlPos =
         Pose(56.7, 51.2)
     val gateOpenPoseFromFar =
         Pose(21.1, 58.0, Math.toRadians(140.0)) // Gate Open Pose of our robot.
-    val gateAfterOpenPose = Pose(17.1, 54.5, Math.toRadians(140.0)) // Gate After Open Pose of our robot.
+    val gateAfterOpenPose = Pose(14.8, 52.25, Math.toRadians(140.0)) // Gate After Open Pose of our robot.
     val altAfterOpenPose = Pose(18.0, 54.4, Math.toRadians(180.0)) // Gate After Open Pose of our robot.
     val altAfterOpenControlPose = Pose(28.4, 57.7)
 //=======
@@ -85,7 +88,7 @@ object AutonPositions {
     val commonIntakePos = Pose(14.0, 10.9, Math.toRadians(180.0))
     val commonIntakeControlPos = Pose(54.8, 36.7)
 
-    val autonParkPose = Pose(43.42857142857144, 80.88571428571427, Math.toRadians(225.0))
+    val autonParkPose = Pose(43.429, 80.886, Math.toRadians(225.0))
 
     // Non-constant positions
     val intake3Pos = Pose(21.4, 36.0, Math.toRadians(180.0)) // Intake Pos1

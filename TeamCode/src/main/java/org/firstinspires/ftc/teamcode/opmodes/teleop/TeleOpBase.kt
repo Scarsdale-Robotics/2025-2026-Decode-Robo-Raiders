@@ -176,8 +176,8 @@ open class TeleOpBase(
 //        )
         // FIELD CENTRIC:
         driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (gamepad1.left_stick_x > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
-            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (gamepad1.left_stick_y > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
+            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (abs(gamepad1.left_stick_x) > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
+            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (abs(gamepad1.left_stick_y) > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
             -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
             false
         )
@@ -634,7 +634,7 @@ open class TeleOpBase(
             "distanceToGoal",
             hypot((goalX - x), (goalY - y))
         );
-        telemetry.addData("ShooterSpeed", speed1);
+        telemetry.addData("ShooterSpeed", ShooterSubsystem.velocity);
         telemetry.addData("Angle", shootAngleDegrees.deg);
         telemetry.update()
 
