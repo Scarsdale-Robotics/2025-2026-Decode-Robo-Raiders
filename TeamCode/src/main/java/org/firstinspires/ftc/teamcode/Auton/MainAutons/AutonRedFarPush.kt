@@ -133,8 +133,8 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
 //    private val LOW_BRAKING = 0.6;
 //    private val HIGH_BRAKING = 0.8;
 
-    private val LOW_BRAKING = 0.75;
-    private val HIGH_BRAKING = 0.75;
+    private val LOW_BRAKING = 0.75;  // <= HIGH_BRAKING
+    private val HIGH_BRAKING = 0.75;  // >= LOW_BRAKING
 
     ////////////////////
     ////Path Builder////
@@ -573,6 +573,8 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         PedroComponent.follower.setStartingPose(
             AutonPositions.Blue(AutonPositions.startPoseFarPush)
         )
+
+        TurretPhiSubsystem.zero();
     }
 
     /** This method is called continuously after Init while waiting for "play".  */

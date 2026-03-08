@@ -573,6 +573,8 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         PedroComponent.follower.setStartingPose(
             AutonPositions.Blue(AutonPositions.startPoseFarPush)
         )
+
+        TurretPhiSubsystem.zero();
     }
 
     /** This method is called continuously after Init while waiting for "play".  */

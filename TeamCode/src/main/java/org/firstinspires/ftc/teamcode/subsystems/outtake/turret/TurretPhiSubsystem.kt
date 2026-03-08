@@ -38,14 +38,20 @@ object TurretPhiSubsystem : Subsystem {
     @JvmField var ENCODERS_FORWARD = 1254.63342295;
     @JvmField var ENCODERS_BACKWARD = 0.0;  // todo: TUNE
 
+    var started = false;
+
     private val controller: ControlSystem;
     private val secondaryController: ControlSystem;
 
     @JvmField var squidCoefficients = PIDCoefficients(0.002, 0.0, 0.00002);
-    @JvmField var secondarySquidCoefficients = PIDCoefficients(0.0005, 0.0, 0.00002);
+    @JvmField var secondarySquidCoefficients = PIDCoefficients(0.0007, 0.0, 0.00002);
 
 //    @JvmField var Ls = 0.0;
 //    @JvmField var Lv = 0.0;
+
+    fun zero() {
+        motor.zero()
+    }
 
     init {
 //        val posSMO = SMOFilter(FeedbackType.POSITION, Lv, Ls);
@@ -55,17 +61,16 @@ object TurretPhiSubsystem : Subsystem {
             .posSquID(squidCoefficients)
             .build();
 
-        controller.goal = KineticState()
-
         secondaryController = ControlSystem()
 //            .posFilter { filter -> filter.custom(posSMO).build(); }
             .posSquID(secondarySquidCoefficients)
             .build();
-
-        secondaryController.goal = KineticState()
     }
 
     override fun initialize() {
+        controller.goal = KineticState()
+        secondaryController.goal = KineticState()
+        started = true;
     }
 
     fun reset() {
@@ -176,6 +181,7 @@ object TurretPhiSubsystem : Subsystem {
     }
 
     override fun periodic() {
+        if (!started) return;
         secondaryController.goal = controller.goal
         var power = controller.calculate(
             motor.state

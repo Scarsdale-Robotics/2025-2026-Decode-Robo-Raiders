@@ -570,6 +570,8 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 //        MagServoSubsystem.stop()
         MagblockServoSubsystem.block()
 
+        TurretPhiSubsystem.zero();
+
         PedroComponent.follower.setStartingPose(AutonPositions.Blue(AutonPositions.startPoseClose))
     }
 
