@@ -72,16 +72,16 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 
     companion object {
         val delayStartShoot: Double = 0.4
-        val DelayBeforeShoot: Double = 0.4
-        val delayAfterEachShoot: Double = 0.35 //currently at a really high #
+        val DelayBeforeShoot: Double = 0.8
+        val delayAfterEachShoot: Double = 0.45 //currently at a really high #
         val DelayForPartnerBot: Double = 0.0
-        val DelayInIntake: Double = 0.4
-        val delayAtGate: Double = 0.3
+        val DelayInIntake: Double = 0.45
+        val delayAtGate: Double = 0.67
 
-        val goalX = 1.0
-        val goalY = 144.0 - 1.0
+        val goalX = 2.0
+        val goalY = 144.0 - 4.0
 
-        val intakeSpeed = 0.5
+        val intakeSpeed = 0.8
 //        var directionGoalX = 4.0;
 //        var directionGoalY = 144.0-4.0;
     }
@@ -145,8 +145,10 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 //tc//            .setTimeoutConstraint(delayAfterIntake / 2.0)
 //            .setTangentHeadingInterpolation()
             .addParametricCallback(0.90, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
-            .setConstantHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.intake1Pos24).heading
+            .setLinearHeadingInterpolation(
+                AutonPositions.Blue(AutonPositions.start24ShootPos).heading,
+                AutonPositions.Blue(AutonPositions.intake1Pos24).heading,
+                0.9
             )
             .build()
 
@@ -176,6 +178,8 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
+            .addParametricCallback(0.0, IntakeAfterCommand)
+            .addParametricCallback(0.5, TravelCommand)
 //tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
@@ -191,7 +195,8 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.coOpStartGateOpen)
                 )
             )
-            .addParametricCallback(0.80, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.6, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.95, IntakeAfterCommand)
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(Math.toRadians(210.0)),
                 AutonPositions.Blue(Math.toRadians(180.0)),
@@ -226,7 +231,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
             )
 //tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
             .setConstantHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.coOpStartGateOpen).heading
+                AutonPositions.Blue(AutonPositions.shootPoseClose).heading
             )
             .build()
 
@@ -235,7 +240,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 BezierCurve(
                     AutonPositions.Blue(AutonPositions.coOpStartGateOpen),
                     AutonPositions.Blue(AutonPositions.coOpGateToCommonControlPos),
-                    AutonPositions.Blue(AutonPositions.commonIntakePos)
+                    AutonPositions.Blue(AutonPositions.CoOpCommonIntake)
                 )
             )
             .addParametricCallback(0.90, IntakeCommand)
@@ -266,8 +271,8 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 )
             )
 //tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
-            .setHeadingInterpolation(
-                HeadingInterpolator.tangent.reverse()
+            .setConstantHeadingInterpolation(
+                AutonPositions.Blue(AutonPositions.shootPoseClose.heading)
             )
             .build()
 
@@ -294,7 +299,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
             )
 //tc//            .setTimeoutConstraint(delayPreShoot / 2.0)
             .setConstantHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.CoOpFinalCommonIntake.heading)
+                AutonPositions.Blue(AutonPositions.shootPoseClose.heading)
             )
             .build()
 
@@ -367,6 +372,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 Delay(delayAfterEachShoot),
                 TravelCommand,
                 FollowPath(robotIntake1!!),
+                Delay(0.5),
 
                 ParallelGroup( //Robot goes back to CLOSE Shoot Position
                     SequentialGroup(
@@ -396,6 +402,8 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
                 TravelCommand,
                 FollowPath(robotIntake2!!), //robot goes to intake
             ),
+
+            Delay(delayAtGate),
 
             ParallelGroup( //Robot goes back to CLOSE Shoot Position
                 SequentialGroup(
@@ -509,17 +517,19 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 
     private var stopShooterAutoAim = false;
     override fun onUpdate() {
-        val dx = AutonBlueFarArtifact.Companion.goalX - PedroComponent.follower.pose.x
-        val dy = AutonBlueFarArtifact.Companion.goalY - PedroComponent.follower.pose.y
+        val dx = goalX - PedroComponent.follower.pose.x
+        val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-        val dxp = dx - PedroComponent.follower.velocity.xComponent * (
-                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
-                else distanceToTimeClose(dxy)
-                )
-        val dyp = dy - PedroComponent.follower.velocity.yComponent * (
-                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
-                else distanceToTimeClose(dxy)
-                )
+        val dxp = dx
+        val dyp = dy
+//        val dxp = dx - PedroComponent.follower.velocity.xComponent * (
+//                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
+//                else distanceToTimeClose(dxy)
+//                )
+//        val dyp = dy - PedroComponent.follower.velocity.yComponent * (
+//                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
+//                else distanceToTimeClose(dxy)
+//                )
         val dxyp = hypot(dxp, dyp)
 
         if (!stopShooterAutoAim) {

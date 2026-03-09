@@ -16,6 +16,10 @@ object AutonPositions {
 
     val startAutonControlPos = Pose(95.3, 58.5)
 
+    val farShootPoseCoOp = Pose(56.9, 12.7, Math.toRadians(180.0));
+    val HPZCoOpPose = Pose(14.0, 9.4, Math.toRadians(180.0));
+    val farParkCoOp = Pose(40.0, 17.1, Math.toRadians(180.0))
+
     //====Push Auton====
     val startPoseFarPush = Pose(63.714, 10.7, Math.toRadians(270.0))
     val postPushPose = Pose(50.0, 14.0, Math.toRadians(270.0))
@@ -23,7 +27,7 @@ object AutonPositions {
     val L2IntakePose = Pose(21.67, 60.8-4.0, Math.toRadians(180.0))
     val L2IntakeControlPose = Pose(58.0, 65.3-4.0)
 
-    val L1IntakePose = Pose(21.0, 84.3, Math.toRadians(180.0))
+    val L1IntakePose = Pose(23.0, 84.3, Math.toRadians(180.0))
     val L1IntakeControlPose = Pose(42.6, 84.2)
 
     val L3IntakePose = Pose(21.0, 35.7, Math.toRadians(180.0))
@@ -36,9 +40,9 @@ object AutonPositions {
 
     //====24 Specific Positions====
     val start24ShootPos = Pose(24.9, 105.6, Math.toRadians(270.0))
-    val intake1Pos24 = Pose(27.7, 90.8, Math.toRadians(270.0))
-    val intake2Pos24 = Pose(27.7, 66.0, Math.toRadians(270.0))
-    val intake3Pos24 = Pose(27.7, 43.3, Math.toRadians(270.0))
+    val intake1Pos24 = Pose(23.7, 90.8, Math.toRadians(270.0))
+    val intake2Pos24 = Pose(23.7, 66.0, Math.toRadians(270.0))
+    val intake3Pos24 = Pose(23.7, 43.3, Math.toRadians(270.0))
     val robotPark24 = Pose(42.8, 10.9, Math.toRadians(180.0))
 
     //====CoOp Specific Positions====
@@ -46,7 +50,7 @@ object AutonPositions {
 
     val coOpFirstStartGateOpen = Pose(20.2, 76.4, Math.toRadians(180.0))
     val coOpFirstGateOpenControlPos = Pose(27.1, 77.11, Math.toRadians(180.0))
-    val coOpStartGateOpen = Pose(20.2, 64.1, Math.toRadians(180.0))
+    val coOpStartGateOpen = Pose(19.0, 68.1, Math.toRadians(180.0))
     val coOpStartGateOpenControlPos = Pose(40.914, 58.286)
     val coOpGateToCommonControlPos = Pose(40.0, 53.7)
 
@@ -55,7 +59,7 @@ object AutonPositions {
 //    val CoOpCommonIntake = Pose(15.0, 36.0, Math.toRadians(180.0)) // Intake Pos1
 //    val CoOpCommonIntakeControlPos1 = Pose(40.0, 53.7)
 //    val CoOpCommonIntakeControlPos2 = Pose(82.0, 32.0)
-    val CoOpCommonIntake = Pose(15.0, 52.0, Math.toRadians(180.0)) // Intake Pos1
+    val CoOpCommonIntake = Pose(12.0, 54.0, Math.toRadians(180.0)) // Intake Pos1
     val CoOpFinalCommonControl = Pose(32.977, 56.138);
     val CoOpFinalCommonIntake = Pose(15.0, 56.0, Math.toRadians(180.0))
     val CoOpFinalCommonToShootControl = Pose(39.714, 65.786)

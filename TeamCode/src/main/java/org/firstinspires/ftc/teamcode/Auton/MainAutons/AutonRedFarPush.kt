@@ -84,7 +84,7 @@ class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         val delayStartup = 2.0;
         val delayFarShoot = 0.8;
         val delayAtGate = 0.01;
-        val delayPreShoot = 0.8;
+        val delayPreShoot = 0.825;
         val delayCloseShoot = 0.41;
         val delayAfterIntake = 0.0;
         val delayAfterGate = 0.75

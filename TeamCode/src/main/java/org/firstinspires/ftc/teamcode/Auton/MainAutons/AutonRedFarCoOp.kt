@@ -2,10 +2,9 @@ package org.firstinspires.ftc.teamcode.Auton.MainAutons
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
-import com.pedropathing.geometry.Pose
+import com.pedropathing.paths.HeadingInterpolator
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
@@ -13,21 +12,19 @@ import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
-import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueFarArtifact.Companion.goalX
-import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueFarArtifact.Companion.goalY
+import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
@@ -36,12 +33,15 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaClose
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaFar
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityClose
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityFar
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
-import kotlin.math.PI
 import kotlin.math.hypot
-import kotlin.math.max
-import kotlin.math.min
 
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
@@ -55,7 +55,7 @@ import kotlin.math.min
 //4th slot = Auton type: Motif, Backup, Shooter, Artifact, CoOp
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__ __Artifact & Auton__ __ CoOp
-@Autonomous(name = "Auton Red Far CoOp", group = "Auton")
+@Autonomous(name = "[CoOp-??] Auton Red Far CoOp", group = "Auton")
 @Configurable
 class AutonRedFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
     //////////////////////
@@ -81,31 +81,20 @@ class AutonRedFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
     ////Constants////
     /////////////////
     companion object {
-        val delayStartShoot: Double = 3.5
-        val DelayBeforeShoot: Double = 0.4
-        val delayAfterEachShoot: Double = 2.0 //currently at a really high #
-        val DelayFromRampIntake: Double = 1.8
-        val DelayInIntake: Double = 1.1
-        val DelayAfterIntake: Double = 0.4
-        val DelayAtLever: Double = 0.05
+        val delayStartup = 2.5;
+        val delayFarShoot = 0.5;
+        val delayAtGate = 0.01;
+        val delayPreShoot = 1.0;
+        val delayCloseShoot = 0.41;
+        val delayAfterIntake = 0.0;
+        val delayAfterGate = 0.75
+        val delayInIntake = 0.5;
 
-        val distanceGoalX = 12
-        val distanceGoalY = 132
-        var directionGoalX = 4.0;
-        var directionGoalY = 144.0-4.0;
-
-    }
-
-    fun blueRedConvertAngle (x : Double): Double {
-        var newAngle = x
-        if (x > 90 && x < 270) {
-            newAngle = 180 - x
-        }
-        else {
-            newAngle = 0 - x
-            newAngle = 180 + newAngle
-        }
-        return newAngle;
+        val goalX = 144.0 - 2.5
+        val goalY = 144.0 - 6.0
+        var pathStarted = false;
+//        var directionGoalX = 4.0;
+//        var directionGoalY = 144.0-4.0;
     }
 
 
@@ -113,268 +102,519 @@ class AutonRedFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
     ////Positions////
     /////////////////
     //Constant positions
-    private val startPose = Pose(144-56.43, 8.503, Math.toRadians(0.0)) // Start Pose of our robot.
-    private val shootPoseClose =
-        Pose(57.0, 76.6, Math.toRadians(0.0)) // Close Shoot Pose of our robot.
-    private val shootPoseFar =
-        Pose(144-57.0, 13.5, Math.toRadians(blueRedConvertAngle(120.0))) // Far Shoot Pose of our robot.
-    private val gateOpenPose =
-        Pose(11.5, 60.48, Math.toRadians(145.0)) // Gate Open Pose of our robot.
-
-    private val commonIntakePos = Pose(144-13.0, 9.7, Math.toRadians(0.0))
-    private val commonIntakeControlPos = Pose(144-54.8, 36.7)
-
-    private val parkPose = Pose(144-35.5, 25.5, Math.toRadians(0.0))
-
-    // Non-constant positions
-    private val intake1Pos = Pose(144-19.0, 40.0) // Intake Pos1
-    private val intake1ControlPos = Pose(144-48.4, 32.0)
-
-    private val intake2Pos = Pose(17.0, 60.0) // Intake Pos2
-    private val intake2ControlPos = Pose(58.9, 51.3)
 
     /////////////
     ////Paths////
     /////////////
     // The different paths the robot will take in during Auton
-    private var robotShootPreload: PathChain? = null //DO NOT NEED
+//    private var pushPath: PathChain? = null
+//
+//    private var pushToClose: PathChain? = null;
+//
+//    private var closeToL2: PathChain? = null
+//    private var L2Shoot: PathChain? = null
+//
+//    private var closeToGate: PathChain? = null
+//    private var gateToAfter: PathChain? = null
+//
+//    private var gateToShoot: PathChain? = null
+//
+//    private var closeToL1: PathChain? = null
+//    private var L1Shoot: PathChain? = null
+//
+//    private var closeToL3: PathChain? = null
+//    private var L3Shoot: PathChain? = null
+//
+//    private var closeToHPZ: PathChain? = null
+//    private var HPZShoot: PathChain? = null
+//
+//    private var parkPath: PathChain? = null
 
-    private var robotIntake1: PathChain? = null
-    private var robotGoToShoot1: PathChain? = null
+//    private val LOW_BRAKING = 0.6;
+//    private val HIGH_BRAKING = 0.8;
 
-    private var robotIntake2: PathChain? = null
-    private var robotGoToShoot2: PathChain? = null
+    private val LOW_BRAKING = 0.75;
+    private val HIGH_BRAKING = 0.75;
 
-    private var robotOpenLeverFromFar: PathChain? = null
-    private var LeverGoShoot: PathChain? = null
-
-    private var robotIntakeCommon: PathChain? = null
-    private var robotGoToShootCommon: PathChain? = null
-    private var robotPark: PathChain? = null
+    private var farToL3: PathChain? = null
+    private var farToHPZ: PathChain? = null;
+    private var L3toFar: PathChain? = null;
+    private var HPZtoFar: PathChain? = null;
+    private var parkPath: PathChain? = null;
 
     ////////////////////
     ////Path Builder////
     ////////////////////
     fun buildPaths() {
-        //1st Intake
-        robotIntake1 = PedroComponent.follower.pathBuilder()
+        farToL3 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
-                    startPose,
-                    intake1ControlPos,
-                    intake1Pos
+                    AutonPositions.Red(AutonPositions.startPoseFarPush),
+                    AutonPositions.Red(AutonPositions.L3IntakeControlPose),
+                    AutonPositions.Red(AutonPositions.L3IntakePose)
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(0.0))
+            .setBrakingStrength(HIGH_BRAKING)
+            .setLinearHeadingInterpolation(
+                AutonPositions.Red(Math.toRadians(270.0)),
+                AutonPositions.Red(Math.toRadians(180.0)),
+                0.5
+            )
+            .addParametricCallback(0.59, IntakeCommand)
+            .addParametricCallback(0.64, IntakeAfterCommand)
             .build()
-        //1st Go Shoot
-        robotGoToShoot1 = PedroComponent.follower.pathBuilder()
+        L3toFar = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    intake1Pos,
-                    shootPoseFar
+                    AutonPositions.Red(AutonPositions.L3IntakePose),
+                    AutonPositions.Red(AutonPositions.farShootPoseCoOp)
                 )
             )
-            .setConstantHeadingInterpolation(shootPoseFar.heading)
-            .build()
-        //2nd Intake
-        robotIntake2 = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierCurve(
-                    shootPoseFar,
-                    intake2ControlPos,
-                    intake2Pos
-                )
+            .setBrakingStrength(LOW_BRAKING)
+            .setLinearHeadingInterpolation(
+                AutonPositions.Red(Math.toRadians(180.0)),
+                AutonPositions.Red(Math.toRadians(215.0))
             )
-            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
-        //2nd Go Shoot
-        robotGoToShoot2 = PedroComponent.follower.pathBuilder()
+        farToHPZ = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    intake2Pos,
-                    shootPoseFar
+                    AutonPositions.Red(AutonPositions.farShootPoseCoOp),
+                    AutonPositions.Red(AutonPositions.commonIntakePos)
                 )
             )
-            .setConstantHeadingInterpolation(shootPoseFar.heading)
+            .addParametricCallback(0.64, IntakeAfterCommand)
+            .setBrakingStrength(HIGH_BRAKING)
+            .setLinearHeadingInterpolation(
+                AutonPositions.Red(Math.toRadians(215.0)),
+                AutonPositions.Red(Math.toRadians(180.0))
+            )
             .build()
-        //1st Go to Gate
-        robotOpenLeverFromFar = PedroComponent.follower.pathBuilder()
+        HPZtoFar = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    shootPoseFar,
-                    gateOpenPose
+                    AutonPositions.Red(AutonPositions.commonIntakePos),
+                    AutonPositions.Red(AutonPositions.farShootPoseCoOp)
                 )
             )
-            .setConstantHeadingInterpolation(gateOpenPose.heading)
+            .setBrakingStrength(HIGH_BRAKING)
+            .setLinearHeadingInterpolation(
+                AutonPositions.Red(Math.toRadians(180.0)),
+                AutonPositions.Red(Math.toRadians(215.0))
+            )
             .build()
-        //Lever Go Shoot
-        LeverGoShoot = PedroComponent.follower.pathBuilder()
+        parkPath = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    gateOpenPose,
-                    shootPoseClose
+                    AutonPositions.Red(AutonPositions.farShootPoseCoOp),
+                    AutonPositions.Red(AutonPositions.farParkCoOp)
                 )
             )
-            .setConstantHeadingInterpolation(Math.toRadians(0.0))
-            .build()
-        //Common Intake
-        robotIntakeCommon = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierCurve(
-                    shootPoseFar,
-                    commonIntakeControlPos,
-                    commonIntakePos
-                )
+            .setBrakingStrength(LOW_BRAKING)
+            .setConstantHeadingInterpolation(
+                AutonPositions.Red(Math.toRadians(215.0))
             )
-            .setConstantHeadingInterpolation(Math.toRadians(0.0))
             .build()
-        //Common Go Shoot
-        robotGoToShootCommon = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierLine(
-                    commonIntakePos,
-                    shootPoseFar
-                )
-            )
-            .setConstantHeadingInterpolation(shootPoseFar.heading)
-            .build()
-        //Go Park
-        robotPark = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierLine(
-                    shootPoseFar,
-                    parkPose
-                )
-            )
-            .setConstantHeadingInterpolation(Math.toRadians(0.0))
-            .build()
+
+
+
+//        //1st Intake
+//        pushPath = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    AutonPositions.Red(AutonPositions.startPoseFarPush),
+//                    AutonPositions.Red(AutonPositions.postPushPose),
+//                )
+//            )
+//            .setBrakingStrength(HIGH_BRAKING)
+//            .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(270.0)))
+//            .build()
+//        pushToClose = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierCurve(
+//                    AutonPositions.Red(AutonPositions.postPushPose),
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                )
+//            )
+//            .setBrakingStrength(LOW_BRAKING)
+////            .addParametricCallback(0.75, intakePower)
+////            .addParametricCallback(0.98, maxPower)
+////            .setTimeoutConstraint(delayPreShoot / 2.0)
+//            .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(270.0)))
+//            .build()
+//        closeToL2 = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierCurve(
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                    AutonPositions.Red(AutonPositions.L2IntakeControlPose),
+//                    AutonPositions.Red(AutonPositions.L2IntakePose),
+//                )
+//            )
+//            .setBrakingStrength(HIGH_BRAKING)
+//////            .setTimeoutConstraint(delayAfterIntake / 2.0)
+//            .addParametricCallback(0.64, IntakeCommand)
+//            .addParametricCallback(0.69, IntakeAfterCommand)
+//            .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(180.0)))
+//            .build()
+//        L2Shoot = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    AutonPositions.Red(AutonPositions.L2IntakePose),
+//                    AutonPositions.Red(AutonPositions.shootPoseClose)
+//                )
+//            )
+//            .setBrakingStrength(LOW_BRAKING)
+////            .addParametricCallback(0.75, intakePower)
+////            .addParametricCallback(0.98, maxPower)
+////            .setTimeoutConstraint(delayPreShoot / 2.0)
+////            .addParametricCallback(0.0, maxPower)
+//            .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(215.0)))
+//            .build()
+//        closeToGate = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierCurve(
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                    AutonPositions.Red(AutonPositions.gateOpenControlPos),
+//                    AutonPositions.Red(AutonPositions.gateOpenPose)
+//                )
+//            )
+//            .setBrakingStrength(HIGH_BRAKING)
+//            .addParametricCallback(0.75, intakePower)
+//            .addParametricCallback(0.98, maxPower)
+//            .setLinearHeadingInterpolation(
+//                AutonPositions.Red(AutonPositions.shootPoseClose).heading,
+//                AutonPositions.Red(AutonPositions.gateOpenPose).heading,
+//                0.9
+//            )
+//            .build()
+//        gateToAfter = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    AutonPositions.Red(AutonPositions.gateOpenPose),
+////                    AutonPositions.Red(AutonPositions.gateToShootControlPos),
+//                    AutonPositions.Red(AutonPositions.gateAfterOpenPose),
+//                )
+//            )
+//            .setBrakingStrength(HIGH_BRAKING)
+//            .addParametricCallback(0.05, IntakeAfterCommand)
+//            .addParametricCallback(0.75, IntakeCommand)
+//            .setConstantHeadingInterpolation(AutonPositions.Red(AutonPositions.gateAfterOpenPose).heading)
+//            .build()
+//        gateToShoot = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierCurve(
+//                    AutonPositions.Red(AutonPositions.gateAfterOpenPose),
+//                    AutonPositions.Red(AutonPositions.gateToShootControlPos),
+//                    AutonPositions.Red(AutonPositions.shootPoseClose)
+//                )
+//            )
+//            .setBrakingStrength(HIGH_BRAKING)
+////            .addParametricCallback(0.75, intakePower)
+////            .addParametricCallback(0.98, maxPower)
+////            .setTimeoutConstraint(delayPreShoot / 2.0)
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.tangent.reverse()
+//            )
+//            .build()
+//        closeToL1 = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierCurve(
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                    AutonPositions.Red(AutonPositions.L1IntakeControlPose),
+//                    AutonPositions.Red(AutonPositions.L1IntakePose),
+//                )
+//            )
+//            .setBrakingStrength(HIGH_BRAKING)
+//////            .setTimeoutConstraint(delayAfterIntake / 2.0)
+//            .addParametricCallback(0.49, IntakeCommand)
+//            .addParametricCallback(0.535, IntakeAfterCommand)
+//            .setTangentHeadingInterpolation()
+//            .build()
+//        L1Shoot = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    AutonPositions.Red(AutonPositions.L1IntakePose),
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                )
+//            )
+//            .setBrakingStrength(LOW_BRAKING)
+////            .setTimeoutConstraint(delayPreShoot / 2.0)
+////            .addParametricCallback(0.0, maxPower)
+//            .setLinearHeadingInterpolation(
+//                AutonPositions.Red(AutonPositions.L1IntakePose).heading,
+//                AutonPositions.Red(AutonPositions.shootPoseClose).heading,
+//            )
+////            .addParametricCallback(0.75, intakePower)
+////            .addParametricCallback(0.98, maxPower)
+//            .setConstantHeadingInterpolation(AutonPositions.Red(Math.toRadians(215.0)))
+//            .build()
+//        closeToL3 = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierCurve(
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                    AutonPositions.Red(AutonPositions.L3IntakeControlPose),
+//                    AutonPositions.Red(AutonPositions.L3IntakePose),
+//                )
+//            )
+//            .setBrakingStrength(HIGH_BRAKING)
+//////            .setTimeoutConstraint(delayAfterIntake / 2.0)
+//            .addParametricCallback(0.59, IntakeCommand)
+//            .addParametricCallback(0.64, IntakeAfterCommand)
+//            .setTangentHeadingInterpolation()
+//            .build()
+//        L3Shoot = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    AutonPositions.Red(AutonPositions.L3IntakePose),
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                )
+//            )
+//            .setBrakingStrength(LOW_BRAKING)
+////            .addParametricCallback(0.85, intakePower)
+////            .addParametricCallback(0.98, maxPower)
+////            .setTimeoutConstraint(delayPreShoot / 2.0)
+////            .addParametricCallback(0.0, maxPower)
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.tangent.reverse()
+//            )
+//            .build()
+//        closeToHPZ = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierCurve(
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                    AutonPositions.Red(AutonPositions.HPZControlPose),
+//                    AutonPositions.Red(AutonPositions.HPZPose),
+//                )
+//            )
+//            .setBrakingStrength(HIGH_BRAKING)
+//////            .setTimeoutConstraint(delayAfterIntake / 2.0)
+//            .addParametricCallback(0.86, IntakeCommand)
+//            .setTangentHeadingInterpolation()
+//            .build()
+//        HPZShoot = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierCurve(
+//                    AutonPositions.Red(AutonPositions.HPZPose),
+//                    AutonPositions.Red(AutonPositions.HPZControlPose),
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                )
+//            )
+//            .setBrakingStrength(LOW_BRAKING)
+////            .addParametricCallback(0.75, intakePower)
+////            .addParametricCallback(0.98, maxPower)
+////            .setTimeoutConstraint(delayPreShoot / 2.0)
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.tangent.reverse()
+//            )
+//            .build()
+//        parkPath = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    AutonPositions.Red(AutonPositions.shootPoseClose),
+//                    AutonPositions.Red(AutonPositions.pApark),
+//                )
+//            )
+//            .setBrakingStrength(HIGH_BRAKING)
+//            .setTimeoutConstraint(0.0)
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.tangent.reverse()
+//            )
+////            .setTangentHeadingInterpolation()
+//            .build()
     }
+
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.6)}
+    val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
 
     val IntakeCommand: Command
         get() = ParallelGroup(
+            intakePower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
             MagServoSubsystem.run,
             MagblockServoSubsystem.block
         )
-    val TravelCommand: Command
+    val IntakeAfterCommand: Command
         get() = ParallelGroup(
-            IntakeMotorSubsystem.off,
-            MagMotorSubsystem.off,
-            MagServoSubsystem.stop,
+            maxPower,
+            IntakeMotorSubsystem.intake,
+            MagMotorSubsystem.intake,
+//            MagServoSubsystem.run,
             MagblockServoSubsystem.block
         )
-    val ShootCommand: Command
+    val TravelCommand: Command
         get() = ParallelGroup(
+            maxPower,
+            IntakeMotorSubsystem.off,
+            MagMotorSubsystem.off,
+//            MagServoSubsystem.stop,
+            MagblockServoSubsystem.block
+        )
+//    val ShootCommandClose: Command
+//        get() = ParallelGroup(
+//            maxPower,
+//            MagblockServoSubsystem.unblock,
+//            MagMotorSubsystem.On(1.0),
+//            IntakeMotorSubsystem.intake,
+//            MagServoSubsystem.run
+//        )
+    val ShootCommandFar: Command
+        get() = ParallelGroup(
+            maxPower,
             MagblockServoSubsystem.unblock,
-            MagMotorSubsystem.On(0.8),
+            MagMotorSubsystem.On(0.85),
             IntakeMotorSubsystem.intake,
-            MagServoSubsystem.run
+//            MagServoSubsystem.run
         )
 
     /////////////////////////
     ////Autonomous Runner////
     /////////////////////////
+    var stopShooterAutoAim = false;
     private val autonomousRoutine: Command
         get() = SequentialGroup(
-            //Main Group
-            SequentialGroup( //Shoots PRELOA+D
-                ParallelGroup(
-                    TurretPhiSubsystem.SetTargetPhi(-5.075.rad),
-                    Delay(AutonBlueFarArtifact.Companion.delayStartShoot),
-                ),
-                ShootCommand,
-                Delay(AutonBlueFarArtifact.Companion.delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntake1!!), //robot goes to intake
-                Delay(AutonBlueFarArtifact.Companion.DelayAfterIntake),
-            ),
+            TravelCommand,
+            Delay(delayStartup),
+            Delay(delayPreShoot),
+            ShootCommandFar,
+            Delay(delayFarShoot),
+            TravelCommand,
 
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((-5.075 + 2.0 * PI - PI / 3.0 + PI / 48.0 /*- PI / 98.0*/).rad),
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShoot1!!),
-            ),
+            FollowPath(farToL3!!),
+            Delay(delayAfterIntake),
 
-            SequentialGroup( //Shoots FIRST Intake
-                Delay(AutonBlueFarArtifact.Companion.DelayBeforeShoot),
-                ShootCommand,
-                Delay(AutonBlueFarArtifact.Companion.delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntakeCommon!!), //robot goes to intake
-                Delay(AutonBlueFarArtifact.Companion.DelayAfterIntake),
+            ParallelGroup(
+                IntakeAfterCommand,
+                Delay(delayInIntake),
+                TravelCommand
             ),
+            FollowPath(L3toFar!!),
 
-            //////////////////////REPEATABLE SECTION//////////////////////
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((-5.075 + 2.0 * PI - PI / 3.0 + PI / 48.0 /*- PI / 98.0*/).rad),
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShootCommon!!)
-            ),
+            Delay(delayPreShoot),
+            ShootCommandFar,
+            Delay(delayFarShoot),
+            TravelCommand,
 
-            SequentialGroup( //Shoots COMMON Intake
-                Delay(AutonBlueFarArtifact.Companion.DelayBeforeShoot),
-                ShootCommand,
-                Delay(AutonBlueFarArtifact.Companion.delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntakeCommon!!), //robot goes to intake
-                Delay(AutonBlueFarArtifact.Companion.DelayAfterIntake),
-            ),
-            //////////////////////REPEATABLE SECTION//////////////////////
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                TurretPhiSubsystem.SetTargetPhi((-5.075 + 2.0 * PI - PI / 3.0 + PI / 48.0 /*- PI / 98.0*/).rad),
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShootCommon!!)
-            ),
+            //REPEAT
+            FollowPath(farToHPZ!!),
+            Delay(delayAfterIntake),
 
-            SequentialGroup( //Shoots COMMON Intake
-                Delay(AutonBlueFarArtifact.Companion.DelayBeforeShoot),
-                ShootCommand,
-                Delay(AutonBlueFarArtifact.Companion.delayAfterEachShoot),
-//                IntakeCommand,
-//                FollowPath(robotIntakeCommon!!), //robot goes to intake
-//                Delay(AutonBlueFarArtifact.Companion.DelayAfterIntake),
+            ParallelGroup(
+                IntakeAfterCommand,
+                Delay(delayInIntake),
+                TravelCommand
             ),
-            //////////////////////REPEATABLE SECTION//////////////////////
-            SequentialGroup( //Robot goes to PARK
-//                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 32.0)).rad),
-                SequentialGroup(
-//                    Delay(AutonBlueFarArtifact.Companion.DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotPark!!)
-            ),
+            FollowPath(HPZtoFar!!),
 
-            )
+            Delay(delayPreShoot),
+            ShootCommandFar,
+            Delay(delayFarShoot),
+            TravelCommand,
+
+            //REPEAT
+            FollowPath(farToHPZ!!),
+            Delay(delayAfterIntake),
+
+            ParallelGroup(
+                IntakeAfterCommand,
+                Delay(delayInIntake),
+                TravelCommand
+            ),
+            FollowPath(HPZtoFar!!),
+
+            Delay(delayPreShoot),
+            ShootCommandFar,
+            Delay(delayFarShoot),
+            TravelCommand,
+
+            //REPEAT
+            FollowPath(farToHPZ!!),
+            Delay(delayAfterIntake),
+
+            ParallelGroup(
+                IntakeAfterCommand,
+                Delay(delayInIntake),
+                TravelCommand
+            ),
+            FollowPath(HPZtoFar!!),
+
+            Delay(delayPreShoot),
+            ShootCommandFar,
+            Delay(delayFarShoot),
+            TravelCommand,
+
+            //REPEAT
+            FollowPath(farToHPZ!!),
+            Delay(delayAfterIntake),
+
+            ParallelGroup(
+                IntakeAfterCommand,
+                Delay(delayInIntake),
+                TravelCommand
+            ),
+            FollowPath(HPZtoFar!!),
+
+            Delay(delayPreShoot),
+            ShootCommandFar,
+            Delay(delayFarShoot),
+            TravelCommand,
+
+            // END REPEATS
+
+            // Park
+            TravelCommand,
+            InstantCommand { stopShooterAutoAim = true },
+            ShooterSubsystem.On(9999.0),
+            FollowPath(parkPath!!),
+        )
 
     override fun onUpdate() {
+//        if (pathStarted && opmodeTimer!!.elapsedTime >= 29.75) {
+//            PedroComponent.follower.setMaxPower(0.0)
+//            PedroComponent.follower.breakFollowing()
+//            IntakeMotorSubsystem.off()
+//            MagMotorSubsystem.off()
+//            MagblockServoSubsystem.block()
+//        }
+
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-        val dxp = dx + PedroComponent.follower.velocity.xComponent * distanceToTime(dxy)
-        val dyp = dy + PedroComponent.follower.velocity.yComponent * distanceToTime(dxy)
+//        val dxp = dx - (0.8*PedroComponent.follower.velocity.xComponent
+//                + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
+//                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
+//                else AutoAimConstants.distanceToTimeClose(dxy)
+//        )
+//        val dyp = dy - (0.8*PedroComponent.follower.velocity.yComponent
+//                + 0.05 * PedroComponent.follower.acceleration.yComponent) * (
+//                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
+//                else AutoAimConstants.distanceToTimeClose(dxy)
+//        )
+        val dxp = dx;
+        val dyp = dy;
         val dxyp = hypot(dxp, dyp)
-        val hp = PedroComponent.follower.pose.heading + PedroComponent.follower.velocity.theta * distanceToTime(dxyp)
-        ShooterSubsystem.AutoAim(
-            dxy,
-            { distanceToVelocity(it) }
-        )()
-//        TurretPhiSubsystem.AutoAim(
-//            dx, dy, hp.rad
-//        )()
+        if (!stopShooterAutoAim) {
+            ShooterSubsystem.AutoAim(
+                dxyp,
+                { dist ->
+                    (
+                            if (PedroComponent.follower.pose.y < BORD_Y)
+                                distanceToVelocityFar(dist)
+                            else
+                                distanceToVelocityClose(dist)
+                            )
+                }
+            )()
+        }
+        TurretPhiSubsystem.AutoAim(dxp, dyp, PedroComponent.follower.pose.heading.rad)();
         TurretThetaSubsystem.AutoAim(
             dxyp,
-            { distanceToTheta(it) }
+            { dist ->
+                (if (PedroComponent.follower.pose.y < BORD_Y)
+                    distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
+                else
+                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)) + 1.5.deg
+            },
         )()
 
         // These loop the movements of the robot, these must be called continuously in order to work
@@ -382,6 +622,7 @@ class AutonRedFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
 //        forward.schedule()
         // Feedback to Driver Hub for debugging
 //        telemetry.addData("path state", pathState)
+
         telemetry.addData("x", PedroComponent.follower.pose.x)
         telemetry.addData("y", PedroComponent.follower.pose.y)
         telemetry.addData("heading", PedroComponent.follower.pose.heading)
@@ -397,24 +638,19 @@ class AutonRedFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
         ShooterSubsystem.off()
         IntakeMotorSubsystem.off()
         MagMotorSubsystem.off()
-        MagServoSubsystem.stop()
+//        MagServoSubsystem.stop()
         MagblockServoSubsystem.block()
+//        follower = Constants.createFollower(hardwareMap)
 
-        PedroComponent.follower.setStartingPose(startPose)
+        PedroComponent.follower.setStartingPose(
+            AutonPositions.Red(AutonPositions.startPoseFarPush)
+        )
+
+        TurretPhiSubsystem.zero();
     }
 
     /** This method is called continuously after Init while waiting for "play".  */
     override fun onWaitForStart() {}
-
-    fun distanceToTime(it: Double): Double {
-        return it * 0.0;
-    }
-    fun distanceToVelocity(it: Double): Double {
-        return 0.95 * (0.0127 * it * it + 1.81 * it + 937.0);
-    }
-    fun distanceToTheta(it: Double): Angle {
-        return max(min(-0.224*it+74, 63.0), 55.0).deg;
-    }
 
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system  */
@@ -423,6 +659,8 @@ class AutonRedFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intak
 
         opmodeTimer!!.resetTimer()
         actionTimer!!.resetTimer()
+
+        pathStarted = true;
 //        setPathState(AutonPath.RobotShoot1)
     }
 
