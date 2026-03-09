@@ -43,8 +43,12 @@ object TurretPhiSubsystem : Subsystem {
     private val controller: ControlSystem;
     private val secondaryController: ControlSystem;
 
+    private var feedforwardCmd = 0.0;
+
     @JvmField var squidCoefficients = PIDCoefficients(0.002, 0.0, 0.00002);
     @JvmField var secondarySquidCoefficients = PIDCoefficients(0.0007, 0.0, 0.00002);
+
+    @JvmField var feedforwardCoefficient = 0.1;
 
 //    @JvmField var Ls = 0.0;
 //    @JvmField var Lv = 0.0;
@@ -129,7 +133,8 @@ object TurretPhiSubsystem : Subsystem {
         private val dx: Double,
         private val dy: Double,
         private val rh: Angle,
-        private val ofsTurret: Angle = 0.0.rad
+        private val ofsTurret: Angle = 0.0.rad,
+        private val feedforward: Double = 0.0
     ) : Command() {
         override val isDone = true;
 
@@ -141,6 +146,9 @@ object TurretPhiSubsystem : Subsystem {
             if (lastCommand != null) {
                 CommandManager.cancelCommand(lastCommand!!)
             }
+
+            feedforwardCmd = feedforward;
+            PanelsTelemetry.telemetry.addData("ff correction", feedforwardCmd * feedforwardCoefficient);
 
             val normAngle = (atan2(dy, dx).rad - rh).inRad
             val upper = normAngle + 2 * PI;
@@ -193,6 +201,9 @@ object TurretPhiSubsystem : Subsystem {
             power = secondaryController.calculate(
                 motor.state
             )
+
+            // add feedforward
+            power += feedforwardCmd * feedforwardCoefficient;
         }
         SetPower(motor, power).setInterruptible(true)()
 

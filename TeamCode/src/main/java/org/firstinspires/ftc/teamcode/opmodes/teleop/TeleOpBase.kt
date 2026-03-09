@@ -78,6 +78,7 @@ open class TeleOpBase(
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
     val ax: Double get() { return (PedroComponent.follower.acceleration.xComponent);}
     val ay: Double get() { return (PedroComponent.follower.acceleration.yComponent);}
+    val ah: Angle  get() { return (PedroComponent.follower.acceleration.theta.rad);}
 
 //    private var ofsX = 0.0;
 //    private var ofsY = 0.0;
@@ -182,20 +183,20 @@ open class TeleOpBase(
             false
         )
 //
-//        gateIntakeChain = PedroComponent.follower.pathBuilder()
-//            .addPath(
-//                BezierLine(
-//                    PedroComponent.follower::getPose,
-//                    Pos(AutonPositions.gateOpenPose, isBlue)
-//                )
-//            )
-//            .setHeadingInterpolation(
-//                HeadingInterpolator.linearFromPoint(
-//                    PedroComponent.follower::getHeading,
-//                    Pos(AutonPositions.gateOpenPose, isBlue).heading,
-//                    0.2
-//                )
-//            )
+        gateIntakeChain = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    PedroComponent.follower::getPose,
+                    Pos(AutonPositions.gateOpenPoseTele, isBlue)
+                )
+            )
+            .setHeadingInterpolation(
+                HeadingInterpolator.linearFromPoint(
+                    PedroComponent.follower::getHeading,
+                    Pos(AutonPositions.gateOpenPoseTele, isBlue).heading,
+                    0.2
+                )
+            )
 //            .addPath(
 //                BezierLine(
 //                    Pos(AutonPositions.gateOpenPose, isBlue),
@@ -207,7 +208,7 @@ open class TeleOpBase(
 //                Pos(AutonPositions.gateAfterOpenPose, isBlue).heading,
 //                0.8
 //            )
-//            .build()
+            .build()
 //
 //        farShootChain = PedroComponent.follower.pathBuilder()
 //            .addPath(
@@ -538,19 +539,19 @@ open class TeleOpBase(
         PedroComponent.follower.update()
 //        odom!!.updateOdom();
 
-//        if (
-//            activeDriveMacros.isNotEmpty() &&
-//            (
-//                    abs(gamepad1.left_stick_x) > 0.02 ||
-//                            abs(gamepad1.left_stick_y) > 0.02 ||
-//                            abs(gamepad1.right_stick_x) > 0.02
-//                    )
-//        ) {
-//            // untrigger macro
-//            activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
-//            activeDriveMacros.clear()
-//            PedroComponent.follower.startTeleopDrive()
-//        }
+        if (
+            activeDriveMacros.isNotEmpty() &&
+            (
+                    abs(gamepad1.left_stick_x) > 0.02 ||
+                            abs(gamepad1.left_stick_y) > 0.02 ||
+                            abs(gamepad1.right_stick_x) > 0.02
+                    )
+        ) {
+            // untrigger macro
+            activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
+            activeDriveMacros.clear()
+            PedroComponent.follower.startTeleopDrive()
+        }
 
         val dx = goalX - x
         val dy = goalY - y
@@ -560,6 +561,8 @@ open class TeleOpBase(
 //        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
 //        dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
+//        val hp = h - (vh + ah * 0.05) * 0.5
+        val hp = h;
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
         PanelsTelemetry.telemetry.addData("SHOOTING?", ShooterSubsystem.isShooting);
@@ -592,7 +595,7 @@ open class TeleOpBase(
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
 //            val sotmFactor = 1 - ((dxyp - dxy) / 10.0).coerceIn(0.0, 1.0);
-            var sotmFactor = 0.0;
+            var sotmFactor = 1.0;
             ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
                 dxyp * sotmFactor + dxy * (1 - sotmFactor),
@@ -619,7 +622,8 @@ open class TeleOpBase(
             TurretPhiSubsystem.AutoAim(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
                 dyp * sotmFactor + dy * (1 - sotmFactor),
-                h, phiTrim
+                hp, phiTrim,
+                -Gamepads.gamepad1.rightStickX.get()  // tODO; make sure not bad
             )()
         } else {
             //ShooterSubsystem.Manual(
