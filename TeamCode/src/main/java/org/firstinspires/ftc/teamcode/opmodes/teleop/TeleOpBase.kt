@@ -72,7 +72,7 @@ open class TeleOpBase(
 //    private var odom: OdometrySubsystem? = null;
     val x:  Double get() { return (PedroComponent.follower.pose.x + ofsX);}
     val y:  Double get() { return (PedroComponent.follower.pose.y + ofsY);}
-    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
+    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad + ofsH;}
     val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
     val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
@@ -298,6 +298,7 @@ open class TeleOpBase(
 
     var ofsX = 0.0;
     var ofsY = 0.0;
+    var ofsH = 0.0.rad;
 
     override fun onStartButtonPressed() {
 //        val file = File(Lefile.filePath)
@@ -330,11 +331,12 @@ open class TeleOpBase(
 //        mecanum();
         driverControlled!!()
 
-//        Gamepads.gamepad1.dpadUp whenBecomesTrue {
-//            val path = FollowPath(gateIntakeChain!!)
-//            path()
-//            activeDriveMacros.add(path)
-//        }
+        Gamepads.gamepad1.leftBumper whenBecomesTrue {
+            val path = FollowPath(gateIntakeChain!!)
+            path()
+            activeDriveMacros.add(path)
+            gamepad1.rumble(100)
+        }
 //        (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
 //            .whenBecomesTrue {
 //                val path = FollowPath(farShootChain!!)
@@ -440,10 +442,20 @@ open class TeleOpBase(
 
         // I think l/r only makes sense when robot facing away (approx same direction person is facing)
         Gamepads.gamepad2.dpadRight whenBecomesTrue {
-            phiTrim -= 2.0.deg
+            PedroComponent.follower.pose = Pose(
+                PedroComponent.follower.pose.x,
+                PedroComponent.follower.pose.y,
+                PedroComponent.follower.pose.heading + Math.toRadians(1.0),
+            )
+//            phiTrim -= 2.0.deg
         }
         Gamepads.gamepad2.dpadLeft whenBecomesTrue {
-            phiTrim += 2.0.deg
+            PedroComponent.follower.pose = Pose(
+                PedroComponent.follower.pose.x,
+                PedroComponent.follower.pose.y,
+                PedroComponent.follower.pose.heading - Math.toRadians(1.0),
+            )
+//            phiTrim += 2.0.deg
         }
 
         Gamepads.gamepad2.rightBumper whenBecomesTrue {
@@ -595,7 +607,11 @@ open class TeleOpBase(
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
 //            val sotmFactor = 1 - ((dxyp - dxy) / 10.0).coerceIn(0.0, 1.0);
-            var sotmFactor = 1.0;
+            val sotmFactor = if (
+                    (abs(Gamepads.gamepad1.leftStickX.get()) <= 0.02) &&
+                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
+            ) 0.0 else 1.0;
+            telemetry.addData("sotm factor", sotmFactor);
             ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
                 dxyp * sotmFactor + dxy * (1 - sotmFactor),
