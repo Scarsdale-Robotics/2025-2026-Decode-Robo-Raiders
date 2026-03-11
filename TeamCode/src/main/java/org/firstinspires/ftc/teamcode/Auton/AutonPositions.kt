@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.Auton
 
 import com.pedropathing.geometry.Pose
-import dev.nextftc.core.units.Angle
 
 object AutonPositions {
-
     //base positions are in blue coordinates
 
     val startPose = Pose(63.7, 8.503, Math.toRadians(90.0)) // Start Pose of our robot.
@@ -24,8 +22,8 @@ object AutonPositions {
     val startPoseFarPush = Pose(63.714, 10.7, Math.toRadians(270.0))
     val postPushPose = Pose(50.0, 14.0, Math.toRadians(270.0))
 
-    val L2IntakePose = Pose(21.67, 60.8-4.0, Math.toRadians(180.0))
-    val L2IntakeControlPose = Pose(58.0, 65.3-4.0)
+    val L2IntakePose = Pose(21.67, 60.8 - 4.0, Math.toRadians(180.0))
+    val L2IntakeControlPose = Pose(58.0, 65.3 - 4.0)
 
     val L1IntakePose = Pose(23.0, 84.3, Math.toRadians(180.0))
     val L1IntakeControlPose = Pose(42.6, 84.2)
@@ -40,10 +38,22 @@ object AutonPositions {
 
     //====24 Specific Positions====
     val start24ShootPos = Pose(24.9, 105.6, Math.toRadians(270.0))
-    val intake1Pos24 = Pose(23.7, 90.8, Math.toRadians(270.0))
-    val intake2Pos24 = Pose(23.7, 66.0, Math.toRadians(270.0))
+
+    val intake1Pos24 = Pose(23.0, 84.3, Math.toRadians(180.0))
+    val intake1Pos24CPos = Pose(42.6, 84.2)
+
+    val intake2Pos24 = Pose(23.7, 66.0, Math.toRadians(180.0))
+    val intake2P24CPos = Pose(41.3, 71.5)
+
     val intake3Pos24 = Pose(23.7, 43.3, Math.toRadians(270.0))
     val robotPark24 = Pose(42.8, 10.9, Math.toRadians(180.0))
+
+    val commonIntakePos24 = Pose(11.0, 10.9, Math.toRadians(180.0))
+    val commonIntakeControlPos24 = Pose(54.8, 36.7)
+
+    val spedPosition24 = Pose(9.6, 9.0, Math.toRadians(180.0))
+    val spedPosition24ControlPos = Pose(5.1, 69.4)
+    val spedPosition24ControlPos2 = Pose(9.9, 44.4)
 
     //====CoOp Specific Positions====
     val startCoOpControlPos = Pose(91.6, 91.2)
@@ -78,11 +88,13 @@ object AutonPositions {
 //    val altGateOpenPose =
 //        Pose(21.0, 54.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
     val gateOpenControlPos =
-        Pose(56.7, 51.2)
+    Pose(56.7, 51.2)
     val gateOpenPoseFromFar =
         Pose(21.1, 58.0, Math.toRadians(140.0)) // Gate Open Pose of our robot.
-    val gateAfterOpenPose = Pose(13.8, 53.25, Math.toRadians(140.0)) // Gate After Open Pose of our robot.
-    val altAfterOpenPose = Pose(18.0, 54.4, Math.toRadians(180.0)) // Gate After Open Pose of our robot.
+    val gateAfterOpenPose =
+        Pose(13.8, 53.25, Math.toRadians(140.0)) // Gate After Open Pose of our robot.
+    val altAfterOpenPose =
+        Pose(18.0, 54.4, Math.toRadians(180.0)) // Gate After Open Pose of our robot.
     val altAfterOpenControlPose = Pose(28.4, 57.7)
 //=======
 //        Pose(15.0, 56.0, Math.toRadians(140.0)) // Gate After Open Pose of our robot.
@@ -107,7 +119,11 @@ object AutonPositions {
     fun Blue(bluePose: Pose): Pose { return bluePose }
     fun Blue(rads: Double): Double { return rads }
     fun Red(bluePose: Pose): Pose {
-        return Pose(144.0 - bluePose.x, bluePose.y, Math.toRadians(blueRedConvertAngle(Math.toDegrees(bluePose.heading))))
+        return Pose(
+            144.0 - bluePose.x,
+            bluePose.y,
+            Math.toRadians(blueRedConvertAngle(Math.toDegrees(bluePose.heading)))
+        )
     }
     fun Red(rads: Double): Double { return Math.toRadians(blueRedConvertAngle(Math.toDegrees(rads))) }
 

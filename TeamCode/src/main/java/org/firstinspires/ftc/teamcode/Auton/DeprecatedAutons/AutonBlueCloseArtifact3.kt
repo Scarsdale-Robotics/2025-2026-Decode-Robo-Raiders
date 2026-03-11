@@ -1,14 +1,11 @@
-package org.firstinspires.ftc.teamcode.Auton.MainAutons
-import org.firstinspires.ftc.teamcode.Auton.AutonPositions
+package org.firstinspires.ftc.teamcode.Auton.DeprecatedAutons
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
@@ -19,6 +16,7 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
+import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
@@ -44,9 +42,9 @@ import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.hypot
 
-@Autonomous(name = "[DEPRECATED] Auton Blue Close Artifact", group = "Auton")
+//@Autonomous(name = "[MAIN-3] Auton Blue Close Artifact", group = "Auton")
 @Configurable
-class AutonBlueCloseArtifact: NextFTCOpMode() {
+class AutonBlueCloseArtifact3: NextFTCOpMode() {
     //////////////////////
     ////Base Variables////
     //////////////////////
@@ -67,13 +65,13 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
     }
 
     companion object {
-        val delayStartShoot: Double = 2.0
+        val delayStartShoot: Double = 0.75
         val DelayBeforeShoot: Double = 0.25
         val delayAfterEachShoot: Double = 0.5 //currently at a really high #
-        val DelayFromRampIntake: Double = 1.0
-        val DelayInIntake: Double = 1.1
-//        val DelayAfterIntake: Double = 0.0
-        val DelayAtLever: Double = 0.05
+        val DelayFromRampIntake: Double = 0.25
+        val DelayInIntake: Double = 0.75
+        //        val DelayAfterIntake: Double = 0.0
+        val DelayAtLever: Double = 0.1
 
         val goalX = 3.0
         val goalY = 144.0 - 6.0
@@ -87,26 +85,29 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
     //Constant positions
     private val shootPoseCloseFromIntake1 = Pose(57.0, 76.6, Math.toRadians(128.0)) // Close Shoot Pose of our robot.
 
-
     /////////////
     ////Paths////
     /////////////
     // The different paths the robot will take in during Auton
     private var robotShootPreload: PathChain? = null
+
+    private var robotIntake1: PathChain? = null
     private var robotGoToShoot1: PathChain? = null //since preload also intakes, there is no intake1
 
     private var robotIntake2: PathChain? = null
     private var robotGoToShoot2: PathChain? = null
 
     private var robotOpenLeverFromFar: PathChain? = null
-    private var robotOpenLeverFromClose: PathChain? = null
     private var robotBackupFromRamp: PathChain? = null
     private var LeverGoShoot: PathChain? = null
+
+    private var roboCommonIntake: PathChain? = null
+    private var roboCommonGoShoot: PathChain? = null
 
     private var robotIntake3: PathChain? = null
     private var robotGoToShoot3: PathChain? = null
 
-//    private var robotIntake4: PathChain? = null
+    //    private var robotIntake4: PathChain? = null
 //    private var robotGoToShoot4: PathChain? = null
     private var robotPark: PathChain? = null
 
@@ -117,25 +118,34 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
         //Shoots preload and intakes once
         robotShootPreload = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierCurve(
+                BezierLine(
                     AutonPositions.Blue(AutonPositions.startPoseClose),
-                    AutonPositions.Blue(AutonPositions.startAutonControlPos),
-                    AutonPositions.Blue(AutonPositions.intake2Pos),
+                    AutonPositions.Blue(AutonPositions.start24ShootPos)
                 )
             )
-            .setTangentHeadingInterpolation()
-//            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
+//            .setTangentHeadingInterpolation()
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
             .build()
-
+        //1st Intake
+        robotIntake1 = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    AutonPositions.Blue(AutonPositions.start24ShootPos),
+                    AutonPositions.Blue(AutonPositions.intake1Pos24)
+                )
+            )
+//            .setTangentHeadingInterpolation()
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
+            .build()
         //1st Go Shoot
         robotGoToShoot1 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.intake2Pos),
-                    AutonPositions.Blue(AutonPositions.shootPoseClose)
+                    AutonPositions.Blue(AutonPositions.intake1Pos24),
+                    AutonPositions.Blue(AutonPositions.start24ShootPos)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
             .build()
 
         // Go to Gate
@@ -175,18 +185,18 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
         robotIntake2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.intake1Pos)
+                    AutonPositions.Blue(AutonPositions.start24ShootPos),
+                    AutonPositions.Blue(AutonPositions.intake2Pos24)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake2Pos24).heading)
             .build()
 
         //2nd Go Shoot
         robotGoToShoot2 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.intake1Pos),
+                    AutonPositions.Blue(AutonPositions.intake2Pos24),
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
@@ -196,13 +206,12 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
         //3rd Intake
         robotIntake3 = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierCurve(
+                BezierLine(
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.intake3ControlPos),
-                    AutonPositions.Blue(AutonPositions.intake3Pos)
+                    AutonPositions.Blue(AutonPositions.intake3Pos24)
                 )
             )
-            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake3Pos).heading)
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake3Pos24).heading)
             .build()
 
         //3rd Go Shoot
@@ -210,17 +219,38 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
             .addPath(
                 BezierLine(
                     AutonPositions.Blue(AutonPositions.intake3Pos),
-                    AutonPositions.Blue(AutonPositions.shootPoseClose)
+                    AutonPositions.Blue(AutonPositions.shootPoseFar)
                 )
             )
             .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake3Pos).heading)
+            .build()
+        //3rd Intake
+        roboCommonIntake = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    AutonPositions.Blue(AutonPositions.shootPoseFar),
+                    AutonPositions.Blue(AutonPositions.commonIntakePos)
+                )
+            )
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.commonIntakePos).heading)
+            .build()
+
+        //3rd Go Shoot
+        roboCommonGoShoot = PedroComponent.follower.pathBuilder()
+            .addPath(
+                BezierLine(
+                    AutonPositions.Blue(AutonPositions.commonIntakePos),
+                    AutonPositions.Blue(AutonPositions.shootPoseFar)
+                )
+            )
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseFar).heading)
             .build()
         //Go Park
         robotPark = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
-                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.autonParkPose)
+                    AutonPositions.Blue(AutonPositions.shootPoseFar),
+                    AutonPositions.Blue(AutonPositions.robotPark24)
                 )
             )
             .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.autonParkPose).heading)
@@ -258,161 +288,42 @@ class AutonBlueCloseArtifact: NextFTCOpMode() {
     private val autonomousRoutine: Command
         get() = SequentialGroup(
             //Main Group
-            ParallelGroup( //Shoots PRELOAD
+            SequentialGroup( //Shoots PRELOAD
                 FollowPath(robotShootPreload!!),
-                SequentialGroup(
-                    Delay(delayStartShoot),
-                    ShootCommand,
-                    Delay(delayAfterEachShoot),
-                    IntakeCommand,
-                ),
-//                FollowPath(robotIntake1!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-//                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 48.0)).rad),
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShoot1!!)
-            ),
-
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-            SequentialGroup( //Shoots FIRST Intake, goes to intake from the lever
-                Delay(DelayBeforeShoot),
+                Delay(delayStartShoot),
                 ShootCommand,
                 Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotOpenLeverFromFar!!), //robot goes to intake
-                Delay(DelayAtLever),
-                FollowPath(robotBackupFromRamp!!),
-                Delay(DelayFromRampIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(LeverGoShoot!!)
-            ),
-
-            SequentialGroup( //Shoots SECOND Intake, goes to intake from the lever
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotOpenLeverFromFar!!), //robot goes to intake
-                Delay(DelayAtLever),
-                FollowPath(robotBackupFromRamp!!),
-                Delay(DelayFromRampIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(LeverGoShoot!!)
-            ),
-
-            SequentialGroup( //Shoots THIRD Intake, goes to intake from the lever
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotOpenLeverFromFar!!), //robot goes to intake
-                Delay(DelayAtLever),
-                FollowPath(robotBackupFromRamp!!),
-                Delay(DelayFromRampIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(LeverGoShoot!!)
-            ),
-
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-            //////////////////Lever Portion//////////////////
-
-            SequentialGroup( //Shoots FOURTH Intake, goes to intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntake2!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShoot2!!)
-            ),
-
-            SequentialGroup( //Shoots FIFTH Intake, goes to intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                IntakeCommand,
-                FollowPath(robotIntake3!!), //robot goes to intake
-//                Delay(DelayAfterIntake),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    Delay(DelayInIntake),
-                    TravelCommand,
-                ),
-                FollowPath(robotGoToShoot3!!)
-            ),
-
-            SequentialGroup( //Shoots SIXTH Intake, goes to PARK
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                TravelCommand,
+                Delay(23.0),
                 InstantCommand { stopShooterAutoAim = true },
                 ShooterSubsystem.On(9999.0),
-                FollowPath(robotPark!!), //robot goes to intake
             ),
         )
 
     private var stopShooterAutoAim = false;
     override fun onUpdate() {
-        val dx = AutonBlueFarArtifact.Companion.goalX - PedroComponent.follower.pose.x
-        val dy = AutonBlueFarArtifact.Companion.goalY - PedroComponent.follower.pose.y
+        val dx = goalX - PedroComponent.follower.pose.x
+        val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
         val dxp = dx - PedroComponent.follower.velocity.xComponent * (
                 if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
                 else distanceToTimeClose(dxy)
-        )
+                )
         val dyp = dy - PedroComponent.follower.velocity.yComponent * (
                 if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
                 else distanceToTimeClose(dxy)
-        )
+                )
         val dxyp = hypot(dxp, dyp)
 
         if (!stopShooterAutoAim) {
             ShooterSubsystem.AutoAim(
-                dxy,
+                dxyp,
                 { dist ->
                     (
-                        if (PedroComponent.follower.pose.y < BORD_Y)
-                            distanceToVelocityFar(dist)
-                        else
-                            distanceToVelocityClose(dist)
-                    )
+                            if (PedroComponent.follower.pose.y < BORD_Y)
+                                distanceToVelocityFar(dist)
+                            else
+                                distanceToVelocityClose(dist)
+                            )
                 }
             )()
         }
