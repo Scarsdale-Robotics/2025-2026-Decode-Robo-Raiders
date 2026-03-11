@@ -72,7 +72,7 @@ open class TeleOpBase(
 //    private var odom: OdometrySubsystem? = null;
     val x:  Double get() { return (PedroComponent.follower.pose.x + ofsX);}
     val y:  Double get() { return (PedroComponent.follower.pose.y + ofsY);}
-    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
+    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad + ofsH;}
     val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
     val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
@@ -298,6 +298,7 @@ open class TeleOpBase(
 
     var ofsX = 0.0;
     var ofsY = 0.0;
+    var ofsH = 0.0.rad;
 
     override fun onStartButtonPressed() {
 //        val file = File(Lefile.filePath)
@@ -441,10 +442,20 @@ open class TeleOpBase(
 
         // I think l/r only makes sense when robot facing away (approx same direction person is facing)
         Gamepads.gamepad2.dpadRight whenBecomesTrue {
-            phiTrim -= 2.0.deg
+            PedroComponent.follower.pose = Pose(
+                PedroComponent.follower.pose.x,
+                PedroComponent.follower.pose.y,
+                PedroComponent.follower.pose.heading + Math.toRadians(1.0),
+            )
+//            phiTrim -= 2.0.deg
         }
         Gamepads.gamepad2.dpadLeft whenBecomesTrue {
-            phiTrim += 2.0.deg
+            PedroComponent.follower.pose = Pose(
+                PedroComponent.follower.pose.x,
+                PedroComponent.follower.pose.y,
+                PedroComponent.follower.pose.heading - Math.toRadians(1.0),
+            )
+//            phiTrim += 2.0.deg
         }
 
         Gamepads.gamepad2.rightBumper whenBecomesTrue {
