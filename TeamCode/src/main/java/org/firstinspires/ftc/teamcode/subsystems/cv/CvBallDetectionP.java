@@ -23,7 +23,7 @@ public class CvBallDetectionP {
 
 
     public CvBallDetectionP(HardwareMap hm) {
-        ColorBlobLocatorProcessor colorLocator = new ColorBlobLocatorProcessor.Builder()
+        this.colorLocator = new ColorBlobLocatorProcessor.Builder()
                 .setTargetColorRange(ColorRange.ARTIFACT_PURPLE)   // Use a predefined color match
                 .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
                 .setRoi(ImageRegion.entireFrame())
@@ -38,7 +38,7 @@ public class CvBallDetectionP {
                 .setMorphOperationType(ColorBlobLocatorProcessor.MorphOperationType.CLOSING)
 
                 .build();
-        VisionPortal portal = new VisionPortal.Builder()
+        this.visionPortal = new VisionPortal.Builder()
                 .addProcessor(colorLocator)
                 .setCameraResolution(new android.util.Size(640, 480))
                 .setCamera(hm.get(WebcamName.class, "Cam"))
