@@ -57,10 +57,6 @@ class BasicTeleOp(): NextFTCOpMode() {
             SubsystemComponent(
                 LowerSubsystem,
                 OuttakeSubsystem,
-                MagServoSubsystem,
-                MagblockServoSubsystem,
-                TurretThetaSubsystem,
-                TurretPhiSubsystem
             ),
             PedroComponent(Constants::createFollower),
             BindingsComponent,

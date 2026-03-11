@@ -393,60 +393,60 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
     val EnableSOTM: Command = InstantCommand { sotmFactor = 1.0 }
     val DisableSOTM: Command = InstantCommand { sotmFactor = 0.0 }
 
-    val Intake = { path: PathChain ->
-        SequentialGroup(
-            FollowPath(path),  // intake L2
-            Delay(delayAfterIntake),
-        )
-    }
-    val RawApproachShoot = { path: PathChain ->
-        SequentialGroup(
-            EnableSOTM,
-            FollowPath(path),
-            DisableSOTM
-        )
-    }
-    val ShootClose = SequentialGroup(
-            Delay(delayPreShoot),
-            ShootCommandClose,
-            Delay(delayCloseShoot),
-        )
-    val ShootFar = SequentialGroup(
-            Delay(delayPreShoot),
-            ShootCommandFar,
-            Delay(delayFarShoot),
-        )
-    val PostIntake = SequentialGroup(
-            IntakeAfterCommand,
-            Delay(delayInIntake),
-            TravelCommand,
-        )
-    val PostIntakeApproachShoot = { shootPath: PathChain ->
-        ParallelGroup(
-            PostIntake,
-            RawApproachShoot(shootPath)
-        )
-    }
-    val IntakeApproachShoot = { intakePath: PathChain, shootPath: PathChain ->
-        SequentialGroup(
-            TravelCommand,
-            Intake(intakePath),
-            Delay(delayAfterIntake),
-            PostIntakeApproachShoot(shootPath)
-        )
-    }
-    val GateIntakeClose = SequentialGroup(
-        FollowPath(closeToGate!!),
-        Delay(delayAtGate),
-        FollowPath(gateToAfter!!),
-        Delay(delayAfterGate),
-    )
-    val Park = SequentialGroup(
-        TravelCommand,
-        InstantCommand { stopShooterAutoAim = true },
-        ShooterSubsystem.On(9999.0),
-        FollowPath(parkPath!!),
-    )
+//    val Intake = { path: PathChain ->
+//        SequentialGroup(
+//            FollowPath(path),  // intake L2
+//            Delay(delayAfterIntake),
+//        )
+//    }
+//    val RawApproachShoot = { path: PathChain ->
+//        SequentialGroup(
+//            EnableSOTM,
+//            FollowPath(path),
+//            DisableSOTM
+//        )
+//    }
+//    val ShootClose = SequentialGroup(
+//            Delay(delayPreShoot),
+//            ShootCommandClose,
+//            Delay(delayCloseShoot),
+//        )
+//    val ShootFar = SequentialGroup(
+//            Delay(delayPreShoot),
+//            ShootCommandFar,
+//            Delay(delayFarShoot),
+//        )
+//    val PostIntake = SequentialGroup(
+//            IntakeAfterCommand,
+//            Delay(delayInIntake),
+//            TravelCommand,
+//        )
+//    val PostIntakeApproachShoot = { shootPath: PathChain ->
+//        ParallelGroup(
+//            PostIntake,
+//            RawApproachShoot(shootPath)
+//        )
+//    }
+//    val IntakeApproachShoot = { intakePath: PathChain, shootPath: PathChain ->
+//        SequentialGroup(
+//            TravelCommand,
+//            Intake(intakePath),
+//            Delay(delayAfterIntake),
+//            PostIntakeApproachShoot(shootPath)
+//        )
+//    }
+//    val GateIntakeClose = SequentialGroup(
+//        FollowPath(closeToGate!!),
+//        Delay(delayAtGate),
+//        FollowPath(gateToAfter!!),
+//        Delay(delayAfterGate),
+//    )
+//    val Park = SequentialGroup(
+//        TravelCommand,
+//        InstantCommand { stopShooterAutoAim = true },
+//        ShooterSubsystem.On(9999.0),
+//        FollowPath(parkPath!!),
+//    )
 
     /////////////////////////
     ////Autonomous Runner////

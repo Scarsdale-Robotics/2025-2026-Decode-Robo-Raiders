@@ -56,7 +56,7 @@ public class BothTest extends LinearOpMode {
             panelsManager.addLine("CV");
             panelsManager.addData("xc: ", cv.getRCx1());
             panelsManager.addData("yc: ", cv.getRCy1());
-            panelsManager.addData("yc: ", cv.getRCh());
+            panelsManager.addData("hc: ", cv.getRCh());
 
             panelsManager.addLine("ERROR");
             panelsManager.addData("Xe: ", odom.getROx1() - cv.getRCx1());

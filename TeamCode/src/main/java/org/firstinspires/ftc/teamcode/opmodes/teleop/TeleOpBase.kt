@@ -72,9 +72,9 @@ open class TeleOpBase(
 //    private var odom: OdometrySubsystem? = null;
     val x:  Double get() { return (PedroComponent.follower.pose.x + ofsX);}
     val y:  Double get() { return (PedroComponent.follower.pose.y + ofsY);}
-    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad + ofsH;}
-    val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
-    val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
+    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad + ofsH; }
+    var vx = 0.0;
+    var vy = 0.0;
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
     val ax: Double get() { return (PedroComponent.follower.acceleration.xComponent);}
     val ay: Double get() { return (PedroComponent.follower.acceleration.yComponent);}
@@ -161,7 +161,9 @@ open class TeleOpBase(
         )
     }
 
+    var lastPose: Pose = Pose(0.0, 0.0, 0.0);
     var lockDirection = false;
+    var lastTime = 0.0;
     override fun onInit() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
@@ -568,13 +570,20 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-        dxp = dx - (vx + 0.05 * ax) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        dyp = dy - (vy + 0.05 * ay) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dxp = dx - 1.0 * vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dyp = dy - 1.0 * vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
 //        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
 //        dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
 //        val hp = h - (vh + ah * 0.05) * 0.5
         val hp = h;
+
+        vx = (PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime);
+        vy = (PedroComponent.follower.pose.y - lastPose.pose.y) / (runtime - lastTime);
+        PanelsTelemetry.telemetry.addData("vx", vx);
+        PanelsTelemetry.telemetry.addData("vy", vy);
+        lastPose = PedroComponent.follower.pose;
+        lastTime = runtime;
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
         PanelsTelemetry.telemetry.addData("SHOOTING?", ShooterSubsystem.isShooting);
@@ -607,10 +616,11 @@ open class TeleOpBase(
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
 //            val sotmFactor = 1 - ((dxyp - dxy) / 10.0).coerceIn(0.0, 1.0);
-            val sotmFactor = if (
-                    (abs(Gamepads.gamepad1.leftStickX.get()) <= 0.02) &&
-                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
-            ) 0.0 else 1.0;
+//            val sotmFactor = if (
+//                    (abs(Gamepads.gamepad1.leftStickX.get()) <= 0.02) &&
+//                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
+//            ) 0.0 else 1.0;
+            val sotmFactor = 1.0;
             telemetry.addData("sotm factor", sotmFactor);
             ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
