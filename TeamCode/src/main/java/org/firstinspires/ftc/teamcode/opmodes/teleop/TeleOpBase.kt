@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.speed
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem_VisionPortal
 import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
@@ -148,6 +149,8 @@ open class TeleOpBase(
     var driverControlled: PedroDriverControlled? = null;
     //    var driverControlled: PedroDriverControlled;
     var parkChain: PathChain? = null;
+
+    var cv: CVSubsystem_VisionPortal? = null;
 
     init {
         addComponents(
@@ -271,6 +274,7 @@ open class TeleOpBase(
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         PedroComponent.follower.pose = Pose(startX, startY, startH)
+        cv = CVSubsystem_VisionPortal(startX, startY, startH, hardwareMap)
 //        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
 //        odom!!.updateOdom()
 
@@ -550,7 +554,14 @@ open class TeleOpBase(
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
 
+        cv!!.updateCV()
         PedroComponent.follower.update()
+        if (
+            cv!!.hasDetection()
+//            && hypot(vx, vy) < 1.0  // todo: consider adding if cam bad during movement
+        ) {
+            PedroComponent.follower.pose = Pose(cv!!.x, cv!!.y, cv!!.h);
+        }
 //        odom!!.updateOdom();
 
         if (

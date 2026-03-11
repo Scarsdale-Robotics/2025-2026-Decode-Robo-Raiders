@@ -70,7 +70,7 @@ public class CVSubsystem_VisionPortal {
                                 DistanceUnit.INCH, 4.25462244094, -4.50787402, 7.57202637795, 0
                         ), new YawPitchRollAngles(
                                 AngleUnit.DEGREES,
-                                180,  // backwards
+                                180,  // backwards  // todo: try change this for better heading measurement?
                                 -105,  // 15 deg above horizontal
                                 180,  // upside-down
                                 0
@@ -109,6 +109,11 @@ public class CVSubsystem_VisionPortal {
         visionPortal.close();
     }
 
+    private boolean hasDetection = false;
+    public boolean getHasDetection() {
+        return hasDetection;
+    }
+
     public void updateCV() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         if (detections == null || detections.isEmpty()) return;
@@ -123,7 +128,12 @@ public class CVSubsystem_VisionPortal {
             }
         }
 
-        if (best == null) return;
+        if (best == null) {
+            hasDetection = false;
+            return;
+        }
+
+        hasDetection = true;
 //        if (best.ftcPose == null) return;
 
 
@@ -166,6 +176,10 @@ public class CVSubsystem_VisionPortal {
     public double getRCx1() { return RCx1; }
     public double getRCy1() { return RCy1; }
     public double getRCh()  { return RCh; }
+
+    public double getX() { return RCx1; }
+    public double getY() { return RCy1; }
+    public double getH() { return RCh; }
 
     private double normalizeAngle(double angle) {
         while (angle > Math.PI)  angle -= 2 * Math.PI;
