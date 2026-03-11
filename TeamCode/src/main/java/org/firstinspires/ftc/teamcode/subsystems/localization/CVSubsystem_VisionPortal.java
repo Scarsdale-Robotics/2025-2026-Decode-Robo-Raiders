@@ -60,8 +60,8 @@ public class CVSubsystem_VisionPortal {
                         new Quaternion(0.6725937f, -0.6725937f, -0.2182149f, 0.2182149f, 0))
 //                .addTags(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .build();
-        //i hate kotlin, it sucks, and next ftc is so ahh
-        //viir is king and we should all switch to ftclib
+
+
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setTagLibrary(tagLibrary)
 //                .setLensIntrinsics(1430,1457,480,620)
@@ -70,7 +70,7 @@ public class CVSubsystem_VisionPortal {
                                 DistanceUnit.INCH, 4.25462244094, -4.50787402, 7.57202637795, 0
                         ), new YawPitchRollAngles(
                                 AngleUnit.DEGREES,
-                                180,  // backwards  // todo: try change this for better heading measurement?
+                                180,  // backwards
                                 -105,  // 15 deg above horizontal
                                 180,  // upside-down
                                 0
