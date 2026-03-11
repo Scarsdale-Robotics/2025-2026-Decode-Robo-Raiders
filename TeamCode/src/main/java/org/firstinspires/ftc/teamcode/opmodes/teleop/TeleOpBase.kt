@@ -330,11 +330,12 @@ open class TeleOpBase(
 //        mecanum();
         driverControlled!!()
 
-//        Gamepads.gamepad1.dpadUp whenBecomesTrue {
-//            val path = FollowPath(gateIntakeChain!!)
-//            path()
-//            activeDriveMacros.add(path)
-//        }
+        Gamepads.gamepad1.leftBumper whenBecomesTrue {
+            val path = FollowPath(gateIntakeChain!!)
+            path()
+            activeDriveMacros.add(path)
+            gamepad1.rumble(100)
+        }
 //        (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
 //            .whenBecomesTrue {
 //                val path = FollowPath(farShootChain!!)
@@ -595,7 +596,11 @@ open class TeleOpBase(
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
 //            val sotmFactor = 1 - ((dxyp - dxy) / 10.0).coerceIn(0.0, 1.0);
-            var sotmFactor = 1.0;
+            val sotmFactor = if (
+                    (abs(Gamepads.gamepad1.leftStickX.get()) <= 0.02) &&
+                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
+            ) 0.0 else 1.0;
+            telemetry.addData("sotm factor", sotmFactor);
             ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
                 dxyp * sotmFactor + dxy * (1 - sotmFactor),

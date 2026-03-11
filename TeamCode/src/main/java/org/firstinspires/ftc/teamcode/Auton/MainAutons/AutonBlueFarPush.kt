@@ -389,17 +389,101 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             MagServoSubsystem.run
         )
 
+    var sotmFactor = 1.0;
+    val EnableSOTM: Command = InstantCommand { sotmFactor = 1.0 }
+    val DisableSOTM: Command = InstantCommand { sotmFactor = 0.0 }
+
+    val Intake = { path: PathChain ->
+        SequentialGroup(
+            FollowPath(path),  // intake L2
+            Delay(delayAfterIntake),
+        )
+    }
+    val RawApproachShoot = { path: PathChain ->
+        SequentialGroup(
+            EnableSOTM,
+            FollowPath(path),
+            DisableSOTM
+        )
+    }
+    val ShootClose = SequentialGroup(
+            Delay(delayPreShoot),
+            ShootCommandClose,
+            Delay(delayCloseShoot),
+        )
+    val ShootFar = SequentialGroup(
+            Delay(delayPreShoot),
+            ShootCommandFar,
+            Delay(delayFarShoot),
+        )
+    val PostIntake = SequentialGroup(
+            IntakeAfterCommand,
+            Delay(delayInIntake),
+            TravelCommand,
+        )
+    val PostIntakeApproachShoot = { shootPath: PathChain ->
+        ParallelGroup(
+            PostIntake,
+            RawApproachShoot(shootPath)
+        )
+    }
+    val IntakeApproachShoot = { intakePath: PathChain, shootPath: PathChain ->
+        SequentialGroup(
+            TravelCommand,
+            Intake(intakePath),
+            Delay(delayAfterIntake),
+            PostIntakeApproachShoot(shootPath)
+        )
+    }
+    val GateIntakeClose = SequentialGroup(
+        FollowPath(closeToGate!!),
+        Delay(delayAtGate),
+        FollowPath(gateToAfter!!),
+        Delay(delayAfterGate),
+    )
+    val Park = SequentialGroup(
+        TravelCommand,
+        InstantCommand { stopShooterAutoAim = true },
+        ShooterSubsystem.On(9999.0),
+        FollowPath(parkPath!!),
+    )
+
     /////////////////////////
     ////Autonomous Runner////
     /////////////////////////
     var stopShooterAutoAim = false;
+//    private val autonomousRoutine = SequentialGroup(
+//        FollowPath(pushPath!!),
+//        RawApproachShoot(pushToClose!!),
+//        ShootClose,
+//
+//        Intake(closeToL2!!),
+//        PostIntakeApproachShoot(L2Shoot!!),
+//        ShootClose,
+//
+//        GateIntakeClose,
+//        PostIntakeApproachShoot(gateToShoot!!),
+//        ShootClose,
+//
+//        Intake(closeToL1!!),
+//        PostIntakeApproachShoot(L1Shoot!!),
+//        ShootClose,
+//
+//        Intake(closeToL3!!),
+//        PostIntakeApproachShoot(L3Shoot!!),
+//        ShootClose,
+//
+//        Park
+//    )
     private val autonomousRoutine: Command
         get() = SequentialGroup(
             // push partner
             maxPower,
             FollowPath(pushPath!!),
 //            Delay(delayStartup),
+            EnableSOTM,
             FollowPath(pushToClose!!),
+            DisableSOTM,
 
             // preload
             Delay(delayPreShoot),
@@ -410,13 +494,17 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             TravelCommand,
             FollowPath(closeToL2!!),  // intake L2
             Delay(delayAfterIntake),
-            IntakeAfterCommand,
             ParallelGroup(  // shoot l2
                 SequentialGroup(
+                    IntakeAfterCommand,
                     Delay(delayInIntake),
                     TravelCommand,
                 ),
-                FollowPath(L2Shoot!!)
+                SequentialGroup(
+                    EnableSOTM,
+                    FollowPath(L2Shoot!!),
+                    DisableSOTM
+                )
             ),
             Delay(delayPreShoot),
             ShootCommandClose,
@@ -435,7 +523,11 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     Delay(delayInIntake),
                     TravelCommand,
                 ),
-                FollowPath(gateToShoot!!)
+                SequentialGroup(
+                    EnableSOTM,
+                    FollowPath(gateToShoot!!),
+                    DisableSOTM
+                )
             ),
             Delay(delayPreShoot),  // shoot
             ShootCommandClose,
@@ -451,7 +543,11 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     Delay(delayInIntake),
                     TravelCommand,
                 ),
-                FollowPath(L1Shoot!!)
+                SequentialGroup(
+                    EnableSOTM,
+                    FollowPath(L1Shoot!!),
+                    DisableSOTM
+                )
             ),
             Delay(delayPreShoot),
             ShootCommandClose,
@@ -467,7 +563,11 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     Delay(delayInIntake),
                     TravelCommand,
                 ),
-                FollowPath(L3Shoot!!)
+                SequentialGroup(
+                    EnableSOTM,
+                    FollowPath(L3Shoot!!),
+                    DisableSOTM
+                )
             ),
             Delay(delayPreShoot),
             ShootCommandClose,
@@ -508,22 +608,22 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-//        val dxp = dx - (0.8*PedroComponent.follower.velocity.xComponent
-//                + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
-//                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
-//                else AutoAimConstants.distanceToTimeClose(dxy)
-//        )
-//        val dyp = dy - (0.8*PedroComponent.follower.velocity.yComponent
-//                + 0.05 * PedroComponent.follower.acceleration.yComponent) * (
-//                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
-//                else AutoAimConstants.distanceToTimeClose(dxy)
-//        )
-        val dxp = dx;
-        val dyp = dy;
+        val dxp = dx - (1.0*PedroComponent.follower.velocity.xComponent
+                + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
+                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
+                else AutoAimConstants.distanceToTimeClose(dxy)
+        )
+        val dyp = dy - (1.0*PedroComponent.follower.velocity.yComponent
+                + 0.05 * PedroComponent.follower.acceleration.yComponent) * (
+                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
+                else AutoAimConstants.distanceToTimeClose(dxy)
+        )
+//        val dxp = dx;
+//        val dyp = dy;
         val dxyp = hypot(dxp, dyp)
         if (!stopShooterAutoAim) {
             ShooterSubsystem.AutoAim(
-                dxyp,
+                dxyp * sotmFactor + dxy * (1.0 - sotmFactor),
                 { dist ->
                     (
                             if (PedroComponent.follower.pose.y < BORD_Y)
@@ -534,9 +634,13 @@ class AutonBlueFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                 }
             )()
         }
-        TurretPhiSubsystem.AutoAim(dxp, dyp, PedroComponent.follower.pose.heading.rad)();
+        TurretPhiSubsystem.AutoAim(
+            dxp * sotmFactor + dx * (1 - sotmFactor),
+            dyp * sotmFactor + dy * (1 - sotmFactor),
+            PedroComponent.follower.pose.heading.rad
+        )();
         TurretThetaSubsystem.AutoAim(
-            dxyp,
+            dxyp * sotmFactor + dxy * (1.0 - sotmFactor),
             { dist ->
                 (if (PedroComponent.follower.pose.y < BORD_Y)
                     distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
