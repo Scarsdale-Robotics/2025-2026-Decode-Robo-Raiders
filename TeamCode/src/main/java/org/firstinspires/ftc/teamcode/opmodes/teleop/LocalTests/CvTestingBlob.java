@@ -41,8 +41,11 @@ public class CvTestingBlob extends LinearOpMode {
                 panelsManager.addData("Radius: ", circleFit.getRadius());
                 panelsManager.addData("X: ", circleFit.getX());
                 panelsManager.addData("Y: ", circleFit.getY());
+                double cd = (120.0*391)/ circleFit.getRadius()*2;
+                panelsManager.addData("D: ", cd);
+                double theta = Math.atan2(circleFit.getX()-320,391);
+                panelsManager.addData("A: ", theta);
             }
-
 
         }
 
