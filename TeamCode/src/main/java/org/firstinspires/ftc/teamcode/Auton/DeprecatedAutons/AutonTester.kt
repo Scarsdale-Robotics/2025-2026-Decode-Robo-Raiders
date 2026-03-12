@@ -1,4 +1,4 @@
-//package org.firstinspires.ftc.teamcode.Auton.MainAutons
+package org.firstinspires.ftc.teamcode.Auton.DeprecatedAutons
 //
 //import com.bylazar.configurables.annotations.Configurable
 //import com.bylazar.telemetry.PanelsTelemetry
