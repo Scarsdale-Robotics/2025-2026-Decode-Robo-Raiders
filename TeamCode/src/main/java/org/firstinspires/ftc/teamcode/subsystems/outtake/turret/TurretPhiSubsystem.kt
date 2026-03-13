@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
+import com.qualcomm.robotcore.hardware.DcMotor
 import dev.nextftc.bindings.Button
 import dev.nextftc.control.ControlSystem
 import dev.nextftc.control.KineticState
@@ -54,7 +55,8 @@ object TurretPhiSubsystem : Subsystem {
 //    @JvmField var Lv = 0.0;
 
     fun zero() {
-        motor.zero()
+        motor.zeroed()
+        motor.motor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER;
     }
 
     init {
@@ -75,12 +77,6 @@ object TurretPhiSubsystem : Subsystem {
         controller.goal = KineticState()
         secondaryController.goal = KineticState()
         started = true;
-    }
-
-    fun reset() {
-        var d = ENCODERS_FORWARD - ENCODERS_BACKWARD
-        ENCODERS_FORWARD = motor.currentPosition
-        ENCODERS_BACKWARD = ENCODERS_FORWARD - d
     }
 
     // 0.0 --> robot forward

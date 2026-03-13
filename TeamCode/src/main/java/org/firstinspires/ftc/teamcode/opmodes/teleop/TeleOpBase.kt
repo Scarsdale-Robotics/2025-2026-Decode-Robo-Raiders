@@ -170,6 +170,7 @@ open class TeleOpBase(
     override fun onInit() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
+        TurretPhiSubsystem.started = false;
 //        MagServoSubsystem.stop()
 
         // ROBOT CENTRIC:
@@ -448,20 +449,20 @@ open class TeleOpBase(
 
         // I think l/r only makes sense when robot facing away (approx same direction person is facing)
         Gamepads.gamepad2.dpadRight whenBecomesTrue {
-            PedroComponent.follower.pose = Pose(
-                PedroComponent.follower.pose.x,
-                PedroComponent.follower.pose.y,
-                PedroComponent.follower.pose.heading + Math.toRadians(1.0),
-            )
-//            phiTrim -= 2.0.deg
+//            PedroComponent.follower.pose = Pose(
+//                PedroComponent.follower.pose.x,
+//                PedroComponent.follower.pose.y,
+//                PedroComponent.follower.pose.heading + Math.toRadians(1.0),
+//            )
+            phiTrim -= 2.0.deg
         }
         Gamepads.gamepad2.dpadLeft whenBecomesTrue {
-            PedroComponent.follower.pose = Pose(
-                PedroComponent.follower.pose.x,
-                PedroComponent.follower.pose.y,
-                PedroComponent.follower.pose.heading - Math.toRadians(1.0),
-            )
-//            phiTrim += 2.0.deg
+//            PedroComponent.follower.pose = Pose(
+//                PedroComponent.follower.pose.x,
+//                PedroComponent.follower.pose.y,
+//                PedroComponent.follower.pose.heading - Math.toRadians(1.0),
+//            )
+            phiTrim += 2.0.deg
         }
 
         Gamepads.gamepad2.rightBumper whenBecomesTrue {

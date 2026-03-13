@@ -74,6 +74,7 @@ class BasicTeleOp(): NextFTCOpMode() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
         MagServoSubsystem.stop()
+        TurretPhiSubsystem.zero()
 //        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
         PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
     }
