@@ -200,7 +200,7 @@ open class TeleOpBase(
                 HeadingInterpolator.linearFromPoint(
                     PedroComponent.follower::getHeading,
                     Pos(AutonPositions.gateOpenPoseTele, isBlue).heading,
-                    0.2
+                    0.7
                 )
             )
 //            .addPath(
@@ -678,6 +678,7 @@ open class TeleOpBase(
         );
         telemetry.addData("ShooterSpeed", ShooterSubsystem.velocity);
         telemetry.addData("Angle", shootAngleDegrees.deg);
+        telemetry.addData("targetPhi", TurretPhiSubsystem.targetPhi)
         telemetry.update()
 
 //        PanelsTelemetry.telemetry.addData("Vx (in/s)", vx)

@@ -70,7 +70,7 @@ public class CVSubsystem_VisionPortal {
                                 DistanceUnit.INCH, 4.25462244094, -4.50787402, 7.57202637795, 0
                         ), new YawPitchRollAngles(
                                 AngleUnit.DEGREES,
-                                180 - Math.toDegrees(-0.0658537f),  // backwards lean left // todo: adjust to match heading
+                                180 - Math.toDegrees(-0.0658537f) - Math.toDegrees(0.052),  // backwards lean left // todo: adjust to match heading
                                 -105,  // 15 deg above horizontal
                                 180,  // upside-down
                                 0
