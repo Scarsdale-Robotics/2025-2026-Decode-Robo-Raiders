@@ -19,18 +19,13 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import dev.nextftc.hardware.driving.FieldCentric
-import dev.nextftc.hardware.driving.MecanumDriverControlled
-import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
-import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.speed1
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem_VisionPortal
-import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
@@ -40,12 +35,10 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
-import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sign
 
 
 data class ResetModeParams(val x: Double, val y: Double, val h: Angle)
@@ -76,6 +69,8 @@ open class TeleOpBase(
     val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad + ofsH; }
     var vx = 0.0;
     var vy = 0.0;
+    var vxOld = listOf(0.0, 0.0, 0.0, 0.0, 0.0);
+    var vyOld = listOf(0.0, 0.0, 0.0, 0.0, 0.0);
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
     val ax: Double get() { return (PedroComponent.follower.acceleration.xComponent);}
     val ay: Double get() { return (PedroComponent.follower.acceleration.yComponent);}
@@ -308,6 +303,7 @@ open class TeleOpBase(
     var ofsH = 0.0.rad;
 
     override fun onStartButtonPressed() {
+        TurretPhiSubsystem.started = true;
 //        val file = File(Lefile.filePath)
 //        val content = file.readText().split("\n")
 //        val startX = content[0].toDouble()
@@ -582,6 +578,10 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
+        vxOld = vxOld.slice(IntRange(1, vxOld.lastIndex)) + listOf((PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime));
+        vyOld = vyOld.slice(IntRange(1, vyOld.lastIndex)) + listOf((PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime));
+        vx = vxOld.average();
+        vy = vyOld.average();
         dxp = dx - 1.0 * vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dyp = dy - 1.0 * vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
 //        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
@@ -590,10 +590,11 @@ open class TeleOpBase(
 //        val hp = h - (vh + ah * 0.05) * 0.5
         val hp = h;
 
-        vx = (PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime);
-        vy = (PedroComponent.follower.pose.y - lastPose.pose.y) / (runtime - lastTime);
         PanelsTelemetry.telemetry.addData("vx", vx);
         PanelsTelemetry.telemetry.addData("vy", vy);
+        PanelsTelemetry.telemetry.addData("hp", hp);
+        PanelsTelemetry.telemetry.addData("dxp", dxp);
+        PanelsTelemetry.telemetry.addData("dyp", dyp);
         lastPose = PedroComponent.follower.pose;
         lastTime = runtime;
 
@@ -661,7 +662,7 @@ open class TeleOpBase(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
                 dyp * sotmFactor + dy * (1 - sotmFactor),
                 hp, phiTrim,
-                -Gamepads.gamepad1.rightStickX.get()  // tODO; make sure not bad
+//                -Gamepads.gamepad1.rightStickX.get()  // tODO; make sure not bad
             )()
         } else {
             //ShooterSubsystem.Manual(
