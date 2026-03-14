@@ -152,7 +152,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 )
             )
             .setTangentHeadingInterpolation()
-            .addParametricCallback(0.65, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.65, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG  //todo: nathan comment, I think this can be full motor speed
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
             .build()
         //1st Go Shoot
@@ -166,6 +166,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
+            .setTimeoutConstraint(0.0)
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
             .build()
 
@@ -202,7 +203,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //            )
 //            .build()
 
-        //backs up from lever to stay legal
+        //backs up from lever to stay legal  // todo : nathan note, I think we can cut the backup
         robotBackupFromRamp = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
@@ -231,6 +232,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
+            .setTimeoutConstraint(0.0)
             .build()
 
         //2nd Intake
@@ -260,6 +262,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
                 0.5)
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseClose).heading)
+            .setTimeoutConstraint(0.0)
             .build()
 
         //3rd Intake
@@ -291,6 +294,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
                 0.65
             )
+            .setTimeoutConstraint(0.0)
             .build()
         //3rd Intake
         roboCommonIntake = PedroComponent.follower.pathBuilder()
@@ -320,6 +324,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
+            .setTimeoutConstraint(0.0)
 //            .setLinearHeadingInterpolation(
 //                AutonPositions.Blue(AutonPositions.commonIntakePos).heading,
 //                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
@@ -360,6 +365,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
 //                0.75
 //            )
+            .setTimeoutConstraint(0.0)
             .build()
         //Go Park
         robotPark = PedroComponent.follower.pathBuilder()
@@ -374,6 +380,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 AutonPositions.Blue(AutonPositions.autonParkPose).heading,
                 0.9
             )
+            .setTimeoutConstraint(0.0)
             .build()
     }
 
