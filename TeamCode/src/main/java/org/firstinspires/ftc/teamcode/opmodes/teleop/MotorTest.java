@@ -1,18 +1,16 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleop.LocalTests;
-
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.linearOpMode;
+package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-
 @TeleOp(name = "motorTest")
 @Configurable
-public class BasicOpMode extends LinearOpMode {
+@Disabled
+public class MotorTest extends LinearOpMode {
 
     DcMotorEx frontR = hardwareMap.get(DcMotorEx.class, "rfw");
     DcMotor frontL = hardwareMap.get(DcMotor.class, "lfw");

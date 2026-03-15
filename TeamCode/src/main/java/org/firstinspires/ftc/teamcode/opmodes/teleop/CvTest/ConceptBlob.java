@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleop.LocalTests;
+package org.firstinspires.ftc.teamcode.opmodes.teleop.CvTest;
 
 import android.graphics.Color;
-import android.util.Size;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -95,7 +94,8 @@ import java.util.List;
  *   A perfect circle has a circularity of 1.  All others are < 1
  */
 @TeleOp(name = "Concept: Vision Color-Lo12cator (Circle)", group = "Concept")
-public class ConceptVisionColorLocator_Circle extends LinearOpMode {
+@Disabled
+public class ConceptBlob extends LinearOpMode {
     @Override
     public void runOpMode() {
 

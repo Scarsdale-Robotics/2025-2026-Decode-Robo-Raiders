@@ -15,7 +15,7 @@ import java.util.List;
 
 import kotlin.Unit;
 
-@TeleOp(name = "Local odom test")
+@TeleOp(name = "BothTest")
 @Configurable
 public class BothTest extends LinearOpMode {
 

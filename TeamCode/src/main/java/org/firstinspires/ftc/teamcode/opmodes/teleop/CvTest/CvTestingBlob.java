@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleop.LocalTests;
+package org.firstinspires.ftc.teamcode.opmodes.teleop.CvTest;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -9,8 +9,6 @@ import org.firstinspires.ftc.vision.opencv.Circle;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 
 import java.util.List;
-
-import kotlin.Unit;
 
 @TeleOp(name = "CVb3")
 public class CvTestingBlob extends LinearOpMode {
