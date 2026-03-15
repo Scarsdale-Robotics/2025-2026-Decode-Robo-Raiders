@@ -94,7 +94,7 @@ import java.util.List;
  *   A blob's circularity is how circular it is based on the known area and arc length.
  *   A perfect circle has a circularity of 1.  All others are < 1
  */
-@TeleOp(name = "Concept: Vision Color-Locator (Circle)", group = "Concept")
+@TeleOp(name = "Concept: Vision Color-Lo12cator (Circle)", group = "Concept")
 public class ConceptVisionColorLocator_Circle extends LinearOpMode {
     @Override
     public void runOpMode() {
@@ -117,8 +117,8 @@ public class ConceptVisionColorLocator_Circle extends LinearOpMode {
 
         VisionPortal portal = new VisionPortal.Builder()
                 .addProcessor(colorLocator)
-                .setCameraResolution(new Size(320, 240))
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new android.util.Size(640, 480))
+                .setCamera(hardwareMap.get(WebcamName.class, "Cam"))
                 .build();
 
         telemetry.setMsTransmissionInterval(100);   // Speed up telemetry updates for debugging.
