@@ -271,6 +271,10 @@ open class TeleOpBase(
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         PedroComponent.follower.pose = Pose(startX, startY, startH)
         cv = CVSubsystem_VisionPortal(startX, startY, startH, hardwareMap)
+
+        telemetry.addData("Start X", startX);
+        telemetry.addData("Start Y", startY);
+        telemetry.addData("Start H (degs)", Math.toDegrees(startH));
 //        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
 //        odom!!.updateOdom()
 
