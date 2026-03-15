@@ -84,7 +84,7 @@ class CvAprilTag {
     private double x = 0, y = 0, h = 0;
     private boolean hasDetection = false;
 
-    public CvAprilTag() {
+    public CvAprilTag(double x1, double y1, double h1) {
         AprilTagLibrary tagLibrary = new AprilTagLibrary.Builder()
                 .addTag(20, "BlueTarget",
                         6.5, new VectorF(-58.3727f, -55.6425f, 29.5f), DistanceUnit.INCH,
@@ -112,6 +112,10 @@ class CvAprilTag {
                 .setDrawTagOutline(true)
                 .setDrawAxes(true)
                 .build();
+
+        x = x1;
+        y = y1;
+        h = h1;
     }
 
     public AprilTagProcessor getProcessor() {
@@ -161,9 +165,14 @@ class CvAprilTag {
     }
 
     public boolean hasDetection() { return hasDetection; }
-    public double getX() { return x; }
-    public double getY() { return y; }
-    public double getH() { return h; }
+    public double getX1() { return x; }
+    public double getY1() { return y; }
+    public double getH1() { return h; }
+    public void setCv(double x1, double y1, double h1) {
+        x = x1;
+        y = y1;
+        h = h1;
+    }
 }
 
 
@@ -173,9 +182,10 @@ public class CvPortalManager {
     public final CvBallDetection ballDetection;
     public final CvAprilTag aprilTag;
 
-    public CvPortalManager(boolean isPurple, HardwareMap hm) {
+    public CvPortalManager(double x1, double y1, double h1, boolean isPurple, HardwareMap hm) {
         ballDetection = new CvBallDetection(isPurple);
-        aprilTag = new CvAprilTag();
+        aprilTag = new CvAprilTag(x1,y1,h1);
+        aprilTag.setCv(x1,y1,h1);
 
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hm.get(WebcamName.class, "Cam"))
@@ -193,4 +203,11 @@ public class CvPortalManager {
     public void close() {
         visionPortal.close();
     }
+
+    public double getX2(){return aprilTag.getX1();}
+    public double getY2(){return aprilTag.getY1();}
+    public double getH2(){return aprilTag.getH1();}
+    public boolean hasDetection1() { return aprilTag.hasDetection();}
+    public void setCv1(double x1, double y1,double h1) {aprilTag.setCv(x1,y1,h1);}
+    public List<ColorBlobLocatorProcessor.Blob> getBlobs1() {return ballDetection.getBlobs();}
 }
