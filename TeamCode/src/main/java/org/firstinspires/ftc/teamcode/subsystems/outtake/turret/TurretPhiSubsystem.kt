@@ -33,22 +33,13 @@ import kotlin.time.TimeSource
 // left-right
 @Configurable
 object TurretPhiSubsystem : Subsystem {
-    private val motor = MotorEx("turret_phi").brakeMode();
-
+    private val motor = MotorEx("turret_phi").brakeMode()
     @JvmField var ENCODERS_FORWARD = 1254.63342295;
     @JvmField var ENCODERS_BACKWARD = 0.0;  // todo: TUNE
 
     var started = false;
 
     private val controller: ControlSystem;
-    private val secondaryController: ControlSystem;
-
-    private var feedforwardCmd = 0.0;
-
-    @JvmField var squidCoefficients = PIDCoefficients(0.002, 0.0, 0.00002);
-    @JvmField var secondarySquidCoefficients = PIDCoefficients(0.0007, 0.0, 0.00002);
-
-    @JvmField var feedforwardCoefficient = 0.1;
 
 //    @JvmField var Ls = 0.0;
 //    @JvmField var Lv = 0.0;
@@ -59,21 +50,10 @@ object TurretPhiSubsystem : Subsystem {
 
     init {
 //        val posSMO = SMOFilter(FeedbackType.POSITION, Lv, Ls);
-
-        controller = ControlSystem()
-//            .posFilter { filter -> filter.custom(posSMO).build(); }
-            .posSquID(squidCoefficients)
-            .build();
-
-        secondaryController = ControlSystem()
-//            .posFilter { filter -> filter.custom(posSMO).build(); }
-            .posSquID(secondarySquidCoefficients)
-            .build();
     }
 
     override fun initialize() {
         controller.goal = KineticState()
-        secondaryController.goal = KineticState()
         started = true;
     }
 
@@ -147,8 +127,6 @@ object TurretPhiSubsystem : Subsystem {
                 CommandManager.cancelCommand(lastCommand!!)
             }
 
-            feedforwardCmd = feedforward;
-            PanelsTelemetry.telemetry.addData("ff correction", feedforwardCmd * feedforwardCoefficient);
 
             val normAngle = (atan2(dy, dx).rad - rh).inRad
             val upper = normAngle + 2 * PI;
@@ -187,25 +165,9 @@ object TurretPhiSubsystem : Subsystem {
             )
         }
     }
-
+    //to implement
     override fun periodic() {
         if (!started) return;
-        secondaryController.goal = controller.goal
-        var power = controller.calculate(
-            motor.state
-        )
-        val error = abs(controller.goal.position - controller.lastMeasurement.position)
-        if (error < 2.0) {
-            power = 0.0
-        } else if (error < 111.111) {
-            power = secondaryController.calculate(
-                motor.state
-            )
-
-            // add feedforward
-            power += feedforwardCmd * feedforwardCoefficient;
-        }
-        SetPower(motor, power).setInterruptible(true)()
 
         PanelsTelemetry.telemetry.addData("phi enc", motor.currentPosition)
         PanelsTelemetry.telemetry.addData("ref", controller.reference)
