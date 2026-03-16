@@ -199,6 +199,7 @@ open class TeleOpBase(
             .setConstantHeadingInterpolation(
                 Pos(AutonPositions.gateOpenPoseTele, isBlue).heading
             )
+            .setNoDeceleration()  // todo: temp test
             .build()
 //        val gateIntakeChain = PedroComponent.follower.pathBuilder()
 //            .addPath(
