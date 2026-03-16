@@ -43,11 +43,13 @@ object TurretPhiSubsystem : Subsystem {
 
     private val controller: ControlSystem;
     private val secondaryController: ControlSystem;
+//    private val tertiaryController: ControlSystem;
 
     private var feedforwardCmd = 0.0;
 
-    @JvmField var squidCoefficients = PIDCoefficients(0.002, 0.0, 0.00002);
-    @JvmField var secondarySquidCoefficients = PIDCoefficients(0.0007, 0.0, 0.00002);
+    @JvmField var squidCoefficients = PIDCoefficients(0.004, 0.0, 0.0000);
+    @JvmField var secondarySquidCoefficients = PIDCoefficients(0.001, 0.0, 0.00002);
+//    @JvmField var tertiarySquidCoefficients = PIDCoefficients(0.0007, 0.0, 0.00002);
 
     @JvmField var feedforwardCoefficient = 0.1;
 
@@ -71,11 +73,17 @@ object TurretPhiSubsystem : Subsystem {
 //            .posFilter { filter -> filter.custom(posSMO).build(); }
             .posSquID(secondarySquidCoefficients)
             .build();
+
+//        tertiaryController = ControlSystem()
+////            .posFilter { filter -> filter.custom(posSMO).build(); }
+//            .posSquID(tertiarySquidCoefficients)
+//            .build();
     }
 
     override fun initialize() {
         controller.goal = KineticState()
         secondaryController.goal = KineticState()
+//        tertiaryController.goal = KineticState()
         started = true;
     }
 
@@ -187,12 +195,20 @@ object TurretPhiSubsystem : Subsystem {
     override fun periodic() {
         if (!started) return;
         secondaryController.goal = controller.goal
+//        tertiaryController.goal = controller.goal
         var power = controller.calculate(
             motor.state
         )
         val error = abs(controller.goal.position - controller.lastMeasurement.position)
-        if (error < 2.0) {
+        if (error < 6.7) {
             power = 0.0
+//        } else if (error < 50.22) {
+//            power = tertiaryController.calculate(
+//                motor.state
+//            )
+//
+//            // add feedforward
+//            power += feedforwardCmd * feedforwardCoefficient;
         } else if (error < 111.111) {
             power = secondaryController.calculate(
                 motor.state

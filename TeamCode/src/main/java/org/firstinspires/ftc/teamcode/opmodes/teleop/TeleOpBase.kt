@@ -2,9 +2,11 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
+import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.HeadingInterpolator
+import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
@@ -69,8 +71,8 @@ open class TeleOpBase(
     val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad + ofsH; }
     var vx = 0.0;
     var vy = 0.0;
-    var vxOld = listOf(0.0, 0.0, 0.0, 0.0, 0.0);
-    var vyOld = listOf(0.0, 0.0, 0.0, 0.0, 0.0);
+    var vxOld = listOf(0.0, 0.0, 0.0);
+    var vyOld = listOf(0.0, 0.0, 0.0);
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
     val ax: Double get() { return (PedroComponent.follower.acceleration.xComponent);}
     val ay: Double get() { return (PedroComponent.follower.acceleration.yComponent);}
@@ -137,6 +139,7 @@ open class TeleOpBase(
 //            return 0.0;
 //        }
 
+    var gatePreIntakeChain: PathChain? = null;
     var gateIntakeChain: PathChain? = null;
     var farShootChain: PathChain? = null;
     var closeShootChain: PathChain? = null;
@@ -186,30 +189,71 @@ open class TeleOpBase(
 //
         gateIntakeChain = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierLine(
-                    PedroComponent.follower::getPose,
-                    Pos(AutonPositions.gateOpenPoseTele, isBlue)
+                Path(
+                    BezierLine(
+                        PedroComponent.follower::getPose,
+                        Pos(AutonPositions.gateOpenPoseTele, isBlue)
+                    )
                 )
             )
-            .setHeadingInterpolation(
-                HeadingInterpolator.linearFromPoint(
-                    PedroComponent.follower::getHeading,
-                    Pos(AutonPositions.gateOpenPoseTele, isBlue).heading,
-                    0.7
-                )
+            .setConstantHeadingInterpolation(
+                Pos(AutonPositions.gateOpenPoseTele, isBlue).heading
             )
+            .build()
+//        val gateIntakeChain = PedroComponent.follower.pathBuilder()
 //            .addPath(
-//                BezierLine(
-//                    Pos(AutonPositions.gateOpenPose, isBlue),
-//                    Pos(AutonPositions.gateAfterOpenPose, isBlue)
+//                Path(
+//                    BezierLine(
+//                        PedroComponent.follower::getPose,
+//                        Pos(AutonPositions.gateOpenPrePoseTele, isBlue)
+//                    )
 //                )
 //            )
-//            .setLinearHeadingInterpolation(
-//                Pos(AutonPositions.gateOpenPose, isBlue).heading,
-//                Pos(AutonPositions.gateAfterOpenPose, isBlue).heading,
-//                0.8
+//            .setNoDeceleration()
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.tangent
 //            )
-            .build()
+////            .setHeadingInterpolation(
+////                HeadingInterpolator.piecewise(
+////                    HeadingInterpolator.PiecewiseNode(
+////                        0.0,
+////                        0.67,
+////                        HeadingInterpolator.tangent
+////                    )
+////                ),
+////                HeadingInterpolator.piecewise(
+////                    HeadingInterpolator.PiecewiseNode(
+////                        0.67,
+////                        1.0,
+////
+////                    )
+////                )
+////            )
+////            .setLinearHeadingInterpolation(
+////                PedroComponent.follower.heading % (2 * Math.PI),  // todo: trial
+////                Pos(AutonPositions.gateOpenPoseTele, isBlue).heading,
+////                0.7
+////            )
+////            .setHeadingInterpolation(
+////                HeadingInterpolator.linearFromPoint(
+////                    PedroComponent.follower::getHeading,
+////                    Pos(AutonPositions.gateOpenPoseTele, isBlue).heading,
+////                    0.7
+////                )
+////            )
+////            .addPath(
+////                BezierLine(
+////                    Pos(AutonPositions.gateOpenPose, isBlue),
+////                    Pos(AutonPositions.gateAfterOpenPose, isBlue)
+////                )
+////            )
+////            .setLinearHeadingInterpolation(
+////                Pos(AutonPositions.gateOpenPose, isBlue).heading,
+////                Pos(AutonPositions.gateAfterOpenPose, isBlue).heading,
+////                0.8
+////            )
+//            .build()
+        
 //
 //        farShootChain = PedroComponent.follower.pathBuilder()
 //            .addPath(
@@ -340,8 +384,8 @@ open class TeleOpBase(
 
         Gamepads.gamepad1.leftBumper whenBecomesTrue {
             val path = FollowPath(gateIntakeChain!!)
-            path()
             activeDriveMacros.add(path)
+            path()
             gamepad1.rumble(100)
         }
 //        (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
@@ -568,13 +612,16 @@ open class TeleOpBase(
         if (
             activeDriveMacros.isNotEmpty() &&
             (
-                    abs(gamepad1.left_stick_x) > 0.02 ||
-                            abs(gamepad1.left_stick_y) > 0.02 ||
-                            abs(gamepad1.right_stick_x) > 0.02
+                    abs(Gamepads.gamepad1.leftStickX.get()) > 0.02 ||
+                            abs(Gamepads.gamepad1.leftStickY.get()) > 0.02 ||
+                            abs(Gamepads.gamepad1.rightStickX.get()) > 0.02
                     )
         ) {
             // untrigger macro
-            activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
+            activeDriveMacros.forEach {
+                it.stop(true)
+                CommandManager.cancelCommand(it)
+            }
             activeDriveMacros.clear()
             PedroComponent.follower.startTeleopDrive()
         }
@@ -583,7 +630,7 @@ open class TeleOpBase(
         val dy = goalY - y
         val dxy = hypot(dx, dy)
         vxOld = vxOld.slice(IntRange(1, vxOld.lastIndex)) + listOf((PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime));
-        vyOld = vyOld.slice(IntRange(1, vyOld.lastIndex)) + listOf((PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime));
+        vyOld = vyOld.slice(IntRange(1, vyOld.lastIndex)) + listOf((PedroComponent.follower.pose.y - lastPose.pose.y) / (runtime - lastTime));
         vx = vxOld.average();
         vy = vyOld.average();
         dxp = dx - 1.0 * vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))

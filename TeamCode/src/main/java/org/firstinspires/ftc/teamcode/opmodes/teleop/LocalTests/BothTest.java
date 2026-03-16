@@ -43,7 +43,8 @@ public class BothTest extends LinearOpMode {
 
 
         waitForStart();
-        odom.setPinpoint(72.0,72.0,(-Math.PI/2)); //starting pose
+        odom.setPinpoint(72.0,72.0,(-Math.PI/2));
+        cv.setCv(72,72,(-Math.PI/2));//starting pose
         while(opModeIsActive()){
             cv.updateCV();
             odom.updateOdom();
@@ -61,6 +62,7 @@ public class BothTest extends LinearOpMode {
             panelsManager.addLine("ERROR");
             panelsManager.addData("Xe: ", odom.getROx1() - cv.getRCx1());
             panelsManager.addData("Ye: ", odom.getROy1() - cv.getRCy1());
+            panelsManager.addData("He: ", odom.getROh() - cv.getRCh());
 
 
             panelsManager.update(telemetry);
