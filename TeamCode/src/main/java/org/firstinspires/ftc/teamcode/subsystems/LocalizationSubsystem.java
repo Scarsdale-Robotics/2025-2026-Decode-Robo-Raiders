@@ -59,7 +59,6 @@ public class LocalizationSubsystem {
         cv.updateCV();
         odom.updateOdom();
 
-
         kalmanX.predict(odom.getROx1() - Rx);
         kalmanY.predict(odom.getROy1() - Ry);
         kalmanH.predictAngle(odom.getROh() - Rh);

@@ -10,7 +10,7 @@ import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 
 import java.util.List;
 
-@TeleOp(name = "CVb3")
+@TeleOp(name = "CVb4")
 public class CvTestingBlob extends LinearOpMode {
 
     CvBallDetectionP Portal;

@@ -56,8 +56,6 @@ public class TwoPTest extends LinearOpMode {
                         min = cd;
                         close = b;
                     }
-
-
                 }
             }
 
