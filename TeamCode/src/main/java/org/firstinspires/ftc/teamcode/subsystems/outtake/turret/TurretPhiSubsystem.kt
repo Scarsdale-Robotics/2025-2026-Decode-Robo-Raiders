@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
+import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.Servo
 import dev.nextftc.bindings.Button
 import dev.nextftc.control.ControlSystem
 import dev.nextftc.control.KineticState
@@ -29,47 +31,31 @@ import kotlin.math.sin
 import kotlin.time.ComparableTimeMark
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
+import dev.nextftc.hardware.impl.ServoEx
 
 // left-right
 @Configurable
 object TurretPhiSubsystem : Subsystem {
-    private val motor = MotorEx("turret_phi").brakeMode()
-    @JvmField var ENCODERS_FORWARD = 1254.63342295;
-    @JvmField var ENCODERS_BACKWARD = 0.0;  // todo: TUNE
+    private val servo1 = ServoEx("servo_one");
+    private val servo2 = ServoEx("servo_two")
 
     var started = false;
 
-    private val controller: ControlSystem;
-
-//    @JvmField var Ls = 0.0;
-//    @JvmField var Lv = 0.0;
-
-    fun zero() {
-        motor.zero()
-    }
-
     init {
-//        val posSMO = SMOFilter(FeedbackType.POSITION, Lv, Ls);
+//
     }
 
     override fun initialize() {
-        controller.goal = KineticState()
         started = true;
     }
 
-    fun reset() {
-        var d = ENCODERS_FORWARD - ENCODERS_BACKWARD
-        ENCODERS_FORWARD = motor.currentPosition
-        ENCODERS_BACKWARD = ENCODERS_FORWARD - d
-    }
-
     // 0.0 --> robot forward
-    var targetPhi: Angle = 0.0.rad
-        get() {
-            return PI.rad * (motor.currentPosition - ENCODERS_FORWARD) /
-                        (ENCODERS_FORWARD - ENCODERS_BACKWARD)
-        }
-        private set;
+    //var targetPhi: Angle = 0.0.rad
+      //  get() {
+        //    return PI.rad * (motor.currentPosition - ENCODERS_FORWARD) /
+          //          (ENCODERS_FORWARD - ENCODERS_BACKWARD)
+        //}
+        //private set;
 
     fun norm(angle: Angle): Angle {
 //        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
@@ -103,7 +89,7 @@ object TurretPhiSubsystem : Subsystem {
         controller,
         KineticState(
             (norm(angle + ofsTurret)) / PI.rad *
-            (ENCODERS_FORWARD - ENCODERS_BACKWARD) + ENCODERS_FORWARD
+                    (ENCODERS_FORWARD - ENCODERS_BACKWARD) + ENCODERS_FORWARD
         )
     )
 
@@ -126,7 +112,6 @@ object TurretPhiSubsystem : Subsystem {
             if (lastCommand != null) {
                 CommandManager.cancelCommand(lastCommand!!)
             }
-
 
             val normAngle = (atan2(dy, dx).rad - rh).inRad
             val upper = normAngle + 2 * PI;
@@ -165,9 +150,33 @@ object TurretPhiSubsystem : Subsystem {
             )
         }
     }
-    //to implement
+
     override fun periodic() {
         if (!started) return;
+        secondaryController.goal = controller.goal
+//        tertiaryController.goal = controller.goal
+        var power = controller.calculate(
+            motor.state
+        )
+        val error = abs(controller.goal.position - controller.lastMeasurement.position)
+        if (error < 6.7) {
+            power = 0.0
+//        } else if (error < 50.22) {
+//            power = tertiaryController.calculate(
+//                motor.state
+//            )
+//
+//            // add feedforward
+//            power += feedforwardCmd * feedforwardCoefficient;
+        } else if (error < 111.111) {
+            power = secondaryController.calculate(
+                motor.state
+            )
+
+            // add feedforward
+            power += feedforwardCmd * feedforwardCoefficient;
+        }
+        SetPower(motor, power).setInterruptible(true)()
 
         PanelsTelemetry.telemetry.addData("phi enc", motor.currentPosition)
         PanelsTelemetry.telemetry.addData("ref", controller.reference)
@@ -178,4 +187,3 @@ object TurretPhiSubsystem : Subsystem {
 
 
 }
-
