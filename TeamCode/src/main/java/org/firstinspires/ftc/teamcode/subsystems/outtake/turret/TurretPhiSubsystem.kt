@@ -12,16 +12,13 @@ import kotlin.math.abs
 import kotlin.math.atan2
 import dev.nextftc.hardware.impl.ServoEx
 
-// left-right
+//IN CONFIG, SET SERVO 1 TO 0 AND SERVO 2 TO 0.99
 @Configurable
 object TurretPhiSubsystem : Subsystem {
     private val servo1 = ServoEx("servo_one");
     private val servo2 = ServoEx("servo_two")
-    val MIN_ANGLE = Math.toRadians(51.0) - 2 * PI
-    val MAX_ANGLE = Math.toRadians(51.0)
-
-    val SERVO_MIN = 0.0
-    val SERVO_MAX = 1.0
+    val MIN_ANGLE = Math.toRadians(-90.0)
+    val MAX_ANGLE = Math.toRadians(90.0)
     var currentPhi: Angle = 0.0.rad
 
     var started = false;
@@ -46,7 +43,10 @@ object TurretPhiSubsystem : Subsystem {
           //          (ENCODERS_FORWARD - ENCODERS_BACKWARD)
         //}
         //private set;
-
+    //this would work the same but idk
+    fun norm2(angle: Angle): Angle {
+        return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad
+    }
     fun norm(angle: Angle): Angle {
 //        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
         val tolerance = Math.toRadians(10.0);
@@ -80,19 +80,19 @@ object TurretPhiSubsystem : Subsystem {
         val pos = angleToServo(normed)
 
         servo1.position = pos
-        servo2.position = pos
+        servo2.position = 0.99 - pos
 
         currentPhi = normed
     }
 
     var lastCommand: Command? = null;
 
+    //i have no idea what this means nathan
     class AutoAim(
         private val dx: Double,
         private val dy: Double,
         private val rh: Angle,
         private val ofsTurret: Angle = 0.0.rad,
-        private val feedforward: Double = 0.0
     ) : Command() {
         override val isDone = true;
 
@@ -136,7 +136,7 @@ object TurretPhiSubsystem : Subsystem {
             val newPos = (servo1.position + delta).coerceIn(0.0, 1.0)
 
             servo1.position = newPos
-            servo2.position = newPos
+            servo2.position = 0.99 - newPos
         }
     }
 
