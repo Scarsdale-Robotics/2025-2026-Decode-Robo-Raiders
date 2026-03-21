@@ -48,7 +48,7 @@ object TurretPhiSubsystem : Subsystem {
     private var feedforwardCmd = 0.0;
 
     @JvmField var squidCoefficients = PIDCoefficients(0.004, 0.0, 0.0000);
-    @JvmField var secondarySquidCoefficients = PIDCoefficients(0.001, 0.0, 0.00002);
+    @JvmField var secondarySquidCoefficients = PIDCoefficients(0.0008, 0.0, 0.00002);
 //    @JvmField var tertiarySquidCoefficients = PIDCoefficients(0.0007, 0.0, 0.00002);
 
     @JvmField var feedforwardCoefficient = 0.1;

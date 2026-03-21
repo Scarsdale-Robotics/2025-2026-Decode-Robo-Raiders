@@ -713,7 +713,7 @@ open class TeleOpBase(
             TurretPhiSubsystem.AutoAim(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
                 dyp * sotmFactor + dy * (1 - sotmFactor),
-                hp, phiTrim,
+                hp, phiTrim + 90.0.deg * Gamepads.gamepad1.rightStickX.get(),
 //                -Gamepads.gamepad1.rightStickX.get()  // tODO; make sure not bad
             )()
         } else {
