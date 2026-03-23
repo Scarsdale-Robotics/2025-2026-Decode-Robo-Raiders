@@ -1,116 +1,72 @@
 package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
-
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.qualcomm.robotcore.hardware.DcMotor
-import dev.nextftc.bindings.Button
-import dev.nextftc.control.ControlSystem
-import dev.nextftc.control.KineticState
-import dev.nextftc.control.feedback.PIDCoefficients
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
-import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
-import dev.nextftc.hardware.controllable.RunToState
-import dev.nextftc.hardware.impl.MotorEx
-import dev.nextftc.hardware.powerable.SetPower
-import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem.setMotorPowers
-import org.opencv.video.BackgroundSubtractor
 import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sin
-import kotlin.time.ComparableTimeMark
-import kotlin.time.DurationUnit
-import kotlin.time.TimeSource
+import dev.nextftc.hardware.impl.ServoEx
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem.setControllerGoals
 
-// left-right
+//IN CONFIG, SET SERVO 1 TO 0 AND SERVO 2 TO 0.99
 @Configurable
 object TurretPhiSubsystem : Subsystem {
-    private val motor = MotorEx("turret_phi").brakeMode();
-
-    @JvmField var ENCODERS_FORWARD = 1254.63342295;
-    @JvmField var ENCODERS_BACKWARD = 0.0;  // todo: TUNE
+    private val servo1 = ServoEx("servo_one");
+    private val servo2 = ServoEx("servo_two")
+    val MIN_ANGLE = Math.toRadians(-432.0)
+    val MAX_ANGLE = Math.toRadians(0.0)
+    var targetPhi: Angle = 0.0.rad
 
     var started = false;
 
-    private val controller: ControlSystem;
-    private val secondaryController: ControlSystem;
-//    private val tertiaryController: ControlSystem;
-
-    private var feedforwardCmd = 0.0;
-
-    @JvmField var squidCoefficients = PIDCoefficients(0.004, 0.0, 0.0000);
-    @JvmField var secondarySquidCoefficients = PIDCoefficients(0.0008, 0.0, 0.00002);
-//    @JvmField var tertiarySquidCoefficients = PIDCoefficients(0.0007, 0.0, 0.00002);
-
-    @JvmField var feedforwardCoefficient = 0.1;
-
-//    @JvmField var Ls = 0.0;
-//    @JvmField var Lv = 0.0;
-
-    fun zero() {
-        motor.zeroed()
-        motor.motor.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER;
-    }
-
     init {
-//        val posSMO = SMOFilter(FeedbackType.POSITION, Lv, Ls);
-
-        controller = ControlSystem()
-//            .posFilter { filter -> filter.custom(posSMO).build(); }
-            .posSquID(squidCoefficients)
-            .build();
-
-        secondaryController = ControlSystem()
-//            .posFilter { filter -> filter.custom(posSMO).build(); }
-            .posSquID(secondarySquidCoefficients)
-            .build();
-
-//        tertiaryController = ControlSystem()
-////            .posFilter { filter -> filter.custom(posSMO).build(); }
-//            .posSquID(tertiarySquidCoefficients)
-//            .build();
+//
     }
 
     override fun initialize() {
-        controller.goal = KineticState()
-        secondaryController.goal = KineticState()
-//        tertiaryController.goal = KineticState()
         started = true;
     }
+    fun angleToServo(angle: Angle): Double {
+        val a = angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE)
+        return (a - MIN_ANGLE) / (MAX_ANGLE - MIN_ANGLE) * 0.99
+    }
+
 
     // 0.0 --> robot forward
-    var targetPhi: Angle = 0.0.rad
-        get() {
-            return PI.rad * (motor.currentPosition - ENCODERS_FORWARD) /
-                        (ENCODERS_FORWARD - ENCODERS_BACKWARD)
-        }
-        private set;
-
+    //var targetPhi: Angle = 0.0.rad
+      //  get() {
+        //    return PI.rad * (motor.currentPosition - ENCODERS_FORWARD) /
+          //          (ENCODERS_FORWARD - ENCODERS_BACKWARD)
+        //}
+        //private set;
+    //this would work the same but idk
+    fun norm2(angle: Angle): Angle {
+        return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad
+    }
     fun norm(angle: Angle): Angle {
+        return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
+
 //        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
-        val tolerance = Math.toRadians(10.0);
-        val dzHalf = Math.toRadians(19.0);
-        var a = angle.inRad;
-
-        val LOWER = Math.toRadians(51.0) - 2*PI;
-        val UPPER = Math.toRadians(51.0);
-
-        while (a < LOWER - tolerance) {
-            a += 2 * PI;
-        }
-        while (a > UPPER + tolerance) {
-            a -= 2 * PI;
-        }
-        return a.coerceIn(LOWER + dzHalf, UPPER - dzHalf).rad;
+//        val tolerance = Math.toRadians(10.0);
+//        val dzHalf = Math.toRadians(19.0);
+//        var a = angle.inRad;
+//
+//        val LOWER = Math.toRadians(51.0) - 2*PI;
+//        val UPPER = Math.toRadians(51.0);
+//
+//        while (a < LOWER - tolerance) {
+//            a += 2 * PI;
+//        }
+//        while (a > UPPER + tolerance) {
+//            a -= 2 * PI;
+//        }
+//        return a.coerceIn(LOWER + dzHalf, UPPER - dzHalf).rad;
 //        Math.max(Math.min(a, UPPER), LOWER).rad;
 
 //        while (a < 0.27 - 2 * PI - tolerance) {
@@ -123,22 +79,35 @@ object TurretPhiSubsystem : Subsystem {
 //        return max(min(a, PI / 4.0), -7.0 * PI / 4.0).rad
     }
 
-    open class SetTargetPhi(val angle: Angle, ofsTurret: Angle = 0.0.rad) : RunToState(
-        controller,
-        KineticState(
-            (norm(angle + ofsTurret)) / PI.rad *
-            (ENCODERS_FORWARD - ENCODERS_BACKWARD) + ENCODERS_FORWARD
-        )
-    )
+    class SetTargetPhi(
+        private val angle: Angle,
+        private val ofsTurret: Angle = 0.0.rad
+    ): Command() {
+        override val isDone = true;
+
+        init {
+            requires(TurretPhiSubsystem)
+        }
+
+        override fun start() {
+            val normed = norm(angle + ofsTurret)
+            val pos = angleToServo(normed)
+
+            servo1.position = pos
+            servo2.position = 0.99 - pos
+
+            targetPhi = normed
+        }
+    }
 
     var lastCommand: Command? = null;
 
+    //i have no idea what this means nathan
     class AutoAim(
         private val dx: Double,
         private val dy: Double,
         private val rh: Angle,
         private val ofsTurret: Angle = 0.0.rad,
-        private val feedforward: Double = 0.0
     ) : Command() {
         override val isDone = true;
 
@@ -151,16 +120,12 @@ object TurretPhiSubsystem : Subsystem {
                 CommandManager.cancelCommand(lastCommand!!)
             }
 
-            feedforwardCmd = feedforward;
-            PanelsTelemetry.telemetry.addData("ff correction", feedforwardCmd * feedforwardCoefficient);
-
             val normAngle = (atan2(dy, dx).rad - rh).inRad
             val upper = normAngle + 2 * PI;
             val lower = normAngle - 2 * PI;
             var closestDist = abs(normAngle - targetPhi.inRad)
             val upperDist = abs(upper - targetPhi.inRad)
             val lowerDist = abs(lower - targetPhi.inRad)
-
             var closest = normAngle;
             if (upperDist < closestDist) {
                 closest = upper
@@ -170,9 +135,7 @@ object TurretPhiSubsystem : Subsystem {
                 closest = lower
             }
 
-            val currCommand = SetTargetPhi(closest.rad, ofsTurret);
-            currCommand();
-            lastCommand = currCommand;
+            SetTargetPhi(closest.rad, ofsTurret)()
         }
     }
 
@@ -180,52 +143,21 @@ object TurretPhiSubsystem : Subsystem {
     class Manual(
         private val goalChange: Supplier<Double>
     ) : Command() {
-        override val isDone = false;
+
+        override val isDone = false
 
         override fun update() {
-            RunToState(
-                controller,
-                KineticState(
-                    controller.goal.position + goalChange.get() * thing
-                )
-            )
+            val delta = goalChange.get() * 0.01
+
+            val newPos = (servo1.position + delta).coerceIn(0.0, 1.0)
+
+            servo1.position = newPos
+            servo2.position = 0.99 - newPos
         }
     }
 
     override fun periodic() {
         if (!started) return;
-        secondaryController.goal = controller.goal
-//        tertiaryController.goal = controller.goal
-        var power = controller.calculate(
-            motor.state
-        )
-        val error = abs(controller.goal.position - controller.lastMeasurement.position)
-        if (error < 6.7) {
-            power = 0.0
-//        } else if (error < 50.22) {
-//            power = tertiaryController.calculate(
-//                motor.state
-//            )
-//
-//            // add feedforward
-//            power += feedforwardCmd * feedforwardCoefficient;
-        } else if (error < 111.111) {
-            power = secondaryController.calculate(
-                motor.state
-            )
-
-            // add feedforward
-            power += feedforwardCmd * feedforwardCoefficient;
-        }
-        SetPower(motor, power).setInterruptible(true)()
-
-        PanelsTelemetry.telemetry.addData("phi enc", motor.currentPosition)
-        PanelsTelemetry.telemetry.addData("ref", controller.reference)
-        PanelsTelemetry.telemetry.addData("goal", controller.goal)
-        PanelsTelemetry.telemetry.addData("turret phi", targetPhi)
-        PanelsTelemetry.telemetry.addData("lm", controller.lastMeasurement)
+        PanelsTelemetry.telemetry.addData("servo pos", servo1.position)
     }
-
-
 }
-
