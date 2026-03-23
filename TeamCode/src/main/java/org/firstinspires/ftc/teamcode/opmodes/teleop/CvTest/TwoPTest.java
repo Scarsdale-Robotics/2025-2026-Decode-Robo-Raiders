@@ -17,6 +17,7 @@ public class TwoPTest extends LinearOpMode {
     Double y;
     Double h;
     List<ColorBlobLocatorProcessor.Blob> Blobs;
+    final double FOV = 391.0;
 
     ColorBlobLocatorProcessor.Blob close;
     Blob big;

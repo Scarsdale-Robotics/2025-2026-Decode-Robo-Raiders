@@ -48,7 +48,7 @@ public class CvBallDetectionP {
         if (blobs != null && !blobs.isEmpty()) {
             ColorBlobLocatorProcessor.Util.filterByCriteria(
                     ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
-                    75, 50000, blobs);
+                    400, 50000, blobs);
 
             ColorBlobLocatorProcessor.Util.filterByCriteria(
                     ColorBlobLocatorProcessor.BlobCriteria.BY_CIRCULARITY,
