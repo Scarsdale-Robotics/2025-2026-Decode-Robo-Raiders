@@ -11,15 +11,17 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
 import dev.nextftc.hardware.impl.ServoEx
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem.setControllerGoals
 
 //IN CONFIG, SET SERVO 1 TO 0 AND SERVO 2 TO 0.99
 @Configurable
 object TurretPhiSubsystem : Subsystem {
     private val servo1 = ServoEx("servo_one");
     private val servo2 = ServoEx("servo_two")
-    val MIN_ANGLE = Math.toRadians(-90.0)
-    val MAX_ANGLE = Math.toRadians(90.0)
-    var currentPhi: Angle = 0.0.rad
+    val MIN_ANGLE = Math.toRadians(-432.0)
+    val MAX_ANGLE = Math.toRadians(0.0)
+    var targetPhi: Angle = 0.0.rad
 
     var started = false;
 
@@ -32,7 +34,7 @@ object TurretPhiSubsystem : Subsystem {
     }
     fun angleToServo(angle: Angle): Double {
         val a = angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE)
-        return (a - MIN_ANGLE) / (MAX_ANGLE - MIN_ANGLE)
+        return (a - MIN_ANGLE) / (MAX_ANGLE - MIN_ANGLE) * 0.99
     }
 
 
@@ -48,21 +50,23 @@ object TurretPhiSubsystem : Subsystem {
         return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad
     }
     fun norm(angle: Angle): Angle {
+        return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
+
 //        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
-        val tolerance = Math.toRadians(10.0);
-        val dzHalf = Math.toRadians(19.0);
-        var a = angle.inRad;
-
-        val LOWER = Math.toRadians(51.0) - 2*PI;
-        val UPPER = Math.toRadians(51.0);
-
-        while (a < LOWER - tolerance) {
-            a += 2 * PI;
-        }
-        while (a > UPPER + tolerance) {
-            a -= 2 * PI;
-        }
-        return a.coerceIn(LOWER + dzHalf, UPPER - dzHalf).rad;
+//        val tolerance = Math.toRadians(10.0);
+//        val dzHalf = Math.toRadians(19.0);
+//        var a = angle.inRad;
+//
+//        val LOWER = Math.toRadians(51.0) - 2*PI;
+//        val UPPER = Math.toRadians(51.0);
+//
+//        while (a < LOWER - tolerance) {
+//            a += 2 * PI;
+//        }
+//        while (a > UPPER + tolerance) {
+//            a -= 2 * PI;
+//        }
+//        return a.coerceIn(LOWER + dzHalf, UPPER - dzHalf).rad;
 //        Math.max(Math.min(a, UPPER), LOWER).rad;
 
 //        while (a < 0.27 - 2 * PI - tolerance) {
@@ -75,14 +79,25 @@ object TurretPhiSubsystem : Subsystem {
 //        return max(min(a, PI / 4.0), -7.0 * PI / 4.0).rad
     }
 
-    fun setTargetPhi(angle: Angle, ofsTurret: Angle = 0.0.rad) {
-        val normed = norm(angle + ofsTurret)
-        val pos = angleToServo(normed)
+    class SetTargetPhi(
+        private val angle: Angle,
+        private val ofsTurret: Angle = 0.0.rad
+    ): Command() {
+        override val isDone = true;
 
-        servo1.position = pos
-        servo2.position = 0.99 - pos
+        init {
+            requires(TurretPhiSubsystem)
+        }
 
-        currentPhi = normed
+        override fun start() {
+            val normed = norm(angle + ofsTurret)
+            val pos = angleToServo(normed)
+
+            servo1.position = pos
+            servo2.position = 0.99 - pos
+
+            targetPhi = normed
+        }
     }
 
     var lastCommand: Command? = null;
@@ -108,9 +123,9 @@ object TurretPhiSubsystem : Subsystem {
             val normAngle = (atan2(dy, dx).rad - rh).inRad
             val upper = normAngle + 2 * PI;
             val lower = normAngle - 2 * PI;
-            var closestDist = abs(normAngle - currentPhi.inRad)
-            val upperDist = abs(upper - currentPhi.inRad)
-            val lowerDist = abs(lower - currentPhi.inRad)
+            var closestDist = abs(normAngle - targetPhi.inRad)
+            val upperDist = abs(upper - targetPhi.inRad)
+            val lowerDist = abs(lower - targetPhi.inRad)
             var closest = normAngle;
             if (upperDist < closestDist) {
                 closest = upper
@@ -119,7 +134,8 @@ object TurretPhiSubsystem : Subsystem {
             if (lowerDist < closestDist) {
                 closest = lower
             }
-            setTargetPhi(closest.rad, ofsTurret)
+
+            SetTargetPhi(closest.rad, ofsTurret)()
         }
     }
 
