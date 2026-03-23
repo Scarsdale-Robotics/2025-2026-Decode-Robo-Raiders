@@ -38,17 +38,6 @@ object TurretPhiSubsystem : Subsystem {
     }
 
 
-    // 0.0 --> robot forward
-    //var targetPhi: Angle = 0.0.rad
-      //  get() {
-        //    return PI.rad * (motor.currentPosition - ENCODERS_FORWARD) /
-          //          (ENCODERS_FORWARD - ENCODERS_BACKWARD)
-        //}
-        //private set;
-    //this would work the same but idk
-    fun norm2(angle: Angle): Angle {
-        return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad
-    }
     fun norm(angle: Angle): Angle {
         return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
 
@@ -158,6 +147,7 @@ object TurretPhiSubsystem : Subsystem {
 
     override fun periodic() {
         if (!started) return;
-        PanelsTelemetry.telemetry.addData("servo pos", servo1.position)
+        PanelsTelemetry.telemetry.addData("target phi", targetPhi)
+        PanelsTelemetry.telemetry.addData("servo1 pos", servo1.position)
     }
 }
