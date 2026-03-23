@@ -11,17 +11,16 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
 import dev.nextftc.hardware.impl.ServoEx
-import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem.setControllerGoals
 
 //IN CONFIG, SET SERVO 1 TO 0 AND SERVO 2 TO 0.99
 @Configurable
 object TurretPhiSubsystem : Subsystem {
-    private val servo1 = ServoEx("servo_one");
-    private val servo2 = ServoEx("servo_two")
-    val MIN_ANGLE = Math.toRadians(-432.0)
-    val MAX_ANGLE = Math.toRadians(0.0)
+    private val servoBelow = ServoEx("turret_below");
+    private val servoAbove = ServoEx("turret_above")
+    val MIN_ANGLE = Math.toRadians(-360.0)
+    val MAX_ANGLE = Math.toRadians(6.7)
     var targetPhi: Angle = 0.0.rad
+    var lmao = 0.98375
 
     var started = false;
 
@@ -29,12 +28,14 @@ object TurretPhiSubsystem : Subsystem {
 //
     }
 
+    fun zero() {}
+
     override fun initialize() {
         started = true;
     }
     fun angleToServo(angle: Angle): Double {
         val a = angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE)
-        return (a - MIN_ANGLE) / (MAX_ANGLE - MIN_ANGLE) * 0.99
+        return (a - MIN_ANGLE) / (MAX_ANGLE - MIN_ANGLE) * lmao
     }
 
 
@@ -82,8 +83,8 @@ object TurretPhiSubsystem : Subsystem {
             val normed = norm(angle + ofsTurret)
             val pos = angleToServo(normed)
 
-            servo1.position = pos
-            servo2.position = 0.99 - pos
+            servoBelow.position = pos
+            servoAbove.position = lmao - pos
 
             targetPhi = normed
         }
@@ -138,16 +139,16 @@ object TurretPhiSubsystem : Subsystem {
         override fun update() {
             val delta = goalChange.get() * 0.01
 
-            val newPos = (servo1.position + delta).coerceIn(0.0, 1.0)
+            val newPos = (servoBelow.position + delta).coerceIn(0.0, 1.0)
 
-            servo1.position = newPos
-            servo2.position = 0.99 - newPos
+            servoBelow.position = newPos
+            servoAbove.position = lmao - newPos
         }
     }
 
     override fun periodic() {
         if (!started) return;
         PanelsTelemetry.telemetry.addData("target phi", targetPhi)
-        PanelsTelemetry.telemetry.addData("servo1 pos", servo1.position)
+        PanelsTelemetry.telemetry.addData("servo1 pos", servoBelow.position)
     }
 }
