@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.11.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.11.1)" variant="all" version="8.11.1">
+
+    <issue
+        id="SuspiciousIndentation"
+        message="Suspicious indentation: This is indented but is not continuing the previous expression (`val dxp = dx`...)"
+        errorLine1="            - (PedroComponent.follower.velocity.xComponent"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/firstinspires/ftc/teamcode/Auton/MainAutons/AutonBlueCloseArtifact24.kt"
+            line="525"
+            column="13"/>
+        <location
+            file="src/main/java/org/firstinspires/ftc/teamcode/Auton/MainAutons/AutonBlueCloseArtifact24.kt"
+            line="524"
+            column="9"
+            message="Previous statement here"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.core:core-ktx than 1.17.0 is available: 1.18.0"
+        errorLine1="    implementation &apos;androidx.core:core-ktx:1.17.0&apos;"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="41"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of dev.nextftc:ftc than 1.0.1 is available: 1.1.0"
+        errorLine1="    implementation &apos;dev.nextftc:ftc:1.0.1&apos;"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="37"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="NewerVersionAvailable"
+        message="A newer version of dev.nextftc:hardware than 1.0.1 is available: 1.1.0"
+        errorLine1="    implementation &apos;dev.nextftc:hardware:1.0.1&apos; // If you would like to use the hardware module"
+        errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="38"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libEasyOpenCV.so` (from `org.openftc:easyopencv:1.7.3`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/6cfad9a3c0ba3d954e434e396e0e39a2/transformed/easyopencv-1.7.3/jni/arm64-v8a/libEasyOpenCV.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libEasyOpenCV.so` (from `org.openftc:easyopencv:1.7.3`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/6cfad9a3c0ba3d954e434e396e0e39a2/transformed/easyopencv-1.7.3/jni/arm64-v8a/libEasyOpenCV.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libEasyOpenCV.so` (from `org.openftc:easyopencv:1.7.3`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/6cfad9a3c0ba3d954e434e396e0e39a2/transformed/easyopencv-1.7.3/jni/arm64-v8a/libEasyOpenCV.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libRobotCore.so` (from `org.firstinspires.ftc:RobotCore:11.1.0`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/ad4b0f08bcc2b069ae3c48e9f219b5c6/transformed/RobotCore-11.1.0/jni/arm64-v8a/libRobotCore.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libRobotCore.so` (from `org.firstinspires.ftc:RobotCore:11.1.0`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/ad4b0f08bcc2b069ae3c48e9f219b5c6/transformed/RobotCore-11.1.0/jni/arm64-v8a/libRobotCore.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libRobotCore.so` (from `org.firstinspires.ftc:RobotCore:11.1.0`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/ad4b0f08bcc2b069ae3c48e9f219b5c6/transformed/RobotCore-11.1.0/jni/arm64-v8a/libRobotCore.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libapriltag.so` (from `org.openftc:apriltag:2.1.0`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/b1bffb8ab9ed52458b34defbece7b095/transformed/apriltag-2.1.0/jni/arm64-v8a/libapriltag.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libapriltag.so` (from `org.openftc:apriltag:2.1.0`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/b1bffb8ab9ed52458b34defbece7b095/transformed/apriltag-2.1.0/jni/arm64-v8a/libapriltag.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libapriltag.so` (from `org.openftc:apriltag:2.1.0`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/b1bffb8ab9ed52458b34defbece7b095/transformed/apriltag-2.1.0/jni/arm64-v8a/libapriltag.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libc++_shared.so` (from `org.openftc:opencv-repackaged-bundled-dylibs:4.10.0-A`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/396729ac70d99ba59adb8c2f8bbaff90/transformed/opencv-repackaged-bundled-dylibs-4.10.0-A/jni/arm64-v8a/libc++_shared.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libc++_shared.so` (from `org.openftc:opencv-repackaged-bundled-dylibs:4.10.0-A`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/396729ac70d99ba59adb8c2f8bbaff90/transformed/opencv-repackaged-bundled-dylibs-4.10.0-A/jni/arm64-v8a/libc++_shared.so"/>
+    </issue>
+
+    <issue
+        id="Aligned16KB"
+        message="The native library `arm64-v8a/libc++_shared.so` (from `org.openftc:opencv-repackaged-bundled-dylibs:4.10.0-A`) is not 16 KB aligned">
+        <location
+            file="$GRADLE_USER_HOME/caches/8.13/transforms/396729ac70d99ba59adb8c2f8bbaff90/transformed/opencv-repackaged-bundled-dylibs-4.10.0-A/jni/arm64-v8a/libc++_shared.so"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        message="Use of this function is discouraged because resource reflection makes it harder to perform build optimizations and compile-time verification of code. It is much more efficient to retrieve resources by identifier (e.g. `R.foo.bar`) than by name (e.g. `getIdentifier(&quot;bar&quot;, &quot;foo&quot;, null)`)."
+        errorLine1="                        hm.appContext.getResources().getIdentifier("
+        errorLine2="                                                     ~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/firstinspires/ftc/teamcode/subsystems/localization/CVSubsystem_VisionPortal.java"
+            line="82"
+            column="54"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.raw.readme` appears to be unused">
+        <location
+            file="src/main/res/raw/readme.md"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.xml.teamwebcamcalibrations` appears to be unused"
+        errorLine1="&lt;Calibrations>"
+        errorLine2="^">
+        <location
+            file="src/main/res/xml/teamwebcamcalibrations.xml"
+            line="53"
+            column="1"/>
+    </issue>
+
+</issues>

@@ -8,7 +8,6 @@ import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import dev.nextftc.hardware.impl.ServoEx
 import dev.nextftc.hardware.positionable.SetPosition
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
 
 @TeleOp(name = "Intake Servo Test", group = "Base Subsystem Tests")
 class IntakeServoTest : NextFTCOpMode() {
