@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems.localization;
 
 import androidx.annotation.Nullable;
 
+import com.bylazar.telemetry.PanelsTelemetry;
 import com.pedropathing.ftc.InvertedFTCCoordinates;
 import com.pedropathing.ftc.PoseConverter;
 import com.pedropathing.geometry.PedroCoordinates;
@@ -51,26 +52,26 @@ public class CVSubsystem_VisionPortal {
 
 
         AprilTagLibrary tagLibrary = new AprilTagLibrary.Builder()
-//                .addTag(20, "BlueTarget",
-//                        6.5, new VectorF(-58.3727f, -55.6425f, 29.5f), DistanceUnit.INCH,
-//                        new Quaternion(0.2182149f, -0.2182149f, -0.6725937f, 0.6725937f, 0))
-//                .addTag(24, "RedTarget",
-//                        6.5, new VectorF(-58.3727f, 55.6425f, 29.5f), DistanceUnit.INCH,
-//                        new Quaternion(0.6725937f, -0.6725937f, -0.2182149f, 0.2182149f, 0))
-                .addTags(AprilTagGameDatabase.getCurrentGameTagLibrary())
+                .addTag(20, "BlueTarget",
+                        6.5, new VectorF(-58.3727f, -55.6425f, 29.5f), DistanceUnit.INCH,
+                        new Quaternion(0.2182149f, -0.2182149f, -0.6725937f, 0.6725937f, 0))
+                .addTag(24, "RedTarget",
+                        6.5, new VectorF(-58.3727f, 55.6425f, 29.5f), DistanceUnit.INCH,
+                        new Quaternion(0.6725937f, -0.6725937f, -0.2182149f, 0.2182149f, 0))
+//                .addTags(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .build();
-        //i hate kotlin, it sucks, and next ftc is so ahh
-        //viir is king and we should all switch to ftclib
+
+
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setTagLibrary(tagLibrary)
-                .setLensIntrinsics(1430,1457,480,620)
+//                .setLensIntrinsics(1430,1457,480,620)
                 .setCameraPose(
-                        new Position(
+                        new Position(//todo: y bad?
                                 DistanceUnit.INCH, 4.25462244094, -4.50787402, 7.57202637795, 0
                         ), new YawPitchRollAngles(
                                 AngleUnit.DEGREES,
-                                180,  // backwards
-                                -105,  // 15 deg above horizontal
+                                180 - Math.toDegrees(-0.0658537f) - Math.toDegrees(0.052),  // backwards lean left // todo: adjust to match heading
+                                -75,  // 15 deg above horizontal
                                 180,  // upside-down
                                 0
                         )
@@ -108,6 +109,11 @@ public class CVSubsystem_VisionPortal {
         visionPortal.close();
     }
 
+    private boolean hasDetection = false;
+    public boolean getHasDetection() {
+        return hasDetection;
+    }
+
     public void updateCV() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         if (detections == null || detections.isEmpty()) return;
@@ -122,11 +128,17 @@ public class CVSubsystem_VisionPortal {
             }
         }
 
-        if (best == null) return;
+        if (best == null) {
+            hasDetection = false;
+            return;
+        }
+
+        hasDetection = true;
 //        if (best.ftcPose == null) return;
 
 
         Pose3D pose = best.robotPose;
+        PanelsTelemetry.INSTANCE.getTelemetry().addData("pose", pose.toString());
 
 
         Pose ftcStandard = PoseConverter.pose2DToPose(
@@ -140,9 +152,9 @@ public class CVSubsystem_VisionPortal {
                 InvertedFTCCoordinates.INSTANCE
         );
         Pose cvtPose = ftcStandard.getAsCoordinateSystem(PedroCoordinates.INSTANCE);
-        RCx1 = cvtPose.getX();
-        RCy1 = cvtPose.getY();
-        RCh = cvtPose.getHeading();
+        RCx1 = 72.0-cvtPose.getX();
+        RCy1 = 72.0-cvtPose.getY();
+        RCh = cvtPose.getHeading() % (2 * Math.PI) - Math.PI;
 
 //        camXE = RCx1 - 72.0;
 //        camYE = RCy1 -72.0;
@@ -164,6 +176,10 @@ public class CVSubsystem_VisionPortal {
     public double getRCx1() { return RCx1; }
     public double getRCy1() { return RCy1; }
     public double getRCh()  { return RCh; }
+
+    public double getX() { return RCx1; }
+    public double getY() { return RCy1; }
+    public double getH() { return RCh; }
 
     private double normalizeAngle(double angle) {
         while (angle > Math.PI)  angle -= 2 * Math.PI;

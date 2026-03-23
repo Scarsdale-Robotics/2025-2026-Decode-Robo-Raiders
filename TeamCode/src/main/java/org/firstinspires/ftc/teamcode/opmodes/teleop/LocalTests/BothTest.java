@@ -15,7 +15,7 @@ import java.util.List;
 
 import kotlin.Unit;
 
-@TeleOp(name = "Local81[7 test")
+@TeleOp(name = "BothTest")
 @Configurable
 public class BothTest extends LinearOpMode {
 
@@ -28,7 +28,7 @@ public class BothTest extends LinearOpMode {
 
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode(){
         cv = new CVSubsystem_VisionPortal(72.0,72.0,(-Math.PI/2), hardwareMap); //starting pose
         odom = new OdometrySubsystem(72.0,72.0,(-Math.PI/2), hardwareMap); //starting pose
 //
@@ -43,7 +43,8 @@ public class BothTest extends LinearOpMode {
 
 
         waitForStart();
-        odom.setPinpoint(72.0,72.0,(-Math.PI/2)); //starting pose
+        odom.setPinpoint(72.0,72.0,(-Math.PI/2));
+        cv.setCv(72,72,(-Math.PI/2));//starting pose
         while(opModeIsActive()){
             cv.updateCV();
             odom.updateOdom();
@@ -56,11 +57,12 @@ public class BothTest extends LinearOpMode {
             panelsManager.addLine("CV");
             panelsManager.addData("xc: ", cv.getRCx1());
             panelsManager.addData("yc: ", cv.getRCy1());
-            panelsManager.addData("yc: ", cv.getRCh());
+            panelsManager.addData("hc: ", cv.getRCh());
 
             panelsManager.addLine("ERROR");
             panelsManager.addData("Xe: ", odom.getROx1() - cv.getRCx1());
             panelsManager.addData("Ye: ", odom.getROy1() - cv.getRCy1());
+            panelsManager.addData("He: ", odom.getROh() - cv.getRCh());
 
 
             panelsManager.update(telemetry);

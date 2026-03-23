@@ -2,9 +2,11 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
+import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.HeadingInterpolator
+import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
@@ -19,17 +21,13 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import dev.nextftc.hardware.driving.FieldCentric
-import dev.nextftc.hardware.driving.MecanumDriverControlled
-import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
-import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.speed1
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
+import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem_VisionPortal
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
@@ -39,12 +37,10 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
-import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.sign
 
 
 data class ResetModeParams(val x: Double, val y: Double, val h: Angle)
@@ -72,9 +68,11 @@ open class TeleOpBase(
 //    private var odom: OdometrySubsystem? = null;
     val x:  Double get() { return (PedroComponent.follower.pose.x + ofsX);}
     val y:  Double get() { return (PedroComponent.follower.pose.y + ofsY);}
-    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad;}
-    val vx: Double get() { return (PedroComponent.follower.velocity.xComponent);}
-    val vy: Double get() { return (PedroComponent.follower.velocity.yComponent);}
+    val h:  Angle  get() { return (PedroComponent.follower.pose.heading).rad + ofsH; }
+    var vx = 0.0;
+    var vy = 0.0;
+    var vxOld = listOf(0.0, 0.0, 0.0);
+    var vyOld = listOf(0.0, 0.0, 0.0);
     val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
     val ax: Double get() { return (PedroComponent.follower.acceleration.xComponent);}
     val ay: Double get() { return (PedroComponent.follower.acceleration.yComponent);}
@@ -141,6 +139,7 @@ open class TeleOpBase(
 //            return 0.0;
 //        }
 
+    var gatePreIntakeChain: PathChain? = null;
     var gateIntakeChain: PathChain? = null;
     var farShootChain: PathChain? = null;
     var closeShootChain: PathChain? = null;
@@ -148,6 +147,8 @@ open class TeleOpBase(
     var driverControlled: PedroDriverControlled? = null;
     //    var driverControlled: PedroDriverControlled;
     var parkChain: PathChain? = null;
+
+    var cv: CVSubsystem_VisionPortal? = null;
 
     init {
         addComponents(
@@ -161,10 +162,13 @@ open class TeleOpBase(
         )
     }
 
+    var lastPose: Pose = Pose(0.0, 0.0, 0.0);
     var lockDirection = false;
+    var lastTime = 0.0;
     override fun onInit() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
+        TurretPhiSubsystem.started = false;
 //        MagServoSubsystem.stop()
 
         // ROBOT CENTRIC:
@@ -185,30 +189,72 @@ open class TeleOpBase(
 //
         gateIntakeChain = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierLine(
-                    PedroComponent.follower::getPose,
-                    Pos(AutonPositions.gateOpenPoseTele, isBlue)
+                Path(
+                    BezierLine(
+                        PedroComponent.follower::getPose,
+                        Pos(AutonPositions.gateOpenPoseTele, isBlue)
+                    )
                 )
             )
-            .setHeadingInterpolation(
-                HeadingInterpolator.linearFromPoint(
-                    PedroComponent.follower::getHeading,
-                    Pos(AutonPositions.gateOpenPoseTele, isBlue).heading,
-                    0.2
-                )
+            .setConstantHeadingInterpolation(
+                Pos(AutonPositions.gateOpenPoseTele, isBlue).heading
             )
+            .setNoDeceleration()  // todo: temp test
+            .build()
+//        val gateIntakeChain = PedroComponent.follower.pathBuilder()
 //            .addPath(
-//                BezierLine(
-//                    Pos(AutonPositions.gateOpenPose, isBlue),
-//                    Pos(AutonPositions.gateAfterOpenPose, isBlue)
+//                Path(
+//                    BezierLine(
+//                        PedroComponent.follower::getPose,
+//                        Pos(AutonPositions.gateOpenPrePoseTele, isBlue)
+//                    )
 //                )
 //            )
-//            .setLinearHeadingInterpolation(
-//                Pos(AutonPositions.gateOpenPose, isBlue).heading,
-//                Pos(AutonPositions.gateAfterOpenPose, isBlue).heading,
-//                0.8
+//            .setNoDeceleration()
+//            .setHeadingInterpolation(
+//                HeadingInterpolator.tangent
 //            )
-            .build()
+////            .setHeadingInterpolation(
+////                HeadingInterpolator.piecewise(
+////                    HeadingInterpolator.PiecewiseNode(
+////                        0.0,
+////                        0.67,
+////                        HeadingInterpolator.tangent
+////                    )
+////                ),
+////                HeadingInterpolator.piecewise(
+////                    HeadingInterpolator.PiecewiseNode(
+////                        0.67,
+////                        1.0,
+////
+////                    )
+////                )
+////            )
+////            .setLinearHeadingInterpolation(
+////                PedroComponent.follower.heading % (2 * Math.PI),  // todo: trial
+////                Pos(AutonPositions.gateOpenPoseTele, isBlue).heading,
+////                0.7
+////            )
+////            .setHeadingInterpolation(
+////                HeadingInterpolator.linearFromPoint(
+////                    PedroComponent.follower::getHeading,
+////                    Pos(AutonPositions.gateOpenPoseTele, isBlue).heading,
+////                    0.7
+////                )
+////            )
+////            .addPath(
+////                BezierLine(
+////                    Pos(AutonPositions.gateOpenPose, isBlue),
+////                    Pos(AutonPositions.gateAfterOpenPose, isBlue)
+////                )
+////            )
+////            .setLinearHeadingInterpolation(
+////                Pos(AutonPositions.gateOpenPose, isBlue).heading,
+////                Pos(AutonPositions.gateAfterOpenPose, isBlue).heading,
+////                0.8
+////            )
+//            .build()
+        
 //
 //        farShootChain = PedroComponent.follower.pathBuilder()
 //            .addPath(
@@ -269,6 +315,11 @@ open class TeleOpBase(
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         PedroComponent.follower.pose = Pose(startX, startY, startH)
+        cv = CVSubsystem_VisionPortal(startX, startY, startH, hardwareMap)
+
+        telemetry.addData("Start X", startX);
+        telemetry.addData("Start Y", startY);
+        telemetry.addData("Start H (degs)", Math.toDegrees(startH));
 //        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
 //        odom!!.updateOdom()
 
@@ -298,8 +349,10 @@ open class TeleOpBase(
 
     var ofsX = 0.0;
     var ofsY = 0.0;
+    var ofsH = 0.0.rad;
 
     override fun onStartButtonPressed() {
+        TurretPhiSubsystem.started = true;
 //        val file = File(Lefile.filePath)
 //        val content = file.readText().split("\n")
 //        val startX = content[0].toDouble()
@@ -332,8 +385,8 @@ open class TeleOpBase(
 
         Gamepads.gamepad1.leftBumper whenBecomesTrue {
             val path = FollowPath(gateIntakeChain!!)
-            path()
             activeDriveMacros.add(path)
+            path()
             gamepad1.rumble(100)
         }
 //        (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
@@ -441,9 +494,19 @@ open class TeleOpBase(
 
         // I think l/r only makes sense when robot facing away (approx same direction person is facing)
         Gamepads.gamepad2.dpadRight whenBecomesTrue {
+//            PedroComponent.follower.pose = Pose(
+//                PedroComponent.follower.pose.x,
+//                PedroComponent.follower.pose.y,
+//                PedroComponent.follower.pose.heading + Math.toRadians(1.0),
+//            )
             phiTrim -= 2.0.deg
         }
         Gamepads.gamepad2.dpadLeft whenBecomesTrue {
+//            PedroComponent.follower.pose = Pose(
+//                PedroComponent.follower.pose.x,
+//                PedroComponent.follower.pose.y,
+//                PedroComponent.follower.pose.heading - Math.toRadians(1.0),
+//            )
             phiTrim += 2.0.deg
         }
 
@@ -537,19 +600,29 @@ open class TeleOpBase(
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
 
+        cv!!.updateCV()
         PedroComponent.follower.update()
+        if (
+            cv!!.hasDetection()
+//            && hypot(vx, vy) < 1.0  // todo: consider adding if cam bad during movement
+        ) {
+            PedroComponent.follower.pose = Pose(cv!!.x, cv!!.y, cv!!.h);
+        }
 //        odom!!.updateOdom();
 
         if (
             activeDriveMacros.isNotEmpty() &&
             (
-                    abs(gamepad1.left_stick_x) > 0.02 ||
-                            abs(gamepad1.left_stick_y) > 0.02 ||
-                            abs(gamepad1.right_stick_x) > 0.02
+                    abs(Gamepads.gamepad1.leftStickX.get()) > 0.02 ||
+                            abs(Gamepads.gamepad1.leftStickY.get()) > 0.02 ||
+                            abs(Gamepads.gamepad1.rightStickX.get()) > 0.02
                     )
         ) {
             // untrigger macro
-            activeDriveMacros.forEach { CommandManager.cancelCommand(it) }
+            activeDriveMacros.forEach {
+                it.stop(true)
+                CommandManager.cancelCommand(it)
+            }
             activeDriveMacros.clear()
             PedroComponent.follower.startTeleopDrive()
         }
@@ -557,13 +630,25 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-        dxp = dx - (vx + 0.05 * ax) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        dyp = dy - (vy + 0.05 * ay) * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        vxOld = vxOld.slice(IntRange(1, vxOld.lastIndex)) + listOf((PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime));
+        vyOld = vyOld.slice(IntRange(1, vyOld.lastIndex)) + listOf((PedroComponent.follower.pose.y - lastPose.pose.y) / (runtime - lastTime));
+        vx = vxOld.average();
+        vy = vyOld.average();
+        dxp = dx - 1.0 * vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        dyp = dy - 1.0 * vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
 //        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
 //        dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
         dxyp = hypot(dxp, dyp)
 //        val hp = h - (vh + ah * 0.05) * 0.5
         val hp = h;
+
+        PanelsTelemetry.telemetry.addData("vx", vx);
+        PanelsTelemetry.telemetry.addData("vy", vy);
+        PanelsTelemetry.telemetry.addData("hp", hp);
+        PanelsTelemetry.telemetry.addData("dxp", dxp);
+        PanelsTelemetry.telemetry.addData("dyp", dyp);
+        lastPose = PedroComponent.follower.pose;
+        lastTime = runtime;
 
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
         PanelsTelemetry.telemetry.addData("SHOOTING?", ShooterSubsystem.isShooting);
@@ -596,10 +681,11 @@ open class TeleOpBase(
             TurretPhiSubsystem.SetTargetPhi(resetModePhiAngle, phiTrim).requires(TurretPhiSubsystem)()
         } else if (autoAimEnabled) {
 //            val sotmFactor = 1 - ((dxyp - dxy) / 10.0).coerceIn(0.0, 1.0);
-            val sotmFactor = if (
-                    (abs(Gamepads.gamepad1.leftStickX.get()) <= 0.02) &&
-                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
-            ) 0.0 else 1.0;
+//            val sotmFactor = if (
+//                    (abs(Gamepads.gamepad1.leftStickX.get()) <= 0.02) &&
+//                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
+//            ) 0.0 else 1.0;
+            val sotmFactor = 1.0;
             telemetry.addData("sotm factor", sotmFactor);
             ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
@@ -627,8 +713,8 @@ open class TeleOpBase(
             TurretPhiSubsystem.AutoAim(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
                 dyp * sotmFactor + dy * (1 - sotmFactor),
-                hp, phiTrim,
-                -Gamepads.gamepad1.rightStickX.get()  // tODO; make sure not bad
+                hp, phiTrim + 90.0.deg * Gamepads.gamepad1.rightStickX.get(),
+//                -Gamepads.gamepad1.rightStickX.get()  // tODO; make sure not bad
             )()
         } else {
             //ShooterSubsystem.Manual(
@@ -645,6 +731,7 @@ open class TeleOpBase(
         );
         telemetry.addData("ShooterSpeed", ShooterSubsystem.velocity);
         telemetry.addData("Angle", shootAngleDegrees.deg);
+        telemetry.addData("targetPhi", TurretPhiSubsystem.targetPhi)
         telemetry.update()
 
 //        PanelsTelemetry.telemetry.addData("Vx (in/s)", vx)

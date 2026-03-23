@@ -57,10 +57,6 @@ class BasicTeleOp(): NextFTCOpMode() {
             SubsystemComponent(
                 LowerSubsystem,
                 OuttakeSubsystem,
-                MagServoSubsystem,
-                MagblockServoSubsystem,
-                TurretThetaSubsystem,
-                TurretPhiSubsystem
             ),
             PedroComponent(Constants::createFollower),
             BindingsComponent,
@@ -78,6 +74,7 @@ class BasicTeleOp(): NextFTCOpMode() {
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
         MagServoSubsystem.stop()
+        TurretPhiSubsystem.zero()
 //        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
         PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
     }

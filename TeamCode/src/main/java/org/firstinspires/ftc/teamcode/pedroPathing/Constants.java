@@ -18,14 +18,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @Configurable
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
-        .mass(13.381) //in kg //13.381
-            .forwardZeroPowerAcceleration(-36.054561910404615)
-            .lateralZeroPowerAcceleration(-71.47283575125162)
+        .mass(13.381) //kg
+            .forwardZeroPowerAcceleration(-23.78562527001998)
+            .lateralZeroPowerAcceleration(-69.11674791438611)
             .translationalPIDFCoefficients(new PIDFCoefficients(
                     0.1,
                     0,
                     0.01,
-                    0.02
+                    0.025
             ))
             .translationalPIDFSwitch(4)
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(
@@ -62,9 +62,9 @@ public class Constants {
             ))
             .drivePIDFSwitch(15)
 
-            .useSecondaryDrivePIDF(true)
-            .useSecondaryHeadingPIDF(true)
-            .useSecondaryTranslationalPIDF(true)
+            .useSecondaryDrivePIDF(false)
+            .useSecondaryHeadingPIDF(false)
+            .useSecondaryTranslationalPIDF(false)
 
             .centripetalScaling(0.00028);
 
@@ -73,8 +73,8 @@ public class Constants {
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .xVelocity(69.04910590704971)
-            .yVelocity(52.76285006305365)
+            .xVelocity(71.76344311331201)
+            .yVelocity(58.151416688453494)
             .rightFrontMotorName("rfw")
             .rightRearMotorName("rbw")
             .leftRearMotorName("lbw")

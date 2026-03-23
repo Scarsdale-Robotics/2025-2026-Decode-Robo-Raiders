@@ -31,7 +31,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.opmodes.teleop.LocalTests;
+package org.firstinspires.ftc.teamcode.opmodes.teleop.CvTest;
 
 import android.util.Size;
 
@@ -60,7 +60,8 @@ import java.util.Locale;
  */
 
 @TeleOp(name = "Utility: Camera Frame Capture", group = "Utility")
-public class UtilityCameraFrameCapture extends LinearOpMode
+@Disabled
+public class Intrensics extends LinearOpMode
 {
     /*
      * EDIT THESE PARAMETERS AS NEEDED
