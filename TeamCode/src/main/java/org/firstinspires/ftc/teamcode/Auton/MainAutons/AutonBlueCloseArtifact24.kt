@@ -47,15 +47,15 @@ import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.hypot
 
-@Autonomous(name = "[MAIN-24] Auton Blue Close Artifact", group = "Auton")
+@Autonomous(name = "[ARTI-24-B] Auton Blue Close Artifact", group = "Auton")
 @Configurable
 class AutonBlueCloseArtifact24: NextFTCOpMode() {
     //////////////////////
     ////Base Variables////
     //////////////////////
     private var pathTimer: Timer? = null
-    var actionTimer: Timer? = null;
-    var opmodeTimer: Timer? = null;
+    var actionTimer: Timer? = null
+    var opmodeTimer: Timer? = null
     var pathStarted: Boolean? = false
     init { addComponents(
         PedroComponent(Constants::createFollower),
@@ -152,7 +152,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 )
             )
             .setTangentHeadingInterpolation()
-            .addParametricCallback(0.65, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG  //todo: nathan comment, I think this can be full motor speed
+            .addParametricCallback(0.65, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
             .build()
         //1st Go Shoot
@@ -387,7 +387,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     ///////////////////////////
     ////Main Auton Commands////
     ///////////////////////////
-    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.75)}
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
     val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
 
     val IntakeCommand: Command
@@ -481,48 +481,49 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 SequentialGroup(
                     Delay(delayStartShoot),
                     robotShoot(),
-                    robotIntake(robotIntake2),
                 ),
             ),
-            //Shoots the intake that intakes to [6 ARTIFACTS]
+            //Intakes to [6 ARTIFACTS] then shoots
+            robotIntake(robotIntake2),
             robotGoShoot(robotGoToShoot2),
-
-            //Shoots and then gate intakes to [9 ARTIFACTS]
             robotShoot(),
+
+            //Gate intakes to [9 ARTIFACTS] then shoots
             robotGateIntake(robotOpenLeverFromClose, robotBackupFromRamp),
             robotGoShoot(LeverGoShoot),
-
-            //Shoots and then intakes to [12 ARTIFACTS]
             robotShoot(),
+
+            //Intakes to [12 ARTIFACTS] then shoots
             robotIntake(robotIntake1),
             robotGoShoot(robotGoToShoot1),
-
-            //Shoots and then gate intakes to [15 ARTIFACTS]
             robotShoot(),
+
+            //Gate intakes to [15 ARTIFACTS] then shoots
             robotGateIntake(robotOpenLeverFromClose, robotBackupFromRamp),
             robotGoShoot(LeverGoShoot),
-
-            //Shoots and then intakes to [18 ARTIFACTS]
             robotShoot(),
+
+            //Intakes to [18 ARTIFACTS] then shoots
             robotIntake(robotIntake3),
             robotGoShoot(robotGoToShoot3),
-
-            //Shoots and then gate intakes to [21 ARTIFACTS]
             robotShoot(),
+
+            //Gate intakes to [21 ARTIFACTS] then shoots
             robotGateIntake(robotOpenLeverFromClose, robotBackupFromRamp),
             robotGoShoot(LeverGoShoot),
-
-            //Shoots and then intakes to [24 ARTIFACTS]
             robotShoot(),
+
+            //Intakes to [24 ARTIFACTS] then shoots
             robotIntake(roboCommonIntake),
             robotGoShoot(roboCommonGoShoot),
+            robotShoot(),
 
-            //Shoots and then intakes to [27 ARTIFACTS]
+            //Intakes to [27 ARTIFACTS] then shoots
 //            robotShoot(),
 //            robotIntake(roboSPEDIntake),
 //            robotGoShoot(roboSPEDGoShoot),
 
-            //Shoots last intake and then parks
+            //Shoots last intake and then parks [RP Points + 3 points]
             robotShoot(),
             parkRobot()
         )
