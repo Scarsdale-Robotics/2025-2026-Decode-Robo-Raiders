@@ -35,11 +35,12 @@ public class Constants {
                     0.01
             ))
             .headingPIDFCoefficients(new PIDFCoefficients(
-                    1.5,
+                    1.55,
                     0,
                     0.12,
-                    0.02
-            ))
+                    0.01
+
+            )) 
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(
                     1.5,
                     0,
@@ -47,11 +48,11 @@ public class Constants {
                     0.0003
             ))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.012,
+                    0.0125,
                     0,
-                    0.00245, //was 0.00012 //then 0.00035
-                    0, //0.6
-                    0.01 //0.015
+                    0.0003,
+                    0,
+                    0.008
             ))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(
                     0.01,
@@ -62,9 +63,9 @@ public class Constants {
             ))
             .drivePIDFSwitch(15)
 
-            .useSecondaryDrivePIDF(false)
+            .useSecondaryDrivePIDF(true)
             .useSecondaryHeadingPIDF(false)
-            .useSecondaryTranslationalPIDF(false)
+            .useSecondaryTranslationalPIDF(true)
 
             .centripetalScaling(0.00028);
 
@@ -94,7 +95,7 @@ public class Constants {
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 0.75, 0.29);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1.0, 0.5);
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pathConstraints(pathConstraints)
