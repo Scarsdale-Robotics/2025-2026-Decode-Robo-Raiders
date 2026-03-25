@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem_VisionPortal
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
@@ -148,7 +149,7 @@ open class TeleOpBase(
     //    var driverControlled: PedroDriverControlled;
     var parkChain: PathChain? = null;
 
-    var cv: CVSubsystem_VisionPortal? = null;
+//    var cv: CVSubsystem_VisionPortal? = null;
 
     init {
         addComponents(
@@ -315,7 +316,7 @@ open class TeleOpBase(
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         PedroComponent.follower.pose = Pose(startX, startY, startH)
-        cv = CVSubsystem_VisionPortal(startX, startY, startH, hardwareMap)
+//        cv = CVSubsystem_VisionPortal(startX, startY, startH, hardwareMap)
 
         telemetry.addData("Start X", startX);
         telemetry.addData("Start Y", startY);
@@ -423,8 +424,8 @@ open class TeleOpBase(
             Gamepads.gamepad2.rightTrigger.map { it * speedFactorIntake },
             Gamepads.gamepad2.leftTrigger.map { it * speedFactorIntake },
             { lowerOverridePower }
-        );
-        lowerMotorDrive();
+        )
+        lowerMotorDrive()
 
         val intakeMotorDrive = IntakeMotorSubsystem.DriverCommand(
             Gamepads.gamepad2.rightTrigger.map { it * speedFactorIntake },
@@ -432,6 +433,8 @@ open class TeleOpBase(
             { lowerOverridePower }
         )
         intakeMotorDrive()
+
+
 
 //        val magServoDrive = MagServoSubsystem.DriverCommandDefaultOn(
 //            Gamepads.gamepad1.leftTrigger.greaterThan(0.0)
@@ -600,14 +603,14 @@ open class TeleOpBase(
         telemetry.addData("Loop Time (ms)", runtime - lastRuntime);
         lastRuntime = runtime;
 
-        cv!!.updateCV()
+//        cv!!.updateCV()
         PedroComponent.follower.update()
-        if (
-            cv!!.hasDetection()
-//            && hypot(vx, vy) < 1.0  // todo: consider adding if cam bad during movement
-        ) {
-            PedroComponent.follower.pose = Pose(cv!!.x, cv!!.y, cv!!.h);
-        }
+//        if (
+//            cv!!.hasDetection()
+////            && hypot(vx, vy) < 1.0  // todo: consider adding if cam bad during movement
+//        ) {
+//            PedroComponent.follower.pose = Pose(cv!!.x, cv!!.y, cv!!.h);
+//        }
 //        odom!!.updateOdom();
 
         if (

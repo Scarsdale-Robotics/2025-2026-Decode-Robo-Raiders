@@ -29,9 +29,9 @@ public class Constants {
             ))
             .translationalPIDFSwitch(4)
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(
-                    0.11,
+                    0.15,
                     0,
-                    0.003,
+                    0.02,
                     0.01
             ))
             .headingPIDFCoefficients(new PIDFCoefficients(
@@ -40,7 +40,7 @@ public class Constants {
                     0.12,
                     0.01
 
-            )) 
+            ))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(
                     1.5,
                     0,
