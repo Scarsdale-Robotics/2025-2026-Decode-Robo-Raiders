@@ -10,7 +10,7 @@ import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 
 import java.util.List;
 
-@TeleOp(name = "CVb4")
+@TeleOp(name = "CVb5")
 public class CvTestingBlob extends LinearOpMode {
 
     CvBallDetectionP Portal;
@@ -26,7 +26,6 @@ public class CvTestingBlob extends LinearOpMode {
             double min = Double.MAX_VALUE;  // reset each loop iteration
             ColorBlobLocatorProcessor.Blob Minb = null;
 
-
             Portal.updateDetections();
             this.Blobs = Portal.getBlobs();
 
@@ -40,7 +39,7 @@ public class CvTestingBlob extends LinearOpMode {
                     double radius = circleFit.getRadius();
 
                     if (radius == 0) continue;
-                    double cd = (120.0 * 391) / (radius * 2);  // fixed operator precedence
+                    double cd = ((120.0 * 391) / (radius * 2))*2;
                     double theta = Math.atan2(circleFit.getX() - 320, 391);
 
                     telemetry.addData("Blob @ X=" + (int)circleFit.getX() + " Circularity", b.getCircularity());
