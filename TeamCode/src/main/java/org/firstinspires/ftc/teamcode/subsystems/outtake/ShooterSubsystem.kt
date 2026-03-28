@@ -38,6 +38,10 @@ object ShooterSubsystem : Subsystem {
         }
     }
 
+    fun getError(): Double {
+        return controller.goal.velocity - controller.lastMeasurement.velocity;
+    }
+
     fun setMotorPowers(power: Double) {
 //        motor1.power = power;
         motor2.power = power;

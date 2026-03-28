@@ -2,10 +2,8 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
-import com.pedropathing.paths.HeadingInterpolator
 import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
 import dev.nextftc.core.commands.Command
@@ -27,9 +25,7 @@ import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shoot
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.localization.CVSubsystem_VisionPortal
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
@@ -658,6 +654,19 @@ open class TeleOpBase(
         PanelsTelemetry.telemetry.addData("DISTANCE TO GOAL (in)", dxy);
         PanelsTelemetry.telemetry.addData("TIME-ADJ DISTANCE TO GOAL (in)", dxyp);
 
+        // funny little auto shoot i'm trying
+        // todo: experimental
+        if (
+            inTriangle(x, y, 6.0) > 0 &&
+            ShooterSubsystem.getError() < 55.5
+            && vh < 20.deg  // todo: super experimental
+            && hypot(ax, ay) < 24.0  // todo: super duper experimental
+        ) {
+            MagblockServoSubsystem.unblock()
+        } else {
+            MagblockServoSubsystem.block()
+        }
+
         if (resetMode) {
             ShooterSubsystem.AutoAim(
                 dxy,
@@ -690,29 +699,31 @@ open class TeleOpBase(
 //            ) 0.0 else 1.0;
             val sotmFactor = 1.0;
             telemetry.addData("sotm factor", sotmFactor);
-            ShooterSubsystem.AutoAim(
+            if (inTriangle(x, y, 24.0) > 0) {
+                ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
-                dxyp * sotmFactor + dxy * (1 - sotmFactor),
-                { dist ->
-                    (
-                            if (y < BORD_Y)
-                                distanceToVelocityFar(dist)
-                            else
-                                distanceToVelocityClose(dist)
-                    ) + veloTrim
-                }
-            )()
-            TurretThetaSubsystem.AutoAim(
-                dxyp * sotmFactor + dxy * (1 - sotmFactor),
-                { dist ->
-                    (
-                            if (y < BORD_Y)
-                                distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
-                            else
-                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) + 2.0.deg
-                    ) + hoodTrim
-                },
-            )()
+                    dxyp * sotmFactor + dxy * (1 - sotmFactor),
+                    { dist ->
+                        (
+                                if (y < BORD_Y)
+                                    distanceToVelocityFar(dist)
+                                else
+                                    distanceToVelocityClose(dist)
+                                ) + veloTrim
+                    }
+                )()
+                TurretThetaSubsystem.AutoAim(
+                    dxyp * sotmFactor + dxy * (1 - sotmFactor),
+                    { dist ->
+                        (
+                                if (y < BORD_Y)
+                                    distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
+                                else
+                                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) + 2.0.deg
+                                ) + hoodTrim
+                    },
+                )()
+            }
             TurretPhiSubsystem.AutoAim(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
                 dyp * sotmFactor + dy * (1 - sotmFactor),
@@ -749,5 +760,26 @@ open class TeleOpBase(
                     y.toString() + "\n" +
                     h.inRad.toString() + "\n"
         )
+    }
+
+    //    double[] x_top = {72,-8,152};
+    //    double[] y_top = {64,144,144};
+    //    double[] x_bottom = {72,40,104};
+    //    double[] y_bottom = {32,0,0};
+    fun inTriangle(x1: Double, y1: Double, margin: Double): Int {
+        /**0 = none, 1 = top, 2 = bottom, -1 = error */
+        if (x1 > 144 || x1 < 0 || y1 > 144 || y1 < 0) {
+            return -1
+        }
+
+        // T triangle: vertices (72,64), (-8,144), (152,144)
+        val inTop = (y1 <= -x1 + 144 - margin) && (y1 <= x1 - margin)
+
+        // B triangle:  (40,0), (72,32), (104,0)
+        val inBottom = (y1 <= x1 - (48 - margin)) && (y1 <= -x1 + 96 + margin)
+
+        if (inTop) return 1
+        if (inBottom) return 2
+        return 0
     }
 }
