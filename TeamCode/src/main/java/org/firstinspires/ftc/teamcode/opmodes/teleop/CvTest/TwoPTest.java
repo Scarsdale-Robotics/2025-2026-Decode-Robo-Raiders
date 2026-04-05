@@ -60,6 +60,10 @@ public class TwoPTest extends LinearOpMode {
                 }
             }
 
+            telemetry.addData("x: ", x);
+            telemetry.addData("y: ", y);
+            telemetry.addData("h: ", h);
+
             Portal.update();
             telemetry.update();
         }
