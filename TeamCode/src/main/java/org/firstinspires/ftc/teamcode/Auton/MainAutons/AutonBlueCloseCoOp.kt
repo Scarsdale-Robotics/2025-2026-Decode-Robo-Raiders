@@ -21,6 +21,8 @@ import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
+import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueCloseArtifact24.Companion.DelayAtLever
+import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueCloseArtifact24.Companion.DelayFromRampIntake
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
@@ -48,7 +50,7 @@ import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 
-@Autonomous(name = "[COOP-18] Auton Blue Close CoOp", group = "Auton")
+@Autonomous(name = "[COOP-21?] Auton Blue Close CoOp", group = "Auton")
 @Configurable
 class AutonBlueCloseCoOp: NextFTCOpMode() {
     //////////////////////
@@ -72,8 +74,8 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 
     companion object {
         val delayStartShoot: Double = 0.4
-        val DelayBeforeShoot: Double = 0.8
-        val delayAfterEachShoot: Double = 0.45 //currently at a really high #
+        val DelayBeforeShoot: Double = 0.0
+        val delayAfterEachShoot: Double = 0.27 //currently at a really high #
         val DelayForPartnerBot: Double = 0.0
         val DelayInIntake: Double = 0.45
         val delayAtGate: Double = 0.67
@@ -323,11 +325,17 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
     ///////////////////////////
     ////Main Auton Commands////
     ///////////////////////////
-    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(intakeSpeed)}
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
     val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
+
+//    val SetCanShootFalse: Command = InstantCommand {canShoot = false}
+//    val SetCanShootTrue: Command = InstantCommand {canShoot = true}
+
+    val stopFollower: Command = InstantCommand {PedroComponent.follower.breakFollowing()}
 
     val IntakeCommand: Command
         get() = ParallelGroup(
+//            SetCanShootTrue,
             intakePower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
@@ -337,6 +345,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         )
     val IntakeAfterCommand: Command
         get() = ParallelGroup(
+//            SetCanShootTrue,
             maxPower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
@@ -346,73 +355,70 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         )
     val TravelCommand: Command
         get() = ParallelGroup(
+            maxPower,
             IntakeMotorSubsystem.off,
             MagMotorSubsystem.off,
 //            MagServoSubsystem.stop,
-            MagblockServoSubsystem.block
-        )
+            MagblockServoSubsystem.block,
+
+            )
     val ShootCommand: Command
         get() = ParallelGroup(
+//            SetCanShootFalse,
+            maxPower,
             MagblockServoSubsystem.unblock,
             MagMotorSubsystem.On(1.0),
             IntakeMotorSubsystem.intake,
 //            MagServoSubsystem.run
         )
 
+    fun robotShoot(): Command {
+        return SequentialGroup(
+            Delay(DelayBeforeShoot),
+            ShootCommand,
+            Delay(delayAfterEachShoot),
+            stopFollower,
+            TravelCommand,
+        )
+    }
+
+    fun robotIntake(followedPath: PathChain?): Command {
+        return SequentialGroup(
+            TravelCommand,
+            FollowPath(followedPath!!)
+        )
+    }
+
+    fun robotGoShoot(followedPath: PathChain?): Command {
+        return ParallelGroup(
+            SequentialGroup(
+                IntakeAfterCommand,
+                Delay(DelayInIntake),
+                TravelCommand,
+            ),
+            FollowPath(followedPath!!, true)
+        )
+    }
+
     /////////////////////////
     ////Autonomous Runner////
     /////////////////////////
     private val autonomousRoutine: Command
-        get() = SequentialGroup(
-            //Main Group
-            SequentialGroup(
-                FollowPath(robotShootPreload!!),
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                TravelCommand,
-                FollowPath(robotIntake1!!),
-                Delay(0.5),
+        get() = SequentialGroup( //Main Group
+            FollowPath(robotShootPreload!!),
+            robotShoot(),
+            robotIntake(robotIntake1),
+            Delay(0.5),
 
-                ParallelGroup( //Robot goes back to CLOSE Shoot Position
-                    SequentialGroup(
-                        IntakeAfterCommand,
-                        Delay(DelayInIntake),
-                        TravelCommand
-                    ),
-                    FollowPath(robotFirstLeverOpen!!),
-                ),
-                Delay(delayAtGate),
-            ),
-
-            ParallelGroup( //Robot goes back to CLOSE Shoot Position
-//                TurretPhiSubsystem.SetTargetPhi((- (-5.075 + 2.0 * PI - PI / 3.0 - PI / 48.0)).rad),
-                SequentialGroup(
-                    IntakeAfterCommand,
-                    Delay(DelayInIntake),
-                    TravelCommand
-                ),
-                FollowPath(robotGoToShoot1!!)
-            ),
-
-            SequentialGroup( //Shoots FIRST Intake, goes to intake and open lever
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                TravelCommand,
-                FollowPath(robotIntake2!!), //robot goes to intake
-            ),
-
+            robotGoShoot(robotFirstLeverOpen),
             Delay(delayAtGate),
 
-            ParallelGroup( //Robot goes back to CLOSE Shoot Position
-                SequentialGroup(
-                    IntakeAfterCommand,
-                    Delay(DelayInIntake),
-                    TravelCommand
-                ),
-                FollowPath(robotGoToShoot2!!)
-            ),
+            robotGoShoot(robotGoToShoot1),
+            robotShoot(),
+
+//            Delay(delayAtGate),
+//            robotIntake(robotIntake2),
+            robotGoShoot(robotGoToShoot2),
 
             // NEW
 
@@ -461,54 +467,49 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
             ////////REPEATABLE SECTION////////
             //////////////////////////////////
             SequentialGroup( //Shoots THIRD Intake, goes to OPEN lever and then intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                TravelCommand,
-                FollowPath(shootDirectToGate!!), //robot goes to intake
+                robotShoot(),
+                FollowPath(shootDirectToGate!!),
                 TravelCommand
             ),
 
-            SequentialGroup(
-                FollowPath(gateToCommon!!),
-            ),
-
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    IntakeAfterCommand,
-                    Delay(DelayInIntake),
-                    TravelCommand
-                ),
-                FollowPath(robotCommonGoShoot!!)
-            ),
+            FollowPath(gateToCommon!!),
+            robotGoShoot(robotCommonGoShoot),
 
             SequentialGroup( //Shoots THIRD Intake, goes to OPEN lever and then intake
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                TravelCommand,
+                robotShoot(),
                 Delay(DelayForPartnerBot), //Temporary Pos for this delay until figure out how needed or changed delay has to be
                 FollowPath(robotFinalCommonIntake!!), //robot goes to intake
             ),
 
-            ParallelGroup( //Robot goes back to FAR Shoot Position
-                SequentialGroup(
-                    IntakeAfterCommand,
-                    Delay(DelayInIntake),
-                    TravelCommand
-                ),
-                FollowPath(robotFinalCommonGoShoot!!)
+            robotGoShoot(robotFinalCommonGoShoot),
+
+            //////////////////////////////////
+            ////////REPEATABLE SECTION////////
+            //////////////////////////////////
+            SequentialGroup( //Shoots THIRD Intake, goes to OPEN lever and then intake
+                robotShoot(),
+                FollowPath(shootDirectToGate!!),
+                TravelCommand
             ),
+
+            FollowPath(gateToCommon!!),
+            robotGoShoot(robotCommonGoShoot),
+
+            SequentialGroup( //Shoots THIRD Intake, goes to OPEN lever and then intake
+                robotShoot(),
+                Delay(DelayForPartnerBot), //Temporary Pos for this delay until figure out how needed or changed delay has to be
+                FollowPath(robotFinalCommonIntake!!), //robot goes to intake
+            ),
+
+            robotGoShoot(robotFinalCommonGoShoot),
 
             //////////////////////////////////
             ////////REPEATABLE SECTION////////
             //////////////////////////////////
 
+
             SequentialGroup( //Shoots SIXTH Intake, goes to PARK
-                Delay(DelayBeforeShoot),
-                ShootCommand,
-                Delay(delayAfterEachShoot),
-                TravelCommand,
+                robotShoot(),
                 InstantCommand { stopShooterAutoAim = true },
                 ShooterSubsystem.On(9999.0),
                 FollowPath(robotPark!!), //robot goes to intake
