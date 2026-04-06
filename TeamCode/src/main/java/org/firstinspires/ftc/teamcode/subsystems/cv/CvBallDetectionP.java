@@ -53,6 +53,11 @@ public class CvBallDetectionP {
             ColorBlobLocatorProcessor.Util.filterByCriteria(
                     ColorBlobLocatorProcessor.BlobCriteria.BY_CIRCULARITY,
                     0.55, 1, blobs);
+
+//            ColorBlobLocatorProcessor.Util.filterByCriteria(
+//                    ColorBlobLocatorProcessor.BlobCriteria.BY_DENSITY,0.5,1, blobs
+//            );
+
         }
     }
 
