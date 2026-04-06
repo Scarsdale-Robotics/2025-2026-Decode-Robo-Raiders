@@ -42,14 +42,14 @@ object AutonPositions {
     val intake1Pos24 = Pose(23.0, 84.3, Math.toRadians(180.0))
     val intake1Pos24CPos = Pose(42.6, 84.2)
 
-    val intake2Pos24 = Pose(23.7, 66.0, Math.toRadians(180.0))
+    val intake2Pos24 = Pose(26.6, 66.9, Math.toRadians(180.0))
     val intake2P24CPos = Pose(41.3, 71.5)
 
     val intake3Pos24 = Pose(23.7, 43.3, Math.toRadians(270.0))
     val robotPark24 = Pose(42.8, 10.9, Math.toRadians(180.0))
 
     val commonIntakePos24 = Pose(11.0, 10.9, Math.toRadians(180.0))
-    val commonIntakeControlPos24 = Pose(54.8, 36.7)
+    val commonIntakeControlPos24 = Pose(33.1, 14.8) //was (54.8, 36.7)
 
     val spedPosition24 = Pose(9.6, 9.0, Math.toRadians(180.0))
     val spedPosition24ControlPos = Pose(5.1, 69.4)
@@ -90,7 +90,7 @@ object AutonPositions {
 //    val altGateOpenPose =
 //        Pose(21.0, 54.0, Math.toRadians(125.0)) // Gate Open Pose of our robot.
     val gateOpenControlPos =
-    Pose(56.7, 51.2)
+    Pose(14.8, 56.2) //was (56.7, 51.2)
     val gateOpenPoseFromFar =
         Pose(21.1, 58.0, Math.toRadians(140.0)) // Gate Open Pose of our robot.
     val gateAfterOpenPose =
