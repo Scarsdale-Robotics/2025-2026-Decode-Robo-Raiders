@@ -143,9 +143,9 @@ class BasicTeleOp(): NextFTCOpMode() {
 
     override fun onUpdate() {
         PedroComponent.follower.update()
-        TurretPhiSubsystem.AutoAim(
-            goalX - x, goalY - y, h
-        )()
+//        TurretPhiSubsystem.AutoAim(
+//            goalX - x, goalY - y, h
+//        )()
         TurretThetaSubsystem.SetTargetTheta(shootAngleDegrees.deg)()
         ShooterSubsystem.On(speed1)();
         telemetry.addData("x (inch)", x);
