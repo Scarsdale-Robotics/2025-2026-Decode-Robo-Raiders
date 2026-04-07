@@ -7,11 +7,14 @@ import org.firstinspires.ftc.teamcode.subsystems.cv.CvPortalManager;
 import org.firstinspires.ftc.vision.opencv.Circle;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 import org.opencv.core.Mat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Blob;
 import java.util.List;
 
 public class TwoPTest extends LinearOpMode {
+    private static final Logger log = LoggerFactory.getLogger(TwoPTest.class);
     CvPortalManager Portal;
     Double x;
     Double y;
@@ -60,8 +63,13 @@ public class TwoPTest extends LinearOpMode {
                 }
             }
 
+            telemetry.addData("x: ", x);
+            telemetry.addData("y: ", y);
+            telemetry.addData("h: ", h);
+
             Portal.update();
             telemetry.update();
         }
+
     }
 }
