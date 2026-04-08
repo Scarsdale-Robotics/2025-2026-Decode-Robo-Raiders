@@ -13,12 +13,12 @@ import kotlin.math.pow
 @TeleOp(name = "[RED] Tele Op")
 class TeleOpRed : TeleOpBase(
     isBlue = false,
-    goalX = 144.0 - 3.0,
-    goalY = 144.0 - 5.0,
+    goalX = 144.0 - 3.5,
+    goalY = 144.0 - 3.5,
     resetModeParams = ResetModeParams(144.0-17.1887, 115.3623, 270.0.deg),
 //    resetModeParams = ResetModeParams(8.127, 6.5, (PI / 2.0).rad),
 //    resetModeParams = ResetModeParams(8.127, 5.0, (PI / 2.0).rad),
-    resetModePhiAngle = 180.0.deg,
+    resetModePhiAngle = 0.0.deg,
     distanceToVelocityClose = { d -> AutoAimConstants.distanceToVelocityClose(d) },
     distAndVeloToThetaClose = { d, v -> AutoAimConstants.distAndVeloToThetaClose(d, v) },
     distanceToVelocityFar = { d -> AutoAimConstants.distanceToVelocityFar(d) },

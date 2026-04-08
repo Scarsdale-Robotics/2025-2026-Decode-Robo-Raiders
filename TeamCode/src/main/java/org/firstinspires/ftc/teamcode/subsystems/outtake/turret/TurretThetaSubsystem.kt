@@ -29,7 +29,7 @@ import kotlin.time.TimeSource
 @Configurable
 // to reset servo, place at pos zero, then lay hood on, then inc servo value
 object TurretThetaSubsystem : Subsystem {
-    private val servo = ServoEx("turret_theta");
+    private val servo = ServoEx("turret_theta", 0.0001);
 
     ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
     ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
@@ -38,8 +38,8 @@ object TurretThetaSubsystem : Subsystem {
     ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
 
 
-    @JvmField var POS_63deg = 1.0;
-    @JvmField var POS_55deg = 0.31;
+    @JvmField var POS_63deg = 0.92;
+    @JvmField var POS_55deg = 0.4;
 
     val open = SetPosition(servo, 0.1).requires(this)
 
