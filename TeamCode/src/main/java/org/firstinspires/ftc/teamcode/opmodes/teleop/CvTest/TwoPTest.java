@@ -26,7 +26,7 @@ public class TwoPTest extends LinearOpMode {
     Blob big;
     @Override
     public void runOpMode() throws InterruptedException {
-        this.Portal = new CvPortalManager(72,72,-Math.PI, true, hardwareMap);
+        this.Portal = new CvPortalManager(72,72,-Math.PI, hardwareMap);
         x = Portal.getX2();
         y = Portal.getY2();
         h = Portal.getH2();

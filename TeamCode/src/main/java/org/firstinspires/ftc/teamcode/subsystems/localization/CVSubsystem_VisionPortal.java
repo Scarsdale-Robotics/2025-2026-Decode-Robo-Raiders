@@ -41,13 +41,6 @@ public class CVSubsystem_VisionPortal {
 
     private AprilTagDetection lastDetection;
 
-    private static final double CAM_X = -8; //-4.25462244094;
-    private static final double CAM_Y = 5; //this might be postive beacuse this is the robots left
-    private static final double CAM_Z = 7.6; // tune
-
-
-//    double camXE;
-//    double camYE;
     public CVSubsystem_VisionPortal(double x1, double y1, double h, HardwareMap hm) {
 
 
@@ -58,22 +51,16 @@ public class CVSubsystem_VisionPortal {
                 .addTag(24, "RedTarget",
                         6.5, new VectorF(-58.3727f, 55.6425f, 29.5f), DistanceUnit.INCH,
                         new Quaternion(0.6725937f, -0.6725937f, -0.2182149f, 0.2182149f, 0))
-//                .addTags(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .build();
 
 
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setTagLibrary(tagLibrary)
-//                .setLensIntrinsics(1430,1457,480,620)
                 .setCameraPose(
                         new Position(//todo: y bad?
-                                DistanceUnit.INCH, 4.25462244094, -4.50787402, 7.57202637795, 0
+                                DistanceUnit.INCH, 0, 4.50787402, 7.57202637795, 0
                         ), new YawPitchRollAngles(
-                                AngleUnit.DEGREES,
-                                180 - Math.toDegrees(-0.0658537f) - Math.toDegrees(0.052),  // backwards lean left // todo: adjust to match heading
-                                -75,  // 15 deg above horizontal
-                                180,  // upside-down
-                                0
+                                AngleUnit.DEGREES, 0, -90, 0, 0
                         )
                 )
                 .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
@@ -105,14 +92,9 @@ public class CVSubsystem_VisionPortal {
 
 
 
-    public void closeCam() {
-        visionPortal.close();
-    }
+
 
     private boolean hasDetection = false;
-    public boolean getHasDetection() {
-        return hasDetection;
-    }
 
     public void updateCV() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
@@ -134,7 +116,6 @@ public class CVSubsystem_VisionPortal {
         }
 
         hasDetection = true;
-//        if (best.ftcPose == null) return;
 
 
         Pose3D pose = best.robotPose;

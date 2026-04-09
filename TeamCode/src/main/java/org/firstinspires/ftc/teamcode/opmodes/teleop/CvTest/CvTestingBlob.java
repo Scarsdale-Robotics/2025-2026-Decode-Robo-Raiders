@@ -10,15 +10,16 @@ import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 
 import java.util.List;
 
-@TeleOp(name = "CVb6")
+@TeleOp(name = "CVb67")
 public class CvTestingBlob extends LinearOpMode {
 
     CvBallDetectionP Portal;
     List<ColorBlobLocatorProcessor.Blob> Blobs;
+    double cd;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        this.Portal = new CvBallDetectionP(true, hardwareMap);
+        this.Portal = new CvBallDetectionP(hardwareMap);
         waitForStart();
 
 
@@ -31,6 +32,7 @@ public class CvTestingBlob extends LinearOpMode {
 
             if (Blobs != null && !Blobs.isEmpty()) {
                 telemetry.addData("Blob count", Blobs.size());
+                if(Blobs.isEmpty()){cd = -1.0;}
                 for (ColorBlobLocatorProcessor.Blob b : Blobs) {
                     Circle circleFit = b.getCircle();
 
@@ -39,7 +41,7 @@ public class CvTestingBlob extends LinearOpMode {
                     double radius = circleFit.getRadius();
 
                     if (radius == 0) continue;
-                    double cd = ((120.0 * 391) / (radius * 2))*2;
+                     cd = ((120.0 * 391) / (radius * 2))*2;
                     double theta = Math.atan2(circleFit.getX() - 320, 391);
 
                     telemetry.addData("Blob @ X=" + (int)circleFit.getX() + " Circularity", b.getCircularity());
@@ -53,6 +55,7 @@ public class CvTestingBlob extends LinearOpMode {
                         Minb = b;
                     }
                 }
+
             }
 
             telemetry.update();
