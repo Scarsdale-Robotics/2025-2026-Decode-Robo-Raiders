@@ -60,6 +60,7 @@ public class CvBallDetectionP {
     }
 
     public void updateDetections() {
+        blobs.clear();
 
        blobsG = colorLocatorGreen.getBlobs();
        blobsP = colorLocatorPurp.getBlobs();

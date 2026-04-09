@@ -41,8 +41,8 @@ public class CvTestingBlob extends LinearOpMode {
                     double radius = circleFit.getRadius();
 
                     if (radius == 0) continue;
-                     cd = ((120.0 * 391) / (radius * 2))*2;
-                    double theta = Math.atan2(circleFit.getX() - 320, 391);
+                    cd = ((120.0 * 529) / (radius * 2))*2;
+                    double theta = Math.toDegrees(Math.atan2(circleFit.getX() - 320, 391));
 
                     telemetry.addData("Blob @ X=" + (int)circleFit.getX() + " Circularity", b.getCircularity());
                     telemetry.addData("Blob @ X=" + (int)circleFit.getX() + " Radius", radius);

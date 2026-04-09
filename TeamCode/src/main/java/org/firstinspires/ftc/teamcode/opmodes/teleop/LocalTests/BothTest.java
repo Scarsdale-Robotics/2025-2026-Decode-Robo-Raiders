@@ -15,7 +15,7 @@ import java.util.List;
 
 import kotlin.Unit;
 
-@TeleOp(name = "BothTest")
+@TeleOp(name = "BothTest68")
 @Configurable
 public class BothTest extends LinearOpMode {
 
@@ -30,7 +30,8 @@ public class BothTest extends LinearOpMode {
     @Override
     public void runOpMode(){
         cv = new CVSubsystem_VisionPortal(72.0,72.0,(-Math.PI/2), hardwareMap); //starting pose
-        odom = new OdometrySubsystem(72.0,72.0,(-Math.PI/2), hardwareMap); //starting pose
+        odom = new OdometrySubsystem(72.0,72.0,(-Math.PI/2), hardwareMap);
+        cv.setCv(72,72,(-Math.PI/2));//starting pose//starting pose
 //
 
 
@@ -44,6 +45,7 @@ public class BothTest extends LinearOpMode {
 
         waitForStart();
         odom.setPinpoint(72.0,72.0,(-Math.PI/2));
+        cv.setCv(72,72,(-Math.PI/2));//starting pose
         cv.setCv(72,72,(-Math.PI/2));//starting pose
         while(opModeIsActive()){
             cv.updateCV();
