@@ -48,8 +48,8 @@ class BasicTeleOp(): NextFTCOpMode() {
         @JvmField var shootAngleDegrees = 60;
         @JvmField var isBlue = true;
 
-        @JvmField var goalX = 3.0;
-        @JvmField var goalY = 144.0 - 6.0;
+        @JvmField var goalX = 3.5;
+        @JvmField var goalY = 144.0 - 3.5;
     }
 
     init {
@@ -143,9 +143,9 @@ class BasicTeleOp(): NextFTCOpMode() {
 
     override fun onUpdate() {
         PedroComponent.follower.update()
-        TurretPhiSubsystem.AutoAim(
-            goalX - x, goalY - y, h
-        )()
+//        TurretPhiSubsystem.AutoAim(
+//            goalX - x, goalY - y, h
+//        )()
         TurretThetaSubsystem.SetTargetTheta(shootAngleDegrees.deg)()
         ShooterSubsystem.On(speed1)();
         telemetry.addData("x (inch)", x);
@@ -153,7 +153,7 @@ class BasicTeleOp(): NextFTCOpMode() {
         telemetry.addData("h (radians)", h);
         telemetry.addData(
             "distanceToGoal",
-            hypot((3 - x), (141 - y))
+            hypot((3.5 - x), (144.0 - 3.5 - y))
         );
         telemetry.addData("ShooterSpeed", speed1);
         telemetry.addData("Angle", shootAngleDegrees.deg);
