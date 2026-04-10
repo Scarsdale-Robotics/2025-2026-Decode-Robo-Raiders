@@ -699,9 +699,9 @@ open class TeleOpBase(
 //                    (abs(Gamepads.gamepad1.leftStickX.get()) <= 0.02) &&
 //                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
 //            ) 0.0 else 1.0;
-            val sotmFactor = 1.0;
+            val sotmFactor = 0.0;
             telemetry.addData("sotm factor", sotmFactor);
-            if (inTriangle(x, y, 24.0) > 0) {
+//            if (inTriangle(x, y, 24.0) > 0) {
                 ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
                     dxyp * sotmFactor + dxy * (1 - sotmFactor),
@@ -725,7 +725,7 @@ open class TeleOpBase(
                                 ) + hoodTrim
                     },
                 )()
-            }
+//            }
             TurretPhiSubsystem.AutoAim(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
                 dyp * sotmFactor + dy * (1 - sotmFactor),
