@@ -10,7 +10,7 @@ import dev.nextftc.core.units.deg
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem.manualAimPhiChangeDegsPerSecond
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem.targetPhi
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.old.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 //import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.old.TurretThetaSubsystem.manualAimThetaChangeDegsPerSecond
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.old.TurretThetaSubsystem.targetTheta
 import java.util.function.Supplier

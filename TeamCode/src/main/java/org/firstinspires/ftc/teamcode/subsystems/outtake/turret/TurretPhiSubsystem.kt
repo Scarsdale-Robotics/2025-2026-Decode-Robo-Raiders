@@ -1,4 +1,4 @@
-    package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
+package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import dev.nextftc.core.commands.Command
@@ -40,7 +40,7 @@ object TurretPhiSubsystem : Subsystem {
 
 
     fun norm(angle: Angle): Angle {
-        return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
+        return ((angle.inRad - MIN_ANGLE) % (MAX_ANGLE - MIN_ANGLE) + MIN_ANGLE).coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
 
 //        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
 //        val tolerance = Math.toRadians(10.0);
