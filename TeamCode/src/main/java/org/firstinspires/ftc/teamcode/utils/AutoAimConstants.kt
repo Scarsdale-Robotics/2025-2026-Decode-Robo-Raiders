@@ -31,15 +31,33 @@ object AutoAimConstants {
 
 
     fun distanceToVelocityClose(d: Double): Double {
-        val b0 = 111.68989
-        val b1 = 159.803
-        val b2 = -4.00802
+        val b0 = 3.05857
+        val b1 = -0.410753
+        val b2 = 0.0160513
 
         return b0 + b1 * sqrt(d) + b2 * d;
     }
 
-    fun distAndVeloToNewThetaClose(d: Double, v: Double): Double { return 0.0 };
-    fun distAndVeloToNewThetaFar(d: Double, v: Double): Double { return 0.0 };
+    fun distAndVeloToNewThetaClose(d: Double, v: Double): Double {
+        val b0 = 0.804349
+        val b1 = -0.00715735
+        val b2 = 834274.946
+        val b3 = -15846.2897
+        val b4 = 121.08801
+
+        if (v == 0.0) return 0.9;
+
+        return max(min((
+                b0 +
+                        b1 * d +
+                        b2 / (v * v) +
+                        b3 * d / (v * v) +
+                        b4 * (d * d) / (v * v)
+                ), 0.9), 0.45);
+    };
+    fun distAndVeloToNewThetaFar(d: Double, v: Double): Double {
+        return distAndVeloToNewThetaClose(d, v);
+    };
 
     fun distAndVeloToThetaClose(d: Double, v: Double): Angle {
         val b0 = 70.90073
@@ -61,9 +79,7 @@ object AutoAimConstants {
 
     // todo: retune
     fun distanceToVelocityFar(d: Double): Double {
-        val b0 = 331.92644;
-        val b1 = 8.39963;
-        return b0 + b1 * d
+        return distanceToVelocityClose(d)
     }
 
 //    fun distanceToVelocityFar(d: Double): Double {
@@ -109,6 +125,7 @@ object AutoAimConstants {
 
     // first ball time (seconds)
     fun distanceToTimeClose(d: Double): Double {
+        return 0.0
         val b0 = -12.17499
         val b1 = 2.91218
         val b2 = -0.165714
@@ -118,6 +135,7 @@ object AutoAimConstants {
 
     // first ball time
     fun distanceToTimeFar(d: Double): Double {
+        return 0.0
         val b0 = 11.10757
         val b1 = -1.96187
         val b2 = 0.0939321
