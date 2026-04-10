@@ -34,14 +34,18 @@ import java.util.List;
 
 class CvBallDetection {
 
-    private final ColorBlobLocatorProcessor colorLocator;
-    private List<ColorBlobLocatorProcessor.Blob> blobs = new ArrayList<>();
+    private ColorBlobLocatorProcessor colorLocatorPurp;
+    private ColorBlobLocatorProcessor colorLocatorGreen;
 
-    public CvBallDetection(boolean isPurple) {
-        ColorRange targetColor = isPurple ? ColorRange.ARTIFACT_PURPLE : ColorRange.ARTIFACT_GREEN;
+    private VisionPortal visionPortal;
+    private List<ColorBlobLocatorProcessor.Blob> blobs = new ArrayList<>(); // initialize to avoid null
+    private List<ColorBlobLocatorProcessor.Blob> blobsG = new ArrayList<>(); // initialize to avoid null
+    private List<ColorBlobLocatorProcessor.Blob> blobsP = new ArrayList<>();
+    private List<ColorBlobLocatorProcessor> Colors = new ArrayList<>();
 
-        colorLocator = new ColorBlobLocatorProcessor.Builder()
-                .setTargetColorRange(targetColor)
+    public CvBallDetection() {
+        this.colorLocatorPurp = new ColorBlobLocatorProcessor.Builder()
+                .setTargetColorRange(ColorRange.ARTIFACT_PURPLE)
                 .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
                 .setRoi(ImageRegion.entireFrame())
                 .setDrawContours(true)
@@ -52,22 +56,48 @@ class CvBallDetection {
                 .setErodeSize(15)
                 .setMorphOperationType(ColorBlobLocatorProcessor.MorphOperationType.CLOSING)
                 .build();
+
+        this.colorLocatorGreen = new ColorBlobLocatorProcessor.Builder()
+                .setTargetColorRange(ColorRange.ARTIFACT_GREEN)
+                .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
+                .setRoi(ImageRegion.entireFrame())
+                .setDrawContours(true)
+                .setBoxFitColor(0)
+                .setCircleFitColor(Color.rgb(255, 255, 0))
+                .setBlurSize(5)
+                .setDilateSize(15)
+                .setErodeSize(15)
+                .setMorphOperationType(ColorBlobLocatorProcessor.MorphOperationType.CLOSING)
+                .build();
+
+        this.Colors.add(colorLocatorGreen);
+        this.Colors.add(colorLocatorPurp);
     }
 
-    public ColorBlobLocatorProcessor getProcessor() {
-        return colorLocator;
+    public List<ColorBlobLocatorProcessor> getProcessor() {
+        return this.Colors;
     }
 
     public void update() {
-        blobs = colorLocator.getBlobs();
-
-        if (blobs != null && !blobs.isEmpty()) {
-//            ColorBlobLocatorProcessor.Util.filterByCriteria(
-//                    ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
-//                    50, 20000, blobs);
+        blobsG = colorLocatorGreen.getBlobs();
+        blobsP = colorLocatorPurp.getBlobs();
+        if(blobsG != null && !blobsG.isEmpty()){
+            ColorBlobLocatorProcessor.Util.filterByCriteria(
+                    ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
+                    400, 50000, blobsG);
             ColorBlobLocatorProcessor.Util.filterByCriteria(
                     ColorBlobLocatorProcessor.BlobCriteria.BY_CIRCULARITY,
-                    0.2, 1, blobs);
+                    0.55, 1, blobsG);
+            this.blobs.addAll(blobsG);
+        }
+        if(blobsP != null && !blobsP.isEmpty()){
+            ColorBlobLocatorProcessor.Util.filterByCriteria(
+                    ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
+                    400, 50000, blobsP);
+            ColorBlobLocatorProcessor.Util.filterByCriteria(
+                    ColorBlobLocatorProcessor.BlobCriteria.BY_CIRCULARITY,
+                    0.55, 1, blobsP);
+            this.blobs.addAll(blobsP);
         }
     }
 
@@ -182,15 +212,16 @@ public class CvPortalManager {
     public final CvBallDetection ballDetection;
     public final CvAprilTag aprilTag;
 
-    public CvPortalManager(double x1, double y1, double h1, boolean isPurple, HardwareMap hm) {
-        ballDetection = new CvBallDetection(isPurple);
+    public CvPortalManager(double x1, double y1, double h1, HardwareMap hm) {
+        ballDetection = new CvBallDetection();
         aprilTag = new CvAprilTag(x1,y1,h1);
         aprilTag.setCv(x1,y1,h1);
 
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hm.get(WebcamName.class, "Cam"))
                 .setCameraResolution(new android.util.Size(640, 480))
-                .addProcessor(ballDetection.getProcessor())
+                .addProcessor(ballDetection.getProcessor().get(0))
+                .addProcessor(ballDetection.getProcessor().get(1))
                 .addProcessor(aprilTag.getProcessor())
                 .build();
     }

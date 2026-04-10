@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.teleop.CvTest;
+package org.firstinspires.ftc.teamcode.opmodes.Old;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -32,7 +32,7 @@ public class ahhh extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        portal = new CvPortalManager(72, 72, -Math.PI, true, hardwareMap);
+        portal = new CvPortalManager(72, 72, -Math.PI,  hardwareMap);
 
         x = portal.getX2();
         y = portal.getY2();
