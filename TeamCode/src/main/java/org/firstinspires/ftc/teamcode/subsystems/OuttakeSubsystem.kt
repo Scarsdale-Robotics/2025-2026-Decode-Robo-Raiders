@@ -8,7 +8,7 @@ import dev.nextftc.core.units.Angle
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.TurretSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.old.TurretThetaSubsystem
 import java.util.function.Supplier
 import kotlin.math.hypot
 

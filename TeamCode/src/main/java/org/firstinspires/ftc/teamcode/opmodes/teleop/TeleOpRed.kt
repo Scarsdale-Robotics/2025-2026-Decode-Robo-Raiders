@@ -19,10 +19,10 @@ class TeleOpRed : TeleOpBase(
 //    resetModeParams = ResetModeParams(8.127, 6.5, (PI / 2.0).rad),
 //    resetModeParams = ResetModeParams(8.127, 5.0, (PI / 2.0).rad),
     resetModePhiAngle = 0.0.deg,
-    distanceToVelocityClose = { d -> AutoAimConstants.distanceToVelocityClose(d) },
-    distAndVeloToThetaClose = { d, v -> AutoAimConstants.distAndVeloToThetaClose(d, v) },
-    distanceToVelocityFar = { d -> AutoAimConstants.distanceToVelocityFar(d) },
-    distAndVeloToThetaFar = { d, v -> AutoAimConstants.distAndVeloToThetaFar(d, v) },
-    distanceToTimeClose = { d -> AutoAimConstants.distanceToTimeClose(d) },
-    distanceToTimeFar = { d -> AutoAimConstants.distanceToTimeFar(d) }
+    distanceToVelocityClose = { d -> AutoAimConstants.distanceToVelocityClose(d + D_OFS) },
+    distAndVeloToThetaClose = { d, v -> AutoAimConstants.distAndVeloToNewThetaClose(d + D_OFS, v) },
+    distanceToVelocityFar = { d -> AutoAimConstants.distanceToVelocityFar(d + D_OFS) },
+    distAndVeloToThetaFar = { d, v -> AutoAimConstants.distAndVeloToNewThetaFar(d + D_OFS, v) },
+    distanceToTimeClose = { d -> AutoAimConstants.distanceToTimeClose(d + D_OFS) },
+    distanceToTimeFar = { d -> AutoAimConstants.distanceToTimeFar(d + D_OFS) }
 )

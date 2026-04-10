@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.old.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants
 import kotlin.math.PI
 import kotlin.math.hypot

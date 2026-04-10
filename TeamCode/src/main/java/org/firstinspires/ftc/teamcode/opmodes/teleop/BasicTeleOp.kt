@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
-import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.Pose
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import dev.nextftc.core.components.BindingsComponent
@@ -14,14 +13,11 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
-import dev.nextftc.hardware.driving.FieldCentric
 import dev.nextftc.hardware.driving.MecanumDriverControlled
 import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants.createFollower
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.localization.OdometrySubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.IntakeMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
@@ -29,7 +25,6 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
-import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.hypot
 
@@ -45,7 +40,7 @@ class BasicTeleOp(): NextFTCOpMode() {
 
     companion object {
         @JvmField var speed1 = 0.0;
-        @JvmField var shootAngleDegrees = 60;
+        @JvmField var shootAngleVal = 0.8;
         @JvmField var isBlue = true;
 
         @JvmField var goalX = 3.5;
@@ -76,7 +71,7 @@ class BasicTeleOp(): NextFTCOpMode() {
         MagServoSubsystem.stop()
         TurretPhiSubsystem.zero()
 //        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
-        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
+        PedroComponent.follower.pose = Pose(17.1887, 115.3623, 3 * PI / 2);
     }
 
     var speedFactor = 1.0;
@@ -143,10 +138,10 @@ class BasicTeleOp(): NextFTCOpMode() {
 
     override fun onUpdate() {
         PedroComponent.follower.update()
-//        TurretPhiSubsystem.AutoAim(
-//            goalX - x, goalY - y, h
-//        )()
-        TurretThetaSubsystem.SetTargetTheta(shootAngleDegrees.deg)()
+        TurretPhiSubsystem.AutoAim(
+            goalX - x, goalY - y, h
+        )()
+        TurretThetaSubsystem.SetThetaPos(shootAngleVal)()
         ShooterSubsystem.On(speed1)();
         telemetry.addData("x (inch)", x);
         telemetry.addData("y (inch)", y);
@@ -156,7 +151,7 @@ class BasicTeleOp(): NextFTCOpMode() {
             hypot((3.5 - x), (144.0 - 3.5 - y))
         );
         telemetry.addData("ShooterSpeed", speed1);
-        telemetry.addData("Angle", shootAngleDegrees.deg);
+        telemetry.addData("Angle", shootAngleVal.deg);
         telemetry.update()
         PanelsTelemetry.telemetry.update()
     }

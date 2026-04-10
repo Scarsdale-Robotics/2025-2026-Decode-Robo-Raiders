@@ -21,7 +21,7 @@ import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
-import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleDegrees
+import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleVal
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
@@ -42,6 +42,8 @@ import kotlin.math.min
 
 data class ResetModeParams(val x: Double, val y: Double, val h: Angle)
 
+const val D_OFS = 0.0;
+
 @Configurable
 open class TeleOpBase(
     private val isBlue: Boolean,
@@ -50,9 +52,9 @@ open class TeleOpBase(
     private val resetModeParams: ResetModeParams,
     private val resetModePhiAngle: Angle,
     private val distanceToVelocityClose: (Double) -> Double,
-    private val distAndVeloToThetaClose: (Double, Double) -> Angle,
+    private val distAndVeloToThetaClose: (Double, Double) -> Double,
     private val distanceToVelocityFar: (Double) -> Double,
-    private val distAndVeloToThetaFar: (Double, Double) -> Angle,
+    private val distAndVeloToThetaFar: (Double, Double) -> Double,
     private val distanceToTimeClose: (Double) -> Double,
     private val distanceToTimeFar: (Double) -> Double
 ): NextFTCOpMode() {
@@ -337,7 +339,7 @@ open class TeleOpBase(
 
     private var phiTrim = 0.0.deg;
     private var veloTrim = 0;
-    private var hoodTrim = 0.0.deg;
+    private var hoodTrim = 0.0;
 
     var speedFactorDrive = 1.0;
     var speedFactorIntake = 1.0;
@@ -440,11 +442,11 @@ open class TeleOpBase(
 //        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
         Gamepads.gamepad1.rightTrigger greaterThan 0.05 whenBecomesTrue {
-            lowerOverridePower = if (y < BORD_Y) {
-                0.8 * shootTransferSpeedFactor;
-            } else {
-                1.0 * shootTransferSpeedFactor;
-            }
+//            lowerOverridePower = if (y < BORD_Y) {
+//                0.8 * shootTransferSpeedFactor;
+//            } else {
+//                1.0 * shootTransferSpeedFactor;
+//            }
             MagblockServoSubsystem.unblock()
             ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
         } whenBecomesFalse {
@@ -517,10 +519,10 @@ open class TeleOpBase(
         }
 
         Gamepads.gamepad2.dpadUp whenBecomesTrue {
-            hoodTrim += 0.5.deg;
+            hoodTrim += 0.025;
         }
         Gamepads.gamepad2.dpadDown whenBecomesTrue {
-            hoodTrim -= 0.5.deg;
+            hoodTrim -= 0.025;
         }
 
         Gamepads.gamepad2.triangle whenBecomesTrue {
@@ -565,7 +567,7 @@ open class TeleOpBase(
             ofsY = 0.0;
             phiTrim = 0.0.rad;
             veloTrim = 0;
-            hoodTrim = 0.0.deg;
+            hoodTrim = 0.0;
             gamepad2.rumble(500);
         }
     }
@@ -578,7 +580,7 @@ open class TeleOpBase(
         telemetry.addLine("TRIMMING:")
         telemetry.addData("PHI TRIM", abs(phiTrim.inDeg).toString() + " deg " + if (phiTrim.inDeg < 0.0) "RIGHT" else "LEFT");
         telemetry.addData("VELO TRIM", "$veloTrim tps");
-        telemetry.addData("HOOD TRIM", abs(hoodTrim.inDeg).toString() + " deg " + if (hoodTrim.inDeg < 0.0) "FLATTER" else "CURVIER");
+        telemetry.addData("HOOD TRIM", abs(hoodTrim).toString() + " tk " + if (hoodTrim < 0.0) "FLATTER" else "CURVIER");
         telemetry.addData("X TRIM", ofsX);
         telemetry.addData("Y TRIM", ofsY)
 
@@ -654,18 +656,18 @@ open class TeleOpBase(
         PanelsTelemetry.telemetry.addData("DISTANCE TO GOAL (in)", dxy);
         PanelsTelemetry.telemetry.addData("TIME-ADJ DISTANCE TO GOAL (in)", dxyp);
 
-        // funny little auto shoot i'm trying
-        // todo: experimental
-        if (
-            inTriangle(x, y, 6.0) > 0 &&
-            ShooterSubsystem.getError() < 55.5
-            && vh < 20.deg  // todo: super experimental
-            && hypot(ax, ay) < 24.0  // todo: super duper experimental
-        ) {
-            MagblockServoSubsystem.unblock()
-        } else {
-            MagblockServoSubsystem.block()
-        }
+//        // funny little auto shoot i'm trying
+//        // todo: experimental
+//        if (
+//            inTriangle(x, y, 6.0) > 0 &&
+//            ShooterSubsystem.getError() < 55.5
+//            && vh < 20.deg  // todo: super experimental
+//            && hypot(ax, ay) < 24.0  // todo: super duper experimental
+//        ) {
+//            MagblockServoSubsystem.unblock()
+//        } else {
+//            MagblockServoSubsystem.block()
+//        }
 
         if (resetMode) {
             ShooterSubsystem.AutoAim(
@@ -686,7 +688,7 @@ open class TeleOpBase(
                             if (y < BORD_Y)
                                 distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                             else
-                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) + 2.5.deg
+                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
                     ) + hoodTrim
                 },
             )()
@@ -719,7 +721,7 @@ open class TeleOpBase(
                                 if (y < BORD_Y)
                                     distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
                                 else
-                                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) + 2.0.deg
+                                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
                                 ) + hoodTrim
                     },
                 )()
@@ -744,7 +746,7 @@ open class TeleOpBase(
             hypot((goalX - x), (goalY - y))
         );
         telemetry.addData("ShooterSpeed", ShooterSubsystem.velocity);
-        telemetry.addData("Angle", shootAngleDegrees.deg);
+        telemetry.addData("Angle", shootAngleVal.deg);
         telemetry.addData("targetPhi", TurretPhiSubsystem.targetPhi)
         telemetry.update()
 

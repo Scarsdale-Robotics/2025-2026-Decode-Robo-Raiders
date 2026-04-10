@@ -38,6 +38,9 @@ object AutoAimConstants {
         return b0 + b1 * sqrt(d) + b2 * d;
     }
 
+    fun distAndVeloToNewThetaClose(d: Double, v: Double): Double { return 0.0 };
+    fun distAndVeloToNewThetaFar(d: Double, v: Double): Double { return 0.0 };
+
     fun distAndVeloToThetaClose(d: Double, v: Double): Angle {
         val b0 = 70.90073
         val b1 = -0.366685
