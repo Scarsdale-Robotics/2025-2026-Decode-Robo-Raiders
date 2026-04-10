@@ -30,7 +30,6 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.old.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaClose
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaFar
@@ -406,15 +405,15 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             )()
         }
         TurretPhiSubsystem.AutoAim(dxp, dyp, PedroComponent.follower.pose.heading.rad)();
-        TurretThetaSubsystem.AutoAim(
-            dxyp,
-            { dist ->
-                (if (PedroComponent.follower.pose.y < BORD_Y)
-                    distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
-                else
-                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)) + 1.5.deg
-            },
-        )()
+//        TurretThetaSubsystem.AutoAim(
+//            dxyp,
+//            { dist ->
+//                (if (PedroComponent.follower.pose.y < BORD_Y)
+//                    distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
+//                else
+//                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)) + 1.5.deg
+//            },
+//        )()
 
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower!!.update();
@@ -467,7 +466,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         var Portal: CvBallDetectionP? = null
         var Blobs: MutableList<ColorBlobLocatorProcessor.Blob>? = null
 
-        Portal = CvBallDetectionP(true, hardwareMap)
+        Portal = CvBallDetectionP( hardwareMap)
         waitForStart()
 
 
