@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.outtake
 
 import com.bylazar.configurables.annotations.Configurable
+import com.bylazar.telemetry.PanelsTelemetry
 import com.bylazar.telemetry.PanelsTelemetry.telemetry
 import com.qualcomm.robotcore.util.ElapsedTime
 import dev.nextftc.control.ControlSystem
@@ -82,6 +83,7 @@ object ShooterSubsystem : Subsystem {
         }
 
         override fun start() {
+            PanelsTelemetry.telemetry.addData("vbdres", veloByDistance(dxy))
             setControllerGoals(veloByDistance(dxy))
         }
     }

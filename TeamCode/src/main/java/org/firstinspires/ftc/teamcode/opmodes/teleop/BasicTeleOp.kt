@@ -70,8 +70,8 @@ class BasicTeleOp(): NextFTCOpMode() {
         MagMotorSubsystem.off()
         MagServoSubsystem.stop()
         TurretPhiSubsystem.zero()
-//        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
-        PedroComponent.follower.pose = Pose(17.1887, 115.3623, 3 * PI / 2);
+        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
+//        PedroComponent.follower.pose = Pose(17.1887, 115.3623, 3 * PI / 2);
     }
 
     var speedFactor = 1.0;

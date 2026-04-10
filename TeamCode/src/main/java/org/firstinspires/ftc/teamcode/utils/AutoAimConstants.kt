@@ -31,9 +31,9 @@ object AutoAimConstants {
 
 
     fun distanceToVelocityClose(d: Double): Double {
-        val b0 = 3.05857
-        val b1 = -0.410753
-        val b2 = 0.0160513
+        val b0 = 361.17228
+        val b1 = 43.20028
+        val b2 = 2.1651
 
         return b0 + b1 * sqrt(d) + b2 * d;
     }
