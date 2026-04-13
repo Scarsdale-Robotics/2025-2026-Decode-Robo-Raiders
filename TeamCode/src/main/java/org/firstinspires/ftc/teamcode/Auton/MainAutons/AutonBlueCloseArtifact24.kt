@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.Auton.MainAutons
 
-//import org.firstinspires.ftc.teamcode.subsystems.lower.MagServoSubsystem
-//import org.firstinspires.ftc.teamcode.subsystems.lower.LowerMotorSubsystem
-
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.geometry.BezierCurve
