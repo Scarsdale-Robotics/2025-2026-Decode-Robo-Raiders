@@ -21,8 +21,8 @@ object IntakeMotorSubsystem : Subsystem {
         SetPower(motor, 1.0),
         SetPower(servo, 1.0))
     var reverse = ParallelGroup(
-        SetPower(motor, 0.0),
-        SetPower(servo, -1.0))
+        SetPower(motor, -1.0),
+        SetPower(servo, 0.0))
     var off = ParallelGroup(
         SetPower(motor, 0.0),
         SetPower(servo, 0.5))
