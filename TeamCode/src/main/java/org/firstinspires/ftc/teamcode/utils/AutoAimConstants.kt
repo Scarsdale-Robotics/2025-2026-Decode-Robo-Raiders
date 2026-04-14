@@ -9,85 +9,39 @@ import kotlin.math.sqrt
 object AutoAimConstants {
     const val BORD_Y = 48;
 
-//    fun distanceToVelocityClose(d: Double): Double {
-//        val (b0, b1, b2) = arrayOf(
-//            -609.4652, 304.04375, -11.0255
-//        );
-//        return b0 + b1 * sqrt(d) + b2 * d;
-//    }
-//
-//    fun distAndVeloToThetaClose(d: Double, v: Double): Angle {
-//        val (b0, b1, b2, b3, b4) = arrayOf(
-//            77.50779, -0.429656, 4507231.16, -263782.983, 5613.57621
-//        );
-//        return max(min((
-//                b0 +
-//                b1 * d +
-//                b2 / (v * v) +
-//                b3 * d / (v * v) +
-//                b4 * (d * d) / (v * v)
-//        ), 63.0), 55.0).deg;
-//    }
-
-
     fun distanceToVelocityClose(d: Double): Double {
-        val b0 = 361.17228
-        val b1 = 43.20028
-        val b2 = 2.1651
-
-        return b0 + b1 * sqrt(d) + b2 * d;
+        return 715 + 9.25 * d + -0.0353 * d * d;
     }
 
     fun distAndVeloToNewThetaClose(d: Double, v: Double): Double {
-        val b0 = 0.804349
-        val b1 = -0.00715735
-        val b2 = 834274.946
-        val b3 = -15846.2897
-        val b4 = 121.08801
-
-        if (v == 0.0) return 0.9;
-
-        return max(min((
-                b0 +
-                        b1 * d +
-                        b2 / (v * v) +
-                        b3 * d / (v * v) +
-                        b4 * (d * d) / (v * v)
-                ), 0.9), 0.45);
-    };
-    fun distAndVeloToNewThetaFar(d: Double, v: Double): Double {
-        return distAndVeloToNewThetaClose(d, v);
+        return max(min(1.69 + -0.0203 * d + 9.73E-05 * d * d, 0.9), 0.63)
     };
 
-    fun distAndVeloToThetaClose(d: Double, v: Double): Angle {
-        val b0 = 70.90073
-        val b1 = -0.366685
-        val b2 = 7519899.79
-        val b3 = -225684.275
-        val b4 = 4969.34854
-
-        if (v == 0.0) return 63.0.deg;
-
-        return max(min((
-                b0 +
-                        b1 * d +
-                        b2 / (v * v) +
-                        b3 * d / (v * v) +
-                        b4 * (d * d) / (v * v)
-                ), 63.0), 55.0).deg;
-    }
-
-    // todo: retune
     fun distanceToVelocityFar(d: Double): Double {
-        return distanceToVelocityClose(d)
+        return 2685 + -23.6 * d + 0.109 * d * d
     }
 
-//    fun distanceToVelocityFar(d: Double): Double {
-//        val (b0, b1, b2) = arrayOf(
-//            2907.55323, -437.74778, 26.97694
-//        );
-//        return b0 + b1 * sqrt(d) + b2 * d;
-//    }
+    fun distAndVeloToNewThetaFar(d: Double, v: Double): Double {
+        return 0.63
+    };
+
+    // first ball time (seconds)
+    fun distanceToTimeClose(d: Double): Double {
+        return -9.99E-03 + 0.0113 * d + -5.29E-05 * d * d
+    }
+
+    // first ball time
+    fun distanceToTimeFar(d: Double): Double {
+        return 2.43 + -0.0304 * d + 1.3E-04 * d * d
+    }
+
+
+
+    ////////////////////////
+
+
+
+
 
     // todo: redo
     fun distAndVeloToThetaFar(d: Double, v: Double): Angle {
@@ -123,24 +77,22 @@ object AutoAimConstants {
 //        ), 63.0), 55.0).deg;
     }
 
-    // first ball time (seconds)
-    fun distanceToTimeClose(d: Double): Double {
-        return 0.0
-        val b0 = -12.17499
-        val b1 = 2.91218
-        val b2 = -0.165714
+    fun distAndVeloToThetaClose(d: Double, v: Double): Angle {
+        val b0 = 70.90073
+        val b1 = -0.366685
+        val b2 = 7519899.79
+        val b3 = -225684.275
+        val b4 = 4969.34854
 
-        return b0 + b1 * sqrt(d) + b2 * d
-    }
+        if (v == 0.0) return 63.0.deg;
 
-    // first ball time
-    fun distanceToTimeFar(d: Double): Double {
-        return 0.0
-        val b0 = 11.10757
-        val b1 = -1.96187
-        val b2 = 0.0939321
-
-        return b0 + b1 * sqrt(d) + b2 * d
+        return max(min((
+                b0 +
+                        b1 * d +
+                        b2 / (v * v) +
+                        b3 * d / (v * v) +
+                        b4 * (d * d) / (v * v)
+                ), 63.0), 55.0).deg;
     }
 
 }

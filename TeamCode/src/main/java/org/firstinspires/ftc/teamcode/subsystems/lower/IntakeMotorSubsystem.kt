@@ -16,16 +16,16 @@ object IntakeMotorSubsystem : Subsystem {
     private val motor = MotorEx("intake").reversed()
     private val servo = CRServoEx("intake_servo")
 
-    class On(power: Double) : InstantCommand({ motor.power = power ; servo.power = power})
+    class On(power: Double) : InstantCommand({ motor.power = power ; servo.power = -power})
     var intake = ParallelGroup(
         SetPower(motor, 1.0),
-        SetPower(servo, 1.0))
+        SetPower(servo, -1.0))
     var reverse = ParallelGroup(
         SetPower(motor, -1.0),
-        SetPower(servo, 0.0))
+        SetPower(servo, 1.0))
     var off = ParallelGroup(
         SetPower(motor, 0.0),
-        SetPower(servo, 0.5))
+        SetPower(servo, 0.0))
 
     class DriverCommandDefaultOn(
         private val outPower: Supplier<Double>,
@@ -45,7 +45,7 @@ object IntakeMotorSubsystem : Subsystem {
 
         override fun update() {
             motor.power = 1.0 - 2.0 * outPower.get();
-            servo.power = 1.0 - 2.0 * outPower.get();
+            servo.power = -(1.0 - 2.0 * outPower.get());
         }
     }
 
@@ -67,8 +67,14 @@ object IntakeMotorSubsystem : Subsystem {
         }
 
         override fun update() {
-            if (override.get() != 0.0){ motor.power = override.get(); servo.power = override.get()}
-            else { motor.power = inPower.get() - outPower.get();servo.power = inPower.get() - outPower.get();}
+            if (override.get() != 0.0) {
+                motor.power = override.get();
+                servo.power = -override.get()
+            }
+            else {
+                motor.power = inPower.get() - outPower.get();
+                servo.power = -(inPower.get() - outPower.get());
+            }
         }
     }
 }

@@ -437,6 +437,12 @@ open class TeleOpBase(
         )
         intakeMotorDrive()
 
+        Gamepads.gamepad2.rightTrigger.greaterThan(0.003) whenBecomesTrue {  // could also have left trigger stuff but whatev
+            MagblockServoSubsystem.block()
+        } whenBecomesFalse {
+            MagblockServoSubsystem.unblock()
+        }
+
 
 
 //        val magServoDrive = MagServoSubsystem.DriverCommandDefaultOn(
@@ -449,7 +455,8 @@ open class TeleOpBase(
         Gamepads.gamepad1.circle whenBecomesTrue ParallelGroup(
             MagblockServoSubsystem.unblock,
             SequentialGroup(
-                Delay(shootDelay),
+//                InstantCommand { lowerOverridePower = 0.000000001 },
+//                Delay(0.2),
                 InstantCommand {
                     lowerOverridePower = 1.0;
                     ShooterSubsystem.isShooting = true;
@@ -457,7 +464,7 @@ open class TeleOpBase(
             )
         ) whenBecomesFalse {
             lowerOverridePower = 0.0;
-            MagblockServoSubsystem.block()
+//            MagblockServoSubsystem.block()
             ShooterSubsystem.isShooting = false
         }
 
@@ -501,20 +508,20 @@ open class TeleOpBase(
 
         // I think l/r only makes sense when robot facing away (approx same direction person is facing)
         Gamepads.gamepad2.dpadRight whenBecomesTrue {
-//            PedroComponent.follower.pose = Pose(
-//                PedroComponent.follower.pose.x,
-//                PedroComponent.follower.pose.y,
-//                PedroComponent.follower.pose.heading + Math.toRadians(1.0),
-//            )
-            phiTrim -= 2.0.deg
+            PedroComponent.follower.pose = Pose(
+                PedroComponent.follower.pose.x,
+                PedroComponent.follower.pose.y,
+                PedroComponent.follower.pose.heading + Math.toRadians(1.0),
+            )
+//            phiTrim -= 2.0.deg
         }
         Gamepads.gamepad2.dpadLeft whenBecomesTrue {
-//            PedroComponent.follower.pose = Pose(
-//                PedroComponent.follower.pose.x,
-//                PedroComponent.follower.pose.y,
-//                PedroComponent.follower.pose.heading - Math.toRadians(1.0),
-//            )
-            phiTrim += 2.0.deg
+            PedroComponent.follower.pose = Pose(
+                PedroComponent.follower.pose.x,
+                PedroComponent.follower.pose.y,
+                PedroComponent.follower.pose.heading - Math.toRadians(1.0),
+            )
+//            phiTrim += 2.0.deg
         }
 
         Gamepads.gamepad2.rightBumper whenBecomesTrue {
