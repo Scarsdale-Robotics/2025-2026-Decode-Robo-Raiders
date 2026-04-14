@@ -4,6 +4,10 @@ import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.geometry.Pose
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.groups.ParallelGroup
+import dev.nextftc.core.commands.groups.SequentialGroup
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
@@ -45,6 +49,8 @@ class BasicTeleOp(): NextFTCOpMode() {
 
         @JvmField var goalX = 3.5;
         @JvmField var goalY = 144.0 - 3.5;
+
+        @JvmField var shootDelay = 0.5;
     }
 
     init {
@@ -70,7 +76,7 @@ class BasicTeleOp(): NextFTCOpMode() {
         MagMotorSubsystem.off()
         MagServoSubsystem.stop()
         TurretPhiSubsystem.zero()
-        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
+        PedroComponent.follower.pose = Pose(72.0, 72.0, 3 * PI / 2)
 //        PedroComponent.follower.pose = Pose(17.1887, 115.3623, 3 * PI / 2);
     }
 
@@ -124,11 +130,16 @@ class BasicTeleOp(): NextFTCOpMode() {
 //        )
 //        magDrive();
 
-        Gamepads.gamepad1.circle whenBecomesTrue {
-            lowerOverridePower = 1.0;
-            MagblockServoSubsystem.unblock()
-            ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
-        } whenBecomesFalse {
+        Gamepads.gamepad1.circle whenBecomesTrue ParallelGroup(
+            MagblockServoSubsystem.unblock,
+            SequentialGroup(
+                Delay(shootDelay),
+                InstantCommand {
+                    lowerOverridePower = 1.0;
+                    ShooterSubsystem.isShooting = true;
+               },
+            )
+        ) whenBecomesFalse {
             lowerOverridePower = 0.0;
             MagblockServoSubsystem.block()
             ShooterSubsystem.isShooting = false

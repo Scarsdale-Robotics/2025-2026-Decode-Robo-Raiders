@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
+import com.qualcomm.robotcore.hardware.PwmControl
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.subsystems.Subsystem
@@ -23,10 +24,6 @@ object TurretPhiSubsystem : Subsystem {
     var lmao = 0.98375  // servo range to remain flat
 
     var started = false;
-
-    init {
-//
-    }
 
     fun zero() {}
 
@@ -84,6 +81,8 @@ object TurretPhiSubsystem : Subsystem {
             val normed = norm(angle + ofsTurret)
             val pos = angleToServo(normed)
 
+            servoBelow.servo.scaleRange(0.0, 1.0)
+            servoAbove.servo.scaleRange(0.0, 1.0)
             servoBelow.position = pos
             servoAbove.position = lmao - pos
 

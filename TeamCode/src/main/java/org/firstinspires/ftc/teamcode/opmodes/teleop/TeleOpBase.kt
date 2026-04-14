@@ -8,6 +8,10 @@ import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
+import dev.nextftc.core.commands.delays.Delay
+import dev.nextftc.core.commands.groups.ParallelGroup
+import dev.nextftc.core.commands.groups.SequentialGroup
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.BindingsComponent
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.Angle
@@ -22,6 +26,7 @@ import dev.nextftc.ftc.components.BulkReadComponent
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleVal
+import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootDelay
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.OuttakeSubsystem
@@ -441,15 +446,16 @@ open class TeleOpBase(
 //        Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
 //        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
-        Gamepads.gamepad1.rightTrigger greaterThan 0.05 whenBecomesTrue {
-            lowerOverridePower = if (y < BORD_Y) {
-                1.0 * shootTransferSpeedFactor;
-            } else {
-                1.0 * shootTransferSpeedFactor;
-            }
-            MagblockServoSubsystem.unblock()
-            ShooterSubsystem.isShooting = true  // todo: tell aaron to set this (nvm)
-        } whenBecomesFalse {
+        Gamepads.gamepad1.circle whenBecomesTrue ParallelGroup(
+            MagblockServoSubsystem.unblock,
+            SequentialGroup(
+                Delay(shootDelay),
+                InstantCommand {
+                    lowerOverridePower = 1.0;
+                    ShooterSubsystem.isShooting = true;
+                },
+            )
+        ) whenBecomesFalse {
             lowerOverridePower = 0.0;
             MagblockServoSubsystem.block()
             ShooterSubsystem.isShooting = false
