@@ -6,6 +6,7 @@ import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
+import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
@@ -15,7 +16,6 @@ import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.SubsystemComponent
-import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
@@ -31,8 +31,6 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
-import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaClose
-import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaFar
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityClose
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityFar
 import org.firstinspires.ftc.teamcode.utils.Lefile
@@ -40,8 +38,6 @@ import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor
 import java.io.File
 import kotlin.math.atan2
 import kotlin.math.hypot
-import com.pedropathing.geometry.Pose
-import org.firstinspires.ftc.vision.opencv.Circle
 
 //Auton Naming Convention
 //total slots = 4: __ __ __ __
@@ -55,7 +51,7 @@ import org.firstinspires.ftc.vision.opencv.Circle
 //4th slot = Auton type: Motif, Backup, Shooter, Artifact, CoOp
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__ __Artifact & Auton__ __ CoOp
-@Autonomous(name = "[COOP-21] Auton Blue Far CoOp", group = "Auton")
+@Autonomous(name = "[COOP-21-B] Auton Blue Far CoOp", group = "Auton")
 @Configurable
 class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
     //////////////////////
@@ -465,6 +461,7 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         //////////////////////////////////////////////////////////
         var Portal: CvBallDetectionP? = null
         var Blobs: MutableList<ColorBlobLocatorProcessor.Blob>? = null
+        var cd = 0.0
 
         Portal = CvBallDetectionP( hardwareMap)
         waitForStart()
@@ -473,14 +470,15 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
         while (opModeIsActive()) {
             var min = Double.Companion.MAX_VALUE // reset each loop iteration
             var Minb: ColorBlobLocatorProcessor.Blob? = null
-            var cd: Double
 
-            Portal!!.updateDetections()
-            Blobs = Portal!!.getBlobs()
+            Portal.updateDetections()
+            Blobs = Portal.getBlobs()
 
-            if (Blobs.isEmpty()){cd = -1.0}
-            if (Blobs != null && !Blobs!!.isEmpty()) {
-                telemetry.addData("Blob count", Blobs!!.size)
+            if (Blobs != null && !Blobs.isEmpty()) {
+                telemetry.addData("Blob count", Blobs.size)
+                if (Blobs.isEmpty()) {
+                    cd = -1.0
+                }
                 for (b in Blobs) {
                     val circleFit = b.getCircle()
 
@@ -489,8 +487,8 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
                     val radius = circleFit.getRadius().toDouble()
 
                     if (radius == 0.0) continue
-                    cd = ((120.0 * 391) / (radius * 2)) * 2
-                    val theta = atan2((circleFit.getX() - 320).toDouble(), 391.0)
+                    cd = ((120.0 * 529) / (radius * 2)) * 2
+                    val theta = Math.toDegrees(atan2((circleFit.getX() - 320).toDouble(), 391.0))
 
                     telemetry.addData(
                         "Blob @ X=" + circleFit.getX().toInt() + " Circularity",
@@ -506,10 +504,9 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
 
                     if (cd < min) {
                         min = cd
-                        Minb = b
-
                         distanceToBlob = cd
                         radiansToRotateToBlob = theta
+                        Minb = b
                     }
                 }
             }

@@ -17,9 +17,15 @@ object IntakeMotorSubsystem : Subsystem {
     private val servo = CRServoEx("intake_servo")
 
     class On(power: Double) : InstantCommand({ motor.power = power ; servo.power = power})
-    var intake = ParallelGroup(SetPower(motor, 1.0), SetPower(servo, 1.0))
-    var reverse = ParallelGroup(SetPower(motor, -1.0), SetPower(servo, -1.0))
-    var off = ParallelGroup(SetPower(motor, 0.0), SetPower(servo, 0.0));
+    var intake = ParallelGroup(
+        SetPower(motor, 1.0),
+        SetPower(servo, 1.0))
+    var reverse = ParallelGroup(
+        SetPower(motor, -1.0),
+        SetPower(servo, 0.0))
+    var off = ParallelGroup(
+        SetPower(motor, 0.0),
+        SetPower(servo, 0.5))
 
     class DriverCommandDefaultOn(
         private val outPower: Supplier<Double>,
