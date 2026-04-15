@@ -312,6 +312,7 @@ open class TeleOpBase(
 //            .build()
 
         val file = File(Lefile.filePath)
+        while (!file.canRead()) {}
         val content = file.readText().split("\n")
         val startX = content[0].toDouble()
         val startY = content[1].toDouble()
@@ -339,6 +340,7 @@ open class TeleOpBase(
 
     private var autoAimEnabled = true;
     private var resetMode = false;
+    private var resetTypeHeading = false;
 
     var activeDriveMacros = mutableListOf<Command>()
 
@@ -452,7 +454,7 @@ open class TeleOpBase(
 //        Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
 //        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
-        Gamepads.gamepad1.circle whenBecomesTrue ParallelGroup(
+        Gamepads.gamepad1.rightTrigger.greaterThan(0.1) whenBecomesTrue ParallelGroup(
             MagblockServoSubsystem.unblock,
             SequentialGroup(
 //                InstantCommand { lowerOverridePower = 0.000000001 },
@@ -497,12 +499,34 @@ open class TeleOpBase(
                 // 180.0.deg corresponds to turret facing backwards
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
+                resetTypeHeading = false;
             } else {
                 // reset position
-                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
+                if (resetTypeHeading) {
+                    PedroComponent.follower.pose = Pose(
+                        PedroComponent.follower.pose.x,
+                        PedroComponent.follower.pose.y,
+                        resetModeParams.h.inRad
+                    )
+                } else {
+                    PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
+                }
 //                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
+            }
+        }
+
+        Gamepads.gamepad2.circle whenBecomesTrue {
+            if (resetMode) {
+                resetTypeHeading = true;
+                gamepad2.setLedColor(0.0, 255.0, 0.0, -1)
+            }
+        }
+        Gamepads.gamepad2.square whenBecomesTrue {
+            if (resetMode) {
+                resetTypeHeading = false;
+                gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
             }
         }
 
@@ -591,7 +615,7 @@ open class TeleOpBase(
     var dyp = 0.0;
     override fun onUpdate() {
         telemetry.addLine("TRIMMING:")
-        telemetry.addData("PHI TRIM", abs(phiTrim.inDeg).toString() + " deg " + if (phiTrim.inDeg < 0.0) "RIGHT" else "LEFT");
+//        telemetry.addData("PHI TRIM", abs(phiTrim.inDeg).toString() + " deg " + if (phiTrim.inDeg < 0.0) "RIGHT" else "LEFT");
         telemetry.addData("VELO TRIM", "$veloTrim tps");
         telemetry.addData("HOOD TRIM", abs(hoodTrim).toString() + " tk " + if (hoodTrim < 0.0) "FLATTER" else "CURVIER");
         telemetry.addData("X TRIM", ofsX);
@@ -712,7 +736,7 @@ open class TeleOpBase(
 //                    (abs(Gamepads.gamepad1.leftStickX.get()) <= 0.02) &&
 //                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
 //            ) 0.0 else 1.0;
-            val sotmFactor = 0.0;
+            val sotmFactor = 1.0;
             telemetry.addData("sotm factor", sotmFactor);
 //            if (inTriangle(x, y, 24.0) > 0) {
             ShooterSubsystem.AutoAim(
@@ -742,7 +766,8 @@ open class TeleOpBase(
             TurretPhiSubsystem.AutoAim(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
                 dyp * sotmFactor + dy * (1 - sotmFactor),
-                hp, phiTrim + 90.0.deg * Gamepads.gamepad1.rightStickX.get(),
+                hp, phiTrim
+//                        + 90.0.deg * Gamepads.gamepad1.rightStickX.get(),
 //                -Gamepads.gamepad1.rightStickX.get()  // tODO; make sure not bad
             )()
         } else {
@@ -770,6 +795,8 @@ open class TeleOpBase(
     }
     override fun onStop() {
         val file = File(Lefile.filePath)
+        file.delete()
+        while (!file.canWrite()) {}
         file.writeText(
             x.toString() + "\n" +
                     y.toString() + "\n" +
