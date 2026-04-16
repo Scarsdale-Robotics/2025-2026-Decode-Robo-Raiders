@@ -21,7 +21,7 @@ class TeleOpBlue : TeleOpBase(
     distanceToVelocityClose = { d -> AutoAimConstants.distanceToVelocityClose(d + D_OFS) },
     distAndVeloToThetaClose = { d, v -> AutoAimConstants.distAndVeloToNewThetaClose(d + D_OFS, v) },
     distanceToVelocityFar = { d -> AutoAimConstants.distanceToVelocityFar(d + D_OFS) },
-    distAndVeloToThetaFar = { d, v -> AutoAimConstants.distAndVeloToNewThetaClose(d + D_OFS, v) },
+    distAndVeloToThetaFar = { d, v -> AutoAimConstants.distAndVeloToNewThetaFar(d + D_OFS, v) },
 //    distanceToTheta = { max(min(-0.000153176 * it * it + 0.00180231 * it + 63.63936, 63.0), 55.0).deg },
     distanceToTimeClose = { d -> AutoAimConstants.distanceToTimeClose(d + D_OFS) },
     distanceToTimeFar = { d -> AutoAimConstants.distanceToTimeFar(d + D_OFS) }

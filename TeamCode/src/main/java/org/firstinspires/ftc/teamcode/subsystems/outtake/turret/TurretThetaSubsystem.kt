@@ -7,6 +7,8 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.ServoEx
 import dev.nextftc.hardware.positionable.SetPositions
 import java.util.function.Supplier
+import kotlin.math.max
+import kotlin.math.min
 
 // up-down
 @Configurable
@@ -21,11 +23,9 @@ object TurretThetaSubsystem : Subsystem {
     ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
 
 
-    @JvmField var upper = 0.92;
-    @JvmField var lower = 0.4;
 
     class SetThetaPos(val pos: Double) : SetPositions(
-        servo to pos
+        servo to max(min(pos, 0.9), 0.63)
         //im not sure if this work
         //servo to (angle*0.09625 - 5.09375)
     )
@@ -41,7 +41,7 @@ object TurretThetaSubsystem : Subsystem {
         }
 
         override fun start() {
-            SetThetaPos(hoodAngleByDistance(dxy))();
+            servo.position = max(min(hoodAngleByDistance(dxy), 0.9), 0.63)
             PanelsTelemetry.telemetry.addData("s", dxy)
             PanelsTelemetry.telemetry.addData("theta goal", hoodAngleByDistance(dxy))
         }
