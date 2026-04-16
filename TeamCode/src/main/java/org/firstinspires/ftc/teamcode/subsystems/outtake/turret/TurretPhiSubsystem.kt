@@ -28,13 +28,12 @@ object TurretPhiSubsystem : Subsystem {
     fun zero() {}
 
     override fun initialize() {
-        started = true;
+//        started = true;
     }
     fun angleToServo(angle: Angle): Double {
         val a = angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE)
         return (a - MIN_ANGLE) / (MAX_ANGLE - MIN_ANGLE) * lmao
     }
-
 
     fun norm(angle: Angle): Angle {
         return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
@@ -81,8 +80,6 @@ object TurretPhiSubsystem : Subsystem {
             val normed = norm(angle + ofsTurret)
             val pos = angleToServo(normed)
 
-            servoBelow.servo.scaleRange(0.0, 1.0)
-            servoAbove.servo.scaleRange(0.0, 1.0)
             servoBelow.position = pos
             servoAbove.position = lmao - pos
 
@@ -147,7 +144,7 @@ object TurretPhiSubsystem : Subsystem {
     }
 
     override fun periodic() {
-        if (!started) return;
+//        if (!started) return;
         PanelsTelemetry.telemetry.addData("target phi", targetPhi)
         PanelsTelemetry.telemetry.addData("servo1 pos", servoBelow.position)
     }

@@ -76,7 +76,9 @@ class BasicTeleOp(): NextFTCOpMode() {
         MagMotorSubsystem.off()
         MagServoSubsystem.stop()
         TurretPhiSubsystem.zero()
+        PedroComponent.follower.update()
         PedroComponent.follower.pose = Pose(72.0, 72.0, 3 * PI / 2)
+        PedroComponent.follower.update()
 //        PedroComponent.follower.pose = Pose(17.1887, 115.3623, 3 * PI / 2);
     }
 

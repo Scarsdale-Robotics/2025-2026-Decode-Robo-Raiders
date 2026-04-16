@@ -102,6 +102,9 @@ class CenterField: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to
     /** We do not use this because everything should automatically disable  */
     override fun onStop() {
         val file = File(Lefile.filePath)
+        file.delete()
+        file.createNewFile()
+        while (!file.canWrite()) {}
         file.writeText(
             PedroComponent.follower.pose.x.toString() + "\n" +
                     PedroComponent.follower.pose.y.toString() + "\n" +

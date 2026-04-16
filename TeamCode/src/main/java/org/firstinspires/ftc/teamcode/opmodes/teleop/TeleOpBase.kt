@@ -23,6 +23,9 @@ import dev.nextftc.extensions.pedro.PedroDriverControlled
 import dev.nextftc.ftc.Gamepads
 import dev.nextftc.ftc.NextFTCOpMode
 import dev.nextftc.ftc.components.BulkReadComponent
+import dev.nextftc.hardware.driving.FieldCentric
+import dev.nextftc.hardware.driving.MecanumDriverControlled
+import dev.nextftc.hardware.impl.MotorEx
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.opmodes.teleop.BasicTeleOp.Companion.shootAngleVal
@@ -39,6 +42,7 @@ import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsy
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.max
@@ -173,6 +177,7 @@ open class TeleOpBase(
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
         TurretPhiSubsystem.started = false;
+        PedroComponent.follower.update()
 //        MagServoSubsystem.stop()
 
         // ROBOT CENTRIC:
@@ -312,6 +317,7 @@ open class TeleOpBase(
 //            .build()
 
         val file = File(Lefile.filePath)
+        while (!file.canRead()) {}
         val content = file.readText().split("\n")
         val startX = content[0].toDouble()
         val startY = content[1].toDouble()
@@ -339,6 +345,7 @@ open class TeleOpBase(
 
     private var autoAimEnabled = true;
     private var resetMode = false;
+    private var resetTypeHeading = false;
 
     var activeDriveMacros = mutableListOf<Command>()
 
@@ -366,8 +373,8 @@ open class TeleOpBase(
 ////        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
 //        PedroComponent.follower.pose = Pose(startX, startY, startH)
 
-        MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
+        MagblockServoSubsystem.unblock()
 
 //        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
 //        gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
@@ -377,9 +384,9 @@ open class TeleOpBase(
 //            rfw,
 //            lbw,
 //            rbw,
-//            -Gamepads.gamepad1.leftStickY.map { it*speedFactorDrive },
-//            Gamepads.gamepad1.leftStickX.map { it*speedFactorDrive },
-//            Gamepads.gamepad1.rightStickX.map { it*speedFactorDrive },
+//            -Gamepads.gamepad1.leftStickY,
+//            Gamepads.gamepad1.leftStickX,
+//            Gamepads.gamepad1.rightStickX,
 //            FieldCentric {
 //                if (isBlue) (h.inRad - PI).rad else h
 //            }
@@ -437,12 +444,12 @@ open class TeleOpBase(
         )
         intakeMotorDrive()
 
-        Gamepads.gamepad2.rightTrigger.greaterThan(0.003) whenBecomesTrue {  // could also have left trigger stuff but whatev
-            MagblockServoSubsystem.block()
-        } whenBecomesFalse {
-            MagblockServoSubsystem.unblock()
-        }
-
+        Gamepads.gamepad2.rightTrigger.greaterThan(0.003) whenBecomesTrue SequentialGroup(
+            MagblockServoSubsystem.block,
+            InstantCommand { lowerOverridePower = 0.0000001 },
+            Delay(0.5),
+            InstantCommand { lowerOverridePower = 0.0 },
+        ) whenBecomesFalse MagblockServoSubsystem.unblock
 
 
 //        val magServoDrive = MagServoSubsystem.DriverCommandDefaultOn(
@@ -452,7 +459,7 @@ open class TeleOpBase(
 //        Gamepads.gamepad1.leftTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.reverse
 //        Gamepads.gamepad1.rightTrigger.greaterThan(0.0) whenBecomesTrue MagServoSubsystem.run
 
-        Gamepads.gamepad1.circle whenBecomesTrue ParallelGroup(
+        Gamepads.gamepad1.rightTrigger.greaterThan(0.1) whenBecomesTrue ParallelGroup(
             MagblockServoSubsystem.unblock,
             SequentialGroup(
 //                InstantCommand { lowerOverridePower = 0.000000001 },
@@ -497,12 +504,34 @@ open class TeleOpBase(
                 // 180.0.deg corresponds to turret facing backwards
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
+                resetTypeHeading = false;
             } else {
                 // reset position
-                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
+                if (resetTypeHeading) {
+                    PedroComponent.follower.pose = Pose(
+                        PedroComponent.follower.pose.x,
+                        PedroComponent.follower.pose.y,
+                        resetModeParams.h.inRad
+                    )
+                } else {
+                    PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
+                }
 //                PedroComponent.follower.pose = Pose(resetModeParams.x, resetModeParams.y, resetModeParams.h.inRad)
                 gamepad2.rumble(200)
                 gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
+            }
+        }
+
+        Gamepads.gamepad2.circle whenBecomesTrue {
+            if (resetMode) {
+                resetTypeHeading = true;
+                gamepad2.setLedColor(0.0, 255.0, 0.0, -1)
+            }
+        }
+        Gamepads.gamepad2.square whenBecomesTrue {
+            if (resetMode) {
+                resetTypeHeading = false;
+                gamepad2.setLedColor(255.0, 255.0, 0.0, -1)
             }
         }
 
@@ -591,7 +620,7 @@ open class TeleOpBase(
     var dyp = 0.0;
     override fun onUpdate() {
         telemetry.addLine("TRIMMING:")
-        telemetry.addData("PHI TRIM", abs(phiTrim.inDeg).toString() + " deg " + if (phiTrim.inDeg < 0.0) "RIGHT" else "LEFT");
+//        telemetry.addData("PHI TRIM", abs(phiTrim.inDeg).toString() + " deg " + if (phiTrim.inDeg < 0.0) "RIGHT" else "LEFT");
         telemetry.addData("VELO TRIM", "$veloTrim tps");
         telemetry.addData("HOOD TRIM", abs(hoodTrim).toString() + " tk " + if (hoodTrim < 0.0) "FLATTER" else "CURVIER");
         telemetry.addData("X TRIM", ofsX);
@@ -634,8 +663,12 @@ open class TeleOpBase(
         ) {
             // untrigger macro
             activeDriveMacros.forEach {
-                it.stop(true)
-                CommandManager.cancelCommand(it)
+                try {
+                    it.stop(true)
+                    CommandManager.cancelCommand(it)
+                } finally {
+
+                }
             }
             activeDriveMacros.clear()
             PedroComponent.follower.startTeleopDrive()
@@ -644,8 +677,13 @@ open class TeleOpBase(
         val dx = goalX - x
         val dy = goalY - y
         val dxy = hypot(dx, dy)
-        vxOld = vxOld.slice(IntRange(1, vxOld.lastIndex)) + listOf((PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime));
-        vyOld = vyOld.slice(IntRange(1, vyOld.lastIndex)) + listOf((PedroComponent.follower.pose.y - lastPose.pose.y) / (runtime - lastTime));
+        if (vxOld.isEmpty() || vyOld.isEmpty()) {
+            vxOld = listOf(0.0, 0.0, 0.0);
+            vyOld = listOf(0.0, 0.0, 0.0);
+        } else {
+            vxOld = vxOld.slice(IntRange(1, vxOld.lastIndex)) + listOf((PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime));
+            vyOld = vyOld.slice(IntRange(1, vyOld.lastIndex)) + listOf((PedroComponent.follower.pose.y - lastPose.pose.y) / (runtime - lastTime));
+        }
         vx = vxOld.average();
         vy = vyOld.average();
         dxp = dx - 1.0 * vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
@@ -712,7 +750,7 @@ open class TeleOpBase(
 //                    (abs(Gamepads.gamepad1.leftStickX.get()) <= 0.02) &&
 //                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
 //            ) 0.0 else 1.0;
-            val sotmFactor = 0.0;
+            val sotmFactor = 1.0;
             telemetry.addData("sotm factor", sotmFactor);
 //            if (inTriangle(x, y, 24.0) > 0) {
             ShooterSubsystem.AutoAim(
@@ -742,7 +780,8 @@ open class TeleOpBase(
             TurretPhiSubsystem.AutoAim(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
                 dyp * sotmFactor + dy * (1 - sotmFactor),
-                hp, phiTrim + 90.0.deg * Gamepads.gamepad1.rightStickX.get(),
+                hp, phiTrim
+//                        + 90.0.deg * Gamepads.gamepad1.rightStickX.get(),
 //                -Gamepads.gamepad1.rightStickX.get()  // tODO; make sure not bad
             )()
         } else {
@@ -770,6 +809,9 @@ open class TeleOpBase(
     }
     override fun onStop() {
         val file = File(Lefile.filePath)
+        file.delete()
+        file.createNewFile()
+        while (!file.canWrite()) {}
         file.writeText(
             x.toString() + "\n" +
                     y.toString() + "\n" +

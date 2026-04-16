@@ -14,14 +14,14 @@ import kotlin.math.pow
 @TeleOp(name = "[BLUE] Tele Op")
 class TeleOpBlue : TeleOpBase(
     isBlue = true,
-    goalX = 3.5,
-    goalY = 144.0 - 3.5,
+    goalX = 6.0,
+    goalY = 144.0 - 6.0,
     resetModeParams = ResetModeParams(17.1887, 115.3623, 270.0.deg),
     resetModePhiAngle = 0.0.deg,
     distanceToVelocityClose = { d -> AutoAimConstants.distanceToVelocityClose(d + D_OFS) },
     distAndVeloToThetaClose = { d, v -> AutoAimConstants.distAndVeloToNewThetaClose(d + D_OFS, v) },
     distanceToVelocityFar = { d -> AutoAimConstants.distanceToVelocityFar(d + D_OFS) },
-    distAndVeloToThetaFar = { d, v -> AutoAimConstants.distAndVeloToNewThetaClose(d + D_OFS, v) },
+    distAndVeloToThetaFar = { d, v -> AutoAimConstants.distAndVeloToNewThetaFar(d + D_OFS, v) },
 //    distanceToTheta = { max(min(-0.000153176 * it * it + 0.00180231 * it + 63.63936, 63.0), 55.0).deg },
     distanceToTimeClose = { d -> AutoAimConstants.distanceToTimeClose(d + D_OFS) },
     distanceToTimeFar = { d -> AutoAimConstants.distanceToTimeFar(d + D_OFS) }
