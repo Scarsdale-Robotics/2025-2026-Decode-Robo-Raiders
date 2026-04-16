@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.localization;
 import androidx.annotation.Nullable;
 
 import com.bylazar.telemetry.PanelsTelemetry;
+import com.pedropathing.ftc.FTCCoordinates;
 import com.pedropathing.ftc.InvertedFTCCoordinates;
 import com.pedropathing.ftc.PoseConverter;
 import com.pedropathing.geometry.PedroCoordinates;
@@ -54,19 +55,17 @@ public class CVSubsystem_VisionPortal {
                 .build();
 
 
-        aprilTagProcessor = new AprilTagProcessor.Builder()
-                .setTagLibrary(tagLibrary)
-                .setCameraPose(
-                        new Position(//todo: y bad?
-                                DistanceUnit.INCH, 0, 4.50787402, 7.57202637795, 0
-                        ), new YawPitchRollAngles(
-                                AngleUnit.DEGREES, 0, -90, 0, 0
-                        )
-                )
-                .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
-                .setDrawTagOutline(true)
-                .setDrawAxes(true)
-                .build();
+        aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
+//        Position cameraPosition = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
+//        YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
+//        aprilTagProcessor = new AprilTagProcessor.Builder()
+//                .setCameraPose(cameraPosition, cameraOrientation)
+//                .setTagLibrary(tagLibrary)
+//                .setDrawTagID(true)
+//                .setDrawTagOutline(true)
+//                .setDrawAxes(true)
+//                .setDrawCubeProjection(true)
+//               .build();
 
         WebcamName webcamName = hm.get(WebcamName.class, "Cam");
 
@@ -118,24 +117,41 @@ public class CVSubsystem_VisionPortal {
         hasDetection = true;
 
 
-        Pose3D pose = best.robotPose;
-        PanelsTelemetry.INSTANCE.getTelemetry().addData("pose", pose.toString());
+//        Pose3D pose = best.robotPose;
+//        PanelsTelemetry.INSTANCE.getTelemetry().addData("pose", pose.toString());
+//
+//        Pose pediPose = new Pose(
+//                pose.getPosition().toUnit(DistanceUnit.INCH).x,
+//                pose.getPosition().toUnit(DistanceUnit.INCH).y,
+//                pose.getOrientation().getYaw(AngleUnit.RADIANS),
+//                FTCCoordinates.INSTANCE
+//        ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+//
+//        RCx1 = pediPose.getX();
+//        RCy1 = pediPose.getY();
+//        RCh  = pediPose.getHeading();
+        RCx1 = -best.robotPose.getPosition().toUnit(DistanceUnit.INCH).y + 72;
+        RCy1 = best.robotPose.getPosition().toUnit(DistanceUnit.INCH).x + 72;
+        RCh = best.robotPose.getOrientation().getYaw(AngleUnit.RADIANS);
 
 
-        Pose ftcStandard = PoseConverter.pose2DToPose(
-                new Pose2D(
-                        DistanceUnit.INCH,
-                        pose.getPosition().toUnit(DistanceUnit.INCH).x,
-                        pose.getPosition().toUnit(DistanceUnit.INCH).y,
-                        AngleUnit.RADIANS,
-                        pose.getOrientation().getYaw(AngleUnit.RADIANS)
-                ),
-                InvertedFTCCoordinates.INSTANCE
-        );
-        Pose cvtPose = ftcStandard.getAsCoordinateSystem(PedroCoordinates.INSTANCE);
-        RCx1 = 72.0-cvtPose.getX();
-        RCy1 = 72.0-cvtPose.getY();
-        RCh = cvtPose.getHeading() % (2 * Math.PI) - Math.PI;
+//        Pose ftcStandard = PoseConverter.pose2DToPose(
+//                new Pose2D(
+//                        DistanceUnit.INCH,
+//                        pose.getPosition().toUnit(DistanceUnit.INCH).x,
+//                        pose.getPosition().toUnit(DistanceUnit.INCH).y,
+//                        AngleUnit.RADIANS,
+//                        pose.getOrientation().getYaw(AngleUnit.RADIANS)
+//                ),
+//                InvertedFTCCoordinates.INSTANCE
+//        );
+//        Pose cvtPose = ftcStandard.getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+//        RCx1 = cvtPose.getX();
+//        RCy1 = cvtPose.getY();
+//        RCh = cvtPose.getHeading();
+//        RCx1 = 72.0-cvtPose.getX();
+//        RCy1 = 72.0-cvtPose.getY();
+//        RCh = cvtPose.getHeading() % (2 * Math.PI) - Math.PI;
 
 //        camXE = RCx1 - 72.0;
 //        camYE = RCy1 -72.0;
@@ -161,12 +177,12 @@ public class CVSubsystem_VisionPortal {
     public double getX() { return RCx1; }
     public double getY() { return RCy1; }
     public double getH() { return RCh; }
-
-    private double normalizeAngle(double angle) {
-        while (angle > Math.PI)  angle -= 2 * Math.PI;
-        while (angle < -Math.PI) angle += 2 * Math.PI;
-        return angle;
-    }
+//
+//    private double normalizeAngle(double angle) {
+//        while (angle > Math.PI)  angle -= 2 * Math.PI;
+//        while (angle < -Math.PI) angle += 2 * Math.PI;
+//        return angle;
+//    }
 
     public boolean hasDetection() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Supplier;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 
@@ -25,65 +26,47 @@ public class OdometrySubsystem {
 
 
   public OdometrySubsystem(double x1, double y1, double h, HardwareMap hm) {
-    if (hm == null) {
-      throw new IllegalArgumentException("HardwareMap is null — OpMode may not be initialized yet.");
-    }
-
-    try {
-      pinpoint = hm.get(GoBildaPinpointDriver.class, "pinpoint");
-    } catch (Exception e) {
-      pinpoint = null;
-      e.printStackTrace();
-    }
-
-    if (pinpoint == null) {
-      throw new IllegalArgumentException("u fucked up");
-    }
+//    if (hm == null) {
+//      throw new IllegalArgumentException("HardwareMap is null — OpMode may not be initialized yet.");
+//    }
+//
+//    try {
+//      pinpoint = hm.get(GoBildaPinpointDriver.class, "pinpoint");
+//    } catch (Exception e) {
+//      pinpoint = null;
+//      e.printStackTrace();
+//    }
+//
+//    if (pinpoint == null) {
+//      throw new IllegalArgumentException("u fucked up");
+//    }
 
     // Initialize the device
-    pinpoint.resetPosAndIMU();
-    pinpoint.recalibrateIMU();
-
-    Pose2D initPose = new Pose2D(INCH, x1, y1, AngleUnit.RADIANS, h);
-
+//    pinpoint.resetPosAndIMU();
+//    pinpoint.recalibrateIMU();
+    pinpoint = hm.get(GoBildaPinpointDriver.class, "pinpoint");
     // Configure sensors and set initial position
-
     pinpoint.setOffsets(-24.64271, -95.64271, MM);
     pinpoint.setEncoderDirections(
             GoBildaPinpointDriver.EncoderDirection.FORWARD,
             GoBildaPinpointDriver.EncoderDirection.FORWARD
     );
+    Pose2D initPose = new Pose2D(INCH, x1, y1, AngleUnit.RADIANS, h);
     pinpoint.setPosition(initPose);
 
     // Set initial values
-    updateOdom();
+//    updateOdom();
   }
 
 
 
-  ElapsedTime time = null;
-  double rxl = 0.0, ryl = 0.0, rhl = 0.0;
+//  ElapsedTime time = null;
   public void updateOdom() {
     if (pinpoint == null) return;
-
     pinpoint.update();
-    rxl = ROx1; ryl = ROy1; rhl = ROh;
     ROx1 = pinpoint.getPosition().getX(INCH);
     ROy1 = pinpoint.getPosition().getY(INCH);
     ROh = pinpoint.getPosition().getHeading(AngleUnit.RADIANS);
-
-    if (time != null) {
-      Vx = (ROx1 - rxl) / time.seconds();
-      Vy = (ROy1 - ryl) / time.seconds();
-      double dh = ROh - rhl;
-      while (dh >  Math.PI) dh -= 2 * Math.PI;
-      while (dh < -Math.PI) dh += 2 * Math.PI;
-      omega = dh / time.seconds();
-
-      time.reset();
-    } else {
-      time = new ElapsedTime();
-    }
 
     distFromOrigin = Math.hypot(ROx1, ROy1);
 
