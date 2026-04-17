@@ -55,11 +55,11 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     companion object {
         val delayStartShoot: Double = 0.4
         val DelayBeforeShoot: Double = 0.0
-        val delayAfterEachShoot: Double = 0.27 //currently at a really high #
-        val DelayFromRampIntake: Double = 0.4
+        val delayAfterEachShoot: Double = 0.45 //currently at a really high #
+        val DelayFromRampIntake: Double = 0.3
         val DelayInIntake: Double = 0.65
         //        val DelayAfterIntake: Double = 0.0
-        val DelayAtLever: Double = 0.00
+        val DelayAtLever: Double = 0.1
 
         var canShoot: Boolean = false
 
@@ -136,7 +136,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 )
             )
             .setTangentHeadingInterpolation()
-            .addParametricCallback(0.22, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.45, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
             .build()
         //1st Go Shoot
@@ -150,6 +150,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
+            .addParametricCallback(0.8, robotShoot())
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
             .build()
 
@@ -201,6 +202,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
+            .addParametricCallback(0.8, robotShoot())
             .setTimeoutConstraint(0.0)
             .build()
 
@@ -213,7 +215,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.intake2Pos24)
                 )
             )
-            .addParametricCallback(0.7, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.65, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
             .setTangentHeadingInterpolation()
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake2Pos24).heading)
             .build()
@@ -232,6 +234,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 0.5)
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.shootPoseCloseAlt).heading)
             .setTimeoutConstraint(0.0)
+            .addParametricCallback(0.9, robotShoot())
             .build()
 
         //3rd Intake
@@ -246,7 +249,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.shootPoseCloseAlt).heading,
                 AutonPositions.Blue(AutonPositions.intake3Pos24).heading,
-                0.65
+                0.95
             )
             .build()
 
@@ -263,6 +266,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 AutonPositions.Blue(AutonPositions.shootPoseCloseAlt).heading,
                 0.65
             )
+            .addParametricCallback(0.9, robotShoot())
             .setTimeoutConstraint(0.0)
             .build()
         //3rd Intake
@@ -294,6 +298,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setHeadingInterpolation(
                 HeadingInterpolator.tangent.reverse()
             )
+            .addParametricCallback(0.78, robotShoot())
             .setTimeoutConstraint(0.0)
 //            .setLinearHeadingInterpolation(
 //                AutonPositions.Blue(AutonPositions.commonIntakePos).heading,
@@ -357,7 +362,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     ///////////////////////////
     ////Main Auton Commands////
     ///////////////////////////
-    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.75)}
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.7)}
     val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
 
     val SetCanShootFalse: Command = InstantCommand {canShoot = false}
@@ -367,7 +372,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     val IntakeCommand: Command
         get() = ParallelGroup(
-            SetCanShootTrue,
+//            SetCanShootTrue,
             intakePower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
@@ -377,7 +382,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         )
     val IntakeAfterCommand: Command
         get() = ParallelGroup(
-            SetCanShootTrue,
+//            SetCanShootTrue,
             maxPower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
@@ -396,7 +401,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             )
     val ShootCommand: Command
         get() = ParallelGroup(
-            SetCanShootFalse,
+//            SetCanShootFalse,
             maxPower,
             MagblockServoSubsystem.unblock,
             MagMotorSubsystem.On(1.0),
@@ -406,10 +411,11 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     fun robotShoot(): Command {
         return SequentialGroup(
+            stopFollower,
             Delay(DelayBeforeShoot),
             ShootCommand,
             Delay(delayAfterEachShoot),
-            stopFollower,
+//            stopFollower,
             TravelCommand,
         )
     }
@@ -479,12 +485,13 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         get() = SequentialGroup(
             ParallelGroup(
                 //Shoots PRELOAD which had [3 ARTIFACTS]
-                ShooterSubsystem.On(1500.0),
+                ShooterSubsystem.On(1000.0),
                 FollowPath(robotShootPreload!!),
                 SequentialGroup(
                     Delay(delayStartShoot),
-                    SetCanShootTrue,
-//                    robotShoot(),
+                    ShootCommand,
+                    Delay(delayAfterEachShoot),
+                    TravelCommand,
                 ),
             ),
 
@@ -530,7 +537,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //
 //            //Shoots last intake and then parks [RP Points + 3 points]
 //            robotShoot(),
-//            parkRobot()
+            parkRobot()
         )
 
     private var stopShooterAutoAim = false;
@@ -589,7 +596,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         // Feedback to Driver Hub for debugging
 //        telemetry.addData("path state", pathState)
 
-        telemetry.addData("canShoot", canShoot)
+//        telemetry.addData("canShoot", canShoot)
         telemetry.addData("InTriangle", inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y))
         telemetry.addData("x", PedroComponent.follower.pose.x)
         telemetry.addData("y", PedroComponent.follower.pose.y)
@@ -598,9 +605,9 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
         PanelsTelemetry.telemetry.update()
 
-        if (canShoot && inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y) == 1) {
-            robotShoot()
-        }
+//        if (canShoot && inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y) == 1) {
+//            robotShoot()
+//        }
     }
 
     /** This method is called continuously after Init while waiting for "play". **/
