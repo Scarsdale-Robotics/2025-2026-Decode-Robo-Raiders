@@ -373,8 +373,8 @@ open class TeleOpBase(
 ////        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
 //        PedroComponent.follower.pose = Pose(startX, startY, startH)
 
-        MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
+        MagblockServoSubsystem.unblock()
 
 //        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
 //        gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
