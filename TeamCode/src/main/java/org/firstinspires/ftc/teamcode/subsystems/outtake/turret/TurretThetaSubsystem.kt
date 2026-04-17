@@ -41,7 +41,7 @@ object TurretThetaSubsystem : Subsystem {
         }
 
         override fun start() {
-            servo.position = max(min(hoodAngleByDistance(dxy), 0.9), 0.63)
+            SetThetaPos(hoodAngleByDistance(dxy))()
             PanelsTelemetry.telemetry.addData("s", dxy)
             PanelsTelemetry.telemetry.addData("theta goal", hoodAngleByDistance(dxy))
         }

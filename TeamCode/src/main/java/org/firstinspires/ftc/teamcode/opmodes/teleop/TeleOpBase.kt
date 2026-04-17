@@ -375,6 +375,7 @@ open class TeleOpBase(
 
         MagblockServoSubsystem.block()
         MagblockServoSubsystem.unblock()
+        TurretThetaSubsystem.SetThetaPos(0.63)()
 
 //        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
 //        gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
@@ -444,12 +445,14 @@ open class TeleOpBase(
         )
         intakeMotorDrive()
 
-        Gamepads.gamepad2.rightTrigger.greaterThan(0.003) whenBecomesTrue SequentialGroup(
-            MagblockServoSubsystem.block,
-            InstantCommand { lowerOverridePower = 0.0000001 },
-            Delay(0.5),
-            InstantCommand { lowerOverridePower = 0.0 },
-        ) whenBecomesFalse MagblockServoSubsystem.unblock
+        Gamepads.gamepad2.rightTrigger.greaterThan(0.003) whenBecomesTrue {
+            MagblockServoSubsystem.block();
+            (InstantCommand { lowerOverridePower = 0.0000001 })();
+            SequentialGroup(
+                Delay(0.5),
+                InstantCommand { lowerOverridePower = 0.0 }
+            )()
+        } whenBecomesFalse MagblockServoSubsystem.unblock
 
 
 //        val magServoDrive = MagServoSubsystem.DriverCommandDefaultOn(
@@ -461,14 +464,10 @@ open class TeleOpBase(
 
         Gamepads.gamepad1.rightTrigger.greaterThan(0.1) whenBecomesTrue ParallelGroup(
             MagblockServoSubsystem.unblock,
-            SequentialGroup(
-//                InstantCommand { lowerOverridePower = 0.000000001 },
-//                Delay(0.2),
-                InstantCommand {
-                    lowerOverridePower = 1.0;
-                    ShooterSubsystem.isShooting = true;
-                },
-            )
+            InstantCommand {
+                lowerOverridePower = 1.0;
+                ShooterSubsystem.isShooting = true;
+            },
         ) whenBecomesFalse {
             lowerOverridePower = 0.0;
 //            MagblockServoSubsystem.block()
