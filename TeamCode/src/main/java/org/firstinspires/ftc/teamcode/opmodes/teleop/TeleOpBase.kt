@@ -449,7 +449,7 @@ open class TeleOpBase(
             MagblockServoSubsystem.block();
             (InstantCommand { lowerOverridePower = 0.0000001 })();
             SequentialGroup(
-                Delay(0.5),
+                Delay(0.67),
                 InstantCommand { lowerOverridePower = 0.0 }
             )()
         } whenBecomesFalse MagblockServoSubsystem.unblock
