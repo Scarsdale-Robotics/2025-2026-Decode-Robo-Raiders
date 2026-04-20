@@ -136,7 +136,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 )
             )
             .setTangentHeadingInterpolation()
-            .addParametricCallback(0.45, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
+            .addParametricCallback(0.4, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
             .build()
         //1st Go Shoot
