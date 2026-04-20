@@ -7,6 +7,7 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
 import java.util.function.Supplier
+import kotlin.math.abs
 
 @Configurable
 object MagMotorSubsystem : Subsystem {
@@ -55,7 +56,8 @@ object MagMotorSubsystem : Subsystem {
 
         override fun update() {
             if (override.get() != 0.0) {
-                motor.power = override.get();
+                if (abs(override.get()) < 0.01) motor.power = 0.0
+                else motor.power = override.get();
             } else {
                 motor.power = inPower.get() - outPower.get()
             }

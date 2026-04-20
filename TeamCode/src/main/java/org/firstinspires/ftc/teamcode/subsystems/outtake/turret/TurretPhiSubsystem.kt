@@ -16,8 +16,8 @@ import dev.nextftc.hardware.impl.ServoEx
 //IN CONFIG, SET SERVO 1 TO 0 AND SERVO 2 TO 0.99
 @Configurable
 object TurretPhiSubsystem : Subsystem {
-    private val servoBelow = ServoEx("turret_below", 0.0001);
-    private val servoAbove = ServoEx("turret_above", 0.0001);
+    private val servoBelow = ServoEx("turret_below", 0.0);
+    private val servoAbove = ServoEx("turret_above", 0.0);
     val MIN_ANGLE = Math.toRadians(-180.0)
     val MAX_ANGLE = Math.toRadians(183.0)
     var targetPhi: Angle = 0.0.rad

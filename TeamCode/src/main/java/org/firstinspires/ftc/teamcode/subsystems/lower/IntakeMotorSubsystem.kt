@@ -10,6 +10,7 @@ import dev.nextftc.hardware.impl.CRServoEx
 import dev.nextftc.hardware.impl.MotorEx
 import dev.nextftc.hardware.powerable.SetPower
 import java.util.function.Supplier
+import kotlin.math.abs
 
 @Configurable
 object IntakeMotorSubsystem : Subsystem {
@@ -68,8 +69,13 @@ object IntakeMotorSubsystem : Subsystem {
 
         override fun update() {
             if (override.get() != 0.0) {
-                motor.power = override.get();
-                servo.power = -override.get()
+                if (abs(override.get()) < 0.01) {
+                    motor.power = 0.0
+                    servo.power = 0.0
+                } else {
+                    motor.power = override.get();
+                    servo.power = -override.get()
+                }
             }
             else {
                 motor.power = inPower.get() - outPower.get();

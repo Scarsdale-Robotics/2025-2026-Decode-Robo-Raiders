@@ -14,7 +14,7 @@ import kotlin.math.min
 @Configurable
 // to reset servo, place at pos zero, then lay hood on, then inc servo value
 object TurretThetaSubsystem : Subsystem {
-    private val servo = ServoEx("turret_theta", 0.0001);
+    private val servo = ServoEx("turret_theta", 0.0);
 
     ///0.15 (Highest Angle) 0.75 (Shallow Angle)///
     ///0.15 (Highest Angle) 0.75 (Shallow Angle)///

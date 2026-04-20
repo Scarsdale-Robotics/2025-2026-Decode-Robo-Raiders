@@ -445,7 +445,7 @@ open class TeleOpBase(
         )
         intakeMotorDrive()
 
-        Gamepads.gamepad2.rightTrigger.greaterThan(0.003) whenBecomesTrue {
+        Gamepads.gamepad2.rightTrigger.greaterThan(0.0) whenBecomesTrue {
             MagblockServoSubsystem.block();
             (InstantCommand { lowerOverridePower = 0.000000001 })();
             SequentialGroup(
@@ -750,11 +750,13 @@ open class TeleOpBase(
 //                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
 //            ) 0.0 else 1.0;
             val sotmFactor = 1.0;
+            val dist = dxyp * sotmFactor + dxy * (1 - sotmFactor)
             telemetry.addData("sotm factor", sotmFactor);
 //            if (inTriangle(x, y, 24.0) > 0) {
+
             ShooterSubsystem.AutoAim(
 //                dxyp,  // TODO: hope this is not sus
-                dxyp * sotmFactor + dxy * (1 - sotmFactor),
+                dist,
                 { dist ->
                     (
                             if (y < BORD_Y)
@@ -764,22 +766,14 @@ open class TeleOpBase(
                             ) + veloTrim
                 }
             )()
-            if (runtime < 1.0) {
-                TurretThetaSubsystem.SetThetaPos(0.63)()
-            } else {
-                TurretThetaSubsystem.AutoAim(
-                    dxyp * sotmFactor + dxy * (1 - sotmFactor),
-                    { dist ->
-                        (
-                                if (y < BORD_Y)
-                                    distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
-                                else
-                                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
-                                ) + hoodTrim
-                    },
-                )()
-            }
-//            }
+            TurretThetaSubsystem.SetThetaPos(
+                (
+                        if (y < BORD_Y)
+                            distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
+                        else
+                            distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
+                    ) + hoodTrim
+            )()
             TurretPhiSubsystem.AutoAim(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
                 dyp * sotmFactor + dy * (1 - sotmFactor),
