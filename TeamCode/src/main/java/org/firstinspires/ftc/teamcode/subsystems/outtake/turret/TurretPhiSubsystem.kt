@@ -36,8 +36,8 @@ object TurretPhiSubsystem : Subsystem {
     }
 
     fun norm(angle: Angle): Angle {
-        return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
-//        return ((angle.inRad - MIN_ANGLE) % (MAX_ANGLE - MIN_ANGLE) + MIN_ANGLE).coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
+//        return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
+        return ((angle.inRad - MIN_ANGLE) % (MAX_ANGLE - MIN_ANGLE) + MIN_ANGLE).coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
 
 //        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
 //        val tolerance = Math.toRadians(10.0);
