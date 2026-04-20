@@ -375,7 +375,7 @@ open class TeleOpBase(
 
         MagblockServoSubsystem.block()
         MagblockServoSubsystem.unblock()
-        TurretThetaSubsystem.SetThetaPos(0.63)()
+//        TurretThetaSubsystem.SetThetaPos(0.63)()
 
 //        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
 //        gamepad2.setLedColor(255.0, 0.0, 0.0, -1)
@@ -447,9 +447,9 @@ open class TeleOpBase(
 
         Gamepads.gamepad2.rightTrigger.greaterThan(0.003) whenBecomesTrue {
             MagblockServoSubsystem.block();
-            (InstantCommand { lowerOverridePower = 0.0000001 })();
+            (InstantCommand { lowerOverridePower = 0.000000001 })();
             SequentialGroup(
-                Delay(0.67),
+                Delay(0.5),
                 InstantCommand { lowerOverridePower = 0.0 }
             )()
         } whenBecomesFalse MagblockServoSubsystem.unblock
@@ -764,17 +764,21 @@ open class TeleOpBase(
                             ) + veloTrim
                 }
             )()
-            TurretThetaSubsystem.AutoAim(
-                dxyp * sotmFactor + dxy * (1 - sotmFactor),
-                { dist ->
-                    (
-                            if (y < BORD_Y)
-                                distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
-                            else
-                                distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
-                            ) + hoodTrim
-                },
-            )()
+            if (runtime < 1.0) {
+                TurretThetaSubsystem.SetThetaPos(0.63)()
+            } else {
+                TurretThetaSubsystem.AutoAim(
+                    dxyp * sotmFactor + dxy * (1 - sotmFactor),
+                    { dist ->
+                        (
+                                if (y < BORD_Y)
+                                    distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
+                                else
+                                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
+                                ) + hoodTrim
+                    },
+                )()
+            }
 //            }
             TurretPhiSubsystem.AutoAim(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
