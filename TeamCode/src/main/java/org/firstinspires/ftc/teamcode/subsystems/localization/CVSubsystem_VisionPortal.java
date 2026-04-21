@@ -55,17 +55,17 @@ public class CVSubsystem_VisionPortal {
                 .build();
 
 
-        aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
-//        Position cameraPosition = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
-//        YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
-//        aprilTagProcessor = new AprilTagProcessor.Builder()
-//                .setCameraPose(cameraPosition, cameraOrientation)
-//                .setTagLibrary(tagLibrary)
-//                .setDrawTagID(true)
-//                .setDrawTagOutline(true)
-//                .setDrawAxes(true)
-//                .setDrawCubeProjection(true)
-//               .build();
+//        aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
+        Position cameraPosition = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
+        YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
+        aprilTagProcessor = new AprilTagProcessor.Builder()
+                .setCameraPose(cameraPosition, cameraOrientation)
+                .setTagLibrary(tagLibrary)
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true)
+               .build();
 
         WebcamName webcamName = hm.get(WebcamName.class, "Cam");
 
@@ -116,7 +116,7 @@ public class CVSubsystem_VisionPortal {
 
         hasDetection = true;
 
-
+        //Photo 1:
 //        Pose3D pose = best.robotPose;
 //        PanelsTelemetry.INSTANCE.getTelemetry().addData("pose", pose.toString());
 //
@@ -130,7 +130,9 @@ public class CVSubsystem_VisionPortal {
 //        RCx1 = pediPose.getX();
 //        RCy1 = pediPose.getY();
 //        RCh  = pediPose.getHeading();
-        RCx1 = -best.robotPose.getPosition().toUnit(DistanceUnit.INCH).y + 72;
+
+        //Photo 2
+        RCx1 = best.robotPose.getPosition().toUnit(DistanceUnit.INCH).y + 72;
         RCy1 = best.robotPose.getPosition().toUnit(DistanceUnit.INCH).x + 72;
         RCh = best.robotPose.getOrientation().getYaw(AngleUnit.RADIANS);
 
@@ -149,16 +151,7 @@ public class CVSubsystem_VisionPortal {
 //        RCx1 = cvtPose.getX();
 //        RCy1 = cvtPose.getY();
 //        RCh = cvtPose.getHeading();
-//        RCx1 = 72.0-cvtPose.getX();
-//        RCy1 = 72.0-cvtPose.getY();
-//        RCh = cvtPose.getHeading() % (2 * Math.PI) - Math.PI;
 
-//        camXE = RCx1 - 72.0;
-//        camYE = RCy1 -72.0;
-
-//        RCx1 = pose.getPosition().toUnit(DistanceUnit.INCH).x + 72.0;
-//        RCy1 = pose.getPosition().toUnit(DistanceUnit.INCH).y + 72.0;
-//        RCh = pose.getOrientation().getYaw(AngleUnit.RADIANS);
 
         lastDetection = best;
     }
@@ -177,23 +170,11 @@ public class CVSubsystem_VisionPortal {
     public double getX() { return RCx1; }
     public double getY() { return RCy1; }
     public double getH() { return RCh; }
-//
-//    private double normalizeAngle(double angle) {
-//        while (angle > Math.PI)  angle -= 2 * Math.PI;
-//        while (angle < -Math.PI) angle += 2 * Math.PI;
-//        return angle;
-//    }
 
     public boolean hasDetection() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         return detections != null && !detections.isEmpty();
     }
 
-//    public double getCamXE() {
-//        return camXE;
-//    }
-//
-//    public double getCamYE() {
-//        return camYE;
-//    }
+
 }

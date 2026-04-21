@@ -56,21 +56,20 @@ public class InShootingZoneTest extends LinearOpMode {
 
 
 
-
-    public int inTriangle(double x1, double y1){
+    public int inTriangle(double x1, double y1) {
         int MARGIN = 8;
-        ///0 = none, 1 = top, 2 = bottom, 3 = error
+        // 0 = none, 1 = top, 2 = bottom, 3 = error
         if (x1 > 144 || x1 < 0 || y1 > 144 || y1 < 0) {
             return 3;
         }
 
-        // T triangle: vertices (72,64), (-8,144), (152,144)
-        boolean inTop = (y1 <= -x1 + 144 - MARGIN) && (y1 <= x1 - MARGIN);
+        boolean inTop = (y1 >= -x1 + 144 - MARGIN)   // y = -x + 144
+                && (y1 >= x1 - MARGIN);           //y = x
 
-        // B triangle:  (40,0), (72,32), (104,0)
-        boolean inBottom = (y1 <= x1 - (48 - MARGIN)) && (y1 <= -x1 + 96 + MARGIN);
+        boolean inBottom = (y1 <= x1 - 48 + MARGIN)   //y = x - 48
+                && (y1 <= -x1 + 96 + MARGIN);   //y = -x + 96
 
-        if (inTop)    return 1;
+        if (inTop) return 1;
         if (inBottom) return 2;
         return 0;
     }

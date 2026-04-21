@@ -15,7 +15,7 @@ import java.util.List;
 
 import kotlin.Unit;
 
-@TeleOp(name = "BothTest67")
+@TeleOp(name = "BothTest3")
 @Configurable
 public class BothTest extends LinearOpMode {
 
@@ -70,3 +70,5 @@ public class BothTest extends LinearOpMode {
         }
     }
 }
+
+
