@@ -380,10 +380,11 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     val SetCanShootTrue: Command = InstantCommand {canShoot = true}
 
     val stopFollower: Command = InstantCommand {PedroComponent.follower.breakFollowing()}
+    val pauseFollower: Command = InstantCommand {PedroComponent.follower.pausePathFollowing()}
 
     val IntakeCommand: Command
         get() = ParallelGroup(
-//            SetCanShootTrue,
+            SetCanShootTrue,
             intakePower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
@@ -393,7 +394,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         )
     val IntakeAfterCommand: Command
         get() = ParallelGroup(
-//            SetCanShootTrue,
+            SetCanShootTrue,
             maxPower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
@@ -411,7 +412,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         )
     val ShootCommand: Command
         get() = ParallelGroup(
-//            SetCanShootFalse,
+            SetCanShootFalse,
             maxPower,
             MagblockServoSubsystem.unblock,
             MagMotorSubsystem.On(1.0),
@@ -421,11 +422,11 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     fun robotShoot(): Command {
         return SequentialGroup(
-            stopFollower,
+            pauseFollower,
             Delay(DelayBeforeShoot),
             ShootCommand,
             Delay(delayAfterEachShoot),
-//            stopFollower,
+            stopFollower,
             TravelCommand,
         )
     }
@@ -495,7 +496,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         get() = SequentialGroup(
             ParallelGroup(
                 //Shoots PRELOAD which had [3 ARTIFACTS]
-                ShooterSubsystem.On(1000.0),
+//                ShooterSubsystem.On(1000.0),
                 FollowPath(robotShootPreload!!),
                 SequentialGroup(
                     Delay(delayStartShoot),
@@ -545,9 +546,9 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 ////            robotIntake(roboSPEDIntake),
 ////            robotGoShoot(roboSPEDGoShoot),
 //
-//            //Shoots last intake and then parks [RP Points + 3 points]
-//            robotShoot(),
-//            parkRobot()
+//            //Shoots last intake and then parks [For RP Points + 3 points]
+            robotShoot(),
+            parkRobot()
         )
 
     private var stopShooterAutoAim = false;
@@ -556,6 +557,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     var lastPose: Pose = Pose(0.0, 0.0, 0.0);
     var lastTime = 0.0;
     var lastInTriangle = 1;
+
     override fun onUpdate() {
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
@@ -600,8 +602,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         lastTime = runtime;
 
         val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);
-        if (lastInTriangle <= 0 && inTriangle >= 1) {
-            robotShoot()()
+        if (lastInTriangle <= 0 && inTriangle >= 1 && canShoot) {
+            robotShoot()
         }
         lastInTriangle = inTriangle
 
