@@ -40,7 +40,7 @@ import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.hypot
 
-@Autonomous(name = "[ARTI-24-B-STA-0] Auton Blue Close Artifact", group = "Auton")
+@Autonomous(name = "[ARTI-21-B] Auton Blue Close Artifact", group = "Auton")
 @Configurable
 class AutonBlueCloseArtifact24: NextFTCOpMode() {
     //////////////////////
@@ -64,8 +64,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     }
 
     companion object {
-        val delayStartShoot: Double = 0.0
-        val DelayBeforeShoot: Double = 0.0
+        val delayStartShoot: Double = 0.5
+        val DelayBeforeShoot: Double = 0.1
         val delayAfterEachShoot: Double = 0.45 //currently at a really high #
         val DelayFromRampIntake: Double = 1.0
         val DelayInIntake: Double = 0.65
@@ -272,11 +272,12 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.shootPoseCloseAlt)
                 )
             )
-            .setLinearHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.intake3Pos24).heading,
-                AutonPositions.Blue(AutonPositions.shootPoseCloseAlt).heading,
-                0.65
-            )
+//            .setLinearHeadingInterpolation(
+//                AutonPositions.Blue(AutonPositions.intake3Pos24).heading,
+//                AutonPositions.Blue(AutonPositions.shootPoseCloseAlt).heading,
+//                0.65
+//            )
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake3Pos24).heading)
 //            .addParametricCallback(0.9, robotShoot())
             .setTimeoutConstraint(0.0)
             .build()
@@ -373,7 +374,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     ///////////////////////////
     ////Main Auton Commands////
     ///////////////////////////
-    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.7)}
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.65)}
     val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
 
     val SetCanShootFalse: Command = InstantCommand {canShoot = false}
@@ -412,7 +413,6 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         )
     val ShootCommand: Command
         get() = ParallelGroup(
-            SetCanShootFalse,
             maxPower,
             MagblockServoSubsystem.unblock,
             MagMotorSubsystem.On(1.0),
@@ -422,6 +422,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     fun robotShoot(): Command {
         return SequentialGroup(
+            SetCanShootFalse,
             pauseFollower,
             Delay(DelayBeforeShoot),
             ShootCommand,
@@ -464,17 +465,20 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     //    double[] x_bottom = {72,40,104};
     //    double[] y_bottom = {32,0,0};
 
-    fun inTriangle(x1: Double, y1: Double, margin: Double): Int {
-        /**0 = none, 1 = top, 2 = bottom, -1 = error */
+    fun inTriangle(x1: Double, y1: Double, MARGIN: Double): Int {
+        /**0 = none, 1 = top, 2 = bottom, 3 = error */
+        // 0 = none, 1 = top, 2 = bottom, 3 = error
         if (x1 > 144 || x1 < 0 || y1 > 144 || y1 < 0) {
-            return -1
+            return 3
         }
-
         // T triangle: vertices (72,64), (-8,144), (152,144)
-        val inTop = (y1 <= -x1 + 144 - margin) && (y1 <= x1 - margin)
+        val inTop = (y1 >= -x1 + 144 - MARGIN) // y = -x + 144
+                && (y1 >= x1 - MARGIN) //y = x
+
 
         // B triangle:  (40,0), (72,32), (104,0)
-        val inBottom = (y1 <= x1 - (48 - margin)) && (y1 <= -x1 + 96 + margin)
+        val inBottom = (y1 <= x1 - 48 + MARGIN) //y = x - 48
+                && (y1 <= -x1 + 96 + MARGIN) //y = -x + 96
 
         if (inTop) return 1
         if (inBottom) return 2
@@ -602,8 +606,9 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         lastTime = runtime;
 
         val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);
-        if (lastInTriangle <= 0 && inTriangle >= 1 && canShoot) {
-            robotShoot()
+        if (canShoot && lastInTriangle <= 0 && inTriangle >= 1) {
+            canShoot = false
+            robotShoot()()
         }
         lastInTriangle = inTriangle
 
