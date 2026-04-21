@@ -424,7 +424,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         return SequentialGroup(
 //            SetCanShootFalse,
             stopFollower,
-//            pauseFollower,
+            pauseFollower,
             Delay(DelayBeforeShoot),
             ShootCommand,
             Delay(delayAfterEachShoot),
@@ -620,6 +620,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //        telemetry.addData("path state", pathState)
 
 //        telemetry.addData("canShoot", canShoot)
+        telemetry.addData("canshoot", canShoot)
         telemetry.addData("InTriangle", inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 8.0))
         telemetry.addData("x", PedroComponent.follower.pose.x)
         telemetry.addData("y", PedroComponent.follower.pose.y)
