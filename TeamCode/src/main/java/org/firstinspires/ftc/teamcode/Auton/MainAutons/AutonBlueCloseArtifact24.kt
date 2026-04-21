@@ -64,8 +64,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     }
 
     companion object {
-        val delayStartShoot: Double = 1.0
-        val DelayBeforeShoot: Double = 0.0
+        val delayStartShoot: Double = 1.25
+        val DelayBeforeShoot: Double = 0.1
         val delayAfterEachShoot: Double = 0.45 //currently at a really high #
         val DelayFromRampIntake: Double = 1.0
         val DelayInIntake: Double = 0.65
@@ -256,7 +256,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.intake3Pos24)
                 )
             )
-            .addParametricCallback(0.75, IntakeCommand)
+            .addParametricCallback(0.65, IntakeCommand)
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.shootPoseCloseAlt).heading,
                 AutonPositions.Blue(AutonPositions.intake3Pos24).heading,
@@ -604,7 +604,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         lastTime = runtime;
 
         val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);
-        if (inTriangle >= 1 && runtime - lastInTriangle >= 0.67) {
+        if (inTriangle >= 1 && runtime - lastInTriangle >= 0.67 && canShoot) {
+            canShoot = false
             robotShoot()()
         }
         if (inTriangle >= 1) {
