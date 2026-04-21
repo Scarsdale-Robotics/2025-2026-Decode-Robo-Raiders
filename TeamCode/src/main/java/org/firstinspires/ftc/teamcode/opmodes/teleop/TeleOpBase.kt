@@ -377,6 +377,7 @@ open class TeleOpBase(
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         PedroComponent.follower.pose = Pose(startX, startY, startH)
+        PedroComponent.follower.update()
 //        cv = CVSubsystem_VisionPortal(startX, startY, startH, hardwareMap)
 
         telemetry.addData("Start X", startX);
@@ -876,6 +877,7 @@ open class TeleOpBase(
         telemetry.addData("ShooterSpeed", ShooterSubsystem.velocity);
         telemetry.addData("Angle", shootAngleVal.deg);
         telemetry.addData("targetPhi", TurretPhiSubsystem.targetPhi)
+        telemetry.addData("inTriangle", inTriangle(x, y, 5.0))
         telemetry.update()
 
 //        PanelsTelemetry.telemetry.addData("Vx (in/s)", vx)
@@ -906,13 +908,13 @@ open class TeleOpBase(
         }
 
         // T triangle: vertices (72,64), (-8,144), (152,144)
-        val inTop = (y1 <= -x1 + 144 - margin) && (y1 <= x1 - margin)
+        val inTop = (y1 >= -x1 + 144 - margin) && (y1 >= x1 - margin)
 
         // B triangle:  (40,0), (72,32), (104,0)
         val inBottom = (y1 <= x1 - (48 - margin)) && (y1 <= -x1 + 96 + margin)
 
-        if (inTop) return 1
         if (inBottom) return 2
+        if (inTop) return 1
         return 0
     }
 }
