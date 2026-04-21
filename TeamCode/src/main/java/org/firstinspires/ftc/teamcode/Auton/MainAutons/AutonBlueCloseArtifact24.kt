@@ -422,7 +422,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     fun robotShoot(): Command {
         return SequentialGroup(
-            SetCanShootFalse,
+//            SetCanShootFalse,
             pauseFollower,
             Delay(DelayBeforeShoot),
             ShootCommand,
@@ -601,7 +601,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             PedroComponent.follower.heading.rad
         )()
         lastPose = PedroComponent.follower.pose;
-        lastTime = runtime;
+        lastTime = runtime
 
         val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);
         if (inTriangle >= 1 && canShoot) {
@@ -619,7 +619,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //        telemetry.addData("path state", pathState)
 
 //        telemetry.addData("canShoot", canShoot)
-        telemetry.addData("InTriangle", inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0))
+        telemetry.addData("InTriangle", inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 8.0))
         telemetry.addData("x", PedroComponent.follower.pose.x)
         telemetry.addData("y", PedroComponent.follower.pose.y)
         telemetry.addData("heading", PedroComponent.follower.pose.heading)
