@@ -472,7 +472,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         }
 
         // T triangle: vertices (72,64), (-8,144), (152,144)
-        val inTop = (y1 <= -x1 + 144 - margin) && (y1 <= x1 - margin)
+        val inTop = (y1 >= -x1 + 144 - margin) && (y1 >= x1 - margin)
 
         // B triangle:  (40,0), (72,32), (104,0)
         val inBottom = (y1 <= x1 - (48 - margin)) && (y1 <= -x1 + 96 + margin)
