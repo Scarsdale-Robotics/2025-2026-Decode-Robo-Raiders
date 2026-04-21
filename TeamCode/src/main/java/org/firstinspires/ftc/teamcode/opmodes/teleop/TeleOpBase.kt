@@ -771,6 +771,10 @@ open class TeleOpBase(
         lastPose = PedroComponent.follower.pose;
         lastTime = runtime;
 
+        val rp = min(abs(hypot(vx,vy)) / 16.0, 1.0)
+        gamepad2.rumble(rp * (1 - y / 144.0), rp * (y / 144.0), 100)
+
+
 //        gamepad1.rumble((hypot(vx, vy) / 12.0 * 100.0).toInt())
 //        gamepad2.rumble((hypot(vx, vy) / 12.0 * 100.0).toInt())
 
@@ -825,34 +829,36 @@ open class TeleOpBase(
             val sotmFactor = 1.0;
             val dist = dxyp * sotmFactor + dxy * (1 - sotmFactor)
             telemetry.addData("sotm factor", sotmFactor);
-//            if (inTriangle(x, y, 24.0) > 0) {
 
-            ShooterSubsystem.AutoAim(
-//                dxyp,  // TODO: hope this is not sus
-                dist,
-                { dist ->
-                    (
-                            if (y < BORD_Y)
-                                distanceToVelocityFar(dist)
-                            else
-                                distanceToVelocityClose(dist)
-                            ) + veloTrim
+            if (inTriangle(x, y, 5.0) > 0) {
+                gamepad1.rumble(1.0, 1.0, 100)
+            }
+
+            if (y < BORD_Y) {
+                // far zone
+                if (inTriangle(x, y, 36.0) == 2) {
+                    ShooterSubsystem.AutoAim(
+                        dist, { dist -> distanceToVelocityFar(dist) + veloTrim }
+                    )()
+                    TurretThetaSubsystem.SetThetaPos(
+                        distAndVeloToThetaFar(dist, ShooterSubsystem.velocity) + hoodTrim
+                    )()
                 }
-            )()
-            TurretThetaSubsystem.SetThetaPos(
-                (
-                        if (y < BORD_Y)
-                            distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
-                        else
-                            distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)
-                    ) + hoodTrim
-            )()
+            } else {
+                // close zone
+                if (inTriangle(x, y, 36.0) == 1) {
+                    ShooterSubsystem.AutoAim(
+                        dist, { dist -> distanceToVelocityClose(dist) + veloTrim }
+                    )()
+                    TurretThetaSubsystem.SetThetaPos(
+                        distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) + hoodTrim
+                    )()
+                }
+            }
             TurretPhiSubsystem.AutoAim(
                 dxp * sotmFactor + dx * (1 - sotmFactor),
                 dyp * sotmFactor + dy * (1 - sotmFactor),
                 hp, phiTrim
-//                        + 90.0.deg * Gamepads.gamepad1.rightStickX.get(),
-//                -Gamepads.gamepad1.rightStickX.get()  // tODO; make sure not bad
             )()
         } else {
             //ShooterSubsystem.Manual(
