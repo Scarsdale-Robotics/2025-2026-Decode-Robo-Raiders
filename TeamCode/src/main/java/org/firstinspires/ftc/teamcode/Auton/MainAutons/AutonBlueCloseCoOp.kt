@@ -5,6 +5,7 @@ import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
+import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.HeadingInterpolator
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
@@ -23,6 +24,7 @@ import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueCloseArtifact24.Companion.DelayAtLever
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueCloseArtifact24.Companion.DelayFromRampIntake
+import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueCloseArtifact24.Companion.canShoot
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.subsystems.LowerSubsystem
@@ -36,8 +38,10 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
-import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.old.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToNewThetaClose
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToNewThetaFar
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaClose
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToThetaFar
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToTimeClose
@@ -332,6 +336,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 //    val SetCanShootTrue: Command = InstantCommand {canShoot = true}
 
     val stopFollower: Command = InstantCommand {PedroComponent.follower.breakFollowing()}
+    val pauseFollower: Command = InstantCommand {PedroComponent.follower.pausePathFollowing()}
 
     val IntakeCommand: Command
         get() = ParallelGroup(
@@ -359,7 +364,7 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
             IntakeMotorSubsystem.off,
             MagMotorSubsystem.off,
 //            MagServoSubsystem.stop,
-            MagblockServoSubsystem.block,
+            MagblockServoSubsystem.unblock,
 
             )
     val ShootCommand: Command
@@ -374,10 +379,11 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 
     fun robotShoot(): Command {
         return SequentialGroup(
+            stopFollower,
+            pauseFollower,
             Delay(DelayBeforeShoot),
             ShootCommand,
             Delay(delayAfterEachShoot),
-            stopFollower,
             TravelCommand,
         )
     }
@@ -406,7 +412,12 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
     private val autonomousRoutine: Command
         get() = SequentialGroup( //Main Group
             FollowPath(robotShootPreload!!),
-            robotShoot(),
+
+            ParallelGroup(
+                Delay(1.0),
+                ShootCommand,
+            ),
+
             robotIntake(robotIntake1),
             Delay(0.5),
 
@@ -414,7 +425,6 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
             Delay(delayAtGate),
 
             robotGoShoot(robotGoToShoot1),
-            robotShoot(),
 
 //            Delay(delayAtGate),
 //            robotIntake(robotIntake2),
@@ -467,7 +477,6 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
             ////////REPEATABLE SECTION////////
             //////////////////////////////////
             SequentialGroup( //Shoots THIRD Intake, goes to OPEN lever and then intake
-                robotShoot(),
                 FollowPath(shootDirectToGate!!),
                 TravelCommand
             ),
@@ -476,7 +485,6 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
             robotGoShoot(robotCommonGoShoot),
 
             SequentialGroup( //Shoots THIRD Intake, goes to OPEN lever and then intake
-                robotShoot(),
                 Delay(DelayForPartnerBot), //Temporary Pos for this delay until figure out how needed or changed delay has to be
                 FollowPath(robotFinalCommonIntake!!), //robot goes to intake
             ),
@@ -487,7 +495,6 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
             ////////REPEATABLE SECTION////////
             //////////////////////////////////
             SequentialGroup( //Shoots THIRD Intake, goes to OPEN lever and then intake
-                robotShoot(),
                 FollowPath(shootDirectToGate!!),
                 TravelCommand
             ),
@@ -496,7 +503,6 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
             robotGoShoot(robotCommonGoShoot),
 
             SequentialGroup( //Shoots THIRD Intake, goes to OPEN lever and then intake
-                robotShoot(),
                 Delay(DelayForPartnerBot), //Temporary Pos for this delay until figure out how needed or changed delay has to be
                 FollowPath(robotFinalCommonIntake!!), //robot goes to intake
             ),
@@ -509,7 +515,6 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 
 
             SequentialGroup( //Shoots SIXTH Intake, goes to PARK
-                robotShoot(),
                 InstantCommand { stopShooterAutoAim = true },
                 ShooterSubsystem.On(9999.0),
                 FollowPath(robotPark!!), //robot goes to intake
@@ -517,45 +522,59 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         )
 
     private var stopShooterAutoAim = false;
+    var vxOld = listOf(0.0, 0.0, 0.0);
+    var vyOld = listOf(0.0, 0.0, 0.0);
+    var lastPose: Pose = Pose(0.0, 0.0, 0.0);
+    var lastTime = 0.0;
+    var lastInTriangle = 0.0;
     override fun onUpdate() {
-        val dx = goalX - PedroComponent.follower.pose.x
-        val dy = goalY - PedroComponent.follower.pose.y
+        val dx = AutonBlueCloseArtifact24.Companion.goalX - PedroComponent.follower.pose.x
+        val dy = AutonBlueCloseArtifact24.Companion.goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-        val dxp = dx
-        val dyp = dy
-//        val dxp = dx - PedroComponent.follower.velocity.xComponent * (
-//                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
-//                else distanceToTimeClose(dxy)
-//                )
-//        val dyp = dy - PedroComponent.follower.velocity.yComponent * (
-//                if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy)
-//                else distanceToTimeClose(dxy)
-//                )
-        val dxyp = hypot(dxp, dyp)
-
-        if (!stopShooterAutoAim) {
-            ShooterSubsystem.AutoAim(
-                dxy,
-                { dist ->
-                    (
-                            if (PedroComponent.follower.pose.y < BORD_Y)
-                                distanceToVelocityFar(dist)
-                            else
-                                distanceToVelocityClose(dist)
-                            )
-                }
-            )()
+        if (vxOld.isEmpty() || vyOld.isEmpty()) {
+            vxOld = listOf(0.0, 0.0, 0.0);
+            vyOld = listOf(0.0, 0.0, 0.0);
+        } else {
+            vxOld = vxOld.slice(IntRange(1, vxOld.lastIndex)) + listOf((PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime));
+            vyOld = vyOld.slice(IntRange(1, vyOld.lastIndex)) + listOf((PedroComponent.follower.pose.y - lastPose.pose.y) / (runtime - lastTime));
         }
-        TurretPhiSubsystem.AutoAim(dxp, dyp, PedroComponent.follower.pose.heading.rad)();
-        TurretThetaSubsystem.AutoAim(
+        val vx = vxOld.average();
+        val vy = vyOld.average();
+        val dxp = dx - 1.0 * vx * (if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        val dyp = dy - 1.0 * vy * (if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        val dxyp = hypot(dxp, dyp)
+        ShooterSubsystem.AutoAim(
             dxyp,
             { dist ->
-                (if (PedroComponent.follower.pose.y < BORD_Y)
-                    distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
-                else
-                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)) + 1.0.deg
-            },
+                (
+                        if (PedroComponent.follower.pose.y < BORD_Y)
+                            distanceToVelocityFar(dist)
+                        else
+                            distanceToVelocityClose(dist)
+                        )
+            }
         )()
+        TurretThetaSubsystem.SetThetaPos(
+            (
+                    if (PedroComponent.follower.pose.y < BORD_Y)
+                        distAndVeloToNewThetaFar(dxyp, ShooterSubsystem.velocity)
+                    else
+                        distAndVeloToNewThetaClose(dxyp, ShooterSubsystem.velocity)
+                    )
+        )()
+        TurretPhiSubsystem.AutoAim(
+            dxp,
+            dyp,
+            PedroComponent.follower.heading.rad
+        )()
+        lastPose = PedroComponent.follower.pose;
+        lastTime = runtime
+
+        val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);
+        if (inTriangle >= 1 && canShoot) {
+            canShoot = false
+            robotShoot()()
+        }
 
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower!!.update();
@@ -571,6 +590,22 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
         PanelsTelemetry.telemetry.update()
     }
 
+    fun inTriangle(x1: Double, y1: Double, margin: Double): Int {
+        /**0 = none, 1 = top, 2 = bottom, -1 = error */
+        if (x1 > 144 || x1 < 0 || y1 > 144 || y1 < 0) {
+            return -1
+        }
+
+        // T triangle: vertices (72,64), (-8,144), (152,144)
+        val inTop = (y1 >= -x1 + 144 - margin) && (y1 >= x1 - margin)
+
+        // B triangle:  (40,0), (72,32), (104,0)
+        val inBottom = (y1 <= x1 - (48 - margin)) && (y1 <= -x1 + 96 + margin)
+
+        if (inTop) return 1
+        if (inBottom) return 2
+        return 0
+    }
     /** This method is called continuously after Init while waiting for "play". **/
     override fun onInit() {
 //        follower = Constants.createFollower(hardwareMap)
@@ -581,9 +616,19 @@ class AutonBlueCloseCoOp: NextFTCOpMode() {
 //        MagServoSubsystem.stop()
         MagblockServoSubsystem.block()
 
-        TurretPhiSubsystem.zero();
+        TurretThetaSubsystem.SetThetaPos(0.63 + Math.random() * 0.01)()
 
         PedroComponent.follower.setStartingPose(AutonPositions.Blue(AutonPositions.startPoseClose))
+
+        PedroComponent.follower.update()
+
+        val dx = Companion.goalX - PedroComponent.follower.pose.x
+        val dy = Companion.goalY - PedroComponent.follower.pose.y
+        TurretPhiSubsystem.AutoAim(
+            dx + Math.random() * 0.2,
+            dy + Math.random() * 0.2,
+            PedroComponent.follower.heading.rad
+        )()
     }
 
     /** This method is called continuously after Init while waiting for "play".  */
