@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.outtake.turret
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
 import dev.nextftc.core.commands.Command
+import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.hardware.impl.ServoEx
 import dev.nextftc.hardware.positionable.SetPositions
@@ -24,11 +25,9 @@ object TurretThetaSubsystem : Subsystem {
 
 
 
-    class SetThetaPos(val pos: Double) : SetPositions(
-        servo to max(min(pos, 0.9), 0.63)
-        //im not sure if this work
-        //servo to (angle*0.09625 - 5.09375)
-    )
+    class SetThetaPos(val pos: Double) : InstantCommand ({
+        servo.position = max(min(pos, 0.9), 0.63)
+    })
 
     class AutoAim(
         private val dxy: Double,

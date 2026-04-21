@@ -604,13 +604,13 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         lastTime = runtime;
 
         val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);
-        if (inTriangle >= 1 && runtime - lastInTriangle >= 0.67 && canShoot) {
+        if (inTriangle >= 1 && canShoot) {
             canShoot = false
             robotShoot()()
         }
-        if (inTriangle >= 1) {
-            lastInTriangle = runtime
-        }
+//        if (inTriangle >= 1) {
+//            lastInTriangle = runtime
+//        }
 
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower!!.update();
@@ -641,7 +641,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         MagMotorSubsystem.off()
 //        MagServoSubsystem.stop()
         MagblockServoSubsystem.block()
-        TurretThetaSubsystem.SetThetaPos(0.63)()
+        TurretThetaSubsystem.SetThetaPos(0.63 + Math.random() * 0.01)()
 
         PedroComponent.follower.setStartingPose(AutonPositions.Blue(AutonPositions.startPoseClose))
 
@@ -650,8 +650,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         TurretPhiSubsystem.AutoAim(
-            dx,
-            dy,
+            dx + Math.random() * 0.2,
+            dy + Math.random() * 0.2,
             PedroComponent.follower.heading.rad
         )()
     }
