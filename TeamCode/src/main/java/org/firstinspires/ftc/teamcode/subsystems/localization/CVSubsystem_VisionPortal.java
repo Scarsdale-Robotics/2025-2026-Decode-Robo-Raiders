@@ -131,26 +131,26 @@ public class CVSubsystem_VisionPortal {
 //        RCy1 = pediPose.getY();
 //        RCh  = pediPose.getHeading();
 
-        //Photo 2
-        RCx1 = best.robotPose.getPosition().toUnit(DistanceUnit.INCH).y + 72;
-        RCy1 = best.robotPose.getPosition().toUnit(DistanceUnit.INCH).x + 72;
-        RCh = best.robotPose.getOrientation().getYaw(AngleUnit.RADIANS);
+//        //Photo 2
+//        RCx1 = best.robotPose.getPosition().toUnit(DistanceUnit.INCH).y + 72;
+//        RCy1 = best.robotPose.getPosition().toUnit(DistanceUnit.INCH).x + 72;
+//        RCh = best.robotPose.getOrientation().getYaw(AngleUnit.RADIANS);
 
 
-//        Pose ftcStandard = PoseConverter.pose2DToPose(
-//                new Pose2D(
-//                        DistanceUnit.INCH,
-//                        pose.getPosition().toUnit(DistanceUnit.INCH).x,
-//                        pose.getPosition().toUnit(DistanceUnit.INCH).y,
-//                        AngleUnit.RADIANS,
-//                        pose.getOrientation().getYaw(AngleUnit.RADIANS)
-//                ),
-//                InvertedFTCCoordinates.INSTANCE
-//        );
-//        Pose cvtPose = ftcStandard.getAsCoordinateSystem(PedroCoordinates.INSTANCE);
-//        RCx1 = cvtPose.getX();
-//        RCy1 = cvtPose.getY();
-//        RCh = cvtPose.getHeading();
+        Pose ftcStandard = PoseConverter.pose2DToPose(
+                new Pose2D(
+                        DistanceUnit.INCH,
+                        best.robotPose.getPosition().toUnit(DistanceUnit.INCH).x,
+                        best.robotPose.getPosition().toUnit(DistanceUnit.INCH).y,
+                        AngleUnit.RADIANS,
+                        best.robotPose.getOrientation().getYaw(AngleUnit.RADIANS)
+                ),
+                InvertedFTCCoordinates.INSTANCE
+        );
+        Pose cvtPose = ftcStandard.getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+        RCx1 = cvtPose.getX();
+        RCy1 = cvtPose.getY();
+        RCh = cvtPose.getHeading();
 
 
         lastDetection = best;
