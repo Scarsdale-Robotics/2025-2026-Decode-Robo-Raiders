@@ -30,7 +30,12 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagMotorSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
+import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToNewThetaClose
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distAndVeloToNewThetaFar
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToTimeClose
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToTimeFar
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityClose
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.distanceToVelocityFar
 import org.firstinspires.ftc.teamcode.utils.Lefile
@@ -362,54 +367,55 @@ class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is inta
             FollowPath(parkPath!!),
         )
 
+    // for auto aim in autons, copy this...
+    var vxOld = listOf(0.0, 0.0, 0.0);
+    var vyOld = listOf(0.0, 0.0, 0.0);
+    var lastPose: Pose = Pose(0.0, 0.0, 0.0);
+    var lastTime = 0.0;
     override fun onUpdate() {
-//        if (pathStarted && opmodeTimer!!.elapsedTime >= 29.75) {
-//            PedroComponent.follower.setMaxPower(0.0)
-//            PedroComponent.follower.breakFollowing()
-//            IntakeMotorSubsystem.off()
-//            MagMotorSubsystem.off()
-//            MagblockServoSubsystem.block()
-//        }
-
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
         val dxy = hypot(dx, dy)
-//        val dxp = dx - (0.8*PedroComponent.follower.velocity.xComponent
-//                + 0.05 * PedroComponent.follower.acceleration.xComponent) * (
-//                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
-//                else AutoAimConstants.distanceToTimeClose(dxy)
-//        )
-//        val dyp = dy - (0.8*PedroComponent.follower.velocity.yComponent
-//                + 0.05 * PedroComponent.follower.acceleration.yComponent) * (
-//                if (PedroComponent.follower.pose.y < BORD_Y) AutoAimConstants.distanceToTimeFar(dxy)
-//                else AutoAimConstants.distanceToTimeClose(dxy)
-//        )
-        val dxp = dx;
-        val dyp = dy;
-        val dxyp = hypot(dxp, dyp)
-        if (!stopShooterAutoAim) {
-            ShooterSubsystem.AutoAim(
-                dxyp,
-                { dist ->
-                    (
-                            if (PedroComponent.follower.pose.y < BORD_Y)
-                                distanceToVelocityFar(dist)
-                            else
-                                distanceToVelocityClose(dist)
-                            )
-                }
-            )()
+        if (vxOld.isEmpty() || vyOld.isEmpty()) {
+            vxOld = listOf(0.0, 0.0, 0.0);
+            vyOld = listOf(0.0, 0.0, 0.0);
+        } else {
+            vxOld = vxOld.slice(IntRange(1, vxOld.lastIndex)) + listOf((PedroComponent.follower.pose.x - lastPose.pose.x) / (runtime - lastTime));
+            vyOld = vyOld.slice(IntRange(1, vyOld.lastIndex)) + listOf((PedroComponent.follower.pose.y - lastPose.pose.y) / (runtime - lastTime));
         }
-        TurretPhiSubsystem.AutoAim(dxp, dyp, PedroComponent.follower.pose.heading.rad)();
-//        TurretThetaSubsystem.AutoAim(
-//            dxyp,
-//            { dist ->
-//                (if (PedroComponent.follower.pose.y < BORD_Y)
-//                    distAndVeloToThetaFar(dist, ShooterSubsystem.velocity)
-//                else
-//                    distAndVeloToThetaClose(dist, ShooterSubsystem.velocity)) + 1.5.deg
-//            },
-//        )()
+        val vx = vxOld.average();
+        val vy = vyOld.average();
+        val dxp = dx - 1.0 * vx * (if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        val dyp = dy - 1.0 * vy * (if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        val dxyp = hypot(dxp, dyp)
+        ShooterSubsystem.AutoAim(
+            dxyp,
+            { dist ->
+                (
+                        if (PedroComponent.follower.pose.y < BORD_Y)
+                            distanceToVelocityFar(dist)
+                        else
+                            distanceToVelocityClose(dist)
+                        )
+            }
+        )()
+        TurretThetaSubsystem.SetThetaPos(
+            (
+                    if (PedroComponent.follower.pose.y < BORD_Y)
+                        distAndVeloToNewThetaFar(dxyp, ShooterSubsystem.velocity)
+                    else
+                        distAndVeloToNewThetaClose(dxyp, ShooterSubsystem.velocity)
+                    )
+        )()
+        TurretPhiSubsystem.AutoAim(
+            dxp,
+            dyp,
+            PedroComponent.follower.heading.rad
+        )()
+        lastPose = PedroComponent.follower.pose;
+        lastTime = runtime;
+
+        // ...to this
 
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower!!.update();
