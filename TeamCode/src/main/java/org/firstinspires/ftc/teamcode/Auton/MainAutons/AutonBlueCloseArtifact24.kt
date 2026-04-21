@@ -65,7 +65,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     companion object {
         val delayStartShoot: Double = 1.25
-        val DelayBeforeShoot: Double = 0.1
+        val DelayBeforeShoot: Double = 0.5
         val delayAfterEachShoot: Double = 0.45 //currently at a really high #
         val DelayFromRampIntake: Double = 1.0
         val DelayInIntake: Double = 0.65
@@ -130,12 +130,12 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 )
             )
 //            .setTangentHeadingInterpolation()
-            .setLinearHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.startPoseClose).heading,
-                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
-                0.85
-            )
-//            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
+//            .setLinearHeadingInterpolation(
+//                AutonPositions.Blue(AutonPositions.startPoseClose).heading,
+//                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
+//                0.85
+//            )
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
             .build()
         //1st Intake
         robotIntake1 = PedroComponent.follower.pathBuilder()
@@ -423,11 +423,12 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     fun robotShoot(): Command {
         return SequentialGroup(
 //            SetCanShootFalse,
-            pauseFollower,
+            stopFollower,
+//            pauseFollower,
             Delay(DelayBeforeShoot),
             ShootCommand,
             Delay(delayAfterEachShoot),
-            stopFollower,
+//            stopFollower,
             TravelCommand,
         )
     }
