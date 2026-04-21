@@ -640,6 +640,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         MagMotorSubsystem.off()
 //        MagServoSubsystem.stop()
         MagblockServoSubsystem.block()
+        TurretThetaSubsystem.SetThetaPos(0.63)()
 
         PedroComponent.follower.setStartingPose(AutonPositions.Blue(AutonPositions.startPoseClose))
 
