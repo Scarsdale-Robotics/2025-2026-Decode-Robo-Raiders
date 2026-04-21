@@ -64,8 +64,8 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     }
 
     companion object {
-        val delayStartShoot: Double = 1.25
-        val DelayBeforeShoot: Double = 0.5
+        val delayStartShoot: Double = 1.2
+        val DelayBeforeShoot: Double = 0.3
         val delayAfterEachShoot: Double = 0.45 //currently at a really high #
         val DelayFromRampIntake: Double = 1.0
         val DelayInIntake: Double = 0.65
@@ -256,7 +256,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.intake3Pos24)
                 )
             )
-            .addParametricCallback(0.65, IntakeCommand)
+            .addParametricCallback(0.6, IntakeCommand)
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.shootPoseCloseAlt).heading,
                 AutonPositions.Blue(AutonPositions.intake3Pos24).heading,
@@ -382,6 +382,10 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     val stopFollower: Command = InstantCommand {PedroComponent.follower.breakFollowing()}
     val pauseFollower: Command = InstantCommand {PedroComponent.follower.pausePathFollowing()}
+    val unPauseFollower: Command = InstantCommand {PedroComponent.follower.resumePathFollowing()}
+
+//    val test: Command = InstantCommand { PedroComponent.follower.currentPath }
+
 
     val IntakeCommand: Command
         get() = ParallelGroup(
@@ -422,13 +426,12 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     fun robotShoot(): Command {
         return SequentialGroup(
-//            SetCanShootFalse,
-            stopFollower,
             pauseFollower,
+//            stopFollower,
             Delay(DelayBeforeShoot),
             ShootCommand,
             Delay(delayAfterEachShoot),
-//            stopFollower,
+            unPauseFollower,
             TravelCommand,
         )
     }
@@ -549,7 +552,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 ////            robotGoShoot(roboSPEDGoShoot),
 //
 //            //Shoots last intake and then parks [For RP Points + 3 points]
-            robotShoot(),
+//            robotShoot(),
             parkRobot()
         )
 
@@ -620,7 +623,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //        telemetry.addData("path state", pathState)
 
 //        telemetry.addData("canShoot", canShoot)
-        telemetry.addData("canshoot", canShoot)
+        telemetry.addData("canShoot", canShoot)
         telemetry.addData("InTriangle", inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 8.0))
         telemetry.addData("x", PedroComponent.follower.pose.x)
         telemetry.addData("y", PedroComponent.follower.pose.y)
