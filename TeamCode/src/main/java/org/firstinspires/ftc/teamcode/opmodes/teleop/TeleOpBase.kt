@@ -376,6 +376,7 @@ open class TeleOpBase(
         val startH = content[2].toDouble()
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
+        PedroComponent.follower.setStartingPose(Pose(startX, startY, startH))
         PedroComponent.follower.pose = Pose(startX, startY, startH)
         PedroComponent.follower.update()
 //        cv = CVSubsystem_VisionPortal(startX, startY, startH, hardwareMap)

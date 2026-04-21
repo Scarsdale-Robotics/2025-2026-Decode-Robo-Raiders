@@ -64,7 +64,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     }
 
     companion object {
-        val delayStartShoot: Double = 0.0
+        val delayStartShoot: Double = 1.0
         val DelayBeforeShoot: Double = 0.0
         val delayAfterEachShoot: Double = 0.45 //currently at a really high #
         val DelayFromRampIntake: Double = 1.0
@@ -495,7 +495,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         get() = SequentialGroup(
             ParallelGroup(
                 //Shoots PRELOAD which had [3 ARTIFACTS]
-                ShooterSubsystem.On(1000.0),
+//                ShooterSubsystem.On(1000.0),
                 FollowPath(robotShootPreload!!),
                 SequentialGroup(
                     Delay(delayStartShoot),
@@ -550,12 +550,14 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //            parkRobot()
         )
 
+
+
     private var stopShooterAutoAim = false;
     var vxOld = listOf(0.0, 0.0, 0.0);
     var vyOld = listOf(0.0, 0.0, 0.0);
     var lastPose: Pose = Pose(0.0, 0.0, 0.0);
     var lastTime = 0.0;
-    var lastInTriangle = 1;
+    var lastInTriangle = 0.0;
     override fun onUpdate() {
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
@@ -600,10 +602,12 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         lastTime = runtime;
 
         val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);
-        if (lastInTriangle <= 0 && inTriangle >= 1) {
+        if (inTriangle >= 1 && runtime - lastInTriangle >= 0.67) {
             robotShoot()()
         }
-        lastInTriangle = inTriangle
+        if (inTriangle >= 1) {
+            lastInTriangle = runtime
+        }
 
         // These loop the movements of the robot, these must be called continuously in order to work
 //        follower!!.update();
@@ -636,6 +640,16 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         MagblockServoSubsystem.block()
 
         PedroComponent.follower.setStartingPose(AutonPositions.Blue(AutonPositions.startPoseClose))
+
+        PedroComponent.follower.update()
+
+        val dx = goalX - PedroComponent.follower.pose.x
+        val dy = goalY - PedroComponent.follower.pose.y
+        TurretPhiSubsystem.AutoAim(
+            dx,
+            dy,
+            PedroComponent.follower.heading.rad
+        )()
     }
 
     /** This method is called continuously after Init while waiting for "play".  */
