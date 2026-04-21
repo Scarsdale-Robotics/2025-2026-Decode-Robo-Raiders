@@ -6,6 +6,7 @@ import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.Path
 import com.pedropathing.paths.PathChain
+import com.qualcomm.robotcore.hardware.Gamepad
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.commands.delays.Delay
@@ -44,9 +45,13 @@ import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
+import kotlin.math.sin
 
 
 data class ResetModeParams(val x: Double, val y: Double, val h: Angle)
@@ -195,6 +200,53 @@ open class TeleOpBase(
             -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
             false
         )
+//        driverControlled = PedroDriverControlled(
+//            {
+//                val rawX = gamepad1.left_stick_x.toDouble()
+//                val rawY = gamepad1.left_stick_y.toDouble()
+//                val mag = hypot(rawX, rawY)
+//
+//                var finalY = gamepad1.left_stick_y.toDouble()
+//
+//                if (mag > 0.9) {
+//                    val snapped = snapVectorTo45(rawX, rawY)
+//                    finalY = snapped.second // Snapped Y
+//                }
+//
+//                (if (isBlue) finalY else -finalY) * speedFactorDrive
+//            },
+//            {
+//                val rawX = gamepad1.left_stick_x.toDouble()
+//                val rawY = gamepad1.left_stick_y.toDouble()
+//                val mag = hypot(rawX, rawY)
+//
+//                var finalX = gamepad1.left_stick_y.toDouble()
+//
+//                if (mag > 0.9) {
+//                    val snapped = snapVectorTo45(rawX, rawY)
+//                    finalX = snapped.first // Snapped X
+//                }
+//
+//                (if (isBlue) finalX else -finalX) * speedFactorDrive
+//            },
+//            Gamepads.gamepad1.rightStickX.map {
+//                if (abs(gamepad1.right_stick_x) < 0.02) {
+//                    // When locking, we manually calculate heading error (this is a simple P-loop)
+//                    val currentH = PedroComponent.follower.pose.heading
+//                    val targetH = getSnappedHeading(currentH)
+//                    var error = targetH - currentH
+//
+//                    // Normalize angle error to -PI to PI
+//                    while (error > Math.PI) error -= 2 * Math.PI
+//                    while (error < -Math.PI) error += 2 * Math.PI
+//
+//                    (error * 2.0).coerceIn(-1.0, 1.0) // 2.0 is your 'P' gain for snapping
+//                } else {
+//                    -it * speedFactorDrive
+//                }
+//            },
+//            false
+//        )
 //
         gateIntakeChain = PedroComponent.follower.pathBuilder()
             .addPath(
@@ -343,6 +395,24 @@ open class TeleOpBase(
 //        odom!!.setPinpoint(startX, startY, startH)
     }
 
+//    private fun getSnappedHeading(currentHeading: Double): Double {
+//        val increment = Math.PI / 4.0 // 45 degrees
+//        return (currentHeading / increment).roundToInt() * increment
+//    }
+//    private fun snapVectorTo45(x: Double, y: Double): Pair<Double, Double> {
+//        val magnitude = hypot(x, y)
+//        if (magnitude < 0.02) return Pair(0.0, 0.0)
+//
+//        // Get current angle of the joystick in radians
+//        val angle = atan2(y, x)
+//
+//        // Snap angle to nearest PI/4 (45 degrees)
+//        val snappedAngle = (angle / (Math.PI / 4.0)).roundToInt() * (Math.PI / 4.0)
+//
+//        // Reconstruct the vector using the original magnitude
+//        return Pair(cos(snappedAngle) * magnitude, sin(snappedAngle) * magnitude)
+//    }
+
     private var autoAimEnabled = true;
     private var resetMode = false;
     private var resetTypeHeading = false;
@@ -447,9 +517,9 @@ open class TeleOpBase(
 
         Gamepads.gamepad2.rightTrigger.greaterThan(0.0) whenBecomesTrue {
             MagblockServoSubsystem.block();
-            (InstantCommand { lowerOverridePower = 0.000000001 })();
+            (InstantCommand { lowerOverridePower = 0.001 })();
             SequentialGroup(
-                Delay(0.5),
+                Delay(0.33),
                 InstantCommand { lowerOverridePower = 0.0 }
             )()
         } whenBecomesFalse MagblockServoSubsystem.unblock
@@ -701,6 +771,9 @@ open class TeleOpBase(
         lastPose = PedroComponent.follower.pose;
         lastTime = runtime;
 
+//        gamepad1.rumble((hypot(vx, vy) / 12.0 * 100.0).toInt())
+//        gamepad2.rumble((hypot(vx, vy) / 12.0 * 100.0).toInt())
+
         PanelsTelemetry.telemetry.addData("RUNTIME", runtime);
         PanelsTelemetry.telemetry.addData("SHOOTING?", ShooterSubsystem.isShooting);
         PanelsTelemetry.telemetry.addData("DISTANCE TO GOAL (in)", dxy);
@@ -714,9 +787,9 @@ open class TeleOpBase(
 //            && vh < 20.deg  // todo: super experimental
 //            && hypot(ax, ay) < 24.0  // todo: super duper experimental
 //        ) {
-//            MagblockServoSubsystem.unblock()
+//            lowerOverridePower = 1.0
 //        } else {
-//            MagblockServoSubsystem.block()
+//            lowerOverridePower = 0.0
 //        }
 
         if (resetMode) {
