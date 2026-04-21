@@ -40,7 +40,7 @@ import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
 import kotlin.math.hypot
 
-@Autonomous(name = "[ARTI-24-B-STA-0] Auton Blue Close Artifact", group = "Auton")
+@Autonomous(name = "[ARTI-21-B] Auton Blue Close Artifact", group = "Auton")
 @Configurable
 class AutonBlueCloseArtifact24: NextFTCOpMode() {
     //////////////////////
@@ -272,11 +272,12 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.shootPoseCloseAlt)
                 )
             )
-            .setLinearHeadingInterpolation(
-                AutonPositions.Blue(AutonPositions.intake3Pos24).heading,
-                AutonPositions.Blue(AutonPositions.shootPoseCloseAlt).heading,
-                0.65
-            )
+//            .setLinearHeadingInterpolation(
+//                AutonPositions.Blue(AutonPositions.intake3Pos24).heading,
+//                AutonPositions.Blue(AutonPositions.shootPoseCloseAlt).heading,
+//                0.65
+//            )
+            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake3Pos24).heading)
 //            .addParametricCallback(0.9, robotShoot())
             .setTimeoutConstraint(0.0)
             .build()
@@ -373,17 +374,18 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
     ///////////////////////////
     ////Main Auton Commands////
     ///////////////////////////
-    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.7)}
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.65)}
     val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
 
     val SetCanShootFalse: Command = InstantCommand {canShoot = false}
     val SetCanShootTrue: Command = InstantCommand {canShoot = true}
 
     val stopFollower: Command = InstantCommand {PedroComponent.follower.breakFollowing()}
+    val pauseFollower: Command = InstantCommand {PedroComponent.follower.pausePathFollowing()}
 
     val IntakeCommand: Command
         get() = ParallelGroup(
-//            SetCanShootTrue,
+            SetCanShootTrue,
             intakePower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
@@ -393,7 +395,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         )
     val IntakeAfterCommand: Command
         get() = ParallelGroup(
-//            SetCanShootTrue,
+            SetCanShootTrue,
             maxPower,
             IntakeMotorSubsystem.intake,
             MagMotorSubsystem.intake,
@@ -411,7 +413,6 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
         )
     val ShootCommand: Command
         get() = ParallelGroup(
-//            SetCanShootFalse,
             maxPower,
             MagblockServoSubsystem.unblock,
             MagMotorSubsystem.On(1.0),
@@ -421,11 +422,12 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 
     fun robotShoot(): Command {
         return SequentialGroup(
-            stopFollower,
+            SetCanShootFalse,
+            pauseFollower,
             Delay(DelayBeforeShoot),
             ShootCommand,
             Delay(delayAfterEachShoot),
-//            stopFollower,
+            stopFollower,
             TravelCommand,
         )
     }
@@ -545,9 +547,9 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 ////            robotIntake(roboSPEDIntake),
 ////            robotGoShoot(roboSPEDGoShoot),
 //
-//            //Shoots last intake and then parks [RP Points + 3 points]
-//            robotShoot(),
-//            parkRobot()
+//            //Shoots last intake and then parks [For RP Points + 3 points]
+            robotShoot(),
+            parkRobot()
         )
 
 
