@@ -48,7 +48,7 @@ import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 
-@Autonomous(name = "[COOP-18] Auton Red Close CoOp G", group = "Auton")
+//@Autonomous(name = "[COOP-18] Auton Red Close CoOp G", group = "Auton")
 @Configurable
 class AutonRedCloseCoOp: NextFTCOpMode() {
     //////////////////////

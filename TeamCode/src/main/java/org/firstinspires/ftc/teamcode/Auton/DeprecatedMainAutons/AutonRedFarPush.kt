@@ -55,7 +55,7 @@ import kotlin.math.hypot
 //4th slot = Auton type: Motif, Backup, Shooter, Artifact, CoOp
 //Example Auton = AutonBlueCloseBackup, AutonRedWaitFarShooter ...
 //Main Autons should be: Auton__ __Artifact & Auton__ __ CoOp
-@Autonomous(name = "[PUSH-15] Auton Red Far Push", group = "Auton")
+//@Autonomous(name = "[PUSH-15] Auton Red Far Push", group = "Auton")
 @Configurable
 class AutonRedFarPush: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
     //////////////////////

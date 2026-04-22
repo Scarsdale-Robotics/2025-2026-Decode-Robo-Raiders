@@ -44,7 +44,7 @@ import kotlin.math.hypot
 object AutonUtil {
     var canShoot = false;
 
-    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.65)}
+    val intakePower: Command = InstantCommand {PedroComponent.follower.setMaxPower(0.5)}
     val maxPower: Command = InstantCommand {PedroComponent.follower.setMaxPower(1.0)}
 
     val SetCanShootFalse: Command = InstantCommand {canShoot = false}
@@ -93,11 +93,11 @@ object AutonUtil {
     )
 
     val delayStartShoot: Double = 1.2
-    val delayBeforeShoot: Double = 0.2
-    val delayAfterEachShoot: Double = 0.3 //currently at a really high #
-    val delayFromRampIntake: Double = 0.88
-    val delayInIntake: Double = 0.65
-    val delayAtLever: Double = 0.1
+    val delayBeforeShoot: Double = 0.21
+    val delayAfterEachShoot: Double = 0.38 //currently at a really high #
+    val delayFromRampIntake: Double = 0.7
+    val delayInIntake: Double = 0.5
+    val delayAtLever: Double = 0.0
 
     val goalX = 5.0
     val goalY = 144.0 - 5.0
@@ -124,7 +124,7 @@ object AutonUtil {
         return SequentialGroup(
             TravelCommand,
             FollowPath(followedPath!!), //robot goes to intake
-            Delay(delayAtLever),
+//            Delay(delayAtLever),
             IntakeCommand,
             FollowPath(goBackPath!!),
             Delay(delayFromRampIntake),
@@ -154,6 +154,14 @@ object AutonUtil {
                 Delay(delayInIntake),
                 TravelCommand,
             ),
+            FollowPath(followedPath!!, true)
+        )
+    }
+
+        fun parkRobot(followedPath: PathChain?): Command {
+        return SequentialGroup(
+//            InstantCommand { stopShooterAutoAim = true },
+            ShooterSubsystem.On(9999.0),
             FollowPath(followedPath!!, true)
         )
     }
@@ -236,11 +244,11 @@ open class AutonBase(
         val ax = axOld.average();
         val ay = ayOld.average();
         val timeFactor = (if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        val dxp = { accelFactor: Double -> dx - 1.0 * vx * timeFactor - 0.0 * ax * timeFactor * timeFactor }
-        val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - 0.0 * ay * timeFactor * timeFactor }
+        val dxp = { accelFactor: Double -> dx - 1.0 * vx * timeFactor - accelFactor * ax * timeFactor * timeFactor }
+        val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - accelFactor * ay * timeFactor * timeFactor }
         val dxyp = { accelFactor: Double -> hypot(dxp(accelFactor), dyp(accelFactor)) }
         ShooterSubsystem.AutoAim(
-            dxyp(0.05),
+            dxyp(0.2),
             { dist ->
                 (
                         if (PedroComponent.follower.pose.y < BORD_Y)
@@ -253,14 +261,14 @@ open class AutonBase(
         TurretThetaSubsystem.SetThetaPos(
             (
                     if (PedroComponent.follower.pose.y < BORD_Y)
-                        distAndVeloToNewThetaFar(dxyp(0.01), ShooterSubsystem.velocity)
+                        distAndVeloToNewThetaFar(dxyp(0.0), ShooterSubsystem.velocity)
                     else
-                        distAndVeloToNewThetaClose(dxyp(0.01), ShooterSubsystem.velocity)
+                        distAndVeloToNewThetaClose(dxyp(0.0), ShooterSubsystem.velocity)
                     )
         )()
         TurretPhiSubsystem.AutoAim(
-            dxp(0.03),
-            dyp(0.03),
+            dxp(0.0),
+            dyp(0.0),
             PedroComponent.follower.heading.rad
         )()
         lastPose = PedroComponent.follower.pose;

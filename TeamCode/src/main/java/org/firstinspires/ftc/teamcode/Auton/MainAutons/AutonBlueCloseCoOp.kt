@@ -19,6 +19,8 @@ import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Ang
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.X
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.IntakeCommand
+import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.intakePower
+import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.maxPower
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.ShootCommand
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.finalGoShoot
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotGateIntake
@@ -26,6 +28,7 @@ import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotGateIntake
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotGoShoot
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotIntake
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotShoot
+import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.parkRobot
 
 @Autonomous(name = "[COOP-21-B] Auton Blue Close CoOp", group = "Auton")
 class AutonBlueCloseCoOp : AutonBase(
@@ -38,9 +41,11 @@ class AutonBlueCloseCoOp : AutonBase(
         val DOWN = Ang(270.deg.inRad, isBlue)
         val LEFT = Ang(180.deg.inRad, isBlue)
         val DOWN_LEFT = Ang(225.deg.inRad, isBlue)
-        val GATE = Ang(145.deg.inRad, isBlue)
+        val GATE = Ang(150.deg.inRad, isBlue)
 
-        val xIntakeThreshold = 50.0
+        val FRIED = Ang(165.deg.inRad, isBlue)
+
+        val xIntakeThreshold = 51.0
         val gateXIntakeThreshold = 35.0
 
         val startPose = Pos(AutonPositions.startPoseClose, isBlue)
@@ -51,21 +56,24 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val setLine2Pose = Pos(Pose(22.5, 64.0), isBlue)
-        val setLine2Ctrl = Pos(Pose(45.0, 55.0), isBlue)
+        val setLine2Pose = Pos(Pose(19.5, 60.0), isBlue)
+        val setLine2Ctrl = Pos(Pose(48.9, 59.2), isBlue)
         val setLine2Path = pb().addPath(BezierCurve(preloadShootPose, setLine2Ctrl, setLine2Pose))
             .setConstantHeadingInterpolation(LEFT)
+//            .setLinearHeadingInterpolation(LEFT, FRIED, 1.0, 0.75)
             .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold }, IntakeCommand)
+            .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold - 2.0 }, intakePower)
             .setTimeoutConstraint(0.0)
             .build()
 
         val shoot2Pose = Pos(Pose(61.0, 71.0), isBlue)
         val shoot2Path = pb().addPath(BezierLine(setLine2Pose, shoot2Pose))
+            .addParametricCallback(0.0, maxPower)
             .setConstantHeadingInterpolation(LEFT)
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakePose = Pos(Pose(16.0, 60.0), isBlue)
+        val gateIntakePose = Pos(Pose(14.8, 57.2), isBlue)
         val gateIntakePath = pb().addPath(BezierLine(shoot2Pose, gateIntakePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
@@ -84,7 +92,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakeBackupPose = Pos(Pose(16.0, 57.0), isBlue)
+        val gateIntakeBackupPose = Pos(Pose(14.5, 53.7), isBlue)
         val gateIntakeBackupPath = pb().addPath(BezierLine(gateIntakePose, gateIntakeBackupPose))
             .setConstantHeadingInterpolation(GATE)
             .setTimeoutConstraint(0.0)
@@ -112,8 +120,13 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val shoot1Pose = Pos(Pose(55.0, 104.0), isBlue)
+        val shoot1Pose = Pos(Pose(56.7, 97.0), isBlue)
         val shoot1Path = pb().addPath(BezierLine(setLine1Pose, shoot1Pose))
+            .setConstantHeadingInterpolation(DOWN_LEFT)
+            .setTimeoutConstraint(0.0)
+            .build()
+
+        val parkPath = pb().addPath(BezierLine(shoot2Pose, AutonPositions.autonParkPose))
             .setConstantHeadingInterpolation(DOWN_LEFT)
             .setTimeoutConstraint(0.0)
             .build()
@@ -123,7 +136,7 @@ class AutonBlueCloseCoOp : AutonBase(
             ParallelGroup(
                 FollowPath(preloadPath),
                 SequentialGroup(
-                    Delay(1.5),
+                    Delay(1.4),
                     ShootCommand
                 )
             ),
@@ -157,7 +170,9 @@ class AutonBlueCloseCoOp : AutonBase(
             robotIntake(setLine1Path),
             finalGoShoot(shoot1Path),
 
-            ShootCommand
+            robotShoot(),
+//            parkRobot(parkPath)
+
         )
     }() }
 )
