@@ -32,7 +32,7 @@ class AutonBlueCloseCoOp : AutonBase(
     6.0,
     144.0 - 6.0,
     { isBlue, follower -> {
-        val pb = follower.pathBuilder()
+        val pb = { follower.pathBuilder() }
 
         val DOWN = Ang(270.deg.inRad, isBlue)
         val LEFT = Ang(180.deg.inRad, isBlue)
@@ -45,27 +45,27 @@ class AutonBlueCloseCoOp : AutonBase(
         val startPose = Pos(AutonPositions.startPoseClose, isBlue)
 
         val preloadShootPose = Pos(Pose(51.0, 92.0), isBlue)
-        val preloadPath = pb.addPath(BezierLine(startPose, preloadShootPose))
+        val preloadPath = pb().addPath(BezierLine(startPose, preloadShootPose))
             .setLinearHeadingInterpolation(DOWN, LEFT, 0.2)
             .setTimeoutConstraint(0.0)
             .build()
 
         val setLine2Pose = Pos(Pose(21.5, 64.0), isBlue)
         val setLine2Ctrl = Pos(Pose(45.0, 55.0), isBlue)
-        val setLine2Path = pb.addPath(BezierCurve(preloadShootPose, setLine2Ctrl, setLine2Pose))
+        val setLine2Path = pb().addPath(BezierCurve(preloadShootPose, setLine2Ctrl, setLine2Pose))
             .setConstantHeadingInterpolation(LEFT)
             .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold }, IntakeCommand)
             .setTimeoutConstraint(0.0)
             .build()
 
         val shoot2Pose = Pos(Pose(61.0, 71.0), isBlue)
-        val shoot2Path = pb.addPath(BezierLine(setLine2Pose, shoot2Pose))
+        val shoot2Path = pb().addPath(BezierLine(setLine2Pose, shoot2Pose))
             .setConstantHeadingInterpolation(LEFT)
             .setTimeoutConstraint(0.0)
             .build()
 
         val gateIntakePose = Pos(Pose(14.7266, 58.0), isBlue)
-        val gateIntakePath = pb.addPath(BezierLine(shoot2Pose, gateIntakePose))
+        val gateIntakePath = pb().addPath(BezierLine(shoot2Pose, gateIntakePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
                     HeadingInterpolator.PiecewiseNode(
@@ -84,7 +84,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .build()
 
         val shootGatePose = shoot2Pose
-        val shootGatePath = pb.addPath(BezierLine(gateIntakePose, shootGatePose))
+        val shootGatePath = pb().addPath(BezierLine(gateIntakePose, shootGatePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
                     HeadingInterpolator.PiecewiseNode(
@@ -99,14 +99,14 @@ class AutonBlueCloseCoOp : AutonBase(
             .build()
 
         val setLine1Pose = Pos(Pose(21.5, 87.0), isBlue)
-        val setLine1Path = pb.addPath(BezierLine(shootGatePose, setLine1Pose))
+        val setLine1Path = pb().addPath(BezierLine(shootGatePose, setLine1Pose))
             .setConstantHeadingInterpolation(LEFT)
             .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold }, IntakeCommand)
             .setTimeoutConstraint(0.0)
             .build()
 
         val shoot1Pose = Pos(Pose(55.0, 104.0), isBlue)
-        val shoot1Path = pb.addPath(BezierLine(setLine1Pose, shoot1Pose))
+        val shoot1Path = pb().addPath(BezierLine(setLine1Pose, shoot1Pose))
             .setConstantHeadingInterpolation(DOWN_LEFT)
             .setTimeoutConstraint(0.0)
             .build()
