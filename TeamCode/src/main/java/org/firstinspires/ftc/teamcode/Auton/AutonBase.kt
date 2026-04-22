@@ -58,9 +58,12 @@ object AutonUtil {
         SetCanShootTrue,
 //        intakePower,
         maxPower,  // todo: test
-        IntakeMotorSubsystem.intake,
-        MagMotorSubsystem.intake,
-        MagblockServoSubsystem.block
+        MagblockServoSubsystem.block,
+        SequentialGroup(
+            Delay(0.3),
+            IntakeMotorSubsystem.intake,
+            MagMotorSubsystem.intake,
+        )
 
     )
     val IntakeAfterCommand = ParallelGroup(
@@ -90,8 +93,8 @@ object AutonUtil {
     )
 
     val delayStartShoot: Double = 1.2
-    val delayBeforeShoot: Double = 0.3
-    val delayAfterEachShoot: Double = 0.45 //currently at a really high #
+    val delayBeforeShoot: Double = 0.5
+    val delayAfterEachShoot: Double = 1.0 //currently at a really high #
     val delayFromRampIntake: Double = 1.0
     val delayInIntake: Double = 0.65
     val delayAtLever: Double = 0.5
@@ -102,12 +105,12 @@ object AutonUtil {
 
     fun robotShoot(): Command {
         return SequentialGroup(
-            pauseFollower,
+//            pauseFollower,
 //            stopFollower,
             Delay(delayBeforeShoot),
             ShootCommand,
             Delay(delayAfterEachShoot),
-            unPauseFollower,
+//            unPauseFollower,
             TravelCommand,
         )
     }
@@ -248,11 +251,11 @@ open class AutonBase(
         lastPose = PedroComponent.follower.pose;
         lastTime = runtime
 
-        val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);
-        if (inTriangle >= 1 && AutonUtil.canShoot) {
-            AutonUtil.canShoot = false
-            AutonUtil.robotShoot()()
-        }
+//        val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);
+//        if (inTriangle >= 1 && AutonUtil.canShoot) {
+//            AutonUtil.canShoot = false
+//            AutonUtil.robotShoot()()
+//        }
 
         telemetry.addData("canShoot", AutonUtil.canShoot)
         telemetry.addData("InTriangle", inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 8.0))
