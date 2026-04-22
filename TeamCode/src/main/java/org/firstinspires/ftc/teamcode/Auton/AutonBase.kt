@@ -205,7 +205,11 @@ open class AutonBase(
 
     var vxOld = listOf(0.0, 0.0, 0.0);
     var vyOld = listOf(0.0, 0.0, 0.0);
+    var axOld = listOf(0.0, 0.0, 0.0);
+    var ayOld = listOf(0.0, 0.0, 0.0);
     var lastPose: Pose = Pose(0.0, 0.0, 0.0);
+    var lastVX = 0.0;
+    var lastVY = 0.0;
     var lastTime = 0.0;
     var lastInTriangle = 0.0;
     override fun onUpdate() {
@@ -221,11 +225,21 @@ open class AutonBase(
         }
         val vx = vxOld.average();
         val vy = vyOld.average();
-        val dxp = dx - 1.0 * vx * (if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        val dyp = dy - 1.0 * vy * (if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        val dxyp = hypot(dxp, dyp)
+        if (axOld.isEmpty() || ayOld.isEmpty()) {
+            axOld = listOf(0.0, 0.0, 0.0);
+            ayOld = listOf(0.0, 0.0, 0.0);
+        } else {
+            axOld = axOld.slice(IntRange(1, axOld.lastIndex)) + listOf((vx - lastVX) / (runtime - lastTime));
+            ayOld = ayOld.slice(IntRange(1, ayOld.lastIndex)) + listOf((vy - lastVY) / (runtime - lastTime));
+        }
+        val ax = axOld.average();
+        val ay = ayOld.average();
+        val timeFactor = (if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        val dxp = { accelFactor: Double -> dx - 1.0 * vx * timeFactor - accelFactor * ax * timeFactor * timeFactor }
+        val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - accelFactor * ay * timeFactor * timeFactor }
+        val dxyp = { accelFactor: Double -> hypot(dxp(accelFactor), dyp(accelFactor)) }
         ShooterSubsystem.AutoAim(
-            dxyp,
+            dxyp(0.05),
             { dist ->
                 (
                         if (PedroComponent.follower.pose.y < BORD_Y)
@@ -238,17 +252,19 @@ open class AutonBase(
         TurretThetaSubsystem.SetThetaPos(
             (
                     if (PedroComponent.follower.pose.y < BORD_Y)
-                        distAndVeloToNewThetaFar(dxyp, ShooterSubsystem.velocity)
+                        distAndVeloToNewThetaFar(dxyp(0.01), ShooterSubsystem.velocity)
                     else
-                        distAndVeloToNewThetaClose(dxyp, ShooterSubsystem.velocity)
+                        distAndVeloToNewThetaClose(dxyp(0.01), ShooterSubsystem.velocity)
                     )
         )()
         TurretPhiSubsystem.AutoAim(
-            dxp,
-            dyp,
+            dxp(0.03),
+            dyp(0.03),
             PedroComponent.follower.heading.rad
         )()
         lastPose = PedroComponent.follower.pose;
+        lastVX = vx;
+        lastVY = vy;
         lastTime = runtime
 
 //        val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);

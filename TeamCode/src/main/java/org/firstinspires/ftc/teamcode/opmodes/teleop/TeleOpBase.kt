@@ -40,6 +40,7 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.ShooterSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretPhiSubsystem
 import org.firstinspires.ftc.teamcode.subsystems.outtake.turret.TurretThetaSubsystem
+import org.firstinspires.ftc.teamcode.utils.AutoAimConstants
 import org.firstinspires.ftc.teamcode.utils.AutoAimConstants.BORD_Y
 import org.firstinspires.ftc.teamcode.utils.Lefile
 import java.io.File
@@ -86,10 +87,10 @@ open class TeleOpBase(
     var vy = 0.0;
     var vxOld = listOf(0.0, 0.0, 0.0);
     var vyOld = listOf(0.0, 0.0, 0.0);
-    val vh: Angle  get() { return (PedroComponent.follower.velocity.theta.rad);}
-    val ax: Double get() { return (PedroComponent.follower.acceleration.xComponent);}
-    val ay: Double get() { return (PedroComponent.follower.acceleration.yComponent);}
-    val ah: Angle  get() { return (PedroComponent.follower.acceleration.theta.rad);}
+    var ax = 0.0;
+    var ay = 0.0
+    var axOld = listOf(0.0, 0.0, 0.0);
+    var ayOld = listOf(0.0, 0.0, 0.0);
 
 //    private var ofsX = 0.0;
 //    private var ofsY = 0.0;
@@ -176,6 +177,8 @@ open class TeleOpBase(
     }
 
     var lastPose: Pose = Pose(0.0, 0.0, 0.0);
+    var lastVX = 0.0;
+    var lastVY = 0.0;
     var lockDirection = false;
     var lastTime = 0.0;
     override fun onInit() {
@@ -757,12 +760,19 @@ open class TeleOpBase(
         }
         vx = vxOld.average();
         vy = vyOld.average();
-        dxp = dx - 1.0 * vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        dyp = dy - 1.0 * vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-//        dxp = dx - vx * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-//        dyp = dy - vy * (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        dxyp = hypot(dxp, dyp)
-//        val hp = h - (vh + ah * 0.05) * 0.5
+        if (axOld.isEmpty() || ayOld.isEmpty()) {
+            axOld = listOf(0.0, 0.0, 0.0);
+            ayOld = listOf(0.0, 0.0, 0.0);
+        } else {
+            axOld = axOld.slice(IntRange(1, axOld.lastIndex)) + listOf((vx - lastVX) / (runtime - lastTime));
+            ayOld = ayOld.slice(IntRange(1, ayOld.lastIndex)) + listOf((vy - lastVY) / (runtime - lastTime));
+        }
+        val ax = axOld.average();
+        val ay = ayOld.average();
+        val timeFactor = (if (y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
+        val dxp = { accelFactor: Double -> dx - 1.0 * vx * timeFactor - accelFactor * ax * timeFactor * timeFactor }
+        val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - accelFactor * ay * timeFactor * timeFactor }
+        val dxyp = { accelFactor: Double -> hypot(dxp(accelFactor), dyp(accelFactor)) }
         val hp = h;
 
         PanelsTelemetry.telemetry.addData("vx", vx);
@@ -771,6 +781,8 @@ open class TeleOpBase(
         PanelsTelemetry.telemetry.addData("dxp", dxp);
         PanelsTelemetry.telemetry.addData("dyp", dyp);
         lastPose = PedroComponent.follower.pose;
+        lastVX = vx;
+        lastVY = vy;
         lastTime = runtime;
 
         val rp = min(abs(hypot(vx,vy)) / 16.0, 1.0)
@@ -829,7 +841,7 @@ open class TeleOpBase(
 //                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
 //            ) 0.0 else 1.0;
             val sotmFactor = 1.0;
-            val dist = dxyp * sotmFactor + dxy * (1 - sotmFactor)
+            val dist = { accelFactor: Double -> dxyp(accelFactor) * sotmFactor + dxy * (1 - sotmFactor) }
             telemetry.addData("sotm factor", sotmFactor);
 
             if (inTriangle(x, y, 5.0) > 0) {
@@ -840,26 +852,26 @@ open class TeleOpBase(
                 // far zone
                 if (inTriangle(x, y, 36.0) == 2) {
                     ShooterSubsystem.AutoAim(
-                        dist, { dist -> distanceToVelocityFar(dist) + veloTrim }
+                        dist(0.05), { dist -> distanceToVelocityFar(dist) + veloTrim }
                     )()
                     TurretThetaSubsystem.SetThetaPos(
-                        distAndVeloToThetaFar(dist, ShooterSubsystem.velocity) + hoodTrim
+                        distAndVeloToThetaFar(dist(0.01), ShooterSubsystem.velocity) + hoodTrim
                     )()
                 }
             } else {
                 // close zone
                 if (inTriangle(x, y, 36.0) == 1) {
                     ShooterSubsystem.AutoAim(
-                        dist, { dist -> distanceToVelocityClose(dist) + veloTrim }
+                        dist(0.05), { dist -> distanceToVelocityClose(dist) + veloTrim }
                     )()
                     TurretThetaSubsystem.SetThetaPos(
-                        distAndVeloToThetaClose(dist, ShooterSubsystem.velocity) + hoodTrim
+                        distAndVeloToThetaClose(dist(0.01), ShooterSubsystem.velocity) + hoodTrim
                     )()
                 }
             }
             TurretPhiSubsystem.AutoAim(
-                dxp * sotmFactor + dx * (1 - sotmFactor),
-                dyp * sotmFactor + dy * (1 - sotmFactor),
+                dxp(0.03) * sotmFactor + dx * (1 - sotmFactor),
+                dyp(0.03) * sotmFactor + dy * (1 - sotmFactor),
                 hp, phiTrim
             )()
         } else {
