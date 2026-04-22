@@ -33,15 +33,16 @@ import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.parkRobot
 @Autonomous(name = "[COOP-21-B] Auton Blue Close CoOp", group = "Auton")
 class AutonBlueCloseCoOp : AutonBase(
     true,
-    3.5,
-    144.0 - 3.5,
+    4.5,
+    144.0 - 4.5,
     { isBlue, follower -> {
         val pb = { follower.pathBuilder() }
 
         val DOWN = Ang(270.deg.inRad, isBlue)
         val LEFT = Ang(180.deg.inRad, isBlue)
         val DOWN_LEFT = Ang(225.deg.inRad, isBlue)
-        val GATE = Ang(150.deg.inRad, isBlue)
+        val GATE_INITIAL = Ang(180.deg.inRad, isBlue)
+        val GATE = Ang(120.deg.inRad, isBlue)
 
         val FRIED = Ang(165.deg.inRad, isBlue)
 
@@ -62,7 +63,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setConstantHeadingInterpolation(LEFT)
 //            .setLinearHeadingInterpolation(LEFT, FRIED, 1.0, 0.75)
             .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold }, IntakeCommand)
-            .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold - 2.0 }, intakePower)
+            .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold - 4.0 }, intakePower)
             .setTimeoutConstraint(0.0)
             .build()
 
@@ -73,7 +74,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakePose = Pos(Pose(14.8, 57.2), isBlue)
+        val gateIntakePose = Pos(Pose(16.5, 57.2), isBlue)
         val gateIntakePath = pb().addPath(BezierLine(shoot2Pose, gateIntakePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
@@ -81,10 +82,10 @@ class AutonBlueCloseCoOp : AutonBase(
                         0.0, 0.5, HeadingInterpolator.constant(LEFT)
                     ),
                     HeadingInterpolator.PiecewiseNode(
-                        0.5, 0.8, HeadingInterpolator.linear(LEFT, GATE)
+                        0.5, 0.8, HeadingInterpolator.linear(LEFT, GATE_INITIAL)
                     ),
                     HeadingInterpolator.PiecewiseNode(
-                        0.8, 1.0, HeadingInterpolator.constant(GATE)
+                        0.8, 1.0, HeadingInterpolator.constant(GATE_INITIAL)
                     ),
                 )
             )
@@ -92,9 +93,9 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakeBackupPose = Pos(Pose(14.5, 53.7), isBlue)
+        val gateIntakeBackupPose = Pos(Pose(14.7, 53.7), isBlue)
         val gateIntakeBackupPath = pb().addPath(BezierLine(gateIntakePose, gateIntakeBackupPose))
-            .setConstantHeadingInterpolation(GATE)
+            .setLinearHeadingInterpolation(GATE_INITIAL, GATE)
             .setTimeoutConstraint(0.0)
             .build()
 

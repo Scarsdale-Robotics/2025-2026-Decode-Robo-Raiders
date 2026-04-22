@@ -50,12 +50,12 @@ public class Constants {
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(
                     0.014,
                     0,
-                    0.0009, //0.0015
+                    0.0015, //0.0015
                     0,
                     0.07
             ))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.014,
+                    0.1,
                     0.00001,
                     0.00067,
                     0.0,
