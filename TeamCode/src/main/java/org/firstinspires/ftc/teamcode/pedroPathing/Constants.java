@@ -24,14 +24,14 @@ public class Constants {
             .translationalPIDFCoefficients(new PIDFCoefficients(
                     0.1,
                     0,
-                    0.03,
+                    0.05,
                     0.025
             ))
             .translationalPIDFSwitch(4)
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(
-                    0.11,
-                    0,
                     0.05,
+                    0,
+                    0.06,
                     0.01
             ))
             .headingPIDFCoefficients(new PIDFCoefficients(

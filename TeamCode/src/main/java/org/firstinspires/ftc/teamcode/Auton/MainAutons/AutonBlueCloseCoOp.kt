@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.Auton.AutonPositions.X
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.IntakeCommand
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.ShootCommand
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.finalGoShoot
+import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotGateIntake
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotGateIntakeOneShot
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotGoShoot
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotIntake
@@ -29,8 +30,8 @@ import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotShoot
 @Autonomous(name = "[COOP-21-B] Auton Blue Close CoOp", group = "Auton")
 class AutonBlueCloseCoOp : AutonBase(
     true,
-    6.0,
-    144.0 - 6.0,
+    3.5,
+    144.0 - 3.5,
     { isBlue, follower -> {
         val pb = { follower.pathBuilder() }
 
@@ -46,11 +47,11 @@ class AutonBlueCloseCoOp : AutonBase(
 
         val preloadShootPose = Pos(Pose(51.0, 92.0), isBlue)
         val preloadPath = pb().addPath(BezierLine(startPose, preloadShootPose))
-            .setLinearHeadingInterpolation(DOWN, LEFT, 0.2)
+            .setLinearHeadingInterpolation(DOWN, LEFT, 0.3)
             .setTimeoutConstraint(0.0)
             .build()
 
-        val setLine2Pose = Pos(Pose(21.5, 64.0), isBlue)
+        val setLine2Pose = Pos(Pose(22.5, 64.0), isBlue)
         val setLine2Ctrl = Pos(Pose(45.0, 55.0), isBlue)
         val setLine2Path = pb().addPath(BezierCurve(preloadShootPose, setLine2Ctrl, setLine2Pose))
             .setConstantHeadingInterpolation(LEFT)
@@ -64,7 +65,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakePose = Pos(Pose(14.7266, 58.0), isBlue)
+        val gateIntakePose = Pos(Pose(16.0, 60.0), isBlue)
         val gateIntakePath = pb().addPath(BezierLine(shoot2Pose, gateIntakePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
@@ -83,8 +84,14 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
+        val gateIntakeBackupPose = Pos(Pose(16.0, 57.0), isBlue)
+        val gateIntakeBackupPath = pb().addPath(BezierLine(gateIntakePose, gateIntakeBackupPose))
+            .setConstantHeadingInterpolation(GATE)
+            .setTimeoutConstraint(0.0)
+            .build()
+
         val shootGatePose = shoot2Pose
-        val shootGatePath = pb().addPath(BezierLine(gateIntakePose, shootGatePose))
+        val shootGatePath = pb().addPath(BezierLine(gateIntakeBackupPose, shootGatePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
                     HeadingInterpolator.PiecewiseNode(
@@ -98,7 +105,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val setLine1Pose = Pos(Pose(21.5, 87.0), isBlue)
+        val setLine1Pose = Pos(Pose(22.5, 87.0), isBlue)
         val setLine1Path = pb().addPath(BezierLine(shootGatePose, setLine1Pose))
             .setConstantHeadingInterpolation(LEFT)
             .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold }, IntakeCommand)
@@ -116,7 +123,7 @@ class AutonBlueCloseCoOp : AutonBase(
             ParallelGroup(
                 FollowPath(preloadPath),
                 SequentialGroup(
-                    Delay(1.0),
+                    Delay(1.5),
                     ShootCommand
                 )
             ),
@@ -127,24 +134,24 @@ class AutonBlueCloseCoOp : AutonBase(
             robotShoot(),
 
             // 9
-            robotGateIntakeOneShot(gateIntakePath),
+            robotGateIntake(gateIntakePath, gateIntakeBackupPath),
             robotGoShoot(shootGatePath),
             robotShoot(),
 
             // 12
-            robotGateIntakeOneShot(gateIntakePath),
+            robotGateIntake(gateIntakePath, gateIntakeBackupPath),
             robotGoShoot(shootGatePath),
             robotShoot(),
 
             // 15
-            robotGateIntakeOneShot(gateIntakePath),
+            robotGateIntake(gateIntakePath, gateIntakeBackupPath),
             robotGoShoot(shootGatePath),
             robotShoot(),
 
-            // 18
-            robotGateIntakeOneShot(gateIntakePath),
-            robotGoShoot(shootGatePath),
-            robotShoot(),
+//            // 18
+//            robotGateIntake(gateIntakePath, gateIntakeBackupPath),
+//            robotGoShoot(shootGatePath),
+//            robotShoot(),
 
             // 21
             robotIntake(setLine1Path),

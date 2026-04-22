@@ -93,11 +93,11 @@ object AutonUtil {
     )
 
     val delayStartShoot: Double = 1.2
-    val delayBeforeShoot: Double = 0.5
-    val delayAfterEachShoot: Double = 1.0 //currently at a really high #
-    val delayFromRampIntake: Double = 1.0
+    val delayBeforeShoot: Double = 0.2
+    val delayAfterEachShoot: Double = 0.3 //currently at a really high #
+    val delayFromRampIntake: Double = 0.88
     val delayInIntake: Double = 0.65
-    val delayAtLever: Double = 0.5
+    val delayAtLever: Double = 0.1
 
     val goalX = 5.0
     val goalY = 144.0 - 5.0
@@ -125,6 +125,7 @@ object AutonUtil {
             TravelCommand,
             FollowPath(followedPath!!), //robot goes to intake
             Delay(delayAtLever),
+            IntakeCommand,
             FollowPath(goBackPath!!),
             Delay(delayFromRampIntake),
         )
@@ -235,8 +236,8 @@ open class AutonBase(
         val ax = axOld.average();
         val ay = ayOld.average();
         val timeFactor = (if (PedroComponent.follower.pose.y < BORD_Y) distanceToTimeFar(dxy) else distanceToTimeClose(dxy))
-        val dxp = { accelFactor: Double -> dx - 1.0 * vx * timeFactor - accelFactor * ax * timeFactor * timeFactor }
-        val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - accelFactor * ay * timeFactor * timeFactor }
+        val dxp = { accelFactor: Double -> dx - 1.0 * vx * timeFactor - 0.0 * ax * timeFactor * timeFactor }
+        val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - 0.0 * ay * timeFactor * timeFactor }
         val dxyp = { accelFactor: Double -> hypot(dxp(accelFactor), dyp(accelFactor)) }
         ShooterSubsystem.AutoAim(
             dxyp(0.05),
