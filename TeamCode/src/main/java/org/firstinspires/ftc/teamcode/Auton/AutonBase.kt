@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode.Auton.MainAutons
 
 import com.bylazar.configurables.annotations.Configurable
 import com.bylazar.telemetry.PanelsTelemetry
+import com.pedropathing.follower.Follower
 import com.pedropathing.geometry.BezierCurve
 import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.HeadingInterpolator
+import com.pedropathing.paths.PathBuilder
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
 import dev.nextftc.core.commands.Command
@@ -54,7 +56,8 @@ object AutonUtil {
 
     val IntakeCommand = ParallelGroup(
         SetCanShootTrue,
-        intakePower,
+//        intakePower,
+        maxPower,  // todo: test
         IntakeMotorSubsystem.intake,
         MagMotorSubsystem.intake,
         MagblockServoSubsystem.block
@@ -62,6 +65,12 @@ object AutonUtil {
     )
     val IntakeAfterCommand = ParallelGroup(
         SetCanShootTrue,
+        maxPower,
+        IntakeMotorSubsystem.intake,
+        MagMotorSubsystem.intake,
+        MagblockServoSubsystem.block
+    )
+    val IntakeAfterCommandFinal = ParallelGroup(
         maxPower,
         IntakeMotorSubsystem.intake,
         MagMotorSubsystem.intake,
@@ -117,7 +126,23 @@ object AutonUtil {
             Delay(delayFromRampIntake),
         )
     }
-
+    fun robotGateIntakeOneShot(followedPath: PathChain): Command {
+        return SequentialGroup(
+            TravelCommand,
+            FollowPath(followedPath),
+            Delay(delayFromRampIntake),
+        )
+    }
+    fun finalGoShoot(followedPath: PathChain?): Command {
+        return ParallelGroup(
+            SequentialGroup(
+                IntakeAfterCommandFinal,
+                Delay(delayInIntake),
+                TravelCommand,
+            ),
+            FollowPath(followedPath!!, true)
+        )
+    }
     fun robotGoShoot(followedPath: PathChain?): Command {
         return ParallelGroup(
             SequentialGroup(
@@ -135,7 +160,7 @@ open class AutonBase(
     private val isBlue: Boolean,
     private val goalX: Double,
     private val goalY: Double,
-    private val autonomousRoutine: (Boolean) -> Void,
+    private val autonomousRoutine: (Boolean, Follower) -> Command,
 ) : NextFTCOpMode() {
     //////////////////////
     ////Base Variables////
@@ -267,7 +292,7 @@ open class AutonBase(
     /** This method is called once at the start of the OpMode.
      * It runs all the setup actions, including building paths and starting the path system  */
     override fun onStartButtonPressed() {
-        autonomousRoutine(isBlue)
+        autonomousRoutine(isBlue, PedroComponent.follower)()
         pathStarted = true
 
         opmodeTimer!!.resetTimer()

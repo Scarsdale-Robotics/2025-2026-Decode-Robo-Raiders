@@ -134,6 +134,15 @@ object AutonPositions {
     fun Pos(bluePose: Pose, isBlue: Boolean): Pose {
         return if (isBlue) Blue(bluePose) else Red(bluePose);
     }
+    fun Ang(rads: Double, isBlue: Boolean): Double {
+        return if (isBlue) Blue(rads) else Red(rads);
+    }
+    fun X(blueX: Double, isBlue: Boolean): Double {
+        return if (isBlue) blueX else 144.0 - blueX;
+    }
+    fun Y(blueY: Double, isBlue: Boolean): Double {
+        return blueY;
+    }
 
     fun blueRedConvertAngle (x : Double): Double {
         var newAngle = x
