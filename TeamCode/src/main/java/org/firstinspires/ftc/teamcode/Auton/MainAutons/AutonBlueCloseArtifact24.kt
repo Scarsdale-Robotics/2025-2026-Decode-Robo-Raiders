@@ -138,20 +138,23 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setLinearHeadingInterpolation(
                 AutonPositions.Blue(AutonPositions.startPoseClose).heading,
                 AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
-                0.85
+                0.7 //changed from 0.85
             )
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
             .build()
         //1st Intake
         robotIntake1 = PedroComponent.follower.pathBuilder()
             .addPath(
-                BezierCurve(
+                BezierLine(
                     AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.intake1Pos24CPos),
                     AutonPositions.Blue(AutonPositions.intake1Pos24)
                 )
             )
-            .setTangentHeadingInterpolation()
+            .setLinearHeadingInterpolation(
+                AutonPositions.shootPoseClose.heading,
+                AutonPositions.intake1Pos24.heading,
+                0.35 //might be a bit too high
+            )
             .addParametricCallback(0.65, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG  //todo: nathan comment, I think this can be full motor speed
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake1Pos24).heading)
             .build()
@@ -163,8 +166,10 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                     AutonPositions.Blue(AutonPositions.shootPoseClose)
                 )
             )
-            .setHeadingInterpolation(
-                HeadingInterpolator.tangent.reverse()
+            .setLinearHeadingInterpolation(
+                Math.toRadians(180.0),
+                Math.toRadians(210.0),
+                0.7 //changed from 0.85
             )
             .setTimeoutConstraint(0.0)
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.start24ShootPos).heading)
@@ -204,6 +209,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
 //            .build()
 
         //backs up from lever to stay legal  // todo : nathan note, I think we can cut the backup
+        //Viir - I don't think we need this
         robotBackupFromRamp = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
@@ -221,6 +227,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .build()
 
         //Lever Go Shoot
+        //looks fine
         LeverGoShoot = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierCurve(
@@ -245,7 +252,11 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
                 )
             )
             .addParametricCallback(0.95, IntakeCommand) //WHERE INTAKE COMMAND WILL NOW GO IG
-            .setTangentHeadingInterpolation()
+            .setLinearHeadingInterpolation(
+                Math.toRadians(210.0),
+                Math.toRadians(180.0),
+                0.3 //Viir note - this is probably not right j tune it
+            )
 //            .setConstantHeadingInterpolation(AutonPositions.Blue(AutonPositions.intake2Pos24).heading)
             .build()
 
@@ -266,6 +277,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .build()
 
         //3rd Intake
+        //looks fine to me
         robotIntake3 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
@@ -282,6 +294,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .build()
 
         //3rd Go Shoot
+        //looks fine
         robotGoToShoot3 = PedroComponent.follower.pathBuilder()
             .addPath(
                 BezierLine(
@@ -297,76 +310,7 @@ class AutonBlueCloseArtifact24: NextFTCOpMode() {
             .setTimeoutConstraint(0.0)
             .build()
         //3rd Intake
-        roboCommonIntake = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierCurve(
-                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.commonIntakeControlPos24),
-                    AutonPositions.Blue(AutonPositions.commonIntakePos24)
-                )
-            )
-            .setLinearHeadingInterpolation(
-            AutonPositions.Blue(AutonPositions.shootPoseFar).heading,
-            AutonPositions.Blue(AutonPositions.commonIntakePos24).heading,
-            0.75
-            )
-            .addParametricCallback(0.95, IntakeCommand)
-            .build()
-
         //3rd Go Shoot
-        roboCommonGoShoot = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierLine(
-                    AutonPositions.Blue(AutonPositions.commonIntakePos),
-                    AutonPositions.Blue(AutonPositions.shootPoseClose)
-                )
-            )
-            .setHeadingInterpolation(
-                HeadingInterpolator.tangent.reverse()
-            )
-            .setTimeoutConstraint(0.0)
-//            .setLinearHeadingInterpolation(
-//                AutonPositions.Blue(AutonPositions.commonIntakePos).heading,
-//                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
-//                0.75
-//            )
-            .build()
-        roboSPEDIntake = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierCurve(
-                    AutonPositions.Blue(AutonPositions.shootPoseClose),
-                    AutonPositions.Blue(AutonPositions.spedPosition24ControlPos),
-                    AutonPositions.Blue(AutonPositions.spedPosition24ControlPos2),
-                    AutonPositions.Blue(AutonPositions.spedPosition24)
-                )
-            )
-            .setTangentHeadingInterpolation()
-//            .setLinearHeadingInterpolation(
-//                AutonPositions.Blue(AutonPositions.shootPoseFar).heading,
-//                AutonPositions.Blue(AutonPositions.commonIntakePos24).heading,
-//                0.75
-//            )
-            .addParametricCallback(0.3, IntakeAfterCommand)
-            .build()
-
-        //3rd Go Shoot
-        roboSPEDGoShoot = PedroComponent.follower.pathBuilder()
-            .addPath(
-                BezierLine(
-                    AutonPositions.Blue(AutonPositions.commonIntakePos),
-                    AutonPositions.Blue(AutonPositions.shootPoseClose)
-                )
-            )
-            .setHeadingInterpolation(
-                HeadingInterpolator.tangent.reverse()
-            )
-//            .setLinearHeadingInterpolation(
-//                AutonPositions.Blue(AutonPositions.commonIntakePos).heading,
-//                AutonPositions.Blue(AutonPositions.shootPoseClose).heading,
-//                0.75
-//            )
-            .setTimeoutConstraint(0.0)
-            .build()
         //Go Park
         robotPark = PedroComponent.follower.pathBuilder()
             .addPath(
