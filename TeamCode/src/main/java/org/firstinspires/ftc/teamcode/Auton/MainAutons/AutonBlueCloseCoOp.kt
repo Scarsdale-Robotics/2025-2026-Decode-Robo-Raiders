@@ -31,7 +31,7 @@ import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotIntake
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotShoot
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.parkRobot
 
-@Autonomous(name = "[COOP-21-B] Auton Blue Close CoOp", group = "Auton")
+@Autonomous(name = "[C-COOP-18-B] Auton Blue Close CoOp", group = "Auton")
 class AutonBlueCloseCoOp : AutonBase(
     true,
     3.5,

@@ -5,7 +5,7 @@ import com.pedropathing.geometry.Pose
 object AutonPositions {
     //base positions are in blue coordinates
 
-    val startPose = Pose(63.7, 8.503, Math.toRadians(90.0)) // Start Pose of our robot.
+    val startPose = Pose(63.7, 8.503, Math.toRadians(180.0)) // Start Pose of our robot.
     val pushTeammatePose = Pose(55.7, 8.503, Math.toRadians(90.0)) // Start Pose of our robot.
 
 //    val startPoseClose = Pose(33.222, 135.5422, Math.toRadians(270.0)) // Start Pose of our robot.
@@ -17,7 +17,7 @@ object AutonPositions {
 
     val farShootPoseCoOp = Pose(56.9, 12.7, Math.toRadians(180.0));
     val HPZCoOpPose = Pose(14.0, 9.4, Math.toRadians(180.0));
-    val farParkCoOp = Pose(40.0, 17.1, Math.toRadians(180.0))
+    val farParkCoOp = Pose(44.4, 15.3, Math.toRadians(180.0))
 
     //====Push Auton====
     val startPoseFarPush = Pose(63.714, 10.7, Math.toRadians(270.0))
