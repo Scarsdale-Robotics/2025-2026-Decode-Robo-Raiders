@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Ang
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.X
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.IntakeCommand
+import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.TravelCommand
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.intakePower
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.maxPower
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.ShootCommand
@@ -33,16 +34,16 @@ import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.parkRobot
 @Autonomous(name = "[COOP-21-B] Auton Blue Close CoOp", group = "Auton")
 class AutonBlueCloseCoOp : AutonBase(
     true,
-    4.5,
-    144.0 - 4.5,
+    0.0,
+    144.0 - 3.5,
     { isBlue, follower -> {
         val pb = { follower.pathBuilder() }
 
         val DOWN = Ang(270.deg.inRad, isBlue)
         val LEFT = Ang(180.deg.inRad, isBlue)
         val DOWN_LEFT = Ang(225.deg.inRad, isBlue)
-        val GATE_INITIAL = Ang(180.deg.inRad, isBlue)
-        val GATE = Ang(120.deg.inRad, isBlue)
+        val GATE_INITIAL = Ang(150.deg.inRad, isBlue)
+        val GATE = Ang(110.deg.inRad, isBlue)
 
         val FRIED = Ang(165.deg.inRad, isBlue)
 
@@ -57,19 +58,31 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val setLine2Pose = Pos(Pose(19.5, 60.0), isBlue)
-        val setLine2Ctrl = Pos(Pose(48.9, 59.2), isBlue)
+        val setLine2Pose = Pos(Pose(13.7, 57.0), isBlue) //19.5, 60.0
+        val setLine2Ctrl = Pos(Pose(52.9, 55.6), isBlue) //48.9, 59.2
+
         val setLine2Path = pb().addPath(BezierCurve(preloadShootPose, setLine2Ctrl, setLine2Pose))
             .setConstantHeadingInterpolation(LEFT)
 //            .setLinearHeadingInterpolation(LEFT, FRIED, 1.0, 0.75)
             .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold }, IntakeCommand)
-            .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold - 4.0 }, intakePower)
+//            .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold - 4.0 }, intakePower)
             .setTimeoutConstraint(0.0)
             .build()
 
+        val experi_L2 = Pos(Pose(19.1, 61.0), isBlue)
+        val experi_L2Ctrl = Pos(Pose(24.8, 57.0), isBlue)
+        val experiPathL2 = pb().addPath(BezierCurve(setLine2Pose, experi_L2Ctrl, experi_L2))
+            .setConstantHeadingInterpolation(LEFT)
+//            .setLinearHeadingInterpolation(LEFT, FRIED, 1.0, 0.75)
+//            .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold }, IntakeCommand)
+//            .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold - 4.0 }, intakePower)
+            .setTimeoutConstraint(0.0)
+            .build()
+
+
         val shoot2Pose = Pos(Pose(61.0, 71.0), isBlue)
-        val shoot2Path = pb().addPath(BezierLine(setLine2Pose, shoot2Pose))
-            .addParametricCallback(0.0, maxPower)
+        val shoot2Path = pb().addPath(BezierLine(experi_L2, shoot2Pose)) //was setLine2
+//            .addParametricCallback(0.0, maxPower)
             .setConstantHeadingInterpolation(LEFT)
             .setTimeoutConstraint(0.0)
             .build()
@@ -93,7 +106,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakeBackupPose = Pos(Pose(14.7, 53.7), isBlue)
+        val gateIntakeBackupPose = Pos(Pose(15.1, 53.7), isBlue)
         val gateIntakeBackupPath = pb().addPath(BezierLine(gateIntakePose, gateIntakeBackupPose))
             .setLinearHeadingInterpolation(GATE_INITIAL, GATE)
             .setTimeoutConstraint(0.0)
@@ -144,6 +157,8 @@ class AutonBlueCloseCoOp : AutonBase(
 
             // 6
             robotIntake(setLine2Path),
+            FollowPath(experiPathL2),
+
             robotGoShoot(shoot2Path),
             robotShoot(),
 
@@ -171,7 +186,7 @@ class AutonBlueCloseCoOp : AutonBase(
             robotIntake(setLine1Path),
             finalGoShoot(shoot1Path),
 
-            robotShoot(),
+            ShootCommand,
 //            parkRobot(parkPath)
 
         )
