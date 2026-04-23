@@ -10,7 +10,8 @@ object AutonPositions {
 
 //    val startPoseClose = Pose(33.222, 135.5422, Math.toRadians(270.0)) // Start Pose of our robot.
 //    val startPoseClose = Pose(17.1887, 115.3623, Math.toRadians(270.0))
-    val startPoseClose = Pose(15.0, 115.3623, Math.toRadians(270.0))
+//    val startPoseClose = Pose(15.0, 115.3623, Math.toRadians(270.0))
+    val startPoseClose = Pose(17.32, 118.3623, Math.toRadians(270.0))
 
     val startAutonControlPos = Pose(95.3, 58.5)
 

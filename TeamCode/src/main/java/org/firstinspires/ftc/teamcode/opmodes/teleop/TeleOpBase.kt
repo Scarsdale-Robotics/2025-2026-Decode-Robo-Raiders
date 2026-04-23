@@ -380,7 +380,7 @@ open class TeleOpBase(
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         PedroComponent.follower.setStartingPose(Pose(startX, startY, startH))
-        PedroComponent.follower.pose = Pose(startX, startY, startH)
+//        PedroComponent.follower.pose = Pose(startX, startY, startH)
         PedroComponent.follower.update()
 //        cv = CVSubsystem_VisionPortal(startX, startY, startH, hardwareMap)
 
@@ -850,28 +850,28 @@ open class TeleOpBase(
 
             if (y < BORD_Y) {
                 // far zone
-                if (inTriangle(x, y, 36.0) == 2) {
+//                if (inTriangle(x, y, 64.0) == 2) {
                     ShooterSubsystem.AutoAim(
-                        dist(0.05), { dist -> distanceToVelocityFar(dist) + veloTrim }
+                        dist(0.0), { dist -> distanceToVelocityFar(dist) + veloTrim }
                     )()
                     TurretThetaSubsystem.SetThetaPos(
-                        distAndVeloToThetaFar(dist(0.01), ShooterSubsystem.velocity) + hoodTrim
+                        distAndVeloToThetaFar(dist(0.0), ShooterSubsystem.velocity) + hoodTrim
                     )()
-                }
+//                }
             } else {
                 // close zone
-                if (inTriangle(x, y, 36.0) == 1) {
+//                if (inTriangle(x, y, 64.0) == 1) {
                     ShooterSubsystem.AutoAim(
-                        dist(0.05), { dist -> distanceToVelocityClose(dist) + veloTrim }
+                        dist(0.0), { dist -> distanceToVelocityClose(dist) + veloTrim }
                     )()
                     TurretThetaSubsystem.SetThetaPos(
-                        distAndVeloToThetaClose(dist(0.01), ShooterSubsystem.velocity) + hoodTrim
+                        distAndVeloToThetaClose(dist(0.0), ShooterSubsystem.velocity) + hoodTrim
                     )()
-                }
+//                }
             }
             TurretPhiSubsystem.AutoAim(
-                dxp(0.03) * sotmFactor + dx * (1 - sotmFactor),
-                dyp(0.03) * sotmFactor + dy * (1 - sotmFactor),
+                dxp(0.0) * sotmFactor + dx * (1 - sotmFactor),
+                dyp(0.0) * sotmFactor + dy * (1 - sotmFactor),
                 hp, phiTrim
             )()
         } else {
