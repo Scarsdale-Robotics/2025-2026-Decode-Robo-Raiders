@@ -87,7 +87,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakePose = Pos(Pose(16.5+2.32, 57.2+3.0), isBlue)
+        val gateIntakePose = Pos(Pose(15.25, 57.2), isBlue)
         val gateIntakePath = pb().addPath(BezierLine(shoot2Pose, gateIntakePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
@@ -106,7 +106,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakeBackupPose = Pos(Pose(15.1+2.32, 53.7+3.0), isBlue)
+        val gateIntakeBackupPose = Pos(Pose(15.0, 54.2), isBlue)
         val gateIntakeBackupPath = pb().addPath(BezierLine(gateIntakePose, gateIntakeBackupPose))
             .setLinearHeadingInterpolation(GATE_INITIAL, GATE)
             .setTimeoutConstraint(0.0)
