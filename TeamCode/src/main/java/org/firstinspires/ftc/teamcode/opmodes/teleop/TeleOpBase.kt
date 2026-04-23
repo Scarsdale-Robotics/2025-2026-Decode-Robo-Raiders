@@ -448,8 +448,9 @@ open class TeleOpBase(
 ////        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
 //        PedroComponent.follower.pose = Pose(startX, startY, startH)
 
+        MagblockServoSubsystem.unblock();
         MagblockServoSubsystem.block()
-        MagblockServoSubsystem.unblock()
+//        MagblockServoSubsystem.unblock()
 //        TurretThetaSubsystem.SetThetaPos(0.63)()
 
 //        gamepad1.setLedColor(0.0, 0.0, 255.0, -1)
@@ -524,10 +525,11 @@ open class TeleOpBase(
             MagblockServoSubsystem.block();
             (InstantCommand { lowerOverridePower = 0.001 })();
             SequentialGroup(
-                Delay(0.33),
+//                Delay(0.33),
                 InstantCommand { lowerOverridePower = 0.0 }
             )()
-        } whenBecomesFalse MagblockServoSubsystem.unblock
+        }
+//        whenBecomesFalse MagblockServoSubsystem.unblock
 
 
 //        val magServoDrive = MagServoSubsystem.DriverCommandDefaultOn(
@@ -539,13 +541,16 @@ open class TeleOpBase(
 
         Gamepads.gamepad1.rightTrigger.greaterThan(0.1) whenBecomesTrue ParallelGroup(
             MagblockServoSubsystem.unblock,
-            InstantCommand {
-                lowerOverridePower = 1.0;
-                ShooterSubsystem.isShooting = true;
-            },
+            SequentialGroup(
+                Delay(0.2),
+                InstantCommand {
+                    lowerOverridePower = 1.0;
+                    ShooterSubsystem.isShooting = true;
+                },
+            )
         ) whenBecomesFalse {
             lowerOverridePower = 0.0;
-//            MagblockServoSubsystem.block()
+            MagblockServoSubsystem.block()
             ShooterSubsystem.isShooting = false
         }
 
