@@ -9,7 +9,6 @@ import com.pedropathing.geometry.BezierLine
 import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
 import com.pedropathing.util.Timer
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous
 import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
@@ -58,7 +57,7 @@ import kotlin.math.hypot
 //Main Autons should be: Auton__ __Artifact & Auton__ __ CoOp
 //@Autonomous(name = "[COOP-21-B] Auton Blue Far CoOp", group = "Auton")
 @Configurable
-class AutonBlueFarCoOp: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
+class AutonBlueFarCoOpDEPRECATED: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to backplate)
     //////////////////////
     ////Base Variables////
     //////////////////////
