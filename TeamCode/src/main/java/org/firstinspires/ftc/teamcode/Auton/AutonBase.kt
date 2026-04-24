@@ -93,7 +93,7 @@ object AutonUtil {
     )
 
     val delayStartShoot: Double = 1.2
-    val delayBeforeShoot: Double = 0.19
+    val delayBeforeShoot: Double = 0.2
     val delayAfterEachShoot: Double = 0.38 //currently at a really high #
     val delayFromRampIntake: Double = 0.66000000676767676767676767
     val delayInIntake: Double = 0.5
@@ -249,7 +249,7 @@ open class AutonBase(
         val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - accelFactor * ay * timeFactor * timeFactor }
         val dxyp = { accelFactor: Double -> hypot(dxp(accelFactor), dyp(accelFactor)) }
         ShooterSubsystem.AutoAim(
-            dxyp(0.0),
+            dxyp(0.02),
             { dist ->
                 (
                         if (PedroComponent.follower.pose.y < BORD_Y)
@@ -262,14 +262,14 @@ open class AutonBase(
         TurretThetaSubsystem.SetThetaPos(
             (
                     if (PedroComponent.follower.pose.y < BORD_Y)
-                        distAndVeloToNewThetaFar(dxyp(0.0), ShooterSubsystem.velocity)
+                        distAndVeloToNewThetaFar(dxyp(0.02), ShooterSubsystem.velocity)
                     else
-                        distAndVeloToNewThetaClose(dxyp(0.0), ShooterSubsystem.velocity)
+                        distAndVeloToNewThetaClose(dxyp(0.02), ShooterSubsystem.velocity)
                     )
         )()
         TurretPhiSubsystem.AutoAim(
-            dxp(0.0),
-            dyp(0.0),
+            dxp(0.02),
+            dyp(0.02),
             PedroComponent.follower.heading.rad
         )()
         lastPose = PedroComponent.follower.pose;
@@ -288,6 +288,7 @@ open class AutonBase(
         telemetry.addData("x", PedroComponent.follower.pose.x)
         telemetry.addData("y", PedroComponent.follower.pose.y)
         telemetry.addData("heading", PedroComponent.follower.pose.heading)
+        telemetry.addData("shooter necessary", distanceToVelocityFar(dxyp(0.0)))
         telemetry.update()
 
         PanelsTelemetry.telemetry.update()
