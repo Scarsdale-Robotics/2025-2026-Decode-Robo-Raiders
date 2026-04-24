@@ -165,7 +165,7 @@ class AutonBlueFarCoOp : AutonBase(
         SequentialGroup(
             // 3
             SequentialGroup(
-                Delay(1.2),
+                Delay(1.5),
                 robotShoot()
             ),
 
@@ -176,6 +176,7 @@ class AutonBlueFarCoOp : AutonBase(
 
             // 9
             robotIntake(setCommonPath),
+            Delay(0.2),
             robotGoShoot(setCommonShootPath),
             robotShoot(),
 
@@ -189,7 +190,7 @@ class AutonBlueFarCoOp : AutonBase(
             robotGoShoot(getCustomShootPath()),
             robotShoot(),
 
-//            // 18
+            // 18
             robotIntake(getBlobPath()),
             robotGoShoot(getCustomShootPath()),
             robotShoot(),
