@@ -46,6 +46,7 @@ class AutonBlueFarCoOp : AutonBase(
     144.0 - 3.5,
     AutonPositions.Blue(AutonPositions.startPose),
     { isBlue, follower -> {
+        var Portal = CvBallDetectionP(hardwareMap)
         val pb = { follower.pathBuilder() }
 
         val DOWN = Ang(270.deg.inRad, isBlue)
@@ -90,13 +91,11 @@ class AutonBlueFarCoOp : AutonBase(
             var Blobs: MutableList<ColorBlobLocatorProcessor.Blob>? = null
             var cd = 0.0
 
-            Portal = CvBallDetectionP(hardwareMap)
-
             var min = Double.Companion.MAX_VALUE // reset each loop iteration
             var Minb: ColorBlobLocatorProcessor.Blob? = null
             var rad = -1.0
 
-            Portal.updateDetections()
+            Portal!!.updateDetections()
             Blobs = Portal.getBlobs()
 
             if (Blobs != null && !Blobs.isEmpty()) {
@@ -117,7 +116,7 @@ class AutonBlueFarCoOp : AutonBase(
                     if (cd < min) {
                         min = cd
                         rad = theta
-//                        Minb = b
+                        Minb = b
                     }
                 }
             }
@@ -140,6 +139,7 @@ class AutonBlueFarCoOp : AutonBase(
                     .addCallback({ X(follower.pose.x, isBlue) < xCommonThreshold }, IntakeCommand)
                     .build()
             }
+            Portal.close();
             return setCommonPath!!
         }
 
@@ -201,6 +201,7 @@ class AutonBlueFarCoOp : AutonBase(
             robotShoot(),
 
             parkRobot(parkPath)
+
 
         )
     }() }

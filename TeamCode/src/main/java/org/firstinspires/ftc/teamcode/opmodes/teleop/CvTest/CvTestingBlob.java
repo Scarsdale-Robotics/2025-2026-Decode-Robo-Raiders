@@ -22,7 +22,6 @@ public class CvTestingBlob extends LinearOpMode {
         this.Portal = new CvBallDetectionP(hardwareMap);
         waitForStart();
 
-
         while (opModeIsActive()) {
             double min = Double.MAX_VALUE;  // reset each loop iteration
             ColorBlobLocatorProcessor.Blob Minb = null;
