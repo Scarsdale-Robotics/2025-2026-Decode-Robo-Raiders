@@ -180,25 +180,25 @@ class AutonBlueFarCoOp : AutonBase(
             robotGoShoot(setCommonShootPath),
             robotShoot(),
 
-//            // 12
-//            robotIntake(getBlobPath()),
-//            robotGoShoot(getCustomShootPath()),
-//            robotShoot(),
-//
-//            // 15
-//            robotIntake(getBlobPath()),
-//            robotGoShoot(getCustomShootPath()),
-//            robotShoot(),
-//
-//            // 18
-//            robotIntake(getBlobPath()),
-//            robotGoShoot(getCustomShootPath()),
-//            robotShoot(),
-//
-//            // 21
-//            robotIntake(getBlobPath()),
-//            robotGoShoot(getCustomShootPath()),
-//            robotShoot(),
+            // 12
+            robotIntake(getBlobPath()),
+            robotGoShoot(getCustomShootPath()),
+            robotShoot(),
+
+            // 15
+            robotIntake(getBlobPath()),
+            robotGoShoot(getCustomShootPath()),
+            robotShoot(),
+
+            // 18
+            robotIntake(getBlobPath()),
+            robotGoShoot(getCustomShootPath()),
+            robotShoot(),
+
+            // 21
+            robotIntake(getBlobPath()),
+            robotGoShoot(getCustomShootPath()),
+            robotShoot(),
 
             parkRobot(parkPath)
 
