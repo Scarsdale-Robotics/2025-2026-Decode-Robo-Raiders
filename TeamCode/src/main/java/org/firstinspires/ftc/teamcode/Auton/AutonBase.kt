@@ -288,6 +288,7 @@ open class AutonBase(
         telemetry.addData("x", PedroComponent.follower.pose.x)
         telemetry.addData("y", PedroComponent.follower.pose.y)
         telemetry.addData("heading", PedroComponent.follower.pose.heading)
+        telemetry.addData("shooter necessary", distanceToVelocityFar(dxyp(0.0)))
         telemetry.update()
 
         PanelsTelemetry.telemetry.update()

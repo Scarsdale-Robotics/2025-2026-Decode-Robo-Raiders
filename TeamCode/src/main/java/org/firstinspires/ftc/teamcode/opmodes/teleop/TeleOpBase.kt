@@ -542,10 +542,12 @@ open class TeleOpBase(
         Gamepads.gamepad1.rightTrigger.greaterThan(0.1) whenBecomesTrue ParallelGroup(
             MagblockServoSubsystem.unblock,
             SequentialGroup(
-                Delay(0.5),
+                Delay(0.2),
                 InstantCommand {
-                    lowerOverridePower = 1.0;
-                    ShooterSubsystem.isShooting = true;
+                    if (gamepad1.right_trigger > 0.1) {
+                        lowerOverridePower = 1.0;
+                        ShooterSubsystem.isShooting = true;
+                    }
                 },
             )
         ) whenBecomesFalse {

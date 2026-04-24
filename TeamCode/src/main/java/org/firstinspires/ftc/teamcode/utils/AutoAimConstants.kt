@@ -35,7 +35,7 @@ object AutoAimConstants {
 
     // first ball time
     fun distanceToTimeFar(d: Double): Double {
-        return (2.43 + -0.0304 * d + 1.3E-04 * d * d) + 0.13
+        return (2.43 + -0.0304 * d + 1.3E-04 * d * d) + 0.1
     }
 
 
