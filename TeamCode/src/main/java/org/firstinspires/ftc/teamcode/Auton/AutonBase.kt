@@ -247,30 +247,30 @@ open class AutonBase(
         val dxp = { accelFactor: Double -> dx - 1.0 * vx * timeFactor - accelFactor * ax * timeFactor * timeFactor }
         val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - accelFactor * ay * timeFactor * timeFactor }
         val dxyp = { accelFactor: Double -> hypot(dxp(accelFactor), dyp(accelFactor)) }
-        ShooterSubsystem.AutoAim(
-            dxyp(0.0),
-            { dist ->
-                (
-                        if (PedroComponent.follower.pose.y < BORD_Y)
-                            distanceToVelocityFar(dist)
-                        else
-                            distanceToVelocityClose(dist)
-                        )
-            }
-        )()
-        TurretThetaSubsystem.SetThetaPos(
-            (
-                    if (PedroComponent.follower.pose.y < BORD_Y)
-                        distAndVeloToNewThetaFar(dxyp(0.0), ShooterSubsystem.velocity)
-                    else
-                        distAndVeloToNewThetaClose(dxyp(0.0), ShooterSubsystem.velocity)
-                    )
-        )()
-        TurretPhiSubsystem.AutoAim(
-            dxp(0.0),
-            dyp(0.0),
-            PedroComponent.follower.heading.rad
-        )()
+//        ShooterSubsystem.AutoAim(
+//            dxyp(0.0),
+//            { dist ->
+//                (
+//                        if (PedroComponent.follower.pose.y < BORD_Y)
+//                            distanceToVelocityFar(dist)
+//                        else
+//                            distanceToVelocityClose(dist)
+//                        )
+//            }
+//        )()
+//        TurretThetaSubsystem.SetThetaPos(
+//            (
+//                    if (PedroComponent.follower.pose.y < BORD_Y)
+//                        distAndVeloToNewThetaFar(dxyp(0.0), ShooterSubsystem.velocity)
+//                    else
+//                        distAndVeloToNewThetaClose(dxyp(0.0), ShooterSubsystem.velocity)
+//                    )
+//        )()
+//        TurretPhiSubsystem.AutoAim(
+//            dxp(0.0),
+//            dyp(0.0),
+//            PedroComponent.follower.heading.rad
+//        )()
         lastPose = PedroComponent.follower.pose;
         lastVX = vx;
         lastVY = vy;
