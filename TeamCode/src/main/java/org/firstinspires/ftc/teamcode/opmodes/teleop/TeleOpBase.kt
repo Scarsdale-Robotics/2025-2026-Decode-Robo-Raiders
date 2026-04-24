@@ -793,7 +793,7 @@ open class TeleOpBase(
         lastTime = runtime;
 
         val rp = min(abs(hypot(vx,vy)) / 16.0, 1.0)
-        gamepad2.rumble(rp * (1 - y / 144.0), rp * (y / 144.0), 100)
+//        gamepad2.rumble(rp * (1 - y / 144.0), rp * (y / 144.0), 100)
 
 
 //        gamepad1.rumble((hypot(vx, vy) / 12.0 * 100.0).toInt())
@@ -851,9 +851,9 @@ open class TeleOpBase(
             val dist = { accelFactor: Double -> dxyp(accelFactor) * sotmFactor + dxy * (1 - sotmFactor) }
             telemetry.addData("sotm factor", sotmFactor);
 
-            if (inTriangle(x, y, 5.0) > 0 && gamepad1.right_trigger < 0.1) {
-                gamepad1.rumble(0.5, 0.5, 100)
-            }
+//            if (inTriangle(x, y, 5.0) > 0 && gamepad1.right_trigger < 0.1) {
+//                gamepad1.rumble(0.5, 0.5, 100)
+//            }
 
             if (y < BORD_Y) {
                 // far zone
