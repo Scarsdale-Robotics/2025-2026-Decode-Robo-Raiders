@@ -1,13 +1,16 @@
 package org.firstinspires.ftc.teamcode.utils
 
+import com.bylazar.configurables.annotations.Configurable
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
+@Configurable
 object AutoAimConstants {
     const val BORD_Y = 48;
+    var constant = 0.0
 
     fun distanceToVelocityClose(d: Double): Double {
         return 715 + 9.25 * d + -0.0353 * d * d;
@@ -18,7 +21,7 @@ object AutoAimConstants {
     };
 
     fun distanceToVelocityFar(d: Double): Double {
-        return 2685 + -23.6 * d + 0.109 * d * d
+        return 2685 + -23.6 * d + 0.109 * d * d + constant
     }
 
     fun distAndVeloToNewThetaFar(d: Double, v: Double): Double {

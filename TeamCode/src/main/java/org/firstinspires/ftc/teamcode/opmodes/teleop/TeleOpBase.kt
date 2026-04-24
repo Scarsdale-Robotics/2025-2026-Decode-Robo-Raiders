@@ -849,34 +849,34 @@ open class TeleOpBase(
             val dist = { accelFactor: Double -> dxyp(accelFactor) * sotmFactor + dxy * (1 - sotmFactor) }
             telemetry.addData("sotm factor", sotmFactor);
 
-            if (inTriangle(x, y, 5.0) > 0) {
-                gamepad1.rumble(1.0, 1.0, 100)
+            if (inTriangle(x, y, 5.0) > 0 && gamepad1.right_trigger < 0.1) {
+                gamepad1.rumble(0.5, 0.5, 100)
             }
 
             if (y < BORD_Y) {
                 // far zone
 //                if (inTriangle(x, y, 64.0) == 2) {
                     ShooterSubsystem.AutoAim(
-                        dist(0.0), { dist -> distanceToVelocityFar(dist) + veloTrim }
+                        dist(0.02), { dist -> distanceToVelocityFar(dist) + veloTrim }
                     )()
                     TurretThetaSubsystem.SetThetaPos(
-                        distAndVeloToThetaFar(dist(0.0), ShooterSubsystem.velocity) + hoodTrim
+                        distAndVeloToThetaFar(dist(0.02), ShooterSubsystem.velocity) + hoodTrim
                     )()
 //                }
             } else {
                 // close zone
 //                if (inTriangle(x, y, 64.0) == 1) {
                     ShooterSubsystem.AutoAim(
-                        dist(0.0), { dist -> distanceToVelocityClose(dist) + veloTrim }
+                        dist(0.02), { dist -> distanceToVelocityClose(dist) + veloTrim }
                     )()
                     TurretThetaSubsystem.SetThetaPos(
-                        distAndVeloToThetaClose(dist(0.0), ShooterSubsystem.velocity) + hoodTrim
+                        distAndVeloToThetaClose(dist(0.02), ShooterSubsystem.velocity) + hoodTrim
                     )()
 //                }
             }
             TurretPhiSubsystem.AutoAim(
-                dxp(0.0) * sotmFactor + dx * (1 - sotmFactor),
-                dyp(0.0) * sotmFactor + dy * (1 - sotmFactor),
+                dxp(0.02) * sotmFactor + dx * (1 - sotmFactor),
+                dyp(0.02) * sotmFactor + dy * (1 - sotmFactor),
                 hp, phiTrim
             )()
         } else {

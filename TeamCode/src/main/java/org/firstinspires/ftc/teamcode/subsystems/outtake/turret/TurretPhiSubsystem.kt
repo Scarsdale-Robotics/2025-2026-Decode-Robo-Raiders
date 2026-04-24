@@ -6,6 +6,7 @@ import dev.nextftc.core.commands.Command
 import dev.nextftc.core.commands.CommandManager
 import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
+import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
 import java.util.function.Supplier
 import kotlin.math.PI
@@ -19,7 +20,7 @@ object TurretPhiSubsystem : Subsystem {
     private val servoBelow = ServoEx("turret_below", 0.0);
     private val servoAbove = ServoEx("turret_above", 0.0);
     val MIN_ANGLE = Math.toRadians(-180.0)
-    val MAX_ANGLE = Math.toRadians(183.0)
+    val MAX_ANGLE = Math.toRadians(186.0)
     var targetPhi: Angle = 0.0.rad
     var lmao = 0.98375  // servo range to remain flat
 
@@ -36,8 +37,9 @@ object TurretPhiSubsystem : Subsystem {
     }
 
     fun norm(angle: Angle): Angle {
-//        return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
-        return ((angle.inRad - MIN_ANGLE).mod(MAX_ANGLE - MIN_ANGLE) + MIN_ANGLE).coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
+        return angle.inRad.coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
+//        return (ngle.inRad.mod(180.0)
+//        return ((angle.inRad - MIN_ANGLE).mod(MAX_ANGLE - MIN_ANGLE) + MIN_ANGLE).coerceIn(MIN_ANGLE, MAX_ANGLE).rad;
 
 //        return atan2(sin(angle.inRad), cos(angle.inRad)).rad;
 //        val tolerance = Math.toRadians(10.0);
@@ -89,6 +91,7 @@ object TurretPhiSubsystem : Subsystem {
 
     var lastCommand: Command? = null;
 
+    var leftTick = false;
     //i have no idea what this means nathan
     class AutoAim(
         private val dx: Double,
@@ -110,19 +113,26 @@ object TurretPhiSubsystem : Subsystem {
             val normAngle = (atan2(dy, dx).rad - rh).inRad
             val upper = normAngle + 2 * PI;
             val lower = normAngle - 2 * PI;
-            var closestDist = abs(normAngle - targetPhi.inRad)
+            var closestDist = 9999.9
+            var closest = 0.0;
+            val centerDist = abs(normAngle - targetPhi.inRad)
             val upperDist = abs(upper - targetPhi.inRad)
             val lowerDist = abs(lower - targetPhi.inRad)
-            var closest = normAngle;
-            if (upperDist < closestDist) {
+            if (centerDist < closestDist && norm(normAngle.rad) == normAngle.rad) {
+                closestDist = centerDist
+                closest = normAngle
+            }
+            if (upperDist < closestDist && norm(upper.rad) == upper.rad) {
                 closest = upper
                 closestDist = upperDist
             }
-            if (lowerDist < closestDist) {
+            if (lowerDist < closestDist && norm(lower.rad) == lower.rad) {
                 closest = lower
             }
 
-            SetTargetPhi(closest.rad, ofsTurret)()
+            if (leftTick) SetTargetPhi(closest.rad - 0.5.deg, ofsTurret)()
+            else SetTargetPhi(closest.rad + 0.5.deg, ofsTurret)()
+            leftTick = !leftTick
         }
     }
 
@@ -144,6 +154,7 @@ object TurretPhiSubsystem : Subsystem {
     }
 
     override fun periodic() {
+
 //        if (!started) return;
         PanelsTelemetry.telemetry.addData("target phi", targetPhi)
         PanelsTelemetry.telemetry.addData("servo1 pos", servoBelow.position)
