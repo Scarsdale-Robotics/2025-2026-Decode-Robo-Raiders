@@ -99,9 +99,6 @@ object AutonUtil {
     val delayInIntake: Double = 0.5
     val delayAtLever: Double = 0.0
 
-    val goalX = 5.0
-    val goalY = 144.0 - 5.0
-
 
     fun robotShoot(): Command {
         return SequentialGroup(

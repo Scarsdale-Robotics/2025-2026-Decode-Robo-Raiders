@@ -10,7 +10,7 @@ import kotlin.math.sqrt
 @Configurable
 object AutoAimConstants {
     const val BORD_Y = 48;
-    var constant = 0.0
+    var constant = 67.0
 
     fun distanceToVelocityClose(d: Double): Double {
         return 715 + 9.25 * d + -0.0353 * d * d;

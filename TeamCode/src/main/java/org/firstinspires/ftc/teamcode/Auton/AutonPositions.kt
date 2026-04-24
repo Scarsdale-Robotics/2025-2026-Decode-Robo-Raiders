@@ -5,7 +5,7 @@ import com.pedropathing.geometry.Pose
 object AutonPositions {
     //base positions are in blue coordinates
 
-    val startPose = Pose(63.7, 8.503, Math.toRadians(180.0)) // Start Pose of our robot.
+    val startPose = Pose(65.85, 9.79, Math.toRadians(180.0)) // Start Pose of our robot.
     val pushTeammatePose = Pose(55.7, 8.503, Math.toRadians(90.0)) // Start Pose of our robot.
 
 //    val startPoseClose = Pose(33.222, 135.5422, Math.toRadians(270.0)) // Start Pose of our robot.

@@ -38,6 +38,7 @@ import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor
 import kotlin.math.atan2
 
 import dev.nextftc.ftc.ActiveOpMode.hardwareMap
+import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 
 @Autonomous(name = "[F-COOP-18-B] Auton Blue Far CoOp", group = "Auton")
 class AutonBlueFarCoOp : AutonBase(
@@ -46,19 +47,19 @@ class AutonBlueFarCoOp : AutonBase(
     144.0 - 3.5,
     AutonPositions.Blue(AutonPositions.startPose),
     { isBlue, follower -> {
-        var Portal = CvBallDetectionP(hardwareMap)
+//        var Portal = CvBallDetectionP(hardwareMap)
         val pb = { follower.pathBuilder() }
 
         val DOWN = Ang(270.deg.inRad, isBlue)
         val LEFT = Ang(180.deg.inRad, isBlue)
 
-        val xIntakeThreshold = 40.0
-        val xCommonThreshold = 32.5
+        val xIntakeThreshold = 50.0
+        val xCommonThreshold = 45.5
 
         val startPose = Pos(AutonPositions.startPose, isBlue)
 
         val setLine3Pose = Pos(Pose(13.3, 35.9), isBlue)
-        val setLine3Ctrl = Pos(Pose(35.2, 39.7), isBlue)
+        val setLine3Ctrl = Pos(Pose(40.0, 41.1), isBlue)
         val setLine3Path = pb().addPath(BezierCurve(startPose, setLine3Ctrl, setLine3Pose))
             .setConstantHeadingInterpolation(LEFT)
 //            .setLinearHeadingInterpolation(LEFT, FRIED, 1.0, 0.75)
@@ -73,7 +74,7 @@ class AutonBlueFarCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val setCommonPose = Pos(Pose(11.4, 11.0), isBlue)
+        val setCommonPose = Pos(Pose(13.4, 11.0), isBlue)
         val setCommonPath = pb().addPath(BezierLine(shoot1Pose, setCommonPose))
             .setConstantHeadingInterpolation(LEFT)
             .addCallback({ X(follower.pose.x, isBlue) < xCommonThreshold }, IntakeCommand)
@@ -86,75 +87,62 @@ class AutonBlueFarCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        fun getBlobPath(): PathChain {
-            var Portal: CvBallDetectionP? = null
-            var Blobs: MutableList<ColorBlobLocatorProcessor.Blob>? = null
-            var cd = 0.0
-
-            var min = Double.Companion.MAX_VALUE // reset each loop iteration
-            var Minb: ColorBlobLocatorProcessor.Blob? = null
-            var rad = -1.0
-
-            Portal!!.updateDetections()
-            Blobs = Portal.getBlobs()
-
-            if (Blobs != null && !Blobs.isEmpty()) {
-                if (Blobs.isEmpty()) {
-                    cd = -1.0
-                }
-                for (b in Blobs) {
-                    val circleFit = b.getCircle()
-
-                    if (circleFit == null) continue
-
-                    val radius = circleFit.getRadius().toDouble()
-
-                    if (radius == 0.0) continue
-                    cd = ((120.0 * 529) / (radius * 2)) * 2
-                    val theta = Math.toDegrees(atan2((circleFit.getX() - 320).toDouble(), 391.0))
-
-                    if (cd < min) {
-                        min = cd
-                        rad = theta
-                        Minb = b
-                    }
-                }
-            }
-
-            var intakePos: Pose
-
-            if (min != -1.0) {
-                val xa: Double = Math.sin(rad) * min
-                val ya: Double = Math.cos(rad) * min
-                intakePos = Pose(shoot1Pose.x + xa, shoot1Pose.y + ya)
-
-                return PedroComponent.follower.pathBuilder()
-                    .addPath(
-                        BezierLine(
-                            shoot1Pose,
-                            intakePos
-                        )
-                    )
-                    .setTangentHeadingInterpolation()
-                    .addCallback({ X(follower.pose.x, isBlue) < xCommonThreshold }, IntakeCommand)
-                    .build()
-            }
-            Portal.close();
-            return setCommonPath!!
-        }
-
-        fun getCustomShootPath(): PathChain {
-            return PedroComponent.follower.pathBuilder()
-                .addPath(
-                    BezierLine(
-                        Pose(follower.pose.x, follower.pose.y),
-                        shoot1Pose
-                    )
-                )
-                .setTangentHeadingInterpolation()
-                .addCallback({ X(follower.pose.x, isBlue) < xCommonThreshold }, IntakeCommand)
-                .build()
-        }
+//        fun getBlobPath(): PathChain {
+////            var Portal: CvBallDetectionP? = null
+//            var Blobs: MutableList<ColorBlobLocatorProcessor.Blob>? = null
+//            var cd = 0.0
+//
+//            var min = Double.Companion.MAX_VALUE // reset each loop iteration
+//            var Minb: ColorBlobLocatorProcessor.Blob? = null
+//            var rad = -1.0
+//
+//            Portal!!.updateDetections()
+//            Blobs = Portal.getBlobs()
+//
+//            if (Blobs != null && !Blobs.isEmpty()) {
+//                if (Blobs.isEmpty()) {
+//                    cd = -1.0
+//                }
+//                for (b in Blobs) {
+//                    val circleFit = b.getCircle()
+//
+//                    if (circleFit == null) continue
+//
+//                    val radius = circleFit.getRadius().toDouble()
+//
+//                    if (radius == 0.0) continue
+//                    cd = ((120.0 * 529) / (radius * 2)) * 2
+//                    val theta = Math.toDegrees(atan2((circleFit.getX() - 320).toDouble(), 391.0))
+//
+//                    if (cd < min) {
+//                        min = cd
+//                        rad = theta
+//                        Minb = b
+//                    }
+//                }
+//            }
+//
+//            var intakePos: Pose
+//
+//            if (min != -1.0) {
+//                val xa: Double = Math.sin(rad) * min
+//                val ya: Double = Math.cos(rad) * min
+//                intakePos = Pose(shoot1Pose.x + xa, shoot1Pose.y + ya)
+//
+//                return PedroComponent.follower.pathBuilder()
+//                    .addPath(
+//                        BezierLine(
+//                            shoot1Pose,
+//                            intakePos
+//                        )
+//                    )
+//                    .setTangentHeadingInterpolation()
+//                    .addCallback({ X(follower.pose.x, isBlue) < xCommonThreshold }, IntakeCommand)
+//                    .build()
+//            }
+//            Portal.close();
+//            return setCommonPath!!
+//        }
 
         val setParkPose = Pos(Pose(44.4, 15.3), isBlue)
         val parkPath = pb().addPath(BezierLine(shoot1Pose, setParkPose))
@@ -165,6 +153,7 @@ class AutonBlueFarCoOp : AutonBase(
         SequentialGroup(
             // 3
             SequentialGroup(
+                MagblockServoSubsystem.unblock,
                 Delay(1.5),
                 robotShoot()
             ),
@@ -181,24 +170,28 @@ class AutonBlueFarCoOp : AutonBase(
             robotShoot(),
 
             // 12
-            robotIntake(getBlobPath()),
-            robotGoShoot(getCustomShootPath()),
+            robotIntake(setCommonPath),
+            Delay(0.2),
+            robotGoShoot(setCommonShootPath),
             robotShoot(),
 
             // 15
-            robotIntake(getBlobPath()),
-            robotGoShoot(getCustomShootPath()),
+            robotIntake(setCommonPath),
+            Delay(0.2),
+            robotGoShoot(setCommonShootPath),
             robotShoot(),
 
             // 18
-            robotIntake(getBlobPath()),
-            robotGoShoot(getCustomShootPath()),
+            robotIntake(setCommonPath),
+            Delay(0.2),
+            robotGoShoot(setCommonShootPath),
             robotShoot(),
 
             // 21
-            robotIntake(getBlobPath()),
-            robotGoShoot(getCustomShootPath()),
-            robotShoot(),
+//            robotIntake(setCommonPath),
+//            Delay(0.2),
+//            robotGoShoot(setCommonShootPath),
+//            robotShoot(),
 
             parkRobot(parkPath)
 

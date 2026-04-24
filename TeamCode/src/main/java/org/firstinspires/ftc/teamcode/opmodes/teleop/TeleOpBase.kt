@@ -792,7 +792,7 @@ open class TeleOpBase(
         lastVY = vy;
         lastTime = runtime;
 
-        val rp = min(abs(hypot(vx,vy)) / 16.0, 1.0)
+        val rp = min(abs(hypot(vx,vy)) / 80.0, 1.0)
         gamepad2.rumble(rp * (1 - y / 144.0), rp * (y / 144.0), 100)
 
 
@@ -857,13 +857,17 @@ open class TeleOpBase(
 
             if (y < BORD_Y) {
                 // far zone
-//                if (inTriangle(x, y, 64.0) == 2) {
+//                if (inTriangle(x, y, 64.0) == 2){
                     ShooterSubsystem.AutoAim(
                         dist(0.02), { dist -> distanceToVelocityFar(dist) + veloTrim }
                     )()
-                    TurretThetaSubsystem.SetThetaPos(
-                        distAndVeloToThetaFar(dist(0.02), ShooterSubsystem.velocity) + hoodTrim
-                    )()
+                    if (runtime < 1.5) {
+                        TurretThetaSubsystem.SetThetaPos(0.7)()
+                    } else {
+                        TurretThetaSubsystem.SetThetaPos(
+                            distAndVeloToThetaFar(dist(0.02), ShooterSubsystem.velocity) + hoodTrim
+                        )()
+                    }
 //                }
             } else {
                 // close zone
