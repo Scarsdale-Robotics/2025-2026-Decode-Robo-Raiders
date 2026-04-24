@@ -93,7 +93,7 @@ object AutonUtil {
     )
 
     val delayStartShoot: Double = 1.2
-    val delayBeforeShoot: Double = 0.19
+    val delayBeforeShoot: Double = 0.2
     val delayAfterEachShoot: Double = 0.38 //currently at a really high #
     val delayFromRampIntake: Double = 0.66000000676767676767676767
     val delayInIntake: Double = 0.5

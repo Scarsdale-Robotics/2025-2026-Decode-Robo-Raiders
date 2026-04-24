@@ -103,4 +103,10 @@ public class CvBallDetectionP {
     public List<ColorBlobLocatorProcessor.Blob> getBlobs() {
         return blobs != null ? blobs : new ArrayList<>();
     }
+
+    public void close() {
+        if (visionPortal != null) {
+            visionPortal.close();
+        }
+    }
 }
