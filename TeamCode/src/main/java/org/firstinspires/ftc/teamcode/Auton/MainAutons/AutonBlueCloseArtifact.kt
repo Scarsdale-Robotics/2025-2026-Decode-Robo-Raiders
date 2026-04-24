@@ -36,6 +36,7 @@ class AutonBlueCloseArtifact : AutonBase(
     true,
     3.5,
     144.0 - 3.5,
+    AutonPositions.Blue(AutonPositions.startPoseClose),
     { isBlue, follower -> {
         val pb = { follower.pathBuilder() }
 

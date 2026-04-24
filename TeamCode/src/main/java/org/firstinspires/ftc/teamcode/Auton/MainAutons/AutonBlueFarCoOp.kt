@@ -44,6 +44,7 @@ class AutonBlueFarCoOp : AutonBase(
     true,
     3.5,
     144.0 - 3.5,
+    AutonPositions.Blue(AutonPositions.startPose),
     { isBlue, follower -> {
         val pb = { follower.pathBuilder() }
 

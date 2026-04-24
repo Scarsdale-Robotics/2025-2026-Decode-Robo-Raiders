@@ -172,6 +172,7 @@ open class AutonBase(
     private val isBlue: Boolean,
     private val goalX: Double,
     private val goalY: Double,
+    private val startPose: Pose,
     private val autonomousRoutine: (Boolean, Follower) -> Command,
 ) : NextFTCOpMode() {
     //////////////////////
@@ -302,7 +303,7 @@ open class AutonBase(
         MagblockServoSubsystem.block()
         TurretThetaSubsystem.SetThetaPos(0.63 + Math.random() * 0.01)()
 
-        PedroComponent.follower.setStartingPose(AutonPositions.Blue(AutonPositions.startPoseClose))
+        PedroComponent.follower.setStartingPose(startPose)
         PedroComponent.follower.update()
 
         val dx = goalX - PedroComponent.follower.pose.x
