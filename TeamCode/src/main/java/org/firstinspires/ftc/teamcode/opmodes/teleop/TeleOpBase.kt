@@ -251,20 +251,20 @@ open class TeleOpBase(
 //            false
 //        )
 //
-        gateIntakeChain = PedroComponent.follower.pathBuilder()
-            .addPath(
-                Path(
-                    BezierLine(
-                        PedroComponent.follower::getPose,
-                        Pos(AutonPositions.gateOpenPoseTele, isBlue)
-                    )
-                )
-            )
-            .setConstantHeadingInterpolation(
-                Pos(AutonPositions.gateOpenPoseTele, isBlue).heading
-            )
-            .setNoDeceleration()  // todo: temp test
-            .build()
+//        gateIntakeChain = PedroComponent.follower.pathBuilder()
+//            .addPath(
+//                Path(
+//                    BezierLine(
+//                        PedroComponent.follower::getPose,
+//                        Pos(AutonPositions.gateOpenPoseTele, isBlue)
+//                    )
+//                )
+//            )
+//            .setConstantHeadingInterpolation(
+//                Pos(AutonPositions.gateOpenPoseTele, isBlue).heading
+//            )
+//            .setNoDeceleration()  // todo: temp test
+//            .build()
 //        val gateIntakeChain = PedroComponent.follower.pathBuilder()
 //            .addPath(
 //                Path(
@@ -471,12 +471,12 @@ open class TeleOpBase(
 //        mecanum();
         driverControlled!!()
 
-        Gamepads.gamepad1.leftBumper whenBecomesTrue {
-            val path = FollowPath(gateIntakeChain!!)
-            activeDriveMacros.add(path)
-            path()
-            gamepad1.rumble(100)
-        }
+//        Gamepads.gamepad1.leftBumper whenBecomesTrue {
+//            val path = FollowPath(gateIntakeChain!!)
+//            activeDriveMacros.add(path)
+//            path()
+//            gamepad1.rumble(100)
+//        }
 //        (if (isBlue) Gamepads.gamepad1.dpadLeft else Gamepads.gamepad1.dpadRight)
 //            .whenBecomesTrue {
 //                val path = FollowPath(farShootChain!!)
@@ -542,7 +542,7 @@ open class TeleOpBase(
         Gamepads.gamepad1.rightTrigger.greaterThan(0.1) whenBecomesTrue ParallelGroup(
             MagblockServoSubsystem.unblock,
             SequentialGroup(
-                Delay(0.2),
+                Delay(0.25),
                 InstantCommand {
                     if (gamepad1.right_trigger > 0.1) {
                         lowerOverridePower = 1.0;
@@ -847,7 +847,7 @@ open class TeleOpBase(
 //                    (abs(Gamepads.gamepad1.leftStickX.get()) <= 0.02) &&
 //                    (abs(Gamepads.gamepad1.leftStickY.get()) <= 0.02)
 //            ) 0.0 else 1.0;
-            val sotmFactor = 1.0;
+            val sotmFactor = if (gamepad1.left_bumper) 1.0 else 0.0;
             val dist = { accelFactor: Double -> dxyp(accelFactor) * sotmFactor + dxy * (1 - sotmFactor) }
             telemetry.addData("sotm factor", sotmFactor);
 
