@@ -793,7 +793,7 @@ open class TeleOpBase(
         lastTime = runtime;
 
         val rp = min(abs(hypot(vx,vy)) / 80.0, 1.0)
-        gamepad2.rumble(rp * (1 - y / 144.0), rp * (y / 144.0), 100)
+//        gamepad2.rumble(rp * (1 - y / 144.0), rp * (y / 144.0), 100)
 
 
 //        gamepad1.rumble((hypot(vx, vy) / 12.0 * 100.0).toInt())
