@@ -245,8 +245,10 @@ open class AutonBase(
         val dxp = { accelFactor: Double -> dx - 1.0 * vx * timeFactor - accelFactor * ax * timeFactor * timeFactor }
         val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - accelFactor * ay * timeFactor * timeFactor }
         val dxyp = { accelFactor: Double -> hypot(dxp(accelFactor), dyp(accelFactor)) }
+        val sotmFactor = if (runtime < 5.0) 1.0 else 0.0
+        val dist = { accelFactor: Double -> dxyp(accelFactor) * sotmFactor + dxy * (1 - sotmFactor) }
         ShooterSubsystem.AutoAim(
-            dxyp(0.02),
+            dist(0.02),
             { dist ->
                 (
                         if (PedroComponent.follower.pose.y < BORD_Y)
@@ -259,14 +261,14 @@ open class AutonBase(
         TurretThetaSubsystem.SetThetaPos(
             (
                     if (PedroComponent.follower.pose.y < BORD_Y)
-                        distAndVeloToNewThetaFar(dxyp(0.02), ShooterSubsystem.velocity)
+                        distAndVeloToNewThetaFar(dist(0.02), ShooterSubsystem.velocity)
                     else
-                        distAndVeloToNewThetaClose(dxyp(0.02), ShooterSubsystem.velocity)
+                        distAndVeloToNewThetaClose(dist(0.02), ShooterSubsystem.velocity)
                     )
         )()
         TurretPhiSubsystem.AutoAim(
-            dxp(0.02),
-            dyp(0.02),
+            dxp(0.02) * sotmFactor + dx * (1 - sotmFactor),
+            dyp(0.02) * sotmFactor + dy * (1 - sotmFactor),
             PedroComponent.follower.heading.rad
         )()
         lastPose = PedroComponent.follower.pose;
