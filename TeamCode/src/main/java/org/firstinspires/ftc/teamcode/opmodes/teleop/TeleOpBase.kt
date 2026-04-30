@@ -380,7 +380,6 @@ open class TeleOpBase(
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         PedroComponent.follower.setStartingPose(Pose(startX, startY, startH))
-//        PedroComponent.follower.pose = Pose(startX, startY, startH)
         PedroComponent.follower.update()
 //        cv = CVSubsystem_VisionPortal(startX, startY, startH, hardwareMap)
 
@@ -439,14 +438,36 @@ open class TeleOpBase(
 
     override fun onStartButtonPressed() {
         TurretPhiSubsystem.started = true;
-//        val file = File(Lefile.filePath)
-//        val content = file.readText().split("\n")
-//        val startX = content[0].toDouble()
-//        val startY = content[1].toDouble()
-//        val startH = content[2].toDouble()
-//
-////        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
-//        PedroComponent.follower.pose = Pose(startX, startY, startH)
+
+        val file = File(Lefile.filePath)
+        val content = file.readText().split("\n")
+        var startX = content[0].toDouble()
+        var startY = content[1].toDouble()
+        var startH = content[2].toDouble()
+
+        var i = 0
+        while (startX == 0.0) {
+            if (i > 5) break;
+            val file = File(Lefile.filePath)
+            val content = file.readText().split("\n")
+            startX = content[0].toDouble()
+            startY = content[1].toDouble()
+            startH = content[2].toDouble()
+            i++
+        }
+
+//        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
+        PedroComponent.follower.pose = Pose(startX, startY, startH)
+        PedroComponent.follower.update()
+
+        if (PedroComponent.follower.pose.x < 1.0) {
+            PedroComponent.follower.pose = Pose(startX, startY, startH)
+            PedroComponent.follower.update()
+        }
+
+        Gamepads.gamepad2.touchpad whenBecomesTrue {
+            PedroComponent.follower.pose = Pose(startX, startY, startH)
+        }
 
         MagblockServoSubsystem.unblock();
         MagblockServoSubsystem.block()
@@ -857,7 +878,7 @@ open class TeleOpBase(
 
             if (y < BORD_Y) {
                 // far zone
-//                if (inTriangle(x, y, 64.0) == 2){
+                if (inTriangle(x, y, 32.0) == 2){
                     ShooterSubsystem.AutoAim(
                         dist(0.02), { dist -> distanceToVelocityFar(dist) + veloTrim }
                     )()
@@ -868,23 +889,28 @@ open class TeleOpBase(
                             distAndVeloToThetaFar(dist(0.02), ShooterSubsystem.velocity) + hoodTrim
                         )()
                     }
-//                }
+                    TurretPhiSubsystem.AutoAim(
+                        dxp(0.02) * sotmFactor + dx * (1 - sotmFactor),
+                        dyp(0.02) * sotmFactor + dy * (1 - sotmFactor),
+                        hp, phiTrim
+                    )()
+                }
             } else {
                 // close zone
-//                if (inTriangle(x, y, 64.0) == 1) {
+                if (inTriangle(x, y, 32.0) == 1) {
                     ShooterSubsystem.AutoAim(
                         dist(0.02), { dist -> distanceToVelocityClose(dist) + veloTrim }
                     )()
                     TurretThetaSubsystem.SetThetaPos(
                         distAndVeloToThetaClose(dist(0.02), ShooterSubsystem.velocity) + hoodTrim
                     )()
-//                }
+                    TurretPhiSubsystem.AutoAim(
+                        dxp(0.02) * sotmFactor + dx * (1 - sotmFactor),
+                        dyp(0.02) * sotmFactor + dy * (1 - sotmFactor),
+                        hp, phiTrim
+                    )()
+                }
             }
-            TurretPhiSubsystem.AutoAim(
-                dxp(0.02) * sotmFactor + dx * (1 - sotmFactor),
-                dyp(0.02) * sotmFactor + dy * (1 - sotmFactor),
-                hp, phiTrim
-            )()
         } else {
             //ShooterSubsystem.Manual(
 

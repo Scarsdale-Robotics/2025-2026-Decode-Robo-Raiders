@@ -92,10 +92,10 @@ object AutonUtil {
         IntakeMotorSubsystem.intake,
     )
 
-    val delayStartShoot: Double = 1.2
-    val delayBeforeShoot: Double = 0.2
+    val delayStartShoot: Double = 1.4
+    val delayBeforeShoot: Double = 0.4
     val delayAfterEachShoot: Double = 0.38 //currently at a really high #
-    val delayFromRampIntake: Double = 0.66000000676767676767676767
+    val delayFromRampIntake: Double = 0.67000000676767676767676767
     val delayInIntake: Double = 0.5
     val delayAtLever: Double = 0.0
 
@@ -219,6 +219,7 @@ open class AutonBase(
     var lastVY = 0.0;
     var lastTime = 0.0;
     var lastInTriangle = 0.0;
+    var startTime = 0.0;
     override fun onUpdate() {
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
@@ -245,7 +246,7 @@ open class AutonBase(
         val dxp = { accelFactor: Double -> dx - 1.0 * vx * timeFactor - accelFactor * ax * timeFactor * timeFactor }
         val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - accelFactor * ay * timeFactor * timeFactor }
         val dxyp = { accelFactor: Double -> hypot(dxp(accelFactor), dyp(accelFactor)) }
-        val sotmFactor = if (runtime < 5.0) 1.0 else 0.0
+        val sotmFactor = if (runtime - startTime < 6.7) 1.0 else 0.0
         val dist = { accelFactor: Double -> dxyp(accelFactor) * sotmFactor + dxy * (1 - sotmFactor) }
         ShooterSubsystem.AutoAim(
             dist(0.02),
@@ -300,6 +301,7 @@ open class AutonBase(
         ShooterSubsystem.off()
         IntakeMotorSubsystem.off()
         MagMotorSubsystem.off()
+        MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
         TurretThetaSubsystem.SetThetaPos(0.63 + Math.random() * 0.01)()
 
@@ -323,6 +325,8 @@ open class AutonBase(
     override fun onStartButtonPressed() {
         autonomousRoutine(isBlue, PedroComponent.follower)()
         pathStarted = true
+
+        startTime = runtime
 
         opmodeTimer!!.resetTimer()
         actionTimer!!.resetTimer()

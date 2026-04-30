@@ -31,10 +31,10 @@ import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotIntake
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotShoot
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.parkRobot
 
-@Autonomous(name = "[ARTI-21-R] Auton Red Close Artifact", group = "Auton")
+@Autonomous(name = "[ARTI-21-B] Auton Red Close Artifact", group = "Auton")
 class AutonRedCloseArtifact : AutonBase(
     false,
-    144.0 - 3.5,
+    144.0 - 5.5,
     144.0 - 3.5,
     AutonPositions.Red(AutonPositions.startPoseClose),
     { isBlue, follower -> {
@@ -78,7 +78,7 @@ class AutonRedCloseArtifact : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakePose = Pos(Pose(15.25, 57.2), isBlue)
+        val gateIntakePose = Pos(Pose(17.0, 57.2), isBlue)
         val gateIntakePath = pb().addPath(BezierLine(shoot2Pose, gateIntakePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(

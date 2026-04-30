@@ -16,7 +16,7 @@ class TeleOpRed : TeleOpBase(
     isBlue = false,
     goalX = 144.0 - 3.5,
     goalY = 144.0 - 3.5,
-    resetModeParams = ResetModeParams(17.1887, 115.3623, 270.0.deg),
+    resetModeParams = ResetModeParams(144.0 - 17.1887, 115.3623, 270.0.deg),
     resetModePhiAngle = 0.0.deg,
     distanceToVelocityClose = { d -> AutoAimConstants.distanceToVelocityClose(d + D_OFS) },
     distAndVeloToThetaClose = { d, v -> AutoAimConstants.distAndVeloToNewThetaClose(d + D_OFS, v) },

@@ -78,7 +78,7 @@ class AutonBlueCloseArtifact : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakePose = Pos(Pose(15.25, 57.2), isBlue)
+        val gateIntakePose = Pos(Pose(17.0, 57.2), isBlue)
         val gateIntakePath = pb().addPath(BezierLine(shoot2Pose, gateIntakePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(

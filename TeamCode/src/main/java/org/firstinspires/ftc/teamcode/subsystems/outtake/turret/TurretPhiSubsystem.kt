@@ -8,6 +8,7 @@ import dev.nextftc.core.subsystems.Subsystem
 import dev.nextftc.core.units.Angle
 import dev.nextftc.core.units.deg
 import dev.nextftc.core.units.rad
+import dev.nextftc.ftc.ActiveOpMode.runtime
 import java.util.function.Supplier
 import kotlin.math.PI
 import kotlin.math.abs
@@ -17,8 +18,8 @@ import dev.nextftc.hardware.impl.ServoEx
 //IN CONFIG, SET SERVO 1 TO 0 AND SERVO 2 TO 0.99
 @Configurable
 object TurretPhiSubsystem : Subsystem {
-    private val servoBelow = ServoEx("turret_below", 0.0);
-    private val servoAbove = ServoEx("turret_above", 0.0);
+    private val servoBelow = ServoEx("turret_below", 0.001);
+    private val servoAbove = ServoEx("turret_above", 0.001);
     val MIN_ANGLE = Math.toRadians(-180.0)
     val MAX_ANGLE = Math.toRadians(186.0)
     var targetPhi: Angle = 0.0.rad
@@ -92,6 +93,7 @@ object TurretPhiSubsystem : Subsystem {
     var lastCommand: Command? = null;
 
     var leftTick = false;
+    var tickSwapTime = 0.0;
     //i have no idea what this means nathan
     class AutoAim(
         private val dx: Double,
@@ -130,9 +132,13 @@ object TurretPhiSubsystem : Subsystem {
                 closest = lower
             }
 
-            if (leftTick) SetTargetPhi(closest.rad - 0.5.deg, ofsTurret)()
-            else SetTargetPhi(closest.rad + 0.5.deg, ofsTurret)()
-            leftTick = !leftTick
+            SetTargetPhi(closest.rad, ofsTurret)()
+//            if (leftTick) SetTargetPhi(closest.rad - 0.5.deg, ofsTurret)()
+//            else SetTargetPhi(closest.rad + 0.5.deg, ofsTurret)()
+//            if (runtime - tickSwapTime > 3) {
+//                leftTick = !leftTick
+//                tickSwapTime = runtime
+//            }
         }
     }
 

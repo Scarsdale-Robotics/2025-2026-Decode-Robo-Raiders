@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.Auton.AutonPositions
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Ang
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.Pos
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions.X
-import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueFarCoOpDEPRECATED.Companion.distanceToBlob
-import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueFarCoOpDEPRECATED.Companion.radiansToRotateToBlob
+//import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueFarCoOpDEPRECATED.Companion.distanceToBlob
+//import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonBlueFarCoOpDEPRECATED.Companion.radiansToRotateToBlob
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.IntakeCommand
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.TravelCommand
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.intakePower
@@ -74,7 +74,7 @@ class AutonBlueFarCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val setCommonPose = Pos(Pose(13.4, 11.0), isBlue)
+        val setCommonPose = Pos(Pose(13.4, 12.0), isBlue)
         val setCommonPath = pb().addPath(BezierLine(shoot1Pose, setCommonPose))
             .setConstantHeadingInterpolation(LEFT)
             .addCallback({ X(follower.pose.x, isBlue) < xCommonThreshold }, IntakeCommand)
@@ -82,6 +82,19 @@ class AutonBlueFarCoOp : AutonBase(
             .build()
 
         val setCommonShootPath = pb().addPath(BezierLine(setCommonPose, shoot1Pose))
+//            .setConstantHeadingInterpolation(DOWN_LEFT)
+            .setHeadingInterpolation(HeadingInterpolator.tangent.reverse())
+            .setTimeoutConstraint(0.0)
+            .build()
+
+        val setCommonPose2 = Pos(Pose(13.4, 20.0), isBlue)
+        val setCommonPath2 = pb().addPath(BezierLine(shoot1Pose, setCommonPose2))
+            .setConstantHeadingInterpolation(LEFT)
+            .addCallback({ X(follower.pose.x, isBlue) < xCommonThreshold }, IntakeCommand)
+            .setTimeoutConstraint(0.0)
+            .build()
+
+        val setCommonShootPath2 = pb().addPath(BezierLine(setCommonPose2, shoot1Pose))
 //            .setConstantHeadingInterpolation(DOWN_LEFT)
             .setHeadingInterpolation(HeadingInterpolator.tangent.reverse())
             .setTimeoutConstraint(0.0)
@@ -165,26 +178,26 @@ class AutonBlueFarCoOp : AutonBase(
 
             // 9
             robotIntake(setCommonPath),
-            Delay(0.2),
+            Delay(0.15),
             robotGoShoot(setCommonShootPath),
             robotShoot(),
 
             // 12
-            robotIntake(setCommonPath),
-            Delay(0.2),
-            robotGoShoot(setCommonShootPath),
+            robotIntake(setCommonPath2),
+            Delay(0.15),
+            robotGoShoot(setCommonShootPath2),
             robotShoot(),
 
             // 15
             robotIntake(setCommonPath),
-            Delay(0.2),
+            Delay(0.15),
             robotGoShoot(setCommonShootPath),
             robotShoot(),
 
             // 18
-            robotIntake(setCommonPath),
-            Delay(0.2),
-            robotGoShoot(setCommonShootPath),
+            robotIntake(setCommonPath2),
+            Delay(0.15),
+            robotGoShoot(setCommonShootPath2),
             robotShoot(),
 
             // 21
