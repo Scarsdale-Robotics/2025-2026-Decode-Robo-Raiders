@@ -34,7 +34,7 @@ import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.parkRobot
 @Autonomous(name = "[C-COOP-18-B] Auton Blue Close CoOp", group = "Auton")
 class AutonBlueCloseCoOp : AutonBase(
     true,
-    2.5,
+    4.5,
     144.0 - 5.5,
     AutonPositions.Blue(AutonPositions.startPoseClose),
     { isBlue, follower -> {
@@ -86,7 +86,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakePose = Pos(Pose(17.5, 57.5), isBlue)
+        val gateIntakePose = Pos(Pose(16.75, 58.5), isBlue)
         val gateIntakePath = pb().addPath(BezierLine(shoot2Pose, gateIntakePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
@@ -157,7 +157,7 @@ class AutonBlueCloseCoOp : AutonBase(
             // 6
             robotIntake(setLine2Path),
             FollowPath(experiPathL2),
- 
+
             robotGoShoot(shoot2Path),
             robotShoot(),
 

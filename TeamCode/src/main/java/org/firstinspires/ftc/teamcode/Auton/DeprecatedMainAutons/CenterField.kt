@@ -106,9 +106,9 @@ class CenterField: NextFTCOpMode(){ //Pretend robot is 14 to 16 (14 is intake to
         file.createNewFile()
         while (!file.canWrite()) {}
         file.writeText(
-            PedroComponent.follower.pose.x.toString() + "\n" +
-                    PedroComponent.follower.pose.y.toString() + "\n" +
-                    PedroComponent.follower.pose.heading.toString() + "\n"
+            PedroComponent.follower.pose.x.toString().trim() + ";" +
+                    PedroComponent.follower.pose.y.toString().trim() + ";" +
+                    PedroComponent.follower.pose.heading.toString().trim()
         )
     }
 }

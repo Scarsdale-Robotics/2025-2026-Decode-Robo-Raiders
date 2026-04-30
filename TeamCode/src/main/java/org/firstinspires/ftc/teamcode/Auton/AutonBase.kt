@@ -249,7 +249,7 @@ open class AutonBase(
         val sotmFactor = if (runtime - startTime < 6.7) 1.0 else 0.0
         val dist = { accelFactor: Double -> dxyp(accelFactor) * sotmFactor + dxy * (1 - sotmFactor) }
         ShooterSubsystem.AutoAim(
-            dist(0.02),
+            dist(0.0),
             { dist ->
                 (
                         if (PedroComponent.follower.pose.y < BORD_Y)
@@ -262,14 +262,14 @@ open class AutonBase(
         TurretThetaSubsystem.SetThetaPos(
             (
                     if (PedroComponent.follower.pose.y < BORD_Y)
-                        distAndVeloToNewThetaFar(dist(0.02), ShooterSubsystem.velocity)
+                        distAndVeloToNewThetaFar(dist(0.0), ShooterSubsystem.velocity)
                     else
-                        distAndVeloToNewThetaClose(dist(0.02), ShooterSubsystem.velocity)
+                        distAndVeloToNewThetaClose(dist(0.0), ShooterSubsystem.velocity)
                     )
         )()
         TurretPhiSubsystem.AutoAim(
-            dxp(0.02) * sotmFactor + dx * (1 - sotmFactor),
-            dyp(0.02) * sotmFactor + dy * (1 - sotmFactor),
+            dxp(0.0) * sotmFactor + dx * (1 - sotmFactor),
+            dyp(0.0) * sotmFactor + dy * (1 - sotmFactor),
             PedroComponent.follower.heading.rad
         )()
         lastPose = PedroComponent.follower.pose;
@@ -335,10 +335,13 @@ open class AutonBase(
     /** We do not use this because everything should automatically disable  */
     override fun onStop() {
         val file = File(Lefile.filePath)
+        file.delete()
+        file.createNewFile()
+        while (!file.canWrite()) {}
         file.writeText(
-            PedroComponent.follower.pose.x.toString() + "\n" +
-                    PedroComponent.follower.pose.y.toString() + "\n" +
-                    PedroComponent.follower.pose.heading.toString() + "\n"
+            PedroComponent.follower.pose.x.toString().trim() + ";" +
+                    PedroComponent.follower.pose.y.toString().trim() + ";" +
+                    PedroComponent.follower.pose.heading.toString().trim()
         )
     }
 }

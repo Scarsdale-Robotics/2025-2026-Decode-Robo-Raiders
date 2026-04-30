@@ -182,16 +182,24 @@ open class TeleOpBase(
     var lockDirection = false;
     var lastTime = 0.0;
     override fun onInit() {
+        val file = File(Lefile.filePath)
+        while (!file.canRead()) {}
+        val content = file.readText().split("\n")
+        val startX = content[0].toDouble()
+        val startY = content[1].toDouble()
+        val startH = content[2].toDouble()
+        
+        PedroComponent.follower.setStartingPose(Pose(startX, startY, startH))
+        PedroComponent.follower.update()
+        PedroComponent.follower.pose = Pose(startX, startY, startH)
+        PedroComponent.follower.update()
+
         ShooterSubsystem.off()
         MagMotorSubsystem.off()
         TurretPhiSubsystem.started = false;
-        PedroComponent.follower.update()
 //        MagServoSubsystem.stop()
-
-        // ROBOT CENTRIC:
-//        val scaleDrive: (Double) -> Double = { inp -> (inp - 0.1) / 0.9 + 0.1 } // [0.0, 0.1] deadzone (0.0 power), [0.1, 0.9] 0.0 --> 1.0 power, [0.9, 1.0] 1.0 power
-//        driverControlled = PedroDriverControlled(
-//            -Gamepads.gamepad1.leftStickY.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
+////        val scaleDrive: (Double) -> Double = { inp -> (inp -
+//            -Gamepads.gamepad1.leftStickY.deadZone(0.1).map {////        driverContr        // ROBOT CENTRIC: 0.1) / 0.9 + 0.1 } // [0.0, 0.1] deadzone (0.0 power), [0.1, 0.9] 0.0 --> 1.0 power, [0.9, 1.0] 1.0 powerolled = PedroDriverControlled( scaleDrive(it) * speedFactorDrive },
 //            -Gamepads.gamepad1.leftStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
 //            -Gamepads.gamepad1.rightStickX.deadZone(0.1).map { scaleDrive(it) * speedFactorDrive },
 //            true
@@ -371,21 +379,17 @@ open class TeleOpBase(
 //            )
 //            .build()
 
-        val file = File(Lefile.filePath)
-        while (!file.canRead()) {}
-        val content = file.readText().split("\n")
-        val startX = content[0].toDouble()
-        val startY = content[1].toDouble()
-        val startH = content[2].toDouble()
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
-        PedroComponent.follower.setStartingPose(Pose(startX, startY, startH))
-        PedroComponent.follower.update()
 //        cv = CVSubsystem_VisionPortal(startX, startY, startH, hardwareMap)
 
         telemetry.addData("Start X", startX);
         telemetry.addData("Start Y", startY);
         telemetry.addData("Start H (degs)", Math.toDegrees(startH));
+        telemetry.addData("x", PedroComponent.follower.pose.x);
+        telemetry.addData("y", PedroComponent.follower.pose.y);
+        telemetry.addData("h (degs)", Math.toDegrees(PedroComponent.follower.pose.heading));
+        telemetry.update()
 //        odom = OdometrySubsystem(72.0, 72.0, -PI / 2, hardwareMap)
 //        odom!!.updateOdom()
 
@@ -440,7 +444,7 @@ open class TeleOpBase(
         TurretPhiSubsystem.started = true;
 
         val file = File(Lefile.filePath)
-        val content = file.readText().split("\n")
+        val content = file.readText(Charsets.UTF_8).split(";")
         var startX = content[0].toDouble()
         var startY = content[1].toDouble()
         var startH = content[2].toDouble()
@@ -449,7 +453,7 @@ open class TeleOpBase(
         while (startX == 0.0) {
             if (i > 5) break;
             val file = File(Lefile.filePath)
-            val content = file.readText().split("\n")
+            val content = file.readText().split(";")
             startX = content[0].toDouble()
             startY = content[1].toDouble()
             startH = content[2].toDouble()
