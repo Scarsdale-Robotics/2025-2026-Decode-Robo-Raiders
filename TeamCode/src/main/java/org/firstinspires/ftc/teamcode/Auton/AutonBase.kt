@@ -93,7 +93,7 @@ object AutonUtil {
     )
 
     val delayStartShoot: Double = 1.4
-    val delayBeforeShoot: Double = 0.6
+    val delayBeforeShoot: Double = 0.5867
     val delayAfterEachShoot: Double = 0.38 //currently at a really high #
     val delayFromRampIntake: Double = 0.67
     val delayInIntake: Double = 0.7
@@ -323,7 +323,7 @@ open class AutonBase(
         MagMotorSubsystem.off()
         MagblockServoSubsystem.unblock()
         MagblockServoSubsystem.block()
-        TurretThetaSubsystem.SetThetaPos(0.63 + Math.random() * 0.01)()
+        TurretThetaSubsystem.SetThetaPos(0.64 + Math.random() * 0.1)()
 
         PedroComponent.follower.setStartingPose(startPose)
         PedroComponent.follower.update()

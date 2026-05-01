@@ -31,7 +31,7 @@ import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotIntake
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotShoot
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.parkRobot
 
-@Autonomous(name = "[ARTI-21-B] Auton Red Close Artifact", group = "Auton")
+@Autonomous(name = "[ARTI-21-R] Auton Red Close Artifact", group = "Auton")
 class AutonRedCloseArtifact : AutonBase(
     false,
     144.0 - 5.5,

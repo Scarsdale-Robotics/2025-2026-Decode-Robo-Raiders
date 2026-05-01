@@ -19,8 +19,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
         .mass(14.424) //kg
-            .forwardZeroPowerAcceleration(-24.246704215949045)
-            .lateralZeroPowerAcceleration(-69.20150642169749)
+            .forwardZeroPowerAcceleration(-33.07403151669701)
+            .lateralZeroPowerAcceleration(-80.14230415680646)
             .translationalPIDFCoefficients(new PIDFCoefficients(
                     0.1,
                     0,
@@ -48,34 +48,34 @@ public class Constants {
                     0.0003
             ))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.014,
+                    0.007,
+                    0.0,
+                    0.00016,
                     0,
-                    0.0022, //0.0015
-                    0,
-                    0.067
+                    0.07
             ))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.12,
-                    0.000007,
-                    0.0014, //0.00067
                     0.0,
-                    0.01
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
             ))
             .drivePIDFSwitch(15)
 
-            .useSecondaryDrivePIDF(true)
+            .useSecondaryDrivePIDF(false)
             .useSecondaryHeadingPIDF(false)
             .useSecondaryTranslationalPIDF(true)
 
-            .centripetalScaling(0.00045);
+            .centripetalScaling(0.00029);
 
 
 
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .xVelocity(70.47757318451649)
-            .yVelocity(39.92460307924766)
+            .xVelocity(70.3975724347933)
+            .yVelocity(41.62021306556041)
             .rightFrontMotorName("rfw")
             .rightRearMotorName("rbw")
             .leftRearMotorName("lbw")
@@ -95,7 +95,7 @@ public class Constants {
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1.0, 0.55);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1.0, 0.6);
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pathConstraints(pathConstraints)
