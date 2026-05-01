@@ -93,10 +93,10 @@ object AutonUtil {
     )
 
     val delayStartShoot: Double = 1.4
-    val delayBeforeShoot: Double = 0.4
+    val delayBeforeShoot: Double = 0.6
     val delayAfterEachShoot: Double = 0.38 //currently at a really high #
-    val delayFromRampIntake: Double = 0.67000000676767676767676767
-    val delayInIntake: Double = 0.5
+    val delayFromRampIntake: Double = 0.67
+    val delayInIntake: Double = 0.7
     val delayAtLever: Double = 0.0
 
 
@@ -121,9 +121,10 @@ object AutonUtil {
         return SequentialGroup(
             TravelCommand,
             FollowPath(followedPath!!), //robot goes to intake
-//            Delay(delayAtLever),
-            IntakeCommand,
-            FollowPath(goBackPath!!),
+            ParallelGroup(
+                IntakeCommand,
+                FollowPath(goBackPath!!),
+            ),
             Delay(delayFromRampIntake),
         )
     }
@@ -220,6 +221,7 @@ open class AutonBase(
     var lastTime = 0.0;
     var lastInTriangle = 0.0;
     var startTime = 0.0;
+    var lastWorkingPose = Pose(0.0, 0.0, 0.0)
     override fun onUpdate() {
         val dx = goalX - PedroComponent.follower.pose.x
         val dy = goalY - PedroComponent.follower.pose.y
@@ -248,34 +250,52 @@ open class AutonBase(
         val dxyp = { accelFactor: Double -> hypot(dxp(accelFactor), dyp(accelFactor)) }
         val sotmFactor = if (runtime - startTime < 6.7) 1.0 else 0.0
         val dist = { accelFactor: Double -> dxyp(accelFactor) * sotmFactor + dxy * (1 - sotmFactor) }
-        ShooterSubsystem.AutoAim(
-            dist(0.0),
-            { dist ->
-                (
-                        if (PedroComponent.follower.pose.y < BORD_Y)
-                            distanceToVelocityFar(dist)
-                        else
-                            distanceToVelocityClose(dist)
-                        )
-            }
-        )()
-        TurretThetaSubsystem.SetThetaPos(
-            (
-                    if (PedroComponent.follower.pose.y < BORD_Y)
+
+        if (PedroComponent.follower.pose.y < BORD_Y) {
+            // far zone
+            if (runtime < 0.5) {
+                TurretThetaSubsystem.SetThetaPos(0.7)()
+            } else {
+                if (inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 32.0) == 2) {
+                    TurretThetaSubsystem.SetThetaPos(
                         distAndVeloToNewThetaFar(dist(0.0), ShooterSubsystem.velocity)
-                    else
-                        distAndVeloToNewThetaClose(dist(0.0), ShooterSubsystem.velocity)
-                    )
-        )()
-        TurretPhiSubsystem.AutoAim(
-            dxp(0.0) * sotmFactor + dx * (1 - sotmFactor),
-            dyp(0.0) * sotmFactor + dy * (1 - sotmFactor),
-            PedroComponent.follower.heading.rad
-        )()
+                    )()
+                }
+            }
+            if (inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 32.0) == 2){
+                ShooterSubsystem.AutoAim(
+                    dist(0.0), { dist -> distanceToVelocityFar(dist) }
+                )()
+                TurretPhiSubsystem.AutoAim(
+                    dxp(0.0) * sotmFactor + dx * (1 - sotmFactor),
+                    dyp(0.0) * sotmFactor + dy * (1 - sotmFactor),
+                    PedroComponent.follower.pose.heading.rad
+                )()
+            }
+        } else {
+            // close zone
+            if (inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 32.0) == 1) {
+                ShooterSubsystem.AutoAim(
+                    dist(0.02), { dist -> distanceToVelocityClose(dist) }
+                )()
+                TurretThetaSubsystem.SetThetaPos(
+                    distAndVeloToNewThetaClose(dist(0.02), ShooterSubsystem.velocity)
+                )()
+                TurretPhiSubsystem.AutoAim(
+                    dxp(0.02) * sotmFactor + dx * (1 - sotmFactor),
+                    dyp(0.02) * sotmFactor + dy * (1 - sotmFactor),
+                    PedroComponent.follower.pose.heading.rad
+                )()
+            }
+        }
         lastPose = PedroComponent.follower.pose;
         lastVX = vx;
         lastVY = vy;
         lastTime = runtime
+
+        if (PedroComponent.follower.pose.x != 0.0) {
+            lastWorkingPose = PedroComponent.follower.pose
+        }
 
 //        val inTriangle = inTriangle(PedroComponent.follower.pose.x, PedroComponent.follower.pose.y, 6.0);
 //        if (inTriangle >= 1 && AutonUtil.canShoot) {
@@ -334,14 +354,23 @@ open class AutonBase(
 
     /** We do not use this because everything should automatically disable  */
     override fun onStop() {
-        val file = File(Lefile.filePath)
+        var file = File(Lefile.filePath)
         file.delete()
         file.createNewFile()
         while (!file.canWrite()) {}
         file.writeText(
-            PedroComponent.follower.pose.x.toString().trim() + ";" +
-                    PedroComponent.follower.pose.y.toString().trim() + ";" +
-                    PedroComponent.follower.pose.heading.toString().trim()
+            lastWorkingPose.x.toString().trim() + ";" +
+                    lastWorkingPose.y.toString().trim() + ";" +
+                    lastWorkingPose.heading.toString().trim()
+        )
+        file = File(Lefile.backupFilePath)
+        file.delete()
+        file.createNewFile()
+        while (!file.canWrite()) {}
+        file.writeText(
+            lastWorkingPose.x.toString().trim() + ";" +
+                    lastWorkingPose.y.toString().trim() + ";" +
+                    lastWorkingPose.heading.toString().trim()
         )
     }
 }

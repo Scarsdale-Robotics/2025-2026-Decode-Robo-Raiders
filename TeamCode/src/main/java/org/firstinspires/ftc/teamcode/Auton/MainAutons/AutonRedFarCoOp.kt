@@ -43,8 +43,8 @@ import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 @Autonomous(name = "[F-COOP-18-B] Auton Red Far CoOp", group = "Auton")
 class AutonRedFarCoOp : AutonBase(
     false,
-    144.0 - 3.5,
-    144.0 - 3.5,
+    144.0 - 7.5,
+    144.0 - 2.5,
     AutonPositions.Red(AutonPositions.startPose),
     { isBlue, follower -> {
 //        var Portal = CvBallDetectionP(hardwareMap)
@@ -53,7 +53,7 @@ class AutonRedFarCoOp : AutonBase(
         val DOWN = Ang(270.deg.inRad, isBlue)
         val LEFT = Ang(180.deg.inRad, isBlue)
 
-        val xIntakeThreshold = 50.0
+        val xIntakeThreshold = 55.0
         val xCommonThreshold = 45.5
 
         val startPose = Pos(AutonPositions.startPose, isBlue)

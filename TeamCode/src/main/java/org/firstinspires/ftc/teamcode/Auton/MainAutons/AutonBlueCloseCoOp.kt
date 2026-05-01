@@ -34,8 +34,8 @@ import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.parkRobot
 @Autonomous(name = "[C-COOP-18-B] Auton Blue Close CoOp", group = "Auton")
 class AutonBlueCloseCoOp : AutonBase(
     true,
-    4.5,
-    144.0 - 5.5,
+    0.5,
+    144.0 - 5.0,
     AutonPositions.Blue(AutonPositions.startPoseClose),
     { isBlue, follower -> {
         val pb = { follower.pathBuilder() }
@@ -86,7 +86,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakePose = Pos(Pose(16.75, 58.5), isBlue)
+        val gateIntakePose = Pos(Pose(18.67, 58.5), isBlue)
         val gateIntakePath = pb().addPath(BezierLine(shoot2Pose, gateIntakePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
@@ -105,7 +105,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakeBackupPose = Pos(Pose(15.0, 54.2), isBlue)
+        val gateIntakeBackupPose = Pos(Pose(14.25, 54.2), isBlue)
         val gateIntakeBackupPath = pb().addPath(BezierLine(gateIntakePose, gateIntakeBackupPose))
             .setLinearHeadingInterpolation(GATE_INITIAL, GATE)
             .setTimeoutConstraint(0.0)
@@ -133,7 +133,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val shoot1Pose = Pos(Pose(56.7, 97.0), isBlue)
+        val shoot1Pose = Pos(Pose(60.1, 97.5), isBlue)
         val shoot1Path = pb().addPath(BezierLine(setLine1Pose, shoot1Pose))
             .setConstantHeadingInterpolation(DOWN_LEFT)
             .setTimeoutConstraint(0.0)

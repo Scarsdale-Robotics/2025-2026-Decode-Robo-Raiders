@@ -184,7 +184,7 @@ open class TeleOpBase(
     override fun onInit() {
         val file = File(Lefile.filePath)
         while (!file.canRead()) {}
-        val content = file.readText().split("\n")
+        val content = file.readText().split(";")
         val startX = content[0].toDouble()
         val startY = content[1].toDouble()
         val startH = content[2].toDouble()
@@ -452,7 +452,7 @@ open class TeleOpBase(
         var i = 0
         while (startX == 0.0) {
             if (i > 5) break;
-            val file = File(Lefile.filePath)
+            val file = if (i < 2) File(Lefile.filePath) else File(Lefile.backupFilePath)
             val content = file.readText().split(";")
             startX = content[0].toDouble()
             startY = content[1].toDouble()
@@ -469,9 +469,9 @@ open class TeleOpBase(
             PedroComponent.follower.update()
         }
 
-        Gamepads.gamepad2.touchpad whenBecomesTrue {
-            PedroComponent.follower.pose = Pose(startX, startY, startH)
-        }
+//        Gamepads.gamepad2.touchpad whenBecomesTrue {
+//            PedroComponent.follower.pose = Pose(startX, startY, startH)
+//        }
 
         MagblockServoSubsystem.unblock();
         MagblockServoSubsystem.block()
@@ -882,17 +882,19 @@ open class TeleOpBase(
 
             if (y < BORD_Y) {
                 // far zone
-                if (inTriangle(x, y, 32.0) == 2){
-                    ShooterSubsystem.AutoAim(
-                        dist(0.02), { dist -> distanceToVelocityFar(dist) + veloTrim }
-                    )()
-                    if (runtime < 1.5) {
-                        TurretThetaSubsystem.SetThetaPos(0.7)()
-                    } else {
+                if (runtime < 1.5) {
+                    TurretThetaSubsystem.SetThetaPos(0.7)()
+                } else {
+                    if (inTriangle(x, y, 32.0) == 2) {
                         TurretThetaSubsystem.SetThetaPos(
                             distAndVeloToThetaFar(dist(0.02), ShooterSubsystem.velocity) + hoodTrim
                         )()
                     }
+                }
+                if (inTriangle(x, y, 32.0) == 2){
+                    ShooterSubsystem.AutoAim(
+                        dist(0.02), { dist -> distanceToVelocityFar(dist) + veloTrim }
+                    )()
                     TurretPhiSubsystem.AutoAim(
                         dxp(0.02) * sotmFactor + dx * (1 - sotmFactor),
                         dyp(0.02) * sotmFactor + dy * (1 - sotmFactor),
@@ -945,9 +947,9 @@ open class TeleOpBase(
         file.createNewFile()
         while (!file.canWrite()) {}
         file.writeText(
-            x.toString() + "\n" +
-                    y.toString() + "\n" +
-                    h.inRad.toString() + "\n"
+            x.toString() + ";" +
+                    y.toString() + ";" +
+                    h.inRad.toString()
         )
     }
 

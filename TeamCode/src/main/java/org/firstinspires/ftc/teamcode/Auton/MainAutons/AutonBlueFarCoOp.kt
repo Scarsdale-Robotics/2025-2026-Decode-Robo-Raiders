@@ -53,7 +53,7 @@ class AutonBlueFarCoOp : AutonBase(
         val DOWN = Ang(270.deg.inRad, isBlue)
         val LEFT = Ang(180.deg.inRad, isBlue)
 
-        val xIntakeThreshold = 50.0
+        val xIntakeThreshold = 55.0
         val xCommonThreshold = 45.5
 
         val startPose = Pos(AutonPositions.startPose, isBlue)

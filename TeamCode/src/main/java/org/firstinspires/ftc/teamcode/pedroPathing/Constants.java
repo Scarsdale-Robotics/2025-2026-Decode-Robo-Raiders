@@ -48,16 +48,16 @@ public class Constants {
                     0.0003
             ))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.01,
+                    0.014,
                     0,
-                    0.0016, //0.0015
+                    0.0022, //0.0015
                     0,
-                    0.07
+                    0.067
             ))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(
-                    0.1,
-                    0.00001,
-                    0.0008, //0.00067
+                    0.12,
+                    0.000007,
+                    0.0014, //0.00067
                     0.0,
                     0.01
             ))
@@ -95,7 +95,7 @@ public class Constants {
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1.0, 0.6);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1.0, 0.55);
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pathConstraints(pathConstraints)
