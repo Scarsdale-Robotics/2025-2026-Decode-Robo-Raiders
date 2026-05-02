@@ -12,6 +12,7 @@ import dev.nextftc.core.commands.delays.Delay
 import dev.nextftc.core.commands.groups.ParallelGroup
 import dev.nextftc.core.commands.groups.SequentialGroup
 import dev.nextftc.core.units.deg
+import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
 import dev.nextftc.extensions.pedro.PedroComponent
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
@@ -30,11 +31,12 @@ import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotGoShoot
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotIntake
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.robotShoot
 import org.firstinspires.ftc.teamcode.Auton.MainAutons.AutonUtil.parkRobot
+import kotlin.math.PI
 
 @Autonomous(name = "[C-COOP-18-B] Auton Blue Close CoOp", group = "Auton")
 class AutonBlueCloseCoOp : AutonBase(
     true,
-    0.5,
+    1.5,
     144.0 - 5.0,
     AutonPositions.Blue(AutonPositions.startPoseClose),
     { isBlue, follower -> {
@@ -44,7 +46,7 @@ class AutonBlueCloseCoOp : AutonBase(
         val LEFT = Ang(180.deg.inRad, isBlue)
         val DOWN_LEFT = Ang(225.deg.inRad, isBlue)
         val GATE_INITIAL = Ang(160.deg.inRad, isBlue)
-        val GATE = Ang(110.deg.inRad, isBlue)
+        val GATE = Ang(2.76990259 - 10.5.deg.inRad, isBlue)
 
         val xIntakeThreshold = 51.0
         val gateXIntakeThreshold = 35.0
@@ -86,7 +88,7 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakePose = Pos(Pose(18.67, 58.5), isBlue)
+        val gateIntakePose = Pos(Pose(18.67 - 0.5, 58.0 - 0.75), isBlue)
         val gateIntakePath = pb().addPath(BezierLine(shoot2Pose, gateIntakePose))
             .setHeadingInterpolation(
                 HeadingInterpolator.piecewise(
@@ -105,7 +107,8 @@ class AutonBlueCloseCoOp : AutonBase(
             .setTimeoutConstraint(0.0)
             .build()
 
-        val gateIntakeBackupPose = Pos(Pose(14.25, 54.2), isBlue)
+//        val gateIntakeBackupPose = Pos(Pose(14.25, 54.2), isBlue)
+        val gateIntakeBackupPose = Pos(Pose(17.4 + 19.2897-17.6654 - 2.3, 59.1617+115.3662-117.7027 + 1.2), isBlue)
         val gateIntakeBackupPath = pb().addPath(BezierLine(gateIntakePose, gateIntakeBackupPose))
             .setLinearHeadingInterpolation(GATE_INITIAL, GATE)
             .setTimeoutConstraint(0.0)

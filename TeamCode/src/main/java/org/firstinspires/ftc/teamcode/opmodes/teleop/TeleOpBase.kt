@@ -885,7 +885,7 @@ open class TeleOpBase(
                 if (runtime < 1.5) {
                     TurretThetaSubsystem.SetThetaPos(0.7)()
                 } else {
-                    if (inTriangle(x, y, 32.0) == 2) {
+                    if (inTriangle(x, y, 16.0) == 2) {
                         TurretThetaSubsystem.SetThetaPos(
                             distAndVeloToThetaFar(dist(0.02), ShooterSubsystem.velocity) + hoodTrim
                         )()

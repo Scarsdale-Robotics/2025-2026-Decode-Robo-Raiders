@@ -12,7 +12,8 @@ object AutonPositions {
 //    val startPoseClose = Pose(17.1887, 115.3623, Math.toRadians(270.0))
 //    val startPoseClose = Pose(15.0, 115.3623, Math.toRadians(270.0))
     val startPoseClose = Pose(18.1897, 115.3662, Math.toRadians(270.0))
-
+//
+    //
     val startAutonControlPos = Pose(95.3, 58.5)
 
     val farShootPoseCoOp = Pose(56.9, 12.7, Math.toRadians(180.0));

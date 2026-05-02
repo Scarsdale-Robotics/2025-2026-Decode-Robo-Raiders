@@ -40,11 +40,11 @@ import kotlin.math.atan2
 import dev.nextftc.ftc.ActiveOpMode.hardwareMap
 import org.firstinspires.ftc.teamcode.subsystems.lower.MagblockServoSubsystem
 
-@Autonomous(name = "[F-COOP-18-R] Auton Red Far CoOp", group = "Auton")
+@Autonomous(name = "[F-COOP-18-B] Auton Red Far CoOp", group = "Auton")
 class AutonRedFarCoOp : AutonBase(
     false,
-    144.0 - 7.5,
-    144.0 - 2.5,
+    144.0 - 9.3,
+    144.0 - 3.7,
     AutonPositions.Red(AutonPositions.startPose),
     { isBlue, follower -> {
 //        var Portal = CvBallDetectionP(hardwareMap)
@@ -54,7 +54,7 @@ class AutonRedFarCoOp : AutonBase(
         val LEFT = Ang(180.deg.inRad, isBlue)
 
         val xIntakeThreshold = 55.0
-        val xCommonThreshold = 45.5
+        val xCommonThreshold = 48.5
 
         val startPose = Pos(AutonPositions.startPose, isBlue)
 
@@ -64,7 +64,7 @@ class AutonRedFarCoOp : AutonBase(
             .setConstantHeadingInterpolation(LEFT)
 //            .setLinearHeadingInterpolation(LEFT, FRIED, 1.0, 0.75)
             .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold }, IntakeCommand)
-//            .setTimeoutConstraint(0.0)
+            .setTimeoutConstraint(0.0)
             .build()
 
         val shoot1Pose = Pos(Pose(53.9, 12.7), isBlue)
@@ -78,26 +78,26 @@ class AutonRedFarCoOp : AutonBase(
         val setCommonPath = pb().addPath(BezierLine(shoot1Pose, setCommonPose))
             .setConstantHeadingInterpolation(LEFT)
             .addCallback({ X(follower.pose.x, isBlue) < xCommonThreshold }, IntakeCommand)
-//            .setTimeoutConstraint(0.0)
+            .setTimeoutConstraint(0.0)
             .build()
 
         val setCommonShootPath = pb().addPath(BezierLine(setCommonPose, shoot1Pose))
 //            .setConstantHeadingInterpolation(DOWN_LEFT)
             .setHeadingInterpolation(HeadingInterpolator.tangent.reverse())
-//            .setTimeoutConstraint(0.0)
+            .setTimeoutConstraint(0.0)
             .build()
 
         val setCommonPose2 = Pos(Pose(13.4, 20.0), isBlue)
         val setCommonPath2 = pb().addPath(BezierLine(shoot1Pose, setCommonPose2))
             .setConstantHeadingInterpolation(LEFT)
             .addCallback({ X(follower.pose.x, isBlue) < xCommonThreshold }, IntakeCommand)
-//            .setTimeoutConstraint(0.0)
+            .setTimeoutConstraint(0.0)
             .build()
 
         val setCommonShootPath2 = pb().addPath(BezierLine(setCommonPose2, shoot1Pose))
 //            .setConstantHeadingInterpolation(DOWN_LEFT)
             .setHeadingInterpolation(HeadingInterpolator.tangent.reverse())
-//            .setTimeoutConstraint(0.0)
+            .setTimeoutConstraint(0.0)
             .build()
 
 //        fun getBlobPath(): PathChain {
@@ -160,14 +160,14 @@ class AutonRedFarCoOp : AutonBase(
         val setParkPose = Pos(Pose(44.4, 15.3), isBlue)
         val parkPath = pb().addPath(BezierLine(shoot1Pose, setParkPose))
 //            .setConstantHeadingInterpolation(DOWN_LEFT)
-//            .setTimeoutConstraint(0.0)
+            .setTimeoutConstraint(0.0)
             .build()
 
         SequentialGroup(
             // 3
             SequentialGroup(
                 MagblockServoSubsystem.unblock,
-                Delay(1.5),
+                Delay(1.6),
                 robotShoot()
             ),
 
@@ -178,33 +178,33 @@ class AutonRedFarCoOp : AutonBase(
 
             // 9
             robotIntake(setCommonPath),
-            Delay(0.15),
+//            Delay(0.15),
             robotGoShoot(setCommonShootPath),
             robotShoot(),
 
             // 12
             robotIntake(setCommonPath2),
-            Delay(0.15),
+//            Delay(0.15),
             robotGoShoot(setCommonShootPath2),
             robotShoot(),
 
             // 15
             robotIntake(setCommonPath),
-            Delay(0.15),
+//            Delay(0.15),
             robotGoShoot(setCommonShootPath),
             robotShoot(),
 
             // 18
             robotIntake(setCommonPath2),
-            Delay(0.15),
+//            Delay(0.15),
             robotGoShoot(setCommonShootPath2),
             robotShoot(),
 
             // 21
-//            robotIntake(setCommonPath),
+            robotIntake(setCommonPath),
 //            Delay(0.2),
-//            robotGoShoot(setCommonShootPath),
-//            robotShoot(),
+            robotGoShoot(setCommonShootPath),
+            robotShoot(),
 
             parkRobot(parkPath)
 

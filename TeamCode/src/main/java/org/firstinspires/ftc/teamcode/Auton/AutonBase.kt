@@ -18,6 +18,7 @@ import dev.nextftc.core.commands.utility.InstantCommand
 import dev.nextftc.core.components.SubsystemComponent
 import dev.nextftc.core.units.rad
 import dev.nextftc.extensions.pedro.FollowPath
+import dev.nextftc.extensions.pedro.TurnTo
 import dev.nextftc.extensions.pedro.PedroComponent
 import dev.nextftc.ftc.NextFTCOpMode
 import org.firstinspires.ftc.teamcode.Auton.AutonPositions
@@ -92,11 +93,11 @@ object AutonUtil {
         IntakeMotorSubsystem.intake,
     )
 
-    val delayStartShoot: Double = 1.4
-    val delayBeforeShoot: Double = 0.5867
+    val delayStartShoot: Double = 1.5
+    val delayBeforeShoot: Double = 0.53
     val delayAfterEachShoot: Double = 0.38 //currently at a really high #
-    val delayFromRampIntake: Double = 0.67
-    val delayInIntake: Double = 0.7
+    val delayFromRampIntake: Double = 1.11
+    val delayInIntake: Double = 0.5
     val delayAtLever: Double = 0.0
 
 
@@ -128,6 +129,17 @@ object AutonUtil {
             Delay(delayFromRampIntake),
         )
     }
+
+//    fun robotGateIntakeExperi(followedPath: PathChain?, radians: Double?): Command {
+//        return SequentialGroup(
+//            TravelCommand,
+//            FollowPath(followedPath!!), //robot goes to intake
+//            ParallelGroup(
+//                IntakeCommand,
+//            ),
+//            Delay(delayFromRampIntake),
+//        )
+//    }
     fun robotGateIntakeOneShot(followedPath: PathChain): Command {
         return SequentialGroup(
             TravelCommand,
@@ -248,10 +260,11 @@ open class AutonBase(
         val dxp = { accelFactor: Double -> dx - 1.0 * vx * timeFactor - accelFactor * ax * timeFactor * timeFactor }
         val dyp = { accelFactor: Double -> dy - 1.0 * vy * timeFactor - accelFactor * ay * timeFactor * timeFactor }
         val dxyp = { accelFactor: Double -> hypot(dxp(accelFactor), dyp(accelFactor)) }
-        val sotmFactor = if (runtime - startTime < 6.7) 1.0 else 0.0
+        var sotmFactor = if (runtime - startTime < 6.7) 1.0 else 0.0
         val dist = { accelFactor: Double -> dxyp(accelFactor) * sotmFactor + dxy * (1 - sotmFactor) }
 
         if (PedroComponent.follower.pose.y < BORD_Y) {
+            sotmFactor = 0.0
             // far zone
             if (runtime < 0.5) {
                 TurretThetaSubsystem.SetThetaPos(0.7)()

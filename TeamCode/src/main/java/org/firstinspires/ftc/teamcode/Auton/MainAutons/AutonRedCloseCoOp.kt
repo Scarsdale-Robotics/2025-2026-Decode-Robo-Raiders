@@ -66,7 +66,7 @@ class AutonRedCloseCoOp : AutonBase(
 //            .setLinearHeadingInterpolation(LEFT, FRIED, 1.0, 0.75)
             .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold }, IntakeCommand)
 //            .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold - 4.0 }, intakePower)
-            .setTimeoutConstraint(0.0)
+//            .setTimeoutConstraint(0.0)
             .build()
 
         val experi_L2 = Pos(Pose(22.0+C-2.5, 61.0), isBlue)
@@ -76,7 +76,7 @@ class AutonRedCloseCoOp : AutonBase(
 //            .setLinearHeadingInterpolation(LEFT, FRIED, 1.0, 0.75)
 //            .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold }, IntakeCommand)
 //            .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold - 4.0 }, intakePower)
-            .setTimeoutConstraint(0.0)
+//            .setTimeoutConstraint(0.0)
             .build()
 
 
@@ -84,7 +84,7 @@ class AutonRedCloseCoOp : AutonBase(
         val shoot2Path = pb().addPath(BezierLine(experi_L2, shoot2Pose)) //was setLine2
 //            .addParametricCallback(0.0, maxPower)
             .setConstantHeadingInterpolation(LEFT)
-            .setTimeoutConstraint(0.0)
+//            .setTimeoutConstraint(0.0)
             .build()
 
         val gateIntakePose = Pos(Pose(17.4+C, 58.5), isBlue)
@@ -103,13 +103,13 @@ class AutonRedCloseCoOp : AutonBase(
                 )
             )
             .addCallback({ X(follower.pose.x, isBlue) < gateXIntakeThreshold }, IntakeCommand)
-            .setTimeoutConstraint(0.0)
+//            .setTimeoutConstraint(0.0)
             .build()
 
         val gateIntakeBackupPose = Pos(Pose(11.5+C, 52.2), isBlue)
         val gateIntakeBackupPath = pb().addPath(BezierLine(gateIntakePose, gateIntakeBackupPose))
             .setLinearHeadingInterpolation(GATE_INITIAL, GATE)
-            .setTimeoutConstraint(0.0)
+//            .setTimeoutConstraint(0.0)
             .build()
 
         val shootGatePose = shoot2Pose
@@ -124,25 +124,25 @@ class AutonRedCloseCoOp : AutonBase(
                     ),
                 )
             )
-            .setTimeoutConstraint(0.0)
+//            .setTimeoutConstraint(0.0)
             .build()
 
         val setLine1Pose = Pos(Pose(22.5+C, 85.0), isBlue)
         val setLine1Path = pb().addPath(BezierLine(shootGatePose, setLine1Pose))
             .setConstantHeadingInterpolation(LEFT)
             .addCallback({ X(follower.pose.x, isBlue) < xIntakeThreshold + 5.0}, IntakeCommand)
-            .setTimeoutConstraint(0.0)
+//            .setTimeoutConstraint(0.0)
             .build()
 
         val shoot1Pose = Pos(Pose(60.1+C-6.0, 101.0), isBlue)
         val shoot1Path = pb().addPath(BezierLine(setLine1Pose, shoot1Pose))
             .setConstantHeadingInterpolation(DOWN_LEFT)
-            .setTimeoutConstraint(0.0)
+//            .setTimeoutConstraint(0.0)
             .build()
 
         val parkPath = pb().addPath(BezierLine(shoot2Pose, AutonPositions.autonParkPose))
             .setConstantHeadingInterpolation(DOWN_LEFT)
-            .setTimeoutConstraint(0.0)
+//            .setTimeoutConstraint(0.0)
             .build()
 
         SequentialGroup(
