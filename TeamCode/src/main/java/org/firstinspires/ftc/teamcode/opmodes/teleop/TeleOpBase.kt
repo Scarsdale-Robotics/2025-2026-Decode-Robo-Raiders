@@ -182,12 +182,12 @@ open class TeleOpBase(
     var lockDirection = false;
     var lastTime = 0.0;
     override fun onInit() {
-        val file = File(Lefile.filePath)
-        while (!file.canRead()) {}
-        val content = file.readText().split(";")
-        val startX = content[0].toDouble()
-        val startY = content[1].toDouble()
-        val startH = content[2].toDouble()
+//        val file = File(Lefile.filePath)
+//        while (!file.canRead()) {}
+//        val content = file.readText().split(";")
+        val startX = 72.0
+        val startY = 72.0
+        val startH = -PI / 2
         
         PedroComponent.follower.setStartingPose(Pose(startX, startY, startH))
         PedroComponent.follower.update()
@@ -206,9 +206,9 @@ open class TeleOpBase(
 //        )
         // FIELD CENTRIC:
         driverControlled = PedroDriverControlled(
-            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { (if (abs(gamepad1.left_stick_x) > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
-            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { (if (abs(gamepad1.left_stick_y) > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive },
-            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { it * speedFactorDrive },
+            Gamepads.gamepad1.leftStickY.deadZone(0.02).map { min(speedFactorDrive, (if (abs(gamepad1.left_stick_x) > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive) },
+            Gamepads.gamepad1.leftStickX.deadZone(0.02).map { min(speedFactorDrive, (if (abs(gamepad1.left_stick_y) > 0.9) 0.0 else (if (isBlue) it else -it)) * speedFactorDrive) },
+            -Gamepads.gamepad1.rightStickX.deadZone(0.02).map { min(speedFactorDrive, it * speedFactorDrive) },
             false
         )
 //        driverControlled = PedroDriverControlled(
@@ -431,7 +431,7 @@ open class TeleOpBase(
     private var veloTrim = 0;
     private var hoodTrim = 0.0;
 
-    var speedFactorDrive = 1.0;
+    var speedFactorDrive = 0.5;
     var speedFactorIntake = 1.0;
     var shootTransferSpeedFactor = 1.0;
     var lowerOverridePower = 0.0;
@@ -443,31 +443,31 @@ open class TeleOpBase(
     override fun onStartButtonPressed() {
         TurretPhiSubsystem.started = true;
 
-        val file = File(Lefile.filePath)
-        val content = file.readText(Charsets.UTF_8).split(";")
-        var startX = content[0].toDouble()
-        var startY = content[1].toDouble()
-        var startH = content[2].toDouble()
+//        val file = File(Lefile.filePath)
+//        val content = file.readText(Charsets.UTF_8).split(";")
+        val startX = 72.0
+        val startY = 72.0
+        val startH = -PI / 2
 
-        var i = 0
-        while (startX == 0.0) {
-            if (i > 5) break;
-            val file = if (i < 2) File(Lefile.filePath) else File(Lefile.backupFilePath)
-            val content = file.readText().split(";")
-            startX = content[0].toDouble()
-            startY = content[1].toDouble()
-            startH = content[2].toDouble()
-            i++
-        }
+//        var i = 0
+//        while (startX == 0.0) {
+//            if (i > 5) break;
+//            val file = if (i < 2) File(Lefile.filePath) else File(Lefile.backupFilePath)
+//            val content = file.readText().split(";")
+//            startX = content[0].toDouble()
+//            startY = content[1].toDouble()
+//            startH = content[2].toDouble()
+//            i++
+//        }
 
 //        PedroComponent.follower.pose = Pose(72.0, 72.0, -PI / 2)
         PedroComponent.follower.pose = Pose(startX, startY, startH)
         PedroComponent.follower.update()
 
-        if (PedroComponent.follower.pose.x < 1.0) {
-            PedroComponent.follower.pose = Pose(startX, startY, startH)
-            PedroComponent.follower.update()
-        }
+//        if (PedroComponent.follower.pose.x < 1.0) {
+//            PedroComponent.follower.pose = Pose(startX, startY, startH)
+//            PedroComponent.follower.update()
+//        }
 
 //        Gamepads.gamepad2.touchpad whenBecomesTrue {
 //            PedroComponent.follower.pose = Pose(startX, startY, startH)
